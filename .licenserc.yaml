@@ -1,0 +1,53 @@
+# Configuration for the skywalking-eyes tool, for copyright notice enforcement in this repo.
+#
+# Additional syntax options for this configuration file that are supported by the tool are
+# described in the tool's own documentation here: https://github.com/apache/skywalking-eyes.
+#
+# USAGE
+# -------
+# To check files:
+#    > docker run  --rm -v $(pwd):/github/workspace ghcr.io/apache/skywalking-eyes/license-eye:785bb7f3810572d6912666b4f64bad28e4360799 -v info -c .licenserc.yaml header check
+# To fix files automatically:
+#    > docker run  --rm -v $(pwd):/github/workspace ghcr.io/apache/skywalking-eyes/license-eye:785bb7f3810572d6912666b4f64bad28e4360799 -v info -c .licenserc.yaml header fix
+#
+header:
+  license:
+    spdx-id: N/A
+    copyright-owner: DataRobot, Inc.
+    content: |-
+      Copyright 2022 DataRobot, Inc. and its affiliates.
+
+      All rights reserved.
+
+      This is proprietary source code of DataRobot, Inc. and its affiliates.
+
+      Released under the terms of DataRobot Tool and Utility Agreement.
+
+  paths:
+    # do NOT modify the next line as it is used by the groovy script in the CI pipeline
+    # INSERT_FILES_FROM_PULL_REQUEST_HERE
+    - ''
+    # - You can temporarily list files below which will be checked when running the tool locally.
+    # - 'new-file01.py'
+    - '**/*.py'
+
+  paths-ignore:
+    # these files/directories should not be analyzed
+    # by default, .git and the entries in .gitignore are already ignored
+    # - You can temporarily list files below which will be ignored when running the tool locally.
+    # - 'scratch.py'
+    - 'build/'
+
+    # these files appear to have come from the Internet, and do not belong to DataRobot
+    #
+    # - ''
+
+    # the following files are questionable at the moment, as they already
+    # contain author/copyright/license of some kind (though could be a false positive!).
+    # these need to be handled on a case by case basis. once addressed,
+    # they need to be removed from this list.
+    #
+    # - ''
+
+
+  comment: on-failure
