@@ -5,8 +5,9 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+from datetime import datetime
+
 from airflow.decorators import dag
-from airflow.utils.dates import days_ago
 
 from datarobot_provider.operators.datarobot import (
     CreateProjectOperator,
@@ -16,20 +17,13 @@ from datarobot_provider.operators.datarobot import (
 )
 from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor, ScoringCompleteSensor
 
-# These args will get passed on to each operator
-# You can override them on a per-task basis during operator initialization
-default_args = {
-    'owner': 'airflow',
-}
-
 
 @dag(
-    default_args=default_args,
     schedule_interval=None,
-    start_date=days_ago(2),
+    start_date=datetime(2022, 1, 1),
     tags=['example'],
 )
-def DataRobot_Pipeline():
+def datarobot_pipeline():
     create_project_op = CreateProjectOperator(task_id='create_project')
 
     train_models_op = TrainModelsOperator(
@@ -63,4 +57,4 @@ def DataRobot_Pipeline():
     )
 
 
-datarobot_pipeline = DataRobot_Pipeline()
+datarobot_pipeline_dag = datarobot_pipeline()
