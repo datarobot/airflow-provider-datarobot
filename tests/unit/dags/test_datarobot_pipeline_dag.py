@@ -8,7 +8,7 @@
 import pytest
 from airflow.models import DagBag
 
-from datarobot_provider.example_dags.datarobot_pipeline_dag import DataRobot_Pipeline
+from datarobot_provider.example_dags.datarobot_pipeline_dag import datarobot_pipeline
 
 
 @pytest.fixture()
@@ -17,7 +17,7 @@ def dagbag(provider_dir):
 
 
 def test_dag_loaded(dagbag):
-    dag = dagbag.get_dag(dag_id="DataRobot_Pipeline")
+    dag = dagbag.get_dag(dag_id="datarobot_pipeline")
     assert dagbag.import_errors == {}
     assert dag is not None
     assert len(dag.tasks) == 6
@@ -32,7 +32,7 @@ def assert_dag_dict_equal(source, dag):
 
 
 def test_dag_structure():
-    dag = DataRobot_Pipeline()
+    dag = datarobot_pipeline()
     assert_dag_dict_equal(
         {
             "create_project": ["train_models", "check_autopilot_complete", "deploy_recommended_model"],
