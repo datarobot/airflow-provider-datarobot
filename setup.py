@@ -13,7 +13,7 @@ with open("README.md", "r") as fh:
 """Perform the package airflow-provider-datarobot setup."""
 setup(
     name='airflow-provider-datarobot',
-    version="0.0.2",
+    version="0.0.3",
     description='DataRobot Airflow provider.',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -25,7 +25,7 @@ setup(
     license='Apache License 2.0',
     packages=['datarobot_provider', 'datarobot_provider.hooks',
               'datarobot_provider.sensors', 'datarobot_provider.operators'],
-    install_requires=['apache-airflow>=2.0'],
+    install_requires=['apache-airflow>=2.0', 'datarobot>=2.28.0'],
     setup_requires=['setuptools', 'wheel'],
     author='Andrius Senulis',
     author_email='andrius.senulis@datarobot.com',

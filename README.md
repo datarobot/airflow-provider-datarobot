@@ -7,7 +7,9 @@ score predictions against the model deployment.
 
 ## Installation
 
-Prerequisites: [Apache Airflow](https://pypi.org/project/apache-airflow/)
+Prerequisites:
+- [Apache Airflow](https://pypi.org/project/apache-airflow/)
+- [DataRobot Python API client](https://pypi.org/project/datarobot/)
 
 Install the DataRobot provider:
 ```
@@ -35,7 +37,7 @@ Operators and sensors use parameters from the [config](https://airflow.apache.or
 which must be submitted when triggering the dag. Example config JSON with required parameters:
 
     {
-        "training_data": "s3-pre-signed-url-of-training-data",
+        "training_data": "s3-presigned-url-or-local-path-to-training-data",
         "project_name": "Project created from Airflow",
         "autopilot_settings": {
             "target": "readmitted"
@@ -73,10 +75,10 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
  
     Required config params:
 
-        training_data: str - pre-signed S3 URL to training dataset
+        training_data: str - pre-signed S3 URL or local path to training dataset
         project_name: str - project name
 
-    The `training_data` value must be a [pre-signed AWS S3 URL](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html).
+    In case of an S3 input, the `training_data` value must be a [pre-signed AWS S3 URL](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html).
 
     For more [project settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/v2.27.1/autodoc/api_reference.html#project) see the DataRobot docs.
 
@@ -96,7 +98,7 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
     
     For more [autopilot settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/v2.27.1/autodoc/api_reference.html#datarobot.models.Project.set_target) see the DataRobot docs.
 
-- `DeployModelOperator` - deploys a specified model to production and returns its ID
+- `DeployModelOperator` - deploys a specified model and returns the deployment ID
 
     Parameters:
 
@@ -108,7 +110,7 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
     For more [deployment settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/v2.27.1/autodoc/api_reference.html#deployment) see the DataRobot docs.
 
-- `DeployRecommendedModelOperator` - deploys a recommended model to production and returns its ID
+- `DeployRecommendedModelOperator` - deploys a recommended model and returns the deployment ID
 
     Parameters:
 
@@ -149,13 +151,13 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
 ### [Sensors](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/sensors/datarobot.py)
 
-- `AutopilotCompleteSensor` - check whether the Autopilot has completed
+- `AutopilotCompleteSensor` - checks whether the Autopilot has completed
 
     Parameters:
 
         project_id: str - DataRobot project ID
 
-- `ScoringCompleteSensor` - check whether batch scoring has completed
+- `ScoringCompleteSensor` - checks whether batch scoring has completed
 
     Parameters:
 
