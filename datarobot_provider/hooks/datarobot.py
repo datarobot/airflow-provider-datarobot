@@ -34,7 +34,11 @@ class DataRobotHook(BaseHook):
         from wtforms import PasswordField, StringField
 
         return {
-            "extra__http__endpoint": StringField(lazy_gettext('DataRobot endpoint URL'), widget=BS3TextFieldWidget()),
+            "extra__http__endpoint": StringField(
+                lazy_gettext('DataRobot endpoint URL'),
+                widget=BS3TextFieldWidget(),
+                default='https://app.datarobot.com/api/v2',
+            ),
             "extra__http__api_key": PasswordField(lazy_gettext('API Key'), widget=BS3PasswordFieldWidget()),
         }
 

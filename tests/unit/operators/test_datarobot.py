@@ -17,18 +17,15 @@ from datarobot_provider.operators.datarobot import (
 
 
 def test_operator_create_project(mocker):
-    dataset_mock = mocker.Mock()
-    dataset_mock.id = "dataset-id"
-    create_dataset_mock = mocker.patch.object(dr.Dataset, "create_from_url", return_value=dataset_mock)
     project_mock = mocker.Mock()
     project_mock.id = "project-id"
-    create_project_mock = mocker.patch.object(dr.Project, "create_from_dataset", return_value=project_mock)
+    create_project_mock = mocker.patch.object(dr.Project, "create", return_value=project_mock)
 
     operator = CreateProjectOperator(task_id='create_project')
     project_id = operator.execute(
         context={
             "params": {
-                "training_data": "s3://path/to/training_data.csv",
+                "training_data": "/path/to/s3/or/local/file",
                 "project_name": "test project",
                 "unsupervised_mode": False,
                 "use_feature_discovery": False,
@@ -37,8 +34,7 @@ def test_operator_create_project(mocker):
     )
 
     assert project_id == "project-id"
-    create_dataset_mock.assert_called_with("s3://path/to/training_data.csv")
-    create_project_mock.assert_called_with("dataset-id", project_name="test project")
+    create_project_mock.assert_called_with("/path/to/s3/or/local/file", "test project")
 
 
 def test_operator_train_models(mocker):

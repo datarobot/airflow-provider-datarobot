@@ -50,10 +50,9 @@ class CreateProjectOperator(BaseOperator):
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         # Create DataRobot project
-        self.log.info("Creating training dataset in DataRobot AI Catalog")
-        dataset = dr.Dataset.create_from_url(context["params"]["training_data"])
-        self.log.info(f"Created dataset: dataset_id={dataset.id}")
-        project = dr.Project.create_from_dataset(dataset.id, project_name=context['params']['project_name'])
+        self.log.info("Creating DataRobot project")
+        # training_data may be a pre-signed URL to a file on S3 or a path to a local file
+        project = dr.Project.create(context["params"]["training_data"], context['params']['project_name'])
         self.log.info(f"Project created: project_id={project.id}")
         project.unsupervised_mode = context['params'].get('unsupervised_mode')
         project.use_feature_discovery = context['params'].get('use_feature_discovery')
