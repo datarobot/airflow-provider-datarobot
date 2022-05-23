@@ -5,6 +5,8 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+import json
+
 from typing import Any, Dict, Iterable
 
 from airflow.exceptions import AirflowException
@@ -259,3 +261,95 @@ class ScorePredictionsOperator(BaseOperator):
             **context["params"]["score_settings"],
         )
         return job.id
+
+
+class GetTargetDriftOperator(BaseOperator):
+    """
+    Gets target drift measurements from a deployment.
+
+    :param deployment_id: DataRobot deployment ID
+    :type deployment_id: str
+    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
+    :type datarobot_conn_id: str, optional
+    :return: Drift stats for a Deployment's target
+    :rtype: dict
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Iterable[str] = ["deployment_id"]
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Iterable[str] = ()
+    ui_color = "#f4a460"
+
+    def __init__(
+        self,
+        *,
+        deployment_id: str,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.deployment_id = deployment_id
+        self.datarobot_conn_id = datarobot_conn_id
+        if kwargs.get("xcom_push") is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Dict[str, Any]) -> str:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+        client = dr.client.get_client()
+
+        # Score data
+        self.log.info(f"Getting target drift for deployment_id={self.deployment_id}")
+
+        resp = client.get(f"deployments/{self.deployment_id}/targetDrift")
+        target_drift = resp.content.decode()
+        return json.loads(target_drift)
+
+
+class GetFeatureDriftOperator(BaseOperator):
+    """
+    Gets feature drift measurements from a deployment.
+
+    :param deployment_id: DataRobot deployment ID
+    :type deployment_id: str
+    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
+    :type datarobot_conn_id: str, optional
+    :return: Drift stats for a Deployment's features
+    :rtype: dict
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Iterable[str] = ["deployment_id"]
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Iterable[str] = ()
+    ui_color = "#f4a460"
+
+    def __init__(
+        self,
+        *,
+        deployment_id: str,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.deployment_id = deployment_id
+        self.datarobot_conn_id = datarobot_conn_id
+        if kwargs.get("xcom_push") is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Dict[str, Any]) -> str:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+        client = dr.client.get_client()
+
+        # Score data
+        self.log.info(f"Getting feature drift for deployment_id={self.deployment_id}")
+
+        resp = client.get(f"deployments/{self.deployment_id}/featureDrift")
+        feature_drift = resp.content.decode()
+        return json.loads(feature_drift)
