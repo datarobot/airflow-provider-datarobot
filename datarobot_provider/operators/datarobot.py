@@ -249,13 +249,36 @@ class ScorePredictionsOperator(BaseOperator):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
+        score_settings = context["params"]["score_settings"]
+        intake_settings = score_settings["intake_settings"]
+        intake_type = intake_settings["type"]
+
         # Score data
         self.log.info(
             f"Scoring predictions against deployment_id={self.deployment_id} "
-            f"with settings: {context['params']['score_settings']}"
+            f"with settings: {score_settings}"
         )
+
+        # The BatchPredictionJob API expects an instance of a dataset, not just
+        # a datasetId. We must fetch the dataset corresponding to the given ID
+        if intake_type == "dataset":
+            dataset_id = intake_settings.get("datasetId")
+            if not dataset_id:
+                raise ValueError(
+                    """
+                    If intake data type is `dataset`, then a `datasetId` must be supplied.
+
+                    No `datasetId` found in intake_settings.
+                    """
+                )
+            dataset = dr.Dataset.get(dataset_id)
+            intake_settings["dataset"] = dataset
+
+            # We no longer need the ID
+            del intake_settings["datasetId"]
+
         job = dr.BatchPredictionJob.score(
             self.deployment_id,
-            **context["params"]["score_settings"],
+            **score_settings,
         )
         return job.id
