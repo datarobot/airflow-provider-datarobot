@@ -30,6 +30,7 @@ def mock_airflow_connection(mocker, dr_conn_details):
                 "extra__http__endpoint": dr_conn_details["endpoint"],
                 "extra__http__api_key": dr_conn_details["api_key"],
             }
-        )
+        ),
+        conn_type="Default",
     )
     mocker.patch.dict("os.environ", AIRFLOW_CONN_DATAROBOT_DEFAULT=conn.get_uri())
