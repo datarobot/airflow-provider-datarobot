@@ -297,16 +297,11 @@ class GetTargetDriftOperator(BaseOperator):
             )
 
     def execute(self, context: Dict[str, Any]) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-        client = dr.client.get_client()
-
-        # Score data
         self.log.info(f"Getting target drift for deployment_id={self.deployment_id}")
 
-        resp = client.get(f"deployments/{self.deployment_id}/targetDrift")
-        target_drift = resp.content.decode()
-        return json.loads(target_drift)
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+        deployment = dr.Deployment.get(self.deployment_id)
+        return deployment.get_target_drift()
 
 
 class GetFeatureDriftOperator(BaseOperator):
@@ -343,13 +338,8 @@ class GetFeatureDriftOperator(BaseOperator):
             )
 
     def execute(self, context: Dict[str, Any]) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-        client = dr.client.get_client()
-
-        # Score data
         self.log.info(f"Getting feature drift for deployment_id={self.deployment_id}")
 
-        resp = client.get(f"deployments/{self.deployment_id}/featureDrift")
-        feature_drift = resp.content.decode()
-        return json.loads(feature_drift)
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+        deployment = dr.Deployment.get(self.deployment_id)
+        return deployment.get_feature_drift()

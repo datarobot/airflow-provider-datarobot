@@ -13,6 +13,8 @@ from datarobot_provider.operators.datarobot import (
     DeployRecommendedModelOperator,
     ScorePredictionsOperator,
     TrainModelsOperator,
+    GetFeatureDriftOperator,
+    GetTargetDriftOperator,
 )
 
 
@@ -131,3 +133,36 @@ def test_operator_score_predictions(mocker):
 
     assert job_id == "job-id"
     score_mock.assert_called_with("deployment-id", **settings)
+
+
+def test_operator_get_target_drift(mocker):
+    deployment_id = "deployment-id"
+    from datarobot.models.data_drift import TargetDrift
+
+    mocker.patch.object(dr.Deployment, "get", return_value=dr.Deployment(deployment_id))
+    mocker.patch.object(TargetDrift, "get", return_value=TargetDrift())
+
+    operator = GetTargetDriftOperator(
+        task_id="score_predictions", deployment_id=deployment_id
+    )
+
+    target_drift = operator.execute(context=dict())
+
+    assert type(target_drift) == dr.models.data_drift.TargetDrift
+
+
+def test_operator_get_feature_drift(mocker):
+    deployment_id = "deployment-id"
+    from datarobot.models.data_drift import FeatureDrift
+
+    mocker.patch.object(dr.Deployment, "get", return_value=dr.Deployment(deployment_id))
+    mocker.patch.object(FeatureDrift, "list", return_value=[FeatureDrift()])
+
+    operator = GetFeatureDriftOperator(
+        task_id="score_predictions", deployment_id="deployment-id"
+    )
+
+    feature_drift = operator.execute(context=dict())
+
+    assert type(feature_drift) == list
+    assert all(type(fd) == dr.models.data_drift.FeatureDrift for fd in feature_drift)
