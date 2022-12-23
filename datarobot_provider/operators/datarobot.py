@@ -5,8 +5,6 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-import json
-
 from typing import Any, Dict, Iterable
 
 from airflow.exceptions import AirflowException
