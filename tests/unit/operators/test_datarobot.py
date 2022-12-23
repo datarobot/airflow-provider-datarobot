@@ -140,7 +140,7 @@ def test_operator_score_predictions(mocker):
 
 
 @pytest.fixture
-def target_drift_details():
+def drift_details():
     return {
         "period": {
             "start": datetime.fromisoformat("2000-01-01"),
@@ -150,12 +150,12 @@ def target_drift_details():
     }
 
 
-def test_operator_get_target_drift(mocker, target_drift_details):
+def test_operator_get_target_drift(mocker, drift_details):
     deployment_id = "deployment-id"
     from datarobot.models.data_drift import TargetDrift
 
-    target_drift = TargetDrift(**target_drift_details)
-    expected_target_drift = _serialize_drift(TargetDrift(**target_drift_details))
+    target_drift = TargetDrift(**drift_details)
+    expected_target_drift = _serialize_drift(TargetDrift(**drift_details))
 
     mocker.patch.object(dr.Deployment, "get", return_value=dr.Deployment(deployment_id))
     mocker.patch.object(TargetDrift, "get", return_value=target_drift)
@@ -170,23 +170,12 @@ def test_operator_get_target_drift(mocker, target_drift_details):
     assert drift == expected_target_drift
 
 
-@pytest.fixture
-def feature_drift_details():
-    return {
-        "period": {
-            "start": datetime.fromisoformat("2000-01-01"),
-            "end": datetime.fromisoformat("2000-01-07"),
-        },
-        "drift_score": 0.9,
-    }
-
-
-def test_operator_get_feature_drift(mocker, feature_drift_details):
+def test_operator_get_feature_drift(mocker, drift_details):
     deployment_id = "deployment-id"
     from datarobot.models.data_drift import FeatureDrift
 
-    feature_drift = FeatureDrift(**feature_drift_details)
-    expected_feature_drift = [_serialize_drift(FeatureDrift(**feature_drift_details))]
+    feature_drift = FeatureDrift(**drift_details)
+    expected_feature_drift = [_serialize_drift(FeatureDrift(**drift_details))]
 
     mocker.patch.object(dr.Deployment, "get", return_value=dr.Deployment(deployment_id))
     mocker.patch.object(FeatureDrift, "list", return_value=[feature_drift])
