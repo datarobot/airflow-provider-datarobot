@@ -265,13 +265,7 @@ class ScorePredictionsOperator(BaseOperator):
         if intake_type == "dataset":
             dataset_id = intake_settings.get("datasetId")
             if not dataset_id:
-                raise ValueError(
-                    """
-                    If intake data type is `dataset`, then a `datasetId` must be supplied.
-
-                    No `datasetId` found in intake_settings.
-                    """
-                )
+                raise ValueError("Invalid or missing `datasetId` value for the `dataset` intake type.")
             dataset = dr.Dataset.get(dataset_id)
             intake_settings["dataset"] = dataset
 
