@@ -250,8 +250,8 @@ class ScorePredictionsOperator(BaseOperator):
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         score_settings = context["params"]["score_settings"]
-        intake_settings = score_settings["intake_settings"]
-        intake_type = intake_settings["type"]
+        intake_settings = score_settings.get("intake_settings", dict())
+        intake_type = intake_settings.get("type")
 
         # Score data
         self.log.info(
