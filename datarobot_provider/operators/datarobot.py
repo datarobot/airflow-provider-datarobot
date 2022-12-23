@@ -259,8 +259,9 @@ class ScorePredictionsOperator(BaseOperator):
             f"with settings: {score_settings}"
         )
 
-        # The BatchPredictionJob API expects an instance of a dataset, not just
-        # a datasetId. We must fetch the dataset corresponding to the given ID
+        # The BatchPredictionJob method of the Python SDK expects an instance of
+        # a dataset, not just a datasetId. We must fetch the dataset
+        # corresponding to the given ID
         if intake_type == "dataset":
             dataset_id = intake_settings.get("datasetId")
             if not dataset_id:
