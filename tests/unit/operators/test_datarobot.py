@@ -7,6 +7,8 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 import datarobot as dr
 
+import pytest
+
 from datarobot_provider.operators.datarobot import (
     CreateProjectOperator,
     DeployModelOperator,
@@ -103,31 +105,93 @@ def test_operator_deploy_recommended_model(mocker):
     )
 
 
-def test_operator_score_predictions(mocker):
-    job_mock = mocker.Mock()
-    job_mock.id = "job-id"
-    score_mock = mocker.patch.object(dr.BatchPredictionJob, "score", return_value=job_mock)
-
-    operator = ScorePredictionsOperator(task_id="score_predictions", deployment_id="deployment-id")
-    settings = {
-        "intake_settings": {
+@pytest.fixture(
+    scope="module",
+    params=[
+        {
+            "type": "dataset",
+            "datasetId": "dataset-id",
+        },
+        {
             "type": "s3",
             "url": "s3://path/to/scoring_dataset.csv",
             "credential_id": "credential-id",
         },
+    ],
+)
+def score_settings(request):
+    return {
+        "intake_settings": request.param,
         "output_settings": {
             "type": "s3",
             "url": "s3://path/to/predictions.csv",
             "credential_id": "credential-id",
         },
     }
+
+
+def test_operator_score_predictions(mocker, score_settings):
+    job_id = "job-id"
+
+    # Mocks out the response from the BatchPredictionJob POST request
+    # rather than mocking the whole `score` method
+    post_mock = mocker.Mock()
+    post_mock.json = lambda: job_id
+    post_mock.headers = {
+        "Location": f"https://app.datarobot.com/api/v2/BatchPredictionJob/{job_id}/"
+    }
+    mocker.patch.object(dr.BatchPredictionJob._client, "post", return_value=post_mock)
+
+    job_mock = mocker.Mock()
+    job_mock.id = job_id
+    score_mock = mocker.patch.object(
+        dr.BatchPredictionJob, "get", return_value=job_mock
+    )
+
+    if score_settings["intake_settings"]["type"] == "dataset":
+        dataset_mock = mocker.Mock()
+        dataset_mock.id = "dataset-id"
+        dataset_mock.__class__ = dr.models.dataset.Dataset
+        mocker.patch.object(dr.Dataset, "get", return_value=dataset_mock)
+
+    operator = ScorePredictionsOperator(
+        task_id="score_predictions", deployment_id="deployment-id"
+    )
+
     job_id = operator.execute(
         context={
             "params": {
-                "score_settings": settings,
+                "score_settings": score_settings,
             }
         }
     )
 
     assert job_id == "job-id"
-    score_mock.assert_called_with("deployment-id", **settings)
+
+    score_mock.assert_called_with(job_id)
+
+
+def test_operator_score_predictions_fails_when_no_datasetid(mocker):
+    operator = ScorePredictionsOperator(
+        task_id="score_predictions", deployment_id="deployment-id"
+    )
+
+    # If type is `dataset` then the operator should raise a ValueError if a
+    # datasetId is not also supplied
+    with pytest.raises(ValueError) as e:
+        operator.execute(
+            context={
+                "params": {
+                    "score_settings": {
+                        "intake_settings": {
+                            "type": "dataset",
+                        },
+                        "output_settings": {
+                            "type": "s3",
+                            "url": "s3://path/to/predictions.csv",
+                            "credential_id": "credential-id",
+                        },
+                    },
+                }
+            }
+        )
