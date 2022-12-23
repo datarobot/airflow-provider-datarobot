@@ -7,6 +7,9 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 import datarobot as dr
 
+from datetime import datetime
+import pytest
+
 from datarobot_provider.operators.datarobot import (
     CreateProjectOperator,
     DeployModelOperator,
@@ -15,6 +18,7 @@ from datarobot_provider.operators.datarobot import (
     TrainModelsOperator,
     GetFeatureDriftOperator,
     GetTargetDriftOperator,
+    _serialize_drift,
 )
 
 
@@ -135,34 +139,64 @@ def test_operator_score_predictions(mocker):
     score_mock.assert_called_with("deployment-id", **settings)
 
 
-def test_operator_get_target_drift(mocker):
+@pytest.fixture
+def target_drift_details():
+    return {
+        "period": {
+            "start": datetime.fromisoformat("2000-01-01"),
+            "end": datetime.fromisoformat("2000-01-07"),
+        },
+        "drift_score": 0.9,
+    }
+
+
+def test_operator_get_target_drift(mocker, target_drift_details):
     deployment_id = "deployment-id"
     from datarobot.models.data_drift import TargetDrift
 
+    target_drift = TargetDrift(**target_drift_details)
+    expected_target_drift = _serialize_drift(TargetDrift(**target_drift_details))
+
     mocker.patch.object(dr.Deployment, "get", return_value=dr.Deployment(deployment_id))
-    mocker.patch.object(TargetDrift, "get", return_value=TargetDrift())
+    mocker.patch.object(TargetDrift, "get", return_value=target_drift)
 
     operator = GetTargetDriftOperator(
         task_id="score_predictions", deployment_id=deployment_id
     )
 
-    target_drift = operator.execute(context=dict())
+    drift = operator.execute(context=dict())
 
-    assert type(target_drift) == dr.models.data_drift.TargetDrift
+    assert type(drift) == dict
+    assert drift == expected_target_drift
 
 
-def test_operator_get_feature_drift(mocker):
+@pytest.fixture
+def feature_drift_details():
+    return {
+        "period": {
+            "start": datetime.fromisoformat("2000-01-01"),
+            "end": datetime.fromisoformat("2000-01-07"),
+        },
+        "drift_score": 0.9,
+    }
+
+
+def test_operator_get_feature_drift(mocker, feature_drift_details):
     deployment_id = "deployment-id"
     from datarobot.models.data_drift import FeatureDrift
 
+    feature_drift = FeatureDrift(**feature_drift_details)
+    expected_feature_drift = [_serialize_drift(FeatureDrift(**feature_drift_details))]
+
     mocker.patch.object(dr.Deployment, "get", return_value=dr.Deployment(deployment_id))
-    mocker.patch.object(FeatureDrift, "list", return_value=[FeatureDrift()])
+    mocker.patch.object(FeatureDrift, "list", return_value=[feature_drift])
 
     operator = GetFeatureDriftOperator(
         task_id="score_predictions", deployment_id="deployment-id"
     )
 
-    feature_drift = operator.execute(context=dict())
+    drift = operator.execute(context=dict())
 
-    assert type(feature_drift) == list
-    assert all(type(fd) == dr.models.data_drift.FeatureDrift for fd in feature_drift)
+    assert type(drift) == list
+    assert type(drift[0]) == dict
+    assert drift == expected_feature_drift

@@ -296,12 +296,13 @@ class GetTargetDriftOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Dict[str, Any]) -> Dict[str, Any]:
         self.log.info(f"Getting target drift for deployment_id={self.deployment_id}")
 
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
         deployment = dr.Deployment.get(self.deployment_id)
-        return deployment.get_target_drift()
+        drift = deployment.get_target_drift()
+        return _serialize_drift(drift)
 
 
 class GetFeatureDriftOperator(BaseOperator):
@@ -342,4 +343,14 @@ class GetFeatureDriftOperator(BaseOperator):
 
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
         deployment = dr.Deployment.get(self.deployment_id)
-        return deployment.get_feature_drift()
+        drift = deployment.get_feature_drift()
+        return [_serialize_drift(feature) for feature in drift]
+
+
+def _serialize_drift(drift_obj, date_format="%Y-%m-%d %H:%M:%s"):
+    drift_dict = drift_obj.__dict__
+    drift_dict["period"] = {
+        "start": drift_obj.period["start"].strftime(date_format),
+        "end": drift_obj.period["end"].strftime(date_format),
+    }
+    return drift_dict
