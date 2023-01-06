@@ -7,6 +7,8 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 import datarobot as dr
 
+import pytest
+
 from datarobot_provider.operators.datarobot import (
     CreateProjectOperator,
     DeployModelOperator,
@@ -103,31 +105,89 @@ def test_operator_deploy_recommended_model(mocker):
     )
 
 
-def test_operator_score_predictions(mocker):
-    job_mock = mocker.Mock()
-    job_mock.id = "job-id"
-    score_mock = mocker.patch.object(dr.BatchPredictionJob, "score", return_value=job_mock)
-
-    operator = ScorePredictionsOperator(task_id="score_predictions", deployment_id="deployment-id")
-    settings = {
-        "intake_settings": {
+@pytest.fixture(
+    scope="module",
+    params=[
+        {
+            "type": "dataset",
+            "dataset_id": "dataset-id",
+        },
+        {
             "type": "s3",
             "url": "s3://path/to/scoring_dataset.csv",
             "credential_id": "credential-id",
         },
+    ],
+)
+def score_settings(request):
+    return {
+        "intake_settings": request.param,
         "output_settings": {
             "type": "s3",
             "url": "s3://path/to/predictions.csv",
             "credential_id": "credential-id",
         },
     }
-    job_id = operator.execute(
+
+
+def test_operator_score_predictions(mocker, score_settings):
+    job_id = "job-id"
+    deployment_id = "deployment-id"
+
+    job_mock = mocker.Mock()
+    job_mock.id = job_id
+    score_mock = mocker.patch.object(dr.BatchPredictionJob, "score", return_value=job_mock)
+
+    expected_intake_settings = score_settings["intake_settings"].copy()
+
+    if score_settings["intake_settings"]["type"] == "dataset":
+        dataset_mock = mocker.Mock()
+        dataset_mock.id = "dataset-id"
+        mocker.patch.object(dr.Dataset, "get", return_value=dataset_mock)
+
+        del expected_intake_settings["dataset_id"]
+        expected_intake_settings["dataset"] = dataset_mock
+
+    operator = ScorePredictionsOperator(
+        task_id="score_predictions", deployment_id=deployment_id
+    )
+
+    result = operator.execute(
         context={
             "params": {
-                "score_settings": settings,
+                "score_settings": score_settings,
             }
         }
     )
 
-    assert job_id == "job-id"
-    score_mock.assert_called_with("deployment-id", **settings)
+    score_mock.assert_called_with(
+        deployment_id,
+        intake_settings=expected_intake_settings,
+        output_settings=score_settings["output_settings"],
+    )
+    assert result == job_id
+
+
+def test_operator_score_predictions_fails_when_no_datasetid():
+    operator = ScorePredictionsOperator(
+        task_id="score_predictions", deployment_id="deployment-id"
+    )
+
+    # should raise ValueError if intake type is `dataset` but no dataset_id is supplied
+    with pytest.raises(ValueError):
+        operator.execute(
+            context={
+                "params": {
+                    "score_settings": {
+                        "intake_settings": {
+                            "type": "dataset",
+                        },
+                        "output_settings": {
+                            "type": "s3",
+                            "url": "s3://path/to/predictions.csv",
+                            "credential_id": "credential-id",
+                        },
+                    },
+                }
+            }
+        )

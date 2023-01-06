@@ -25,6 +25,7 @@ def mock_datarobot_client(mocker, dr_conn_details):
 @pytest.fixture(scope="function", autouse=True)
 def mock_airflow_connection(mocker, dr_conn_details):
     conn = Connection(
+        conn_type="DataRobot",
         extra=json.dumps(
             {
                 "extra__http__endpoint": dr_conn_details["endpoint"],

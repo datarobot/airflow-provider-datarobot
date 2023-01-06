@@ -127,6 +127,7 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
     Prerequisites:
     - [S3 credentials added to DataRobot via Python API client](https://datarobot-public-api-client.readthedocs-hosted.com/en/v2.27.1/reference/admin/credentials.html#s3-credentials).
       You need the `creds.credential_id` for the `credential_id` parameter in the config.
+    - OR a Dataset ID in the AI Catalog
 
     Parameters:
   
@@ -147,6 +148,18 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
             }
         }
 
+    Config params for scoring a Dataset in the AI Catalog:
+
+        "score_settings": {
+            "intake_settings": {
+                "type": "dataset",
+                "dataset_id": "<datasetId>",
+            },
+            "output_settings": {
+                ...
+            }
+        }
+    
     For more [batch prediction settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/v2.27.1/autodoc/api_reference.html#batch-predictions) see the DataRobot docs.
 
 ### [Sensors](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/sensors/datarobot.py)
