@@ -8,6 +8,7 @@
 from typing import Any
 from typing import Dict
 from typing import Iterable
+from typing import List
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
@@ -371,7 +372,7 @@ class GetFeatureDriftOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Dict[str, Any]) -> List[dict]:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
