@@ -8,6 +8,9 @@ lint:
 black:
 	black .
 
+isort:
+	isort .
+
 unit-tests:
 	pytest -vv tests/unit/
 

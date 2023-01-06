@@ -5,12 +5,12 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-import pytest
-
 import datarobot as dr
+import pytest
 from datarobot.errors import AsyncProcessUnsuccessfulError
 
-from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor, ScoringCompleteSensor
+from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
+from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
 
 
 def test_sensor_autopilot_complete__success(mocker):

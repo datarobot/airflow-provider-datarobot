@@ -5,22 +5,21 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-import datarobot as dr
-from datarobot.models.data_drift import FeatureDrift, TargetDrift
-
 from datetime import datetime
-import pytest
 
-from datarobot_provider.operators.datarobot import (
-    _serialize_drift,
-    CreateProjectOperator,
-    DeployModelOperator,
-    DeployRecommendedModelOperator,
-    GetFeatureDriftOperator,
-    GetTargetDriftOperator,
-    ScorePredictionsOperator,
-    TrainModelsOperator,
-)
+import datarobot as dr
+import pytest
+from datarobot.models.data_drift import FeatureDrift
+from datarobot.models.data_drift import TargetDrift
+
+from datarobot_provider.operators.datarobot import CreateProjectOperator
+from datarobot_provider.operators.datarobot import DeployModelOperator
+from datarobot_provider.operators.datarobot import DeployRecommendedModelOperator
+from datarobot_provider.operators.datarobot import GetFeatureDriftOperator
+from datarobot_provider.operators.datarobot import GetTargetDriftOperator
+from datarobot_provider.operators.datarobot import ScorePredictionsOperator
+from datarobot_provider.operators.datarobot import TrainModelsOperator
+from datarobot_provider.operators.datarobot import _serialize_drift
 
 
 def test_operator_create_project(mocker):
