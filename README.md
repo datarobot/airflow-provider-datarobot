@@ -71,7 +71,9 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
 ### [Operators](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/operators/datarobot.py)
 
-- `CreateProjectOperator` - creates a DataRobot project and returns its ID
+- `CreateProjectOperator`
+
+    Creates a DataRobot project and returns its ID.
  
     Required config params:
 
@@ -82,7 +84,11 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
     For more [project settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#project) see the DataRobot docs.
 
-- `TrainModelsOperator` - triggers DataRobot Autopilot to train models
+    Returns a project ID.
+
+- `TrainModelsOperator`
+
+    Triggers DataRobot Autopilot to train models.
 
     Parameters:
 
@@ -98,7 +104,11 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
     
     For more [autopilot settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Project.set_target) see the DataRobot docs.
 
-- `DeployModelOperator` - deploys a specified model and returns the deployment ID
+    Returns `None`.
+
+- `DeployModelOperator`
+
+    Deploys a specified model.
 
     Parameters:
 
@@ -110,7 +120,11 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
     For more [deployment settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment) see the DataRobot docs.
 
-- `DeployRecommendedModelOperator` - deploys a recommended model and returns the deployment ID
+    Returns a deployment ID.
+
+- `DeployRecommendedModelOperator`
+
+    Deploys a recommended model.
 
     Parameters:
 
@@ -122,7 +136,11 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
     For more [deployment settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment) see the DataRobot docs.
 
-- `ScorePredictionsOperator` - scores predictions against the deployment and returns a batch prediction job ID
+    Returns a deployment ID.
+
+- `ScorePredictionsOperator`
+
+    Scores batch predictions against the deployment.
 
     Prerequisites:
     - [S3 credentials added to DataRobot via Python API client](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/admin/credentials.html#s3-credentials).
@@ -162,7 +180,11 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
     
     For more [batch prediction settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.BatchPredictionJob.score) see the DataRobot docs.
 
-- `GetTargetDriftOperator` - Gets the target drift from a deployment. Returns a JSON blob of the target drift data.
+    Returns a batch prediction job ID.
+
+- `GetTargetDriftOperator`
+
+    Gets the target drift from a deployment.
 
     Parameters:
 
@@ -174,15 +196,15 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
             ...
         }
 
-- `GetFeatureDriftOperator` - Gets the feature drift from a deployment. Returns a JSON blob of the feature drift data.
+    Returns a dict with the target drift data.
+
+- `GetFeatureDriftOperator`
+
+    Gets the feature drift from a deployment.
 
     Parameters:
 
         deployment_id: str - DataRobot deployment ID
-
-    Required config params:
-
-        None
 
     No config params are required. [Optional params](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_feature_drift) may be passed in the config as follows:
 
@@ -190,16 +212,21 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
             ...
         }
 
+    Returns a dict with the feature drift data.
 
 ### [Sensors](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/sensors/datarobot.py)
 
-- `AutopilotCompleteSensor` - checks whether the Autopilot has completed
+- `AutopilotCompleteSensor`
+
+    Checks whether the Autopilot has completed.
 
     Parameters:
 
         project_id: str - DataRobot project ID
 
-- `ScoringCompleteSensor` - checks whether batch scoring has completed
+- `ScoringCompleteSensor`
+
+    Checks whether batch scoring has completed.
 
     Parameters:
 
@@ -207,7 +234,9 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
 ### [Hooks](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/hooks/datarobot.py)
 
-- `DataRobotHook` - a hook for initializing DataRobot Public API client
+- `DataRobotHook`
+
+    A hook for initializing DataRobot Public API client.
 
 
 ## Pipeline
