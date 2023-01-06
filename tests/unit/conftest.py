@@ -18,7 +18,9 @@ def dr_conn_details():
 
 @pytest.fixture(scope="function", autouse=True)
 def mock_datarobot_client(mocker, dr_conn_details):
-    client_mock = mocker.Mock(endpoint=dr_conn_details["endpoint"], token=dr_conn_details["api_key"])
+    client_mock = mocker.Mock(
+        endpoint=dr_conn_details["endpoint"], token=dr_conn_details["api_key"]
+    )
     mocker.patch("datarobot_provider.hooks.datarobot.Client", return_value=client_mock)
 
 
@@ -31,6 +33,6 @@ def mock_airflow_connection(mocker, dr_conn_details):
                 "extra__http__endpoint": dr_conn_details["endpoint"],
                 "extra__http__api_key": dr_conn_details["api_key"],
             }
-        )
+        ),
     )
     mocker.patch.dict("os.environ", AIRFLOW_CONN_DATAROBOT_DEFAULT=conn.get_uri())

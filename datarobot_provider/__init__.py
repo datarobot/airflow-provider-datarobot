@@ -11,9 +11,14 @@ def get_provider_info():
         "name": "DataRobot Airflow Provider",
         "description": "DataRobot Airflow provider.",
         "versions": ["0.0.3"],
-        "hook-class-names": ["datarobot_provider.hooks.datarobot.DataRobotHook"],  # Deprecated in >=2.2.0
+        "hook-class-names": [
+            "datarobot_provider.hooks.datarobot.DataRobotHook"
+        ],  # Deprecated in >=2.2.0
         "connection-types": [
-            {"hook-class-name": "datarobot_provider.hooks.datarobot.DataRobotHook", "connection-type": "http"}
+            {
+                "hook-class-name": "datarobot_provider.hooks.datarobot.DataRobotHook",
+                "connection-type": "http",
+            }
         ],
         "extra-links": [],
     }

@@ -5,11 +5,14 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from typing import Any, Dict, Iterable
+from typing import Any
+from typing import Dict
+from typing import Iterable
+from typing import List
 
+import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
-import datarobot as dr
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
@@ -44,7 +47,8 @@ class CreateProjectOperator(BaseOperator):
         self.datarobot_conn_id = datarobot_conn_id
         if kwargs.get('xcom_push') is not None:
             raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead")
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
 
     def execute(self, context: Dict[str, Any]) -> str:
         # Initialize DataRobot client
@@ -53,7 +57,9 @@ class CreateProjectOperator(BaseOperator):
         # Create DataRobot project
         self.log.info("Creating DataRobot project")
         # training_data may be a pre-signed URL to a file on S3 or a path to a local file
-        project = dr.Project.create(context["params"]["training_data"], context['params']['project_name'])
+        project = dr.Project.create(
+            context["params"]["training_data"], context['params']['project_name']
+        )
         self.log.info(f"Project created: project_id={project.id}")
         project.unsupervised_mode = context['params'].get('unsupervised_mode')
         project.use_feature_discovery = context['params'].get('use_feature_discovery')
@@ -89,7 +95,8 @@ class TrainModelsOperator(BaseOperator):
         self.datarobot_conn_id = datarobot_conn_id
         if kwargs.get('xcom_push') is not None:
             raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead")
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
 
     def execute(self, context: Dict[str, Any]) -> None:
         # Initialize DataRobot client
@@ -112,7 +119,9 @@ class DeployModelMixin:
         """Deploys the provided model to production."""
         self.log.info(f"Deploying model_id={model_id} with label={label}")  # type: ignore
         prediction_server = dr.PredictionServer.list()[0]
-        deployment = dr.Deployment.create_from_learning_model(model_id, label, description, prediction_server.id)
+        deployment = dr.Deployment.create_from_learning_model(
+            model_id, label, description, prediction_server.id
+        )
         self.log.info(f"Model deployed: deployment_id={deployment.id}")  # type: ignore
         self.log.info("Enabling tracking for target drift and feature drift")  # type: ignore
         deployment.update_drift_tracking_settings(
@@ -151,7 +160,8 @@ class DeployModelOperator(BaseOperator, DeployModelMixin):
         self.datarobot_conn_id = datarobot_conn_id
         if kwargs.get('xcom_push') is not None:
             raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead")
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
 
     def execute(self, context: Dict[str, Any]) -> str:
         # Initialize DataRobot client
@@ -159,7 +169,9 @@ class DeployModelOperator(BaseOperator, DeployModelMixin):
 
         # Deploy the model
         deployment = self.deploy_model(
-            self.model_id, context['params']['deployment_label'], context['params'].get('deployment_description'),
+            self.model_id,
+            context['params']['deployment_label'],
+            context['params'].get('deployment_description'),
         )
         return deployment.id
 
@@ -194,9 +206,12 @@ class DeployRecommendedModelOperator(BaseOperator, DeployModelMixin):
         self.datarobot_conn_id = datarobot_conn_id
         if kwargs.get('xcom_push') is not None:
             raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead")
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
 
-    def deploy_recommended_model(self, project_id: str, label: str, description: str = None) -> dr.Deployment:
+    def deploy_recommended_model(
+        self, project_id: str, label: str, description: str = None
+    ) -> dr.Deployment:
         """Deploys the recommended model to production."""
         self.log.info(f"Retrieving recommended model for project_id={project_id}")
         project = dr.Project.get(project_id)
@@ -209,7 +224,9 @@ class DeployRecommendedModelOperator(BaseOperator, DeployModelMixin):
 
         # Deploy the recommended model
         deployment = self.deploy_recommended_model(
-            self.project_id, context['params']['deployment_label'], context['params'].get('deployment_description'),
+            self.project_id,
+            context['params']['deployment_label'],
+            context['params'].get('deployment_description'),
         )
         return deployment.id
 
@@ -244,7 +261,8 @@ class ScorePredictionsOperator(BaseOperator):
         self.datarobot_conn_id = datarobot_conn_id
         if kwargs.get('xcom_push') is not None:
             raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead")
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
 
     def execute(self, context: Dict[str, Any]) -> str:
         # Initialize DataRobot client
@@ -354,7 +372,7 @@ class GetFeatureDriftOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Dict[str, Any]) -> List[dict]:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 

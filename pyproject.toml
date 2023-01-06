@@ -1,0 +1,18 @@
+[tool.black]
+line-length = 100
+skip-string-normalization = true
+target-version = ['py37']
+exclude = '''
+(
+    ^/\.git/
+)
+'''
+
+[tool.isort]
+# Requires isort>5 for profile support
+# See https://pycqa.github.io/isort/docs/configuration/profiles/
+profile = "black"
+# Overrides for the profile:
+line_length = 100
+force_single_line = true
+filter_files = true

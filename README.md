@@ -80,7 +80,7 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
     In case of an S3 input, the `training_data` value must be a [pre-signed AWS S3 URL](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html).
 
-    For more [project settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/v2.27.1/autodoc/api_reference.html#project) see the DataRobot docs.
+    For more [project settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#project) see the DataRobot docs.
 
 - `TrainModelsOperator` - triggers DataRobot Autopilot to train models
 
@@ -96,7 +96,7 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
          
     `target` is a required parameter with the column name which defines the modeling target.
     
-    For more [autopilot settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/v2.27.1/autodoc/api_reference.html#datarobot.models.Project.set_target) see the DataRobot docs.
+    For more [autopilot settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Project.set_target) see the DataRobot docs.
 
 - `DeployModelOperator` - deploys a specified model and returns the deployment ID
 
@@ -108,7 +108,7 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
         deployment_label - deployment label/name
 
-    For more [deployment settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/v2.27.1/autodoc/api_reference.html#deployment) see the DataRobot docs.
+    For more [deployment settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment) see the DataRobot docs.
 
 - `DeployRecommendedModelOperator` - deploys a recommended model and returns the deployment ID
 
@@ -120,12 +120,12 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
         deployment_label: str - deployment label
 
-    For more [deployment settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/v2.27.1/autodoc/api_reference.html#deployment) see the DataRobot docs.
+    For more [deployment settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment) see the DataRobot docs.
 
 - `ScorePredictionsOperator` - scores predictions against the deployment and returns a batch prediction job ID
 
     Prerequisites:
-    - [S3 credentials added to DataRobot via Python API client](https://datarobot-public-api-client.readthedocs-hosted.com/en/v2.27.1/reference/admin/credentials.html#s3-credentials).
+    - [S3 credentials added to DataRobot via Python API client](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/admin/credentials.html#s3-credentials).
       You need the `creds.credential_id` for the `credential_id` parameter in the config.
     - OR a Dataset ID in the AI Catalog
 
@@ -160,7 +160,7 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
             }
         }
     
-    For more [batch prediction settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/v2.27.1/autodoc/api_reference.html#batch-predictions) see the DataRobot docs.
+    For more [batch prediction settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.BatchPredictionJob.score) see the DataRobot docs.
 
 - `GetTargetDriftOperator` - Gets the target drift from a deployment. Returns a JSON blob of the target drift data.
 
