@@ -1,9 +1,12 @@
 SHELL := bash
 
-.PHONY: lint unit-tests typecheck
+.PHONY: lint unit-tests typecheck black
 
 lint:
 	flake8
+
+black:
+	black .
 
 unit-tests:
 	pytest -vv tests/unit/

@@ -22,6 +22,7 @@ from datarobot_provider.operators.datarobot import (
     TrainModelsOperator,
 )
 
+
 def test_operator_create_project(mocker):
     project_mock = mocker.Mock()
     project_mock.id = "project-id"
@@ -49,13 +50,7 @@ def test_operator_train_models(mocker):
 
     operator = TrainModelsOperator(task_id="train_models", project_id="project-id")
     settings = {"target": "readmitted"}
-    operator.execute(
-        context={
-            "params": {
-                "autopilot_settings": settings
-            }
-        }
-    )
+    operator.execute(context={"params": {"autopilot_settings": settings}})
 
     project_mock.set_target.assert_called_with(**settings)
 
@@ -66,7 +61,9 @@ def test_operator_deploy_model(mocker):
     mocker.patch.object(dr.PredictionServer, "list", return_value=[pred_server_mock])
     deployment_mock = mocker.Mock()
     deployment_mock.id = "deployment-id"
-    create_mock = mocker.patch.object(dr.Deployment, "create_from_learning_model", return_value=deployment_mock)
+    create_mock = mocker.patch.object(
+        dr.Deployment, "create_from_learning_model", return_value=deployment_mock
+    )
 
     operator = DeployModelOperator(task_id="deploy_model", model_id="model-id")
     deployment_id = operator.execute(
@@ -93,9 +90,13 @@ def test_operator_deploy_recommended_model(mocker):
     mocker.patch.object(dr.PredictionServer, "list", return_value=[pred_server_mock])
     deployment_mock = mocker.Mock()
     deployment_mock.id = "deployment-id"
-    create_mock = mocker.patch.object(dr.Deployment, "create_from_learning_model", return_value=deployment_mock)
+    create_mock = mocker.patch.object(
+        dr.Deployment, "create_from_learning_model", return_value=deployment_mock
+    )
 
-    operator = DeployRecommendedModelOperator(task_id="deploy_recommended_model", project_id="project-id")
+    operator = DeployRecommendedModelOperator(
+        task_id="deploy_recommended_model", project_id="project-id"
+    )
     deployment_id = operator.execute(
         context={
             "params": {"deployment_label": "test deployment", "deployment_description": "desc"}
@@ -152,9 +153,7 @@ def test_operator_score_predictions(mocker, score_settings):
         del expected_intake_settings["dataset_id"]
         expected_intake_settings["dataset"] = dataset_mock
 
-    operator = ScorePredictionsOperator(
-        task_id="score_predictions", deployment_id=deployment_id
-    )
+    operator = ScorePredictionsOperator(task_id="score_predictions", deployment_id=deployment_id)
 
     result = operator.execute(
         context={
@@ -173,9 +172,7 @@ def test_operator_score_predictions(mocker, score_settings):
 
 
 def test_operator_score_predictions_fails_when_no_datasetid():
-    operator = ScorePredictionsOperator(
-        task_id="score_predictions", deployment_id="deployment-id"
-    )
+    operator = ScorePredictionsOperator(task_id="score_predictions", deployment_id="deployment-id")
 
     # should raise ValueError if intake type is `dataset` but no dataset_id is supplied
     with pytest.raises(ValueError):
@@ -215,11 +212,11 @@ def test_operator_get_target_drift(mocker, drift_details):
     expected_target_drift = _serialize_drift(TargetDrift(**drift_details))
 
     mocker.patch.object(dr.Deployment, "get", return_value=dr.Deployment(deployment_id))
-    get_drift_mock = mocker.patch.object(dr.Deployment, "get_target_drift", return_value=target_drift)
-
-    operator = GetTargetDriftOperator(
-        task_id="score_predictions", deployment_id=deployment_id
+    get_drift_mock = mocker.patch.object(
+        dr.Deployment, "get_target_drift", return_value=target_drift
     )
+
+    operator = GetTargetDriftOperator(task_id="score_predictions", deployment_id=deployment_id)
     target_drift_params = {"target_drift": {"model_id": "5e29a5a65a5fe66a9ce399ae"}}
 
     drift = operator.execute(context={"params": target_drift_params})
@@ -235,11 +232,11 @@ def test_operator_get_feature_drift(mocker, drift_details):
     expected_feature_drift = [_serialize_drift(drift) for drift in feature_drift]
 
     mocker.patch.object(dr.Deployment, "get", return_value=dr.Deployment(deployment_id))
-    get_drift_mock = mocker.patch.object(dr.Deployment, "get_feature_drift", return_value=feature_drift)
-
-    operator = GetFeatureDriftOperator(
-        task_id="score_predictions", deployment_id="deployment-id"
+    get_drift_mock = mocker.patch.object(
+        dr.Deployment, "get_feature_drift", return_value=feature_drift
     )
+
+    operator = GetFeatureDriftOperator(task_id="score_predictions", deployment_id="deployment-id")
     feature_drift_params = {"feature_drift": {"model_id": "5e29a5a65a5fe66a9ce399ae"}}
 
     drift = operator.execute(context={"params": feature_drift_params})

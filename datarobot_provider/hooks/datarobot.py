@@ -39,7 +39,9 @@ class DataRobotHook(BaseHook):
                 widget=BS3TextFieldWidget(),
                 default='https://app.datarobot.com/api/v2',
             ),
-            "extra__http__api_key": PasswordField(lazy_gettext('API Key'), widget=BS3PasswordFieldWidget()),
+            "extra__http__api_key": PasswordField(
+                lazy_gettext('API Key'), widget=BS3PasswordFieldWidget()
+            ),
         }
 
     @staticmethod

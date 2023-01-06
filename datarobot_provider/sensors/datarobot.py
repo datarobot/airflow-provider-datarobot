@@ -89,7 +89,9 @@ class ScoringCompleteSensor(BaseSensorOperator):
         job = dr.BatchPredictionJob.get(self.job_id)
         job_data = job.get_status()
         if job_data["status"].lower()[:5] in ["error", "abort"]:
-            raise AsyncProcessUnsuccessfulError(f"The job did not complete successfully. Job Data: {job_data}")
+            raise AsyncProcessUnsuccessfulError(
+                f"The job did not complete successfully. Job Data: {job_data}"
+            )
         if job_data["status"].lower() == "completed":
             return True
         return False

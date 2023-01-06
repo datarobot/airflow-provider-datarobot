@@ -18,13 +18,15 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     entry_points={
-        "apache_airflow_provider": [
-            "provider_info=datarobot_provider.__init__:get_provider_info"
-        ]
+        "apache_airflow_provider": ["provider_info=datarobot_provider.__init__:get_provider_info"]
     },
     license='Apache License 2.0',
-    packages=['datarobot_provider', 'datarobot_provider.hooks',
-              'datarobot_provider.sensors', 'datarobot_provider.operators'],
+    packages=[
+        'datarobot_provider',
+        'datarobot_provider.hooks',
+        'datarobot_provider.sensors',
+        'datarobot_provider.operators',
+    ],
     install_requires=['apache-airflow>=2.0', 'datarobot>=2.28.0'],
     setup_requires=['setuptools', 'wheel'],
     author='Andrius Senulis',
