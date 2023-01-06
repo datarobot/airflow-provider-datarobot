@@ -162,6 +162,35 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
     
     For more [batch prediction settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/v2.27.1/autodoc/api_reference.html#batch-predictions) see the DataRobot docs.
 
+- `GetTargetDriftOperator` - Gets the target drift from a deployment. Returns a JSON blob of the target drift data.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+
+    No config params are required. [Optional params](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_target_drift) may be passed in the config as follows:
+
+        "target_drift": {
+            ...
+        }
+
+- `GetFeatureDriftOperator` - Gets the feature drift from a deployment. Returns a JSON blob of the feature drift data.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+
+    Required config params:
+
+        None
+
+    No config params are required. [Optional params](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_feature_drift) may be passed in the config as follows:
+
+        "feature_drift": {
+            ...
+        }
+
+
 ### [Sensors](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/sensors/datarobot.py)
 
 - `AutopilotCompleteSensor` - checks whether the Autopilot has completed

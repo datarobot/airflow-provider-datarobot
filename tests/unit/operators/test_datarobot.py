@@ -6,17 +6,21 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 import datarobot as dr
+from datarobot.models.data_drift import FeatureDrift, TargetDrift
 
+from datetime import datetime
 import pytest
 
 from datarobot_provider.operators.datarobot import (
+    _serialize_drift,
     CreateProjectOperator,
     DeployModelOperator,
     DeployRecommendedModelOperator,
+    GetFeatureDriftOperator,
+    GetTargetDriftOperator,
     ScorePredictionsOperator,
     TrainModelsOperator,
 )
-
 
 def test_operator_create_project(mocker):
     project_mock = mocker.Mock()
@@ -191,3 +195,54 @@ def test_operator_score_predictions_fails_when_no_datasetid():
                 }
             }
         )
+
+
+@pytest.fixture
+def drift_details():
+    return {
+        "period": {
+            "start": datetime.fromisoformat("2000-01-01"),
+            "end": datetime.fromisoformat("2000-01-07"),
+        },
+        "drift_score": 0.9,
+    }
+
+
+def test_operator_get_target_drift(mocker, drift_details):
+    deployment_id = "deployment-id"
+
+    target_drift = TargetDrift(**drift_details)
+    expected_target_drift = _serialize_drift(TargetDrift(**drift_details))
+
+    mocker.patch.object(dr.Deployment, "get", return_value=dr.Deployment(deployment_id))
+    get_drift_mock = mocker.patch.object(dr.Deployment, "get_target_drift", return_value=target_drift)
+
+    operator = GetTargetDriftOperator(
+        task_id="score_predictions", deployment_id=deployment_id
+    )
+    target_drift_params = {"target_drift": {"model_id": "5e29a5a65a5fe66a9ce399ae"}}
+
+    drift = operator.execute(context={"params": target_drift_params})
+
+    assert drift == expected_target_drift
+    get_drift_mock.assert_called_with(**target_drift_params["target_drift"])
+
+
+def test_operator_get_feature_drift(mocker, drift_details):
+    deployment_id = "deployment-id"
+
+    feature_drift = [FeatureDrift(**drift_details), FeatureDrift(**drift_details)]
+    expected_feature_drift = [_serialize_drift(drift) for drift in feature_drift]
+
+    mocker.patch.object(dr.Deployment, "get", return_value=dr.Deployment(deployment_id))
+    get_drift_mock = mocker.patch.object(dr.Deployment, "get_feature_drift", return_value=feature_drift)
+
+    operator = GetFeatureDriftOperator(
+        task_id="score_predictions", deployment_id="deployment-id"
+    )
+    feature_drift_params = {"feature_drift": {"model_id": "5e29a5a65a5fe66a9ce399ae"}}
+
+    drift = operator.execute(context={"params": feature_drift_params})
+
+    assert drift == expected_feature_drift
+    get_drift_mock.assert_called_with(**feature_drift_params["feature_drift"])
