@@ -1,4 +1,4 @@
-# Copyright 2022 DataRobot, Inc. and its affiliates.
+# Copyright 2023 DataRobot, Inc. and its affiliates.
 #
 # All rights reserved.
 #
@@ -17,16 +17,14 @@ from airflow.decorators import dag
 
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 
+
 @dag(
     schedule_interval=None,
     start_date=datetime(2022, 1, 1),
     tags=['example'],
-    params={
-        "training_dataset_file_path": "./titanic.csv"
-    }
+    params={"training_dataset_file_path": "./titanic.csv"},
 )
 def datarobot_dataset_uploading():
-
     dataset_uploading_op = UploadDatasetOperator(
         task_id="dataset_uploading",
     )

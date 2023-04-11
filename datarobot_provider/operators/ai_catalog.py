@@ -1,4 +1,4 @@
-# Copyright 2022 DataRobot, Inc. and its affiliates.
+# Copyright 2023 DataRobot, Inc. and its affiliates.
 #
 # All rights reserved.
 #
@@ -8,7 +8,6 @@
 from typing import Any
 from typing import Dict
 from typing import Iterable
-from typing import List
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
@@ -38,10 +37,10 @@ class UploadDatasetOperator(BaseOperator):
     ui_color = '#f4a460'
 
     def __init__(
-            self,
-            *,
-            datarobot_conn_id: str = "datarobot_default",
-            **kwargs: Any,
+        self,
+        *,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.datarobot_conn_id = datarobot_conn_id
@@ -56,7 +55,7 @@ class UploadDatasetOperator(BaseOperator):
 
         # Upload Dataset to AI Catalog
         self.log.info("Upload Dataset to AI Catalog")
-        # training_dataset_file_path a path to a local file
-        ai_catalog_dataset = dr.Dataset.create_from_file(context["params"]["training_dataset_file_path"])
+        # dataset_file_path a path to a local file
+        ai_catalog_dataset = dr.Dataset.create_from_file(context["params"]["dataset_file_path"])
         self.log.info(f"Dataset created: dataset_id={ai_catalog_dataset.id}")
         return ai_catalog_dataset.id
