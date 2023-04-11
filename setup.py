@@ -13,7 +13,7 @@ with open("README.md", "r") as fh:
 """Perform the package airflow-provider-datarobot setup."""
 setup(
     name='airflow-provider-datarobot',
-    version="0.0.4",
+    version="0.0.5",
     description='DataRobot Airflow provider.',
     long_description=long_description,
     long_description_content_type='text/markdown',
