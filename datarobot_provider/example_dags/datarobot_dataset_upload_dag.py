@@ -8,7 +8,7 @@
 """
 Config example for this dag:
 {
-    "training_dataset_file_path": "/tests/integration/datasets/titanic.csv",
+    "dataset_file_path": "/tests/integration/datasets/titanic.csv",
 }
 """
 from datetime import datetime
@@ -22,7 +22,7 @@ from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
     schedule_interval=None,
     start_date=datetime(2022, 1, 1),
     tags=['example'],
-    params={"training_dataset_file_path": "./titanic.csv"},
+    params={"dataset_file_path": "./titanic.csv"},
 )
 def datarobot_dataset_uploading():
     dataset_uploading_op = UploadDatasetOperator(
