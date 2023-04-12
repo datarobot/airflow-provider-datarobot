@@ -3,4 +3,6 @@ repositoryTasks:
     phrase:
     change:
       - changedFilesRegex: '.*'
-        script: jenkins/unit_test.groovy
+        script:
+          - jenkins/unit_test.groovy
+          - jenkins/publish_python_testpypi.groovy
