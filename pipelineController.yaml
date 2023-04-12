@@ -5,3 +5,4 @@ repositoryTasks:
       - changedFilesRegex: '.*'
         script:
           - jenkins/publish_python_testpypi.groovy
+          - jenkins/unit_test.groovy

@@ -15,12 +15,12 @@ stage('build and publish'){
               source .venv/bin/activate
               pip install -r requirements.txt
               echo "Show Airflow version:"
-              echo airflow version
+              airflow version
               echo "Show DataRobot Client version:"
               pip show datarobot
               pip install --upgrade build
               echo "Building wheel..."
-              python -m build
+              python -m build --no-isolation
             """
     }
 }
