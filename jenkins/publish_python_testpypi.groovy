@@ -1,4 +1,4 @@
-stage('build and publish'){
+stage('Build and Publish'){
     node('ubuntu:focal && 2xCPU~4xRAM'){
 
     String pypi_repo_url = "https://test.pypi.org/legacy/"
@@ -7,7 +7,6 @@ stage('build and publish'){
     String build_info_msg = "Open this build on Jenkins: ${env.BUILD_URL}"
 
     checkout scm
-            //sh 'bash jenkins/python_scripts/publish_python_package.sh ' + pypi_repo_url
             sh """
               #!/bin/bash
               set -xe
