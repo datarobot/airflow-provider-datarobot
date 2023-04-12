@@ -1,5 +1,5 @@
 stage('build and publish'){
-node('ubuntu:focal && 2xCPU~2xRAM'){
+node('ubuntu:focal && 2xCPU~4xRAM'){
     String pypi_repo_url = "https://test.pypi.org/legacy/"
 
     String notify_channel = "external-agents-911"
