@@ -1,5 +1,6 @@
 stage('build and publish'){
-node('ubuntu:focal && 2xCPU~4xRAM'){
+    node('ubuntu:focal && 2xCPU~4xRAM'){
+
     String pypi_repo_url = "https://test.pypi.org/legacy/"
 
     String notify_channel = "external-agents-911"
@@ -17,5 +18,5 @@ node('ubuntu:focal && 2xCPU~4xRAM'){
               echo "Building wheel..."
               python -m build
             """
-}
+    }
 }
