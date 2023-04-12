@@ -14,6 +14,10 @@ stage('build and publish'){
               virtualenv .venv -p python3.8
               source .venv/bin/activate
               pip install -r requirements.txt
+              echo "Show Airflow version:"
+              echo airflow version
+              echo "Show DataRobot Client version:"
+              pip show datarobot
               pip install --upgrade build
               echo "Building wheel..."
               python -m build
