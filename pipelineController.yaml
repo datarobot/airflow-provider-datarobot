@@ -1,8 +1,6 @@
 repositoryTasks:
   pr:
     phrase:
-      - phraseRegex: '.*run_bash_check.sh.*'
-        script: .cicd/test.groovy
     change:
       - changedFilesRegex: '.*'
-        script: .cicd/test.groovy
+        script: .cicd/unit_test.groovy
