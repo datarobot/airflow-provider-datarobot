@@ -14,6 +14,7 @@ pip install -r requirements.txt
 
 echo "Installing dependencies needed to build/push python packages..."
 pip install -U pip
+pip install --upgrade build
 pip install -U twine
 
 echo "Building wheel..."
