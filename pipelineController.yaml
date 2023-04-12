@@ -4,5 +4,13 @@ repositoryTasks:
     change:
       - changedFilesRegex: '.*'
         script:
-          - jenkins/publish_python_testpypi.groovy
-          - jenkins/unit_test.groovy
+          - taskName: UnitTests
+            definition: jenkins/unit_test.groovy
+            environment:
+              DEPLOY_ENV: UnitTests
+            phase: 1
+          - taskName: BuildAndPublish
+            definition: jenkins/publish_python_testpypi.groovy
+            environment:
+              DEPLOY_ENV: BuildAndPublish
+            phase: 2
