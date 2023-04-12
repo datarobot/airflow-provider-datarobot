@@ -8,6 +8,8 @@ stage('Unit Test') {
               virtualenv .venv -p python3.8
               source .venv/bin/activate
               pip install -r requirements.txt
+              airflow db init
+              airflow db check
               pytest -vv tests/unit/ --junit-xml=unit_test_report.xml
             """
         } finally {
