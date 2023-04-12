@@ -3,4 +3,4 @@ repositoryTasks:
     phrase:
     change:
       - changedFilesRegex: '.*'
-        script: .cicd/unit_test.groovy
+        script: jenkins/unit_test.groovy
