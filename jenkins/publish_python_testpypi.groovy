@@ -1,4 +1,4 @@
-node('ubuntu:focal'){
+node('ubuntu:focal && 2xCPU~2xRAM'){
     String pypi_repo_url = "https://test.pypi.org/legacy/"
 
     String notify_channel = "external-agents-911"
@@ -8,7 +8,17 @@ node('ubuntu:focal'){
 
     try{
         stage('build and publish'){
-                sh 'bash jenkins/python_scripts/publish_python_package.sh ' + pypi_repo_url
+            //sh 'bash jenkins/python_scripts/publish_python_package.sh ' + pypi_repo_url
+            sh """
+              #!/bin/bash
+              set -xe
+              virtualenv .venv -p python3.8
+              source .venv/bin/activate
+              pip install -r requirements.txt
+              pip install --upgrade build
+              echo "Building wheel..."
+              python -m build
+            """
         }
         stage('notify success') {
             """
