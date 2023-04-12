@@ -1,5 +1,5 @@
 stage('Unit Test') {
-    node('multi-executor && ubuntu:focal') {
+    node('ubuntu:focal && 2xCPU~2xRAM') {
         checkout scm
         try {
             sh """
