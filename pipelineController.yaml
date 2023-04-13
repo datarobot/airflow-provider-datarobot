@@ -1,3 +1,6 @@
+# pipelineController configuration
+buildDraftPRs: true
+
 repositoryTasks:
   pr:
     phrase:
@@ -10,7 +13,7 @@ repositoryTasks:
               DEPLOY_ENV: UnitTests
             phase: 1
           - taskName: BuildAndPublish
-            definition: jenkins/publish_python_testpypi.groovy
+            definition: jenkins/build_and_publish_testpypi.groovy
             environment:
               DEPLOY_ENV: BuildAndPublish
             phase: 2
