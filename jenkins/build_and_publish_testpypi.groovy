@@ -20,6 +20,9 @@ stage('Build and Publish'){
               pip install --upgrade build
               echo "Building wheel..."
               python -m build --no-isolation
+              echo "Install twine tool..."
+              pip install --upgrade pip build twine
+              twine upload --repository testpypi dist/airflow_provider_datarobot-0.0.5-py3-none-any.whl
             """
     }
 }
