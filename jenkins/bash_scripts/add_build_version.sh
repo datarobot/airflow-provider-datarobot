@@ -1,3 +1,4 @@
+#!/bin/bash
 echo "Current build version $1"
 file_suffix="-py3-none-any"
 new_file_suffix="-$1-py3-none-any"
