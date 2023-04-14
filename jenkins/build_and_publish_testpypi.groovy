@@ -32,10 +32,10 @@ stage('Build and Publish'){
               echo "Install twine tool..."
               pip install --upgrade pip build twine
               echo "Adding build number to package"
-              mv -v dist/airflow_provider_datarobot-0.0.4-py3-none-any.whl dist/airflow_provider_datarobot-0.0.4-3-py3-none-any.whl
-              echo "Upload python packages to ${env.DEPLOY_ENV}..."
+              mv -v dist/airflow_provider_datarobot-0.0.4-py3-none-any.whl dist/airflow_provider_datarobot-0.0.4-2-py3-none-any.whl
+              echo "Upload python packages to ${env.PUBLISH_REPO_URL}..."
               twine upload dist/*.whl \
-              --repository-url "${env.DEPLOY_ENV}" \
+              --repository-url "${env.PUBLISH_REPO_URL}" \
               --username "$TWINE_USERNAME" \
               --password "$TWINE_PASSWORD" \
               --non-interactive \
