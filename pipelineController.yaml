@@ -1,9 +1,13 @@
 # pipelineController configuration
-buildDraftPRs: true
 
 repositoryTasks:
   pr:
     phrase:
+      - taskName: BuildAndPublish
+        phraseRegex: '.*publish to pypi.*'
+        definition: jenkins/build_and_publish_testpypi.groovy
+        environment:
+          PUBLISH_REPO_URL: https://test.pypi.org/legacy/
     change:
       - changedFilesRegex: '.*'
         script:
@@ -12,9 +16,5 @@ repositoryTasks:
             phase: 0
           - taskName: UnitTests
             definition: jenkins/unit_test.groovy
-            phase: 1
-          - taskName: BuildAndPublish
-            definition: jenkins/build_and_publish_testpypi.groovy
-            environment:
-              PUBLISH_REPO_URL: https://test.pypi.org/legacy/
-            phase: 2
+            phase: 0
+
