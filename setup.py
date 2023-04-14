@@ -27,10 +27,10 @@ setup(
         'datarobot_provider.sensors',
         'datarobot_provider.operators',
     ],
-    install_requires=['apache-airflow>=2.0', 'datarobot>=2.28.0'],
+    install_requires=['apache-airflow>=2.3.4', 'datarobot>=2.28.0'],
     setup_requires=['setuptools', 'wheel'],
-    author='Andrius Senulis',
-    author_email='andrius.senulis@datarobot.com',
+    author='Oleksandr',
+    author_email='oleksandr.saienko@datarobot.com',
     url='http://www.datarobot.com/',
     python_requires='~=3.7',
 )

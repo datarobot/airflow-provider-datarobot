@@ -10,10 +10,10 @@ repositoryTasks:
           - taskName: UnitTests
             definition: jenkins/unit_test.groovy
             environment:
-              DEPLOY_ENV: UnitTests
+              DEPLOY_ENV: DEV
             phase: 1
           - taskName: BuildAndPublish
             definition: jenkins/build_and_publish_testpypi.groovy
             environment:
-              DEPLOY_ENV: BuildAndPublish
+              DEPLOY_ENV: jenkins/mlops/airflow_provider_datarobot/test-pypi
             phase: 2
