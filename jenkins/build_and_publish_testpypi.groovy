@@ -29,7 +29,7 @@ stage('Build and Publish'){
               echo "Install twine tool..."
               pip install --upgrade pip build twine
               echo "Adding build number: ${env.BUILD_NUMBER} to package"
-              sh /bash_scripts/add_build_version.sh ${env.BUILD_NUMBER}
+              sh jenkins/bash_scripts/add_build_version.sh ${env.BUILD_NUMBER}
               echo "Upload python packages to ${env.PUBLISH_REPO_URL}..."
               twine upload dist/*.whl \
               --repository-url "${env.PUBLISH_REPO_URL}" \
