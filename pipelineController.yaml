@@ -1,0 +1,21 @@
+# pipelineController configuration
+
+repositoryTasks:
+  pr:
+    phrase:
+      - phraseRegex: '.*publish to pypi.*'
+        script:
+          - taskName: BuildAndPublish
+            definition: jenkins/build_and_publish_testpypi.groovy
+            environment:
+              PUBLISH_REPO_URL: https://test.pypi.org/legacy/
+    change:
+      - changedFilesRegex: '.*'
+        script:
+          - taskName: StyleCheck
+            definition: jenkins/style_check.groovy
+            phase: 0
+          - taskName: UnitTests
+            definition: jenkins/unit_test.groovy
+            phase: 0
+

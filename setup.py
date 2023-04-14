@@ -20,17 +20,25 @@ setup(
     entry_points={
         "apache_airflow_provider": ["provider_info=datarobot_provider.__init__:get_provider_info"]
     },
-    license='Apache License 2.0',
+    license='DataRobot Tool and Utility Agreement',
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "License :: Other/Proprietary License",
+    ],
     packages=[
         'datarobot_provider',
         'datarobot_provider.hooks',
         'datarobot_provider.sensors',
         'datarobot_provider.operators',
     ],
-    install_requires=['apache-airflow>=2.0', 'datarobot>=2.28.0'],
+    install_requires=['apache-airflow>=2.3.4', 'datarobot>=2.28.0'],
     setup_requires=['setuptools', 'wheel'],
-    author='Andrius Senulis',
-    author_email='andrius.senulis@datarobot.com',
+    author='DataRobot',
+    author_email='support@datarobot.com',
     url='http://www.datarobot.com/',
     python_requires='~=3.7',
 )

@@ -6,6 +6,7 @@ __pycache__/
 *$py.class
 .vscode/
 .idea/
+.DS_Store
 
 # C extensions
 *.so
