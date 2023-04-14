@@ -15,5 +15,5 @@ repositoryTasks:
           - taskName: BuildAndPublish
             definition: jenkins/build_and_publish_testpypi.groovy
             environment:
-              DEPLOY_ENV: jenkins/mlops/airflow_provider_datarobot/test-pypi
+              DEPLOY_ENV: https://test.pypi.org/legacy/
             phase: 2
