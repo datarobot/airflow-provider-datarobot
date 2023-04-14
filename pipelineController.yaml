@@ -3,11 +3,12 @@
 repositoryTasks:
   pr:
     phrase:
-      - taskName: BuildAndPublish
-        phraseRegex: '.*publish to pypi.*'
-        definition: jenkins/build_and_publish_testpypi.groovy
-        environment:
-          PUBLISH_REPO_URL: https://test.pypi.org/legacy/
+      - phraseRegex: '.*publish to pypi.*'
+        script:
+          - taskName: BuildAndPublish
+            definition: jenkins/build_and_publish_testpypi.groovy
+            environment:
+              PUBLISH_REPO_URL: https://test.pypi.org/legacy/
     change:
       - changedFilesRegex: '.*'
         script:
