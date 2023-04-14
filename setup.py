@@ -29,8 +29,8 @@ setup(
     ],
     install_requires=['apache-airflow>=2.3.4', 'datarobot>=2.28.0'],
     setup_requires=['setuptools', 'wheel'],
-    author='Oleksandr',
-    author_email='oleksandr.saienko@datarobot.com',
+    author='DataRobot',
+    author_email='support@datarobot.com',
     url='http://www.datarobot.com/',
     python_requires='~=3.7',
 )
