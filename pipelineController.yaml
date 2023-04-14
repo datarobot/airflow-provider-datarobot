@@ -7,13 +7,14 @@ repositoryTasks:
     change:
       - changedFilesRegex: '.*'
         script:
+          - taskName: StyleCheck
+            definition: jenkins/style_check.groovy
+            phase: 0
           - taskName: UnitTests
             definition: jenkins/unit_test.groovy
-            environment:
-              DEPLOY_ENV: DEV
             phase: 1
           - taskName: BuildAndPublish
             definition: jenkins/build_and_publish_testpypi.groovy
             environment:
-              DEPLOY_ENV: https://test.pypi.org/legacy/
+              PUBLISH_REPO_URL: https://test.pypi.org/legacy/
             phase: 2
