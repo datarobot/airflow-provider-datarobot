@@ -4,9 +4,6 @@ stage('Build and Publish'){
     String pypi_repo_url = "https://test.pypi.org/legacy/"
     String pypi_repo_jenkins_creds_path = "jenkins/mlops/airflow_provider_datarobot/test-pypi"
 
-    String notify_channel = "external-agents-911"
-    //String build_info_msg = "Open this build on Jenkins: ${env.DEPLOY_ENV}"
-
     checkout scm
         withCredentials([
         usernamePassword(
@@ -32,7 +29,7 @@ stage('Build and Publish'){
               echo "Install twine tool..."
               pip install --upgrade pip build twine
               echo "Adding build number: ${env.BUILD_NUMBER} to package"
-              mv -v dist/airflow_provider_datarobot-0.0.4-py3-none-any.whl dist/airflow_provider_datarobot-0.0.4-${env.BUILD_NUMBER}-py3-none-any.whl
+              sh /bash_scripts/add_build_version.sh ${env.BUILD_NUMBER}
               echo "Upload python packages to ${env.PUBLISH_REPO_URL}..."
               twine upload dist/*.whl \
               --repository-url "${env.PUBLISH_REPO_URL}" \
