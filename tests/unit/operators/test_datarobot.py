@@ -43,6 +43,31 @@ def test_operator_create_project(mocker):
     create_project_mock.assert_called_with("/path/to/s3/or/local/file", "test project")
 
 
+def test_operator_create_project_from_dataset(mocker):
+    project_mock = mocker.Mock()
+    project_mock.id = "project-id"
+    create_project_mock = mocker.patch.object(
+        dr.Project, "create_from_dataset", return_value=project_mock
+    )
+
+    operator = CreateProjectOperator(task_id='create_project_from_dataset')
+    project_id = operator.execute(
+        context={
+            "params": {
+                "training_dataset_id": "some_dataset_id",
+                "project_name": "test project",
+                "unsupervised_mode": False,
+                "use_feature_discovery": False,
+            },
+        }
+    )
+
+    assert project_id == "project-id"
+    create_project_mock.assert_called_with(
+        dataset_id='some_dataset_id', project_name='test project'
+    )
+
+
 def test_operator_train_models(mocker):
     project_mock = mocker.Mock(target=None)
     mocker.patch.object(dr.Project, "get", return_value=project_mock)
