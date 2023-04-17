@@ -3,7 +3,7 @@
 repositoryTasks:
   pr:
     phrase:
-      - phraseRegex: '.*publish to pypi.*'
+      - phraseRegex: '.*publish to testpypi.*'
         script:
           - taskName: BuildAndPublish
             definition: jenkins/build_and_publish_testpypi.groovy
