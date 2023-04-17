@@ -12,6 +12,7 @@ from typing import List
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
+from airflow.exceptions import AirflowFailException
 from airflow.models import BaseOperator
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
@@ -32,7 +33,7 @@ class CreateProjectOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = []
+    template_fields: Iterable[str] = ["dataset_id"]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
     ui_color = '#f4a460'
@@ -40,10 +41,12 @@ class CreateProjectOperator(BaseOperator):
     def __init__(
         self,
         *,
+        dataset_id: str = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
+        self.dataset_id = dataset_id
         self.datarobot_conn_id = datarobot_conn_id
         if kwargs.get('xcom_push') is not None:
             raise AirflowException(
@@ -56,15 +59,39 @@ class CreateProjectOperator(BaseOperator):
 
         # Create DataRobot project
         self.log.info("Creating DataRobot project")
-        # training_data may be a pre-signed URL to a file on S3 or a path to a local file
-        project = dr.Project.create(
-            context["params"]["training_data"], context['params']['project_name']
-        )
-        self.log.info(f"Project created: project_id={project.id}")
-        project.unsupervised_mode = context['params'].get('unsupervised_mode')
-        project.use_feature_discovery = context['params'].get('use_feature_discovery')
-        project.unlock_holdout()
-        return project.id
+
+        if self.dataset_id is None and "training_data" in context['params']:
+            # training_data may be a pre-signed URL to a file on S3 or a path to a local file
+            project = dr.Project.create(
+                context["params"]["training_data"], context['params']['project_name']
+            )
+            self.log.info(f"Project created: project_id={project.id} from local file")
+            project.unsupervised_mode = context['params'].get('unsupervised_mode')
+            project.use_feature_discovery = context['params'].get('use_feature_discovery')
+            project.unlock_holdout()
+            return project.id
+
+        elif self.dataset_id is not None or 'training_dataset_id' in context['params']:
+            # training_dataset_id may be provided via params
+            # or dataset_id should be returned from previous operator
+            training_dataset_id = (
+                self.dataset_id
+                if self.dataset_id is not None
+                else context['params']['training_dataset_id']
+            )
+
+            project = dr.Project.create_from_dataset(
+                dataset_id=training_dataset_id, project_name=context['params']['project_name']
+            )
+            self.log.info(
+                f"Project created: project_id={project.id} from dataset: dataset_id={training_dataset_id}"
+            )
+            return project.id
+
+        else:
+            raise AirflowFailException(
+                'For Project creation training_data or training_dataset_id must be provided'
+            )
 
 
 class TrainModelsOperator(BaseOperator):
