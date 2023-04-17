@@ -35,7 +35,6 @@ from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
     tags=['example'],
 )
 def datarobot_score(deployment_id=None):
-
     if not deployment_id:
         raise ValueError("Invalid or missing `deployment_id` value")
 

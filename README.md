@@ -214,6 +214,16 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
     Returns a dict with the feature drift data.
 
+- `UploadDatasetOperator`
+
+    Uploading local file to DataRobot AI Catalog and return Dataset ID.
+ 
+    Required config params:
+
+        dataset_file_path: str - local path to training dataset
+
+    Returns a dataset ID.
+
 ### [Sensors](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/sensors/datarobot.py)
 
 - `AutopilotCompleteSensor`
