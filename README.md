@@ -107,7 +107,7 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
       Returns a project ID.
 
-   - Creating project from an existing dataset in Datarobot AICatalog, using dataset_id coming from previous operator. 
+   - Creating project from an existing dataset in DataRobot AI Catalog, using dataset_id coming from previous operator. 
      In this case your previous operator must return valid dataset_id (for example `UploadDatasetOperator`) and you 
      should use this output value as a 'dataset_id' argument in `CreateProjectOperator` object creation step. 
      Required config params:
