@@ -8,7 +8,10 @@
 import pytest
 from airflow.models import DagBag
 
-from datarobot_provider.example_dags.datarobot_create_project_from_ai_catalog_dag import create_project_from_aicatalog
+from datarobot_provider.example_dags.datarobot_create_project_from_ai_catalog_dag import (
+    create_project_from_aicatalog,
+)
+
 
 @pytest.fixture()
 def dagbag(provider_dir):
@@ -33,9 +36,6 @@ def assert_dag_dict_equal(source, dag):
 def test_dag_structure():
     dag = create_project_from_aicatalog()
     assert_dag_dict_equal(
-        {
-            "dataset_uploading": ["create_project"],
-            "create_project": []
-        },
+        {"dataset_uploading": ["create_project"], "create_project": []},
         dag,
     )

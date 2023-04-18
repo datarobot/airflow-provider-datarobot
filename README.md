@@ -71,20 +71,52 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
 ### [Operators](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/operators/datarobot.py)
 
+- `UploadDatasetOperator`
+
+    Uploading local file to DataRobot AI Catalog and return Dataset ID.
+ 
+    Required config params:
+
+        dataset_file_path: str - local path to training dataset
+
+    Returns a dataset ID.
+
 - `CreateProjectOperator`
 
     Creates a DataRobot project and returns its ID.
  
-    Required config params:
+    Several options of source dataset supported:
+  
+   - Creating project directly from local file or pre-signed S3 URL. Required config params:
 
-        training_data: str - pre-signed S3 URL or local path to training dataset
-        project_name: str - project name
+          training_data: str - pre-signed S3 URL or local path to training dataset
+          project_name: str - project name
 
-    In case of an S3 input, the `training_data` value must be a [pre-signed AWS S3 URL](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html).
+      In case of an S3 input, the `training_data` value must be a [pre-signed AWS S3 URL](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html).
 
-    For more [project settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#project) see the DataRobot docs.
+      For more [project settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#project) see the DataRobot docs.
 
-    Returns a project ID.
+      Returns a project ID.
+  
+   - Creating project from existing dataset in AICatalog, using dataset_id from config file. Required config params:
+
+          training_dataset_id: str - dataset_id corresponding to existing dataset in DataRobot AICatalog
+          project_name: str - project name
+
+      For more [project settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#project) see the DataRobot docs.
+
+      Returns a project ID.
+
+   - Creating project from an existing dataset in Datarobot AICatalog, using dataset_id coming from previous operator. 
+     In this case your previous operator must return valid dataset_id (for example `UploadDatasetOperator`) and you 
+     should use this output value as a 'dataset_id' argument in `CreateProjectOperator` object creation step. 
+     Required config params:
+
+          project_name: str - project name
+  
+      For more [project settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#project) see the DataRobot docs.
+
+      Returns a project ID.
 
 - `TrainModelsOperator`
 
@@ -214,16 +246,6 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
     Returns a dict with the feature drift data.
 
-- `UploadDatasetOperator`
-
-    Uploading local file to DataRobot AI Catalog and return Dataset ID.
- 
-    Required config params:
-
-        dataset_file_path: str - local path to training dataset
-
-    Returns a dataset ID.
-
 ### [Sensors](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/sensors/datarobot.py)
 
 - `AutopilotCompleteSensor`
@@ -271,7 +293,7 @@ We are happy to hear from you. Please email any feedback to the authors at [supp
 
 # Copyright Notice
 
-Copyright 2022 DataRobot, Inc. and its affiliates.
+Copyright 2023 DataRobot, Inc. and its affiliates.
 
 All rights reserved.
 

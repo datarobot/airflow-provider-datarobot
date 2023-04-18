@@ -23,15 +23,8 @@ from airflow.decorators import dag
 
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 from datarobot_provider.operators.datarobot import CreateProjectOperator
-"""
-Example of parameters for this dag:
-{
-    "dataset_file_path": "/path/to/local/file",
-    "project_name": "test project",
-    "unsupervised_mode": False,
-    "use_feature_discovery": False
-}
-"""
+
+
 @dag(
     schedule_interval=None,
     start_date=datetime(2022, 1, 1),
@@ -40,11 +33,10 @@ Example of parameters for this dag:
         "dataset_file_path": "/path/to/local/file",
         "project_name": "test project",
         "unsupervised_mode": False,
-        "use_feature_discovery": False
+        "use_feature_discovery": False,
     },
 )
 def create_project_from_aicatalog():
-
     dataset_uploading_op = UploadDatasetOperator(
         task_id="dataset_uploading",
     )
@@ -58,6 +50,3 @@ def create_project_from_aicatalog():
 
 
 create_project_from_aicatalog_dag = create_project_from_aicatalog()
-
-if __name__ == "__main__":
-    create_project_from_aicatalog_dag.test()
