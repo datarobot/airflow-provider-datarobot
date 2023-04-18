@@ -6,9 +6,15 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 """
+Example of DAG to upload local file to DataRobot AICatalog as a static dataset,
+then using this stored dataset as a training data to create a DataRobot Project.
+
 Config example for this dag:
 {
-    "dataset_file_path": "/tests/integration/datasets/titanic.csv",
+    "dataset_file_path": "/path/to/local/file",
+    "project_name": "test project",
+    "unsupervised_mode": False,
+    "use_feature_discovery": False
 }
 """
 from datetime import datetime
@@ -17,19 +23,28 @@ from airflow.decorators import dag
 
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 from datarobot_provider.operators.datarobot import CreateProjectOperator
-
+"""
+Example of parameters for this dag:
+{
+    "dataset_file_path": "/path/to/local/file",
+    "project_name": "test project",
+    "unsupervised_mode": False,
+    "use_feature_discovery": False
+}
+"""
 @dag(
     schedule_interval=None,
     start_date=datetime(2022, 1, 1),
     tags=['example'],
     params={
-        "dataset_file_path": "./titanic.csv",
+        "dataset_file_path": "/path/to/local/file",
         "project_name": "test project",
         "unsupervised_mode": False,
         "use_feature_discovery": False
     },
 )
-def datarobot_dataset_uploading_create_project():
+def create_project_from_aicatalog():
+
     dataset_uploading_op = UploadDatasetOperator(
         task_id="dataset_uploading",
     )
@@ -42,7 +57,7 @@ def datarobot_dataset_uploading_create_project():
     dataset_uploading_op >> create_project_op
 
 
-datarobot_pipeline_dag = datarobot_dataset_uploading_create_project()
+create_project_from_aicatalog_dag = create_project_from_aicatalog()
 
 if __name__ == "__main__":
-    print(datarobot_pipeline_dag.test())
+    create_project_from_aicatalog_dag.test()
