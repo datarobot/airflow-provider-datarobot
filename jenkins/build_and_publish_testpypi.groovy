@@ -27,6 +27,7 @@ stage('Build and Publish'){
               python -m build --no-isolation
               echo "Install twine tool..."
               pip install --upgrade pip build twine
+              echo "Publishing to TestPyPi..."
               twine upload dist/*.whl \
               --repository-url "${env.PUBLISH_REPO_URL}" \
               --username "$TWINE_USERNAME" \

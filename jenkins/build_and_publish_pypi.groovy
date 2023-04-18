@@ -27,6 +27,7 @@ stage('Build and Publish'){
               python -m build --no-isolation
               echo "Install twine tool..."
               pip install --upgrade pip build twine
+              echo "Publishing to PyPi..."
               twine upload dist/*.whl \
               --username "$TWINE_USERNAME" \
               --password "$TWINE_PASSWORD" \
