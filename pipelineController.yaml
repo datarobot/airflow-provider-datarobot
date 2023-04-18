@@ -1,25 +1,40 @@
-# pipelineController configuration
+failOnMissingScript: true
+buildDraftPRs: false
+jenkinsFilesFolder: jenkins
+# Makes sure our master branch publish job always runs to completion and every commit to master
+# will get published.
+disableConcurrentBuildsOnBranches: true
 
 repositoryTasks:
   pr:
     phrase:
       - phraseRegex: '.*publish to pypi.*'
         script:
-          - taskName: BuildAndPublishPyPi
-            definition: jenkins/build_and_publish_pypi.groovy
-      - phraseRegex: '.*publish to testpypi.*'
-        script:
           - taskName: BuildAndPublishTestPyPi
-            definition: jenkins/build_and_publish_testpypi.groovy
+            definition: build_and_publish.groovy
             environment:
               PUBLISH_REPO_URL: https://test.pypi.org/legacy/
     change:
       - changedFilesRegex: '.*'
         script:
           - taskName: StyleCheck
-            definition: jenkins/style_check.groovy
+            definition: style_check.groovy
             phase: 0
           - taskName: UnitTests
-            definition: jenkins/unit_test.groovy
+            definition: unit_test.groovy
             phase: 0
 
+
+  standalone:
+
+    - script:
+      - taskName: BuildAndPublishPyPi
+        definition: build_and_publish.groovy
+        environment:
+          PUBLISH_REPO_URL: https://pypi.org/legacy/
+      parameters:
+        - name: GIT_BRANCH
+          type: string
+          default: origin/master
+          description: Branch to checkout
+          #allowedGhUsersOrGroups: datarobot*tracking-agent
