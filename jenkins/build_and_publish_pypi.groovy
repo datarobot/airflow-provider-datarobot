@@ -1,12 +1,12 @@
 stage('Build and Publish'){
     node('ubuntu:focal && 2xCPU~4xRAM'){
 
-    String testpypi_repo_jenkins_creds_path = "jenkins/mlops/airflow_provider_datarobot/test-pypi"
+    String pypi_repo_jenkins_creds_path = "jenkins/mlops/airflow_provider_datarobot/pypi"
 
     checkout scm
         withCredentials([
         usernamePassword(
-            credentialsId: testpypi_repo_jenkins_creds_path,
+            credentialsId: pypi_repo_jenkins_creds_path,
             passwordVariable: 'TWINE_PASSWORD',
             usernameVariable: 'TWINE_USERNAME'
         ),
@@ -28,7 +28,6 @@ stage('Build and Publish'){
               echo "Install twine tool..."
               pip install --upgrade pip build twine
               twine upload dist/*.whl \
-              --repository-url "${env.PUBLISH_REPO_URL}" \
               --username "$TWINE_USERNAME" \
               --password "$TWINE_PASSWORD" \
               --non-interactive \
