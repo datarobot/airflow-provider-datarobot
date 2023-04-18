@@ -8,12 +8,13 @@ disableConcurrentBuildsOnBranches: true
 repositoryTasks:
   pr:
     phrase:
-      - phraseRegex: '.*publish to pypi.*'
+      - phraseRegex: '.*publish( to pypi)?.*'
         script:
           - taskName: BuildAndPublishTestPyPi
             definition: build_and_publish.groovy
             environment:
               PUBLISH_REPO_URL: https://test.pypi.org/legacy/
+            phase: 1
     change:
       - changedFilesRegex: '.*'
         script:
