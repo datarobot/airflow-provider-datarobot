@@ -28,14 +28,13 @@ repositoryTasks:
 
   standalone:
 
-    - script:
-      - taskName: BuildAndPublishPyPi
-        definition: build_and_publish.groovy
-        environment:
-          PUBLISH_REPO_URL: https://pypi.org/legacy/
+    - script: build_and_publish.groovy
+      concurrent: false
+      displayName: BuildAndPublishPyPi
+      description: Publish the package to the public PyPi repository. Be sure to bump the version beforehand and tag the repository.
       parameters:
         - name: GIT_BRANCH
           type: string
           default: origin/master
           description: Branch to checkout
-          allowedGhUsersOrGroups: datarobot*tracking-agent
+      allowedGhUsersOrGroups: datarobot*tracking-agent
