@@ -38,4 +38,4 @@ repositoryTasks:
           type: string
           default: origin/master
           description: Branch to checkout
-          #allowedGhUsersOrGroups: datarobot*tracking-agent
+          allowedGhUsersOrGroups: datarobot*tracking-agent
