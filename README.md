@@ -98,7 +98,7 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
       Returns a project ID.
   
-   - Creating project from existing dataset in AICatalog, using dataset_id from config file. Required config params:
+   - Creating project from existing dataset in AI Catalog, using dataset_id from config file. Required config params:
 
           training_dataset_id: str - dataset_id corresponding to existing dataset in DataRobot AICatalog
           project_name: str - project name
