@@ -13,27 +13,22 @@ stage('Build and Publish'){
         ])
             {
             sh """
-              #!/bin/bash
-              set -xe
+              set -e
               virtualenv .venv -p python3.8
               source .venv/bin/activate
+              pip install --upgrade pip wheel setuptools
               pip install -r requirements.txt
-              echo "Show Airflow version:"
-              airflow version
-              echo "Show DataRobot Client version:"
-              pip show datarobot
-              pip install --upgrade build
+              pip install --upgrade build twine
               echo "Building wheel..."
               python -m build --no-isolation
-              echo "Install twine tool..."
-              pip install --upgrade pip build twine
-              echo "Publishing to TestPyPi..."
+
+              echo "Publishing to PyPi (${env.PUBLISH_REPO_URL})..."
               twine upload dist/*.whl \
-              --repository-url "${env.PUBLISH_REPO_URL}" \
-              --username "$TWINE_USERNAME" \
-              --password "$TWINE_PASSWORD" \
-              --non-interactive \
-              --disable-progress-bar
+                --repository-url "${env.PUBLISH_REPO_URL}" \
+                --username "$TWINE_USERNAME" \
+                --password "$TWINE_PASSWORD" \
+                --non-interactive \
+                --disable-progress-bar
               echo "Finished successfully!"
             """
         }
