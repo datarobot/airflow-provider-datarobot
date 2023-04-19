@@ -10,9 +10,10 @@ from typing import Dict
 
 import datarobot as dr
 from airflow import AirflowException
-from airflow.hooks.base import BaseHook
 from airflow import __version__ as AIRFLOW_VERSION
+from airflow.hooks.base import BaseHook
 from datarobot.client import Client
+
 from datarobot_provider import get_provider_info
 
 
@@ -81,7 +82,9 @@ class DataRobotHook(BaseHook):
         # Creating version-specific user agent suffix to collect usage statistics and troubleshooting proposes:
         provider_package_name = get_provider_info().get('package-name')
         provider_versions = ''.join(get_provider_info().get('versions'))
-        user_agent_suffix = "{}-{}-airflow-{}".format(provider_package_name, provider_versions, AIRFLOW_VERSION)
+        user_agent_suffix = "{}-{}-airflow-{}".format(
+            provider_package_name, provider_versions, AIRFLOW_VERSION
+        )
         self.log.info("Initialize DataRobot Client, user_agent_suffix:{}".format(user_agent_suffix))
         return Client(token=api_key, endpoint=endpoint, user_agent_suffix=user_agent_suffix)
 
