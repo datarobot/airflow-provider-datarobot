@@ -7,7 +7,8 @@ stage('Style Check') {
               virtualenv .venv -p python3.8
               source .venv/bin/activate
               pip install -r requirements.txt
-              make lint fix-licenses check-licenses
+              make lint check-licenses
             """
+            // TODO: need to run black and isort checks
     }
 }

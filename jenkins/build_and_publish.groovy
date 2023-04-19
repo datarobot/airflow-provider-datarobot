@@ -1,6 +1,6 @@
 stage('Build and Publish'){
     node('ubuntu:focal && 2xCPU~4xRAM') {
-      env.PUBLISH_REPO_URL = env.PUBLISH_REPO_URL ?: 'https://test.pypi.org/legacy/'
+      env.PUBLISH_REPO_URL = env.PUBLISH_REPO_URL ?: 'https://pypi.org/legacy/'
 
       String repo_jenkins_creds_key = env.PUBLISH_REPO_URL.startsWith('https://pypi.org/') ? 'pypi' : 'test-pypi'
 
@@ -31,6 +31,7 @@ stage('Build and Publish'){
             --disable-progress-bar
           echo "Finished successfully!"
         """
+        // TODO add a git-tag and push here
     }
   }
 }
