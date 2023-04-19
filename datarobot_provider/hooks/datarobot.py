@@ -79,7 +79,7 @@ class DataRobotHook(BaseHook):
         if not api_key:
             raise AirflowException("API key is not defined")
 
-        # Creating version-specific user agent suffix to collect usage statistics and troubleshooting proposes:
+        # Creating version-specific user agent suffix for collecting usage statistics and troubleshoot purposes:
         provider_package_name = get_provider_info().get('package-name')
         provider_versions = ''.join(get_provider_info().get('versions'))
         user_agent_suffix = "{}-{}-airflow-{}".format(
