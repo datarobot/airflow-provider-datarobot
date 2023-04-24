@@ -25,7 +25,10 @@ DATETIME_FORMAT = "%Y-%m-%d %H:%M:%s"
 class CreateProjectOperator(BaseOperator):
     """
     Creates DataRobot project.
-
+    :param dataset_id: DataRobot AI Catalog dataset ID
+    :type dataset_id: str, optional
+    :param dataset_version_id: DataRobot AI Catalog dataset version ID
+    :type dataset_version_id: str, optional
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
     :return: DataRobot project ID
@@ -33,7 +36,7 @@ class CreateProjectOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["dataset_id"]
+    template_fields: Iterable[str] = ["dataset_id", "dataset_version_id"]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
     ui_color = '#f4a460'
@@ -42,11 +45,13 @@ class CreateProjectOperator(BaseOperator):
         self,
         *,
         dataset_id: str = None,
+        dataset_version_id: str = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.dataset_id = dataset_id
+        self.dataset_version_id = dataset_version_id
         self.datarobot_conn_id = datarobot_conn_id
         if kwargs.get('xcom_push') is not None:
             raise AirflowException(
@@ -81,7 +86,9 @@ class CreateProjectOperator(BaseOperator):
             )
 
             project = dr.Project.create_from_dataset(
-                dataset_id=training_dataset_id, project_name=context['params']['project_name']
+                dataset_id=training_dataset_id,
+                dataset_version_id=self.dataset_version_id,
+                project_name=context['params']['project_name'],
             )
             self.log.info(
                 f"Project created: project_id={project.id} from dataset: dataset_id={training_dataset_id}"
