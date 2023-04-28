@@ -22,12 +22,12 @@ from datarobot_provider.operators.ai_catalog import CreateDatasetFromJDBCOperato
     schedule_interval=None,
     start_date=datetime(2023, 1, 1),
     tags=['example'],
-    params={"datarobot_jdbc_connection": "datarobot_jdbc_default",
-            "dataset_name": "test_dataset_name",
-            "table_schema": "SCORING_CODE_UDF_SCHEMA",
-            "table_name": "10k_diabetes.csv",
-            "query": "SELECT * FROM airlines10mb ;"
-            },
+    params={
+        "datarobot_jdbc_connection": "datarobot_jdbc_default",
+        "dataset_name": "test_dataset_name_sql",
+        "table_schema": "SCORING_CODE_UDF_SCHEMA",
+        "table_name": "10k_diabetes.csv",
+    },
 )
 def datarobot_dataset_connect():
     dataset_connect_op = CreateDatasetFromJDBCOperator(

@@ -17,7 +17,8 @@ from datarobot_provider.hooks.datarobot import DataRobotHook
 
 class JDBCDataSourceHook(BaseHook):
     """
-    A hook that interacts with DataRobot via its public Python API library.
+    A hook that interacts with DataRobot via its public Python API library to
+    manage JDBC connections with corresponding credentials.
 
     :param datarobot_jdbc_conn_id: Connection ID, defaults to `datarobot_jdbc_default`
     :type datarobot_jdbc_conn_id: str, optional
@@ -88,7 +89,7 @@ class JDBCDataSourceHook(BaseHook):
         # Initialize DataRobot client by DataRobotHook
         DataRobotHook(datarobot_conn_id=datarobot_connection_id).run()
 
-        jdbc_driver_name = conn.extra_dejson.get('jdbc_driver_name', '')
+        jdbc_driver_name = conn.extra_dejson.get('jdbc_driver', '')
 
         if not jdbc_driver_name:
             raise AirflowException("jdbc_driver is not defined")
@@ -112,12 +113,10 @@ class JDBCDataSourceHook(BaseHook):
         }
 
         # Find the JDBC driver ID from name:
-        for jdbc_driver in dr.DataDriver.list():
-            if jdbc_driver.canonical_name in jdbc_driver_name:
-                self.log.info(
-                    f"Found JDBC Driver:{jdbc_driver.canonical_name} , id={jdbc_driver.id}"
-                )
-                jdbc_driver_id = jdbc_driver.id
+        for jdbc_drv in dr.DataDriver.list():
+            if jdbc_drv.canonical_name in jdbc_driver_name:
+                self.log.info(f"Found JDBC Driver:{jdbc_drv.canonical_name} , id={jdbc_drv.id}")
+                jdbc_driver_id = jdbc_drv.id
                 break
 
         if jdbc_driver_id is None:
@@ -126,7 +125,7 @@ class JDBCDataSourceHook(BaseHook):
         # Check if DataStore created already:
         for data_store in dr.DataStore.list():
             if data_store.canonical_name == self.datarobot_jdbc_conn_id:
-                f"Found DataStore:{data_store.canonical_name} , id={data_store.id}"
+                f"Found existing DataStore:{data_store.canonical_name} , id={data_store.id}"
                 break
 
         if data_store is None:
@@ -156,7 +155,7 @@ class JDBCDataSourceHook(BaseHook):
         return credential_data, data_store
 
     def run(self) -> Any:
-        # Initialize DataRobot client
+        # get Credentials and initialize DataStore object
         return self.get_conn()
 
     def test_connection(self):

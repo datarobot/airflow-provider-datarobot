@@ -152,26 +152,24 @@ class CreateDatasetFromJDBCOperator(BaseOperator):
     def execute(self, context: Dict[str, Any]) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-        datarobot_jdbc_conn_id = context["params"]["datarobot_jdbc_connection"]
+
+        # Fetch stored JDBC Connection with credentials
         credential_data, data_store = JDBCDataSourceHook(
-            datarobot_jdbc_conn_id=datarobot_jdbc_conn_id
+            datarobot_jdbc_conn_id=context["params"]["datarobot_jdbc_connection"]
         ).run()
 
         dataset_name = context["params"]["dataset_name"]
         table_schema = context["params"]["table_schema"]
         table_name = context["params"]["table_name"]
-        query = context["params"]["query"]
 
-        for data_source in dr.DataSource.list():
-            if data_source.canonical_name == dataset_name:
-                break
+        data_source = None
+
+        for dr_source in dr.DataSource.list():
+            if dr_source.canonical_name == dataset_name:
+                data_source = dr_source
 
         # Creating DataSourceParameters:
-        params = dr.DataSourceParameters(
-            table=table_name,
-            schema=table_schema,
-            #query=query,
-        )
+        params = dr.DataSourceParameters(table=table_name, schema=table_schema)
 
         if data_source is None:
             # Adding data_store_id to params (required for DataSource creation):
