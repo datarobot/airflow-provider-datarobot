@@ -33,7 +33,6 @@ from datarobot_provider.operators.ai_catalog import CreateDatasetFromJDBCOperato
         "table_name": "test_table",
         "query": 'SELECT * FROM "integration_demo"."test_table"',
     },
-
 )
 def datarobot_dataset_connect():
     dataset_connect_op = CreateDatasetFromJDBCOperator(
