@@ -122,7 +122,7 @@ class UpdateDatasetFromFileOperator(BaseOperator):
 
 class CreateDatasetFromJDBCOperator(BaseOperator):
     """
-    Loading dataset from JDBC datasource to DataRobot AI Catalog and return Dataset ID.
+    Loading dataset from JDBC Connection to DataRobot AI Catalog and return Dataset ID.
 
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
@@ -159,32 +159,42 @@ class CreateDatasetFromJDBCOperator(BaseOperator):
         ).run()
 
         dataset_name = context["params"]["dataset_name"]
-        table_schema = context["params"]["table_schema"]
-        table_name = context["params"]["table_name"]
 
         data_source = None
 
         for dr_source in dr.DataSource.list():
             if dr_source.canonical_name == dataset_name:
                 data_source = dr_source
+                break
 
         # Creating DataSourceParameters:
-        params = dr.DataSourceParameters(table=table_name, schema=table_schema)
+        if "query" in context["params"] and context["params"]["query"]:
+            # using sql statement is it's provided:
+            params = dr.DataSourceParameters(query=context["params"]["query"])
+        else:
+            # otherwise using schema and table:
+            params = dr.DataSourceParameters(
+                schema=context["params"]["table_schema"], table=context["params"]["table_name"]
+            )
 
         if data_source is None:
             # Adding data_store_id to params (required for DataSource creation):
             params.data_store_id = data_store.id
             # Creating DataSource using params with data_store_id
+            self.log.info(f"Creating DataSource: {dataset_name}")
             data_source = dr.DataSource.create(
                 data_source_type='jdbc', canonical_name=dataset_name, params=params
             )
-        else:
-            # Checking if there are any changes in params:
-            if not params == data_source.params:
-                # If params in changed, updating data source:
-                data_source.update(canonical_name=dataset_name, params=params)
+            self.log.info(f"DataSource:{dataset_name} successfully created, id={data_source.id}")
 
-        self.log.info("Creating Dataset from Data Source")
+        # Checking if there are any changes in params:
+        elif not params == data_source.params:
+            # If params in changed, updating data source:
+            self.log.info(f"Updating DataSource:{dataset_name} with new params...")
+            data_source.update(canonical_name=dataset_name, params=params)
+            self.log.info(f"DataSource:{dataset_name} successfully updated, id={data_source.id}")
+
+        self.log.info(f"Creating Dataset from DataSource: {dataset_name}")
         ai_catalog_dataset = dr.Dataset.create_from_data_source(
             data_source_id=data_source.id, credential_data=credential_data
         )

@@ -113,19 +113,25 @@ class JDBCDataSourceHook(BaseHook):
         }
 
         # Find the JDBC driver ID from name:
-        for jdbc_drv in dr.DataDriver.list():
-            if jdbc_drv.canonical_name in jdbc_driver_name:
-                self.log.info(f"Found JDBC Driver:{jdbc_drv.canonical_name} , id={jdbc_drv.id}")
-                jdbc_driver_id = jdbc_drv.id
+        for jdbc_drv_item in dr.DataDriver.list():
+            if jdbc_drv_item.canonical_name == jdbc_driver_name:
+                jdbc_driver_id = jdbc_drv_item.id
+                self.log.info(
+                    f"Found JDBC Driver:{jdbc_drv_item.canonical_name} , id={jdbc_drv_item.id}"
+                )
                 break
 
         if jdbc_driver_id is None:
             raise AirflowException("JDBC Driver not found")
 
+        data_store = None
         # Check if DataStore created already:
-        for data_store in dr.DataStore.list():
-            if data_store.canonical_name == self.datarobot_jdbc_conn_id:
-                f"Found existing DataStore:{data_store.canonical_name} , id={data_store.id}"
+        for data_store_item in dr.DataStore.list():
+            if data_store_item.canonical_name == self.datarobot_jdbc_conn_id:
+                data_store = data_store_item
+                self.log.info(
+                    f"Found existing DataStore:{data_store.canonical_name} , id={data_store.id}"
+                )
                 break
 
         if data_store is None:
@@ -141,16 +147,18 @@ class JDBCDataSourceHook(BaseHook):
             self.log.info(
                 f"DataStore:{self.datarobot_jdbc_conn_id} successfully created, id={data_store.id}"
             )
-        else:
-            if (
-                jdbc_url != data_store.params.jdbc_url
-                or jdbc_driver_id != data_store.params.driver_id
-            ):
-                data_store.update(
-                    canonical_name=self.datarobot_jdbc_conn_id,
-                    driver_id=jdbc_driver_id,
-                    jdbc_url=jdbc_url,
-                )
+        elif (
+            jdbc_url != data_store.params.jdbc_url or jdbc_driver_id != data_store.params.driver_id
+        ):
+            self.log.info(f"Updating DataStore:{self.datarobot_jdbc_conn_id} with new params...")
+            data_store.update(
+                canonical_name=self.datarobot_jdbc_conn_id,
+                driver_id=jdbc_driver_id,
+                jdbc_url=jdbc_url,
+            )
+            self.log.info(
+                f"DataStore:{self.datarobot_jdbc_conn_id} successfully updated, id={data_store.id}"
+            )
 
         return credential_data, data_store
 
