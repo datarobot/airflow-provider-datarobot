@@ -50,7 +50,7 @@ def dr_jdbc_conn_details():
     }
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(autouse=True)
 def mock_datarobot_driver(mocker, dr_jdbc_conn_details):
     driver_list_mock = [
         mocker.Mock(
