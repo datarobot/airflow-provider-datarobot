@@ -114,8 +114,6 @@ class JDBCDataSourceHook(BaseHook):
         }
 
         # Find the JDBC driver ID from name:
-        listm = DataDriver.list()
-        print(listm)
         for jdbc_drv_item in DataDriver.list():
             if jdbc_drv_item.canonical_name == jdbc_driver_name:
                 jdbc_driver_id = jdbc_drv_item.id
