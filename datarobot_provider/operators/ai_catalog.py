@@ -189,7 +189,7 @@ class CreateDatasetFromJDBCOperator(BaseOperator):
             self.log.info(f"DataSource:{dataset_name} successfully created, id={data_source.id}")
 
         # Checking if there are any changes in params:
-        elif not (params == data_source.params):
+        elif params != data_source.params:
             # If params in changed, updating data source:
             self.log.info(f"Updating DataSource:{dataset_name} with new params")
             data_source.update(canonical_name=dataset_name, params=params)
