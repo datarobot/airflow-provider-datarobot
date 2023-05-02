@@ -8,9 +8,10 @@
 from typing import Any
 from typing import Dict
 
-import datarobot as dr
 from airflow import AirflowException
 from airflow.hooks.base import BaseHook
+from datarobot.models.data_store import DataStore
+from datarobot.models.driver import DataDriver
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
@@ -76,7 +77,7 @@ class JDBCDataSourceHook(BaseHook):
         super().__init__()
         self.datarobot_jdbc_conn_id = datarobot_jdbc_conn_id
 
-    def get_conn(self) -> (dict, dr.DataStore):
+    def get_conn(self) -> (dict, DataStore):
         """Initializes a DataRobot DataStore instance with associated credentials."""
 
         conn = self.get_connection(self.datarobot_jdbc_conn_id)
@@ -113,7 +114,9 @@ class JDBCDataSourceHook(BaseHook):
         }
 
         # Find the JDBC driver ID from name:
-        for jdbc_drv_item in dr.DataDriver.list():
+        listm = DataDriver.list()
+        print(listm)
+        for jdbc_drv_item in DataDriver.list():
             if jdbc_drv_item.canonical_name == jdbc_driver_name:
                 jdbc_driver_id = jdbc_drv_item.id
                 self.log.info(
@@ -126,7 +129,7 @@ class JDBCDataSourceHook(BaseHook):
 
         data_store = None
         # Check if DataStore created already:
-        for data_store_item in dr.DataStore.list():
+        for data_store_item in DataStore.list():
             if data_store_item.canonical_name == self.datarobot_jdbc_conn_id:
                 data_store = data_store_item
                 self.log.info(
@@ -138,7 +141,7 @@ class JDBCDataSourceHook(BaseHook):
             self.log.info(
                 f"DataStore:{self.datarobot_jdbc_conn_id} does not exist, trying to create it"
             )
-            data_store = dr.DataStore.create(
+            data_store = DataStore.create(
                 data_store_type='jdbc',
                 canonical_name=self.datarobot_jdbc_conn_id,
                 driver_id=jdbc_driver_id,

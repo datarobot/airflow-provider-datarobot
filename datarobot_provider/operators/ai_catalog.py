@@ -162,14 +162,15 @@ class CreateDatasetFromJDBCOperator(BaseOperator):
 
         data_source = None
 
-        for dr_source in dr.DataSource.list():
-            if dr_source.canonical_name == dataset_name:
-                data_source = dr_source
+        for dr_source_item in dr.DataSource.list():
+            if dr_source_item.canonical_name == dataset_name:
+                data_source = dr_source_item
+                self.log.info(f"Found existing DataSource:{dataset_name}, id={data_source.id}")
                 break
 
         # Creating DataSourceParameters:
         if "query" in context["params"] and context["params"]["query"]:
-            # using sql statement is it's provided:
+            # using sql statement if provided:
             params = dr.DataSourceParameters(query=context["params"]["query"])
         else:
             # otherwise using schema and table:
@@ -188,15 +189,18 @@ class CreateDatasetFromJDBCOperator(BaseOperator):
             self.log.info(f"DataSource:{dataset_name} successfully created, id={data_source.id}")
 
         # Checking if there are any changes in params:
-        elif not params == data_source.params:
+        elif not (params == data_source.params):
             # If params in changed, updating data source:
-            self.log.info(f"Updating DataSource:{dataset_name} with new params...")
+            self.log.info(f"Updating DataSource:{dataset_name} with new params")
             data_source.update(canonical_name=dataset_name, params=params)
             self.log.info(f"DataSource:{dataset_name} successfully updated, id={data_source.id}")
 
         self.log.info(f"Creating Dataset from DataSource: {dataset_name}")
         ai_catalog_dataset = dr.Dataset.create_from_data_source(
-            data_source_id=data_source.id, credential_data=credential_data
+            data_source_id=data_source.id,
+            credential_data=credential_data,
+            persist_data_after_ingestion=context["params"]["persist_data_after_ingestion"],
+            do_snapshot=context["params"]["do_snapshot"],
         )
         self.log.info(f"Dataset created: dataset_id={ai_catalog_dataset.id}")
         return ai_catalog_dataset.id
