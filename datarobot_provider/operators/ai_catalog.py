@@ -13,6 +13,7 @@ import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 
+from datarobot_provider.hooks.connections import JDBCDataSourceHook
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
 DATAROBOT_MAX_WAIT = 3600
@@ -117,3 +118,89 @@ class UpdateDatasetFromFileOperator(BaseOperator):
         )
 
         return ai_catalog_dataset.version_id
+
+
+class CreateDatasetFromJDBCOperator(BaseOperator):
+    """
+    Loading dataset from JDBC Connection to DataRobot AI Catalog and return Dataset ID.
+
+    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
+    :type datarobot_conn_id: str, optional
+    :return: DataRobot AI Catalog dataset ID
+    :rtype: str
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Iterable[str] = []
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Iterable[str] = ()
+    ui_color = '#f4a460'
+
+    def __init__(
+        self,
+        *,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.datarobot_conn_id = datarobot_conn_id
+        if kwargs.get('xcom_push') is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Dict[str, Any]) -> str:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        # Fetch stored JDBC Connection with credentials
+        credential_data, data_store = JDBCDataSourceHook(
+            datarobot_jdbc_conn_id=context["params"]["datarobot_jdbc_connection"]
+        ).run()
+
+        dataset_name = context["params"]["dataset_name"]
+
+        data_source = None
+
+        for dr_source_item in dr.DataSource.list():
+            if dr_source_item.canonical_name == dataset_name:
+                data_source = dr_source_item
+                self.log.info(f"Found existing DataSource:{dataset_name}, id={data_source.id}")
+                break
+
+        # Creating DataSourceParameters:
+        if "query" in context["params"] and context["params"]["query"]:
+            # using sql statement if provided:
+            params = dr.DataSourceParameters(query=context["params"]["query"])
+        else:
+            # otherwise using schema and table:
+            params = dr.DataSourceParameters(
+                schema=context["params"]["table_schema"], table=context["params"]["table_name"]
+            )
+
+        if data_source is None:
+            # Adding data_store_id to params (required for DataSource creation):
+            params.data_store_id = data_store.id
+            # Creating DataSource using params with data_store_id
+            self.log.info(f"Creating DataSource: {dataset_name}")
+            data_source = dr.DataSource.create(
+                data_source_type='jdbc', canonical_name=dataset_name, params=params
+            )
+            self.log.info(f"DataSource:{dataset_name} successfully created, id={data_source.id}")
+
+        # Checking if there are any changes in params:
+        elif params != data_source.params:
+            # If params in changed, updating data source:
+            self.log.info(f"Updating DataSource:{dataset_name} with new params")
+            data_source.update(canonical_name=dataset_name, params=params)
+            self.log.info(f"DataSource:{dataset_name} successfully updated, id={data_source.id}")
+
+        self.log.info(f"Creating Dataset from DataSource: {dataset_name}")
+        ai_catalog_dataset = dr.Dataset.create_from_data_source(
+            data_source_id=data_source.id,
+            credential_data=credential_data,
+            persist_data_after_ingestion=context["params"]["persist_data_after_ingestion"],
+            do_snapshot=context["params"]["do_snapshot"],
+        )
+        self.log.info(f"Dataset created: dataset_id={ai_catalog_dataset.id}")
+        return ai_catalog_dataset.id
