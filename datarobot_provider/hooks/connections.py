@@ -165,7 +165,7 @@ class JDBCDataSourceHook(BaseHook):
         return self.get_conn()
 
     def test_connection(self):
-        """Test DataRobot JDBC DataStore Connection"""
+        """Test DataRobot connection to JDBC DataSource"""
         try:
             credential_data, data_store = self.run()
             test_result = data_store.test(
