@@ -28,13 +28,12 @@ from datarobot_provider.operators.ai_catalog import CreateDatasetFromJDBCOperato
     schedule_interval=None,
     start_date=datetime(2023, 1, 1),
     tags=['example'],
-    # Default json config:
+    # Default json config example:
     params={
         "datarobot_jdbc_connection": "datarobot_jdbc_default",
         "dataset_name": "test_dataset_name",
         "table_schema": "integration_demo",
         "table_name": "test_table",
-        # "query": 'SELECT * FROM "integration_demo"."test_table"',
         "persist_data_after_ingestion": True,
         "do_snapshot": True,
     },
