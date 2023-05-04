@@ -33,6 +33,7 @@ class JDBCDataSourceHook(BaseHook):
     @staticmethod
     def get_connection_form_widgets() -> Dict[str, Any]:
         """Returns connection widgets to add to connection form."""
+        from flask_appbuilder.fieldwidgets import BS3TextAreaFieldWidget
         from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
         from flask_babel import lazy_gettext
         from wtforms import StringField
@@ -50,7 +51,7 @@ class JDBCDataSourceHook(BaseHook):
             ),
             "jdbc_url": StringField(
                 lazy_gettext('JDBC URL'),
-                widget=BS3TextFieldWidget(),
+                widget=BS3TextAreaFieldWidget(),
                 default='jdbc:',
             ),
         }
@@ -78,7 +79,8 @@ class JDBCDataSourceHook(BaseHook):
         self.datarobot_jdbc_conn_id = datarobot_jdbc_conn_id
 
     def get_conn(self) -> (dict, DataStore):
-        """Initializes a DataRobot DataStore instance with associated credentials."""
+        """Retrieving corresponding DataStore object or creating if not exist,
+        updating it with new parameters in case of changes."""
 
         conn = self.get_connection(self.datarobot_jdbc_conn_id)
 
@@ -121,21 +123,17 @@ class JDBCDataSourceHook(BaseHook):
                     f"Found JDBC Driver:{jdbc_drv_item.canonical_name} , id={jdbc_drv_item.id}"
                 )
                 break
+        else:
+            raise AirflowException(f'JDBC Driver "{jdbc_driver_name}" not found')
 
-        if jdbc_driver_id is None:
-            raise AirflowException("JDBC Driver not found")
-
-        data_store = None
         # Check if DataStore created already:
-        for data_store_item in DataStore.list():
-            if data_store_item.canonical_name == self.datarobot_jdbc_conn_id:
-                data_store = data_store_item
+        for data_store in DataStore.list():
+            if data_store.canonical_name == self.datarobot_jdbc_conn_id:
                 self.log.info(
                     f"Found existing DataStore:{data_store.canonical_name} , id={data_store.id}"
                 )
                 break
-
-        if data_store is None:
+        else:
             self.log.info(
                 f"DataStore:{self.datarobot_jdbc_conn_id} does not exist, trying to create it"
             )
@@ -148,9 +146,8 @@ class JDBCDataSourceHook(BaseHook):
             self.log.info(
                 f"DataStore:{self.datarobot_jdbc_conn_id} successfully created, id={data_store.id}"
             )
-        elif (
-            jdbc_url != data_store.params.jdbc_url or jdbc_driver_id != data_store.params.driver_id
-        ):
+
+        if jdbc_url != data_store.params.jdbc_url or jdbc_driver_id != data_store.params.driver_id:
             self.log.info(f"Updating DataStore:{self.datarobot_jdbc_conn_id} with new params...")
             data_store.update(
                 canonical_name=self.datarobot_jdbc_conn_id,
@@ -164,17 +161,17 @@ class JDBCDataSourceHook(BaseHook):
         return credential_data, data_store
 
     def run(self) -> Any:
-        # get Credentials and initialize DataStore object
+        # get or create DataStore object updated with actual parameters
         return self.get_conn()
 
     def test_connection(self):
-        """Test DataRobot connection to JDBC DataSource"""
+        """Test DataRobot JDBC DataStore Connection"""
         try:
             credential_data, data_store = self.run()
             test_result = data_store.test(
                 username=credential_data["user"], password=credential_data["password"]
             )
 
-            return True, test_result['message']
+            return True, f"{test_result['message']}, datastore id={data_store.id}"
         except Exception as e:
             return False, str(e)

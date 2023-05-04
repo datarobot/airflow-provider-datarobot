@@ -30,11 +30,11 @@ from datarobot_provider.operators.ai_catalog import CreateDatasetFromJDBCOperato
     tags=['example'],
     # Default json config:
     params={
-        "datarobot_jdbc_connection": "datarobot_jdbc_test",
+        "datarobot_jdbc_connection": "datarobot_jdbc_default",
         "dataset_name": "test_dataset_name",
         "table_schema": "integration_demo",
         "table_name": "test_table",
-        "query": 'SELECT * FROM "integration_demo"."test_table"',
+        # "query": 'SELECT * FROM "integration_demo"."test_table"',
         "persist_data_after_ingestion": True,
         "do_snapshot": True,
     },
