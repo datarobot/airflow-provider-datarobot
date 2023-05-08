@@ -11,10 +11,6 @@ def get_provider_info():
         "name": "DataRobot Airflow Provider",
         "description": "DataRobot Airflow provider.",
         "versions": ["0.0.5"],
-        "hook-class-names": [
-            "datarobot_provider.hooks.datarobot.DataRobotHook",
-            "datarobot_provider.hooks.connections.JDBCDataSourceHook",
-        ],  # Deprecated in >=2.2.0
         "connection-types": [
             {
                 "hook-class-name": "datarobot_provider.hooks.datarobot.DataRobotHook",
@@ -23,6 +19,10 @@ def get_provider_info():
             {
                 "hook-class-name": "datarobot_provider.hooks.connections.JDBCDataSourceHook",
                 "connection-type": "datarobot_jdbc_datasource",
+            },
+            {
+                "hook-class-name": "datarobot_provider.hooks.credentials.BasicCredentialsHook",
+                "connection-type": "datarobot_basic_credentials",
             },
         ],
         "extra-links": [],
