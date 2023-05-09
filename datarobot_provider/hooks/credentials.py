@@ -26,7 +26,6 @@ class CredentialsBaseHook(BaseHook):
     """
 
     conn_name_attr = 'datarobot_credentials_conn_id'
-    # default_datarobot_credentials_conn_name = 'datarobot_credentials_default'
     hook_name = 'DataRobot Credentials'
     default_credential_description = "Credentials managed by Airflow provider for Datarobot"
 
