@@ -26,23 +26,24 @@ class CredentialsBaseHook(BaseHook):
     """
 
     conn_name_attr = 'datarobot_credentials_conn_id'
-    default_datarobot_credentials_conn_name = 'datarobot_credentials_default'
+    # default_datarobot_credentials_conn_name = 'datarobot_credentials_default'
     hook_name = 'DataRobot Credentials'
     default_credential_description = "Credentials managed by Airflow provider for Datarobot"
 
     def __init__(
         self,
-        datarobot_credentials_conn_id: str = default_datarobot_credentials_conn_name,
+        datarobot_credentials_conn_id: str = None,
     ) -> None:
         super().__init__()
         self.datarobot_credentials_conn_id = datarobot_credentials_conn_id
 
-    def create_credentials(self) -> Credential:
+    def create_credentials(self, conn) -> Credential:
         """Creates DataRobot Credentials."""
         raise NotImplementedError()
 
-    def get_credential_data(self) -> dict:
-        """Creates credential data dict"""
+    def get_credential_data(self, conn) -> dict:
+        """Get credential data dict to use with methods that
+        accept credential_data instead of credential ID"""
         raise NotImplementedError()
 
     def get_conn(self) -> Credential:
@@ -69,7 +70,7 @@ class CredentialsBaseHook(BaseHook):
                 else:
                     raise AirflowException(
                         f"Found Existing Credentials :{credential.name} , id={credential.credential_id}"
-                        f"not managed by Airflow provider: {credential.description}"
+                        f" not managed by Airflow provider: {credential.description}"
                     )
         else:
             self.log.info(
@@ -81,7 +82,6 @@ class CredentialsBaseHook(BaseHook):
             )
 
         credential_data = self.get_credential_data(conn)
-
         return credential, credential_data
 
     def run(self) -> Any:
@@ -89,24 +89,34 @@ class CredentialsBaseHook(BaseHook):
         return self.get_conn()
 
     def test_connection(self):
-        """Test DataRobot Credentials exist"""
+        """Test that we can create DataRobot Credentials without errors"""
         try:
             credential, credential_data = self.run()
-            self.log.info(f"Checking credentials:{credential.credential_id} is created already")
             credential = Credential.get(credential.credential_id)
-            if self.default_credential_description == credential.description:
-                return True, f"Credentials exist, credential id={credential.credential_id}"
-            else:
-                return (
-                    False,
-                    f"Found Credentials, id={credential.credential_id} not managed by Airflow",
-                )
+            self.log.info(
+                f"Test credential {credential.name} id={credential.credential_id} created"
+            )
+            # Airflow using randomly generated connection_id for to test connection,
+            # so we need to delete it after creation:
+            credential.delete()
+            self.log.info(
+                f"Test credential {credential.name} id={credential.credential_id} deleted"
+            )
+            return True, "Test creating DataRobot credentials success"
         except Exception as e:
             return False, str(e)
 
 
 class BasicCredentialsHook(CredentialsBaseHook):
+    hook_name = 'DataRobot Basic Credentials'
     conn_type = 'datarobot_basic_credentials'
+
+    def __init__(
+        self,
+        datarobot_credentials_conn_id: str = None,
+    ) -> None:
+        super().__init__()
+        self.datarobot_credentials_conn_id = datarobot_credentials_conn_id
 
     def create_credentials(self, conn) -> Credential:
         """Creates DataRobot Basic Credentials using provided login/password."""
@@ -116,6 +126,7 @@ class BasicCredentialsHook(CredentialsBaseHook):
         if not conn.password:
             raise AirflowException("password is not defined")
 
+        self.log.info(f"Creating Basic Credentials:{self.datarobot_credentials_conn_id}")
         credential = Credential.create_basic(
             name=self.datarobot_credentials_conn_id,
             user=conn.login,

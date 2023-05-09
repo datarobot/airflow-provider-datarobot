@@ -61,4 +61,4 @@ class GetCredentialIdOperator(BaseOperator):
                 )
                 return credential.credential_id
         else:
-            raise AirflowException('Credentials does not exist')
+            raise ValueError('Credentials does not exist')
