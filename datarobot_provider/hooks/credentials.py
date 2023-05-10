@@ -8,7 +8,7 @@
 
 from typing import Any
 from typing import Dict
-
+import json
 from airflow import AirflowException
 from airflow.hooks.base import BaseHook
 from datarobot.models.credential import Credential
@@ -61,7 +61,7 @@ class CredentialsBaseHook(BaseHook):
         # Trying to find existing DataRobot Credentials managed by Airflow provider:
         for credential in Credential.list():
             if credential.name == self.datarobot_credentials_conn_id:
-                if self.default_credential_description == credential.description:
+                if self.default_credential_description in credential.description:
                     self.log.info(
                         f"Found Existing Credentials :{credential.name} , id={credential.credential_id}"
                     )
@@ -169,5 +169,82 @@ class BasicCredentialsHook(CredentialsBaseHook):
                 'datarobot_connection': 'datarobot_default',
                 'login': '',
                 'password': '',
+            },
+        }
+
+
+class GoogleCloudCredentialsHook(CredentialsBaseHook):
+    hook_name = 'DataRobot GCP Credentials'
+    conn_type = 'datarobot_gcp_credentials'
+
+    def create_credentials(self, conn) -> Credential:
+        """Returns Google Cloud credentials for params in connection object"""
+
+        gcp_key = conn.extra_dejson.get('gcp_key', '')
+
+        if not gcp_key:
+            raise AirflowException("gcp_key is not defined")
+
+        try:
+            self.log.info("Trying to parse provided GCP key json")
+            # removing newlines and parsing json:
+            gcp_key_json = json.loads(gcp_key.replace("\n", ""))
+            self.log.info(f"Creating Google Cloud Credentials:{self.datarobot_credentials_conn_id}")
+            credential = Credential.create_gcp(
+                name=self.datarobot_credentials_conn_id,
+                gcp_key=gcp_key_json,
+                description=self.default_credential_description,
+            )
+            return credential
+
+        except Exception as e:
+            self.log.error(
+                f"Error creating GCP Credentials: {self.datarobot_credentials_conn_id}, message:{str(e)}"
+            )
+            raise AirflowException(
+                f"Error creating GCP Credentials: {self.datarobot_credentials_conn_id}"
+            )
+
+    def get_credential_data(self, conn) -> dict:
+        # For methods that accept credential data instead of credential ID
+        credential_data = {
+            "credentialType": "basic",
+            "gcpKey": conn.extra_dejson.get('gcp_key', ''),
+        }
+        return credential_data
+
+    @staticmethod
+    def get_connection_form_widgets() -> Dict[str, Any]:
+        """Returns connection widgets to add to connection form."""
+        from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
+        from flask_appbuilder.fieldwidgets import BS3TextAreaFieldWidget
+        from flask_babel import lazy_gettext
+        from wtforms import StringField
+
+        return {
+            "datarobot_connection": StringField(
+                lazy_gettext('DataRobot Connection'),
+                widget=BS3TextFieldWidget(),
+                default='datarobot_default',
+            ),
+            "gcp_key": StringField(
+                lazy_gettext('GCP Key (Service Account)'),
+                widget=BS3TextAreaFieldWidget(),
+            ),
+            "created": StringField(
+                lazy_gettext('GCP Key (Service Account)'),
+                widget=BS3TextAreaFieldWidget(),
+            ),
+        }
+
+    @staticmethod
+    def get_ui_field_behaviour() -> Dict:
+        """Returns custom field behaviour."""
+        return {
+            "hidden_fields": ['host', 'schema', 'port', 'login', 'password', 'extra'],
+            "relabeling": {},
+            "placeholders": {
+                'datarobot_connection': 'datarobot_default',
+                'gcp_key': 'Enter a valid JSON string',
             },
         }

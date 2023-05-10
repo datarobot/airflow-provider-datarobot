@@ -60,6 +60,15 @@ def dr_basic_credentials_conn_details():
     }
 
 
+# For GCP Credentials test
+@pytest.fixture
+def dr_gcp_credentials_conn_details():
+    return {
+        "gcp_key": '{"gcp_credentials":"test"}',
+        "datarobot_connection": "datarobot_default",
+    }
+
+
 @pytest.fixture(autouse=True)
 def mock_datarobot_driver(mocker, dr_jdbc_conn_details):
     driver_list_mock = [
@@ -138,3 +147,34 @@ def mock_airflow_connection_datarobot_basic_credentials(mocker, dr_basic_credent
         ),
     )
     mocker.patch.dict("os.environ", AIRFLOW_CONN_DATAROBOT_BASIC_CREDENTIALS_DEFAULT=conn.get_uri())
+
+
+@pytest.fixture(scope="function", autouse=True)
+def mock_datarobot_gcp_credentials(mocker, dr_gcp_credentials_conn_details):
+    gcp_credentials_create_mock = mocker.Mock(
+        credential_id='test-gcp-credentials-id',
+        name='datarobot_gcp_credentials_test',
+        credential_type='gcp',
+        gcp_key=dr_gcp_credentials_conn_details["gcp_key"],
+        description="Credentials managed by Airflow provider for Datarobot",
+    )
+
+    mocker.patch("datarobot_provider.hooks.credentials.Credential.list", return_value=[])
+    mocker.patch(
+        "datarobot_provider.hooks.credentials.Credential.create_gcp",
+        return_value=gcp_credentials_create_mock,
+    )
+
+
+@pytest.fixture(scope="function", autouse=True)
+def mock_airflow_connection_datarobot_gcp_credentials(mocker, dr_gcp_credentials_conn_details):
+    conn = Connection(
+        conn_type="datarobot_gcp_credentials",
+        extra=json.dumps(
+            {
+                "gcp_key": dr_gcp_credentials_conn_details["gcp_key"],
+                "datarobot_connection": dr_gcp_credentials_conn_details["datarobot_connection"],
+            }
+        ),
+    )
+    mocker.patch.dict("os.environ", AIRFLOW_CONN_DATAROBOT_GCP_CREDENTIALS_TEST=conn.get_uri())
