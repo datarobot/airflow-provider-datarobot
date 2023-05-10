@@ -232,10 +232,6 @@ class GoogleCloudCredentialsHook(CredentialsBaseHook):
                 lazy_gettext('GCP Key (Service Account)'),
                 widget=BS3TextAreaFieldWidget(),
             ),
-            "created": StringField(
-                lazy_gettext('GCP Key (Service Account)'),
-                widget=BS3TextAreaFieldWidget(),
-            ),
         }
 
     @staticmethod
