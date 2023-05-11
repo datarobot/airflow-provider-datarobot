@@ -149,7 +149,7 @@ def mock_airflow_connection_datarobot_basic_credentials(mocker, dr_basic_credent
     mocker.patch.dict("os.environ", AIRFLOW_CONN_DATAROBOT_BASIC_CREDENTIALS_DEFAULT=conn.get_uri())
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(autouse=True)
 def mock_datarobot_gcp_credentials(mocker, dr_gcp_credentials_conn_details):
     gcp_credentials_create_mock = mocker.Mock(
         credential_id='test-gcp-credentials-id',
