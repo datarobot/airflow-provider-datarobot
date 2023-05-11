@@ -13,9 +13,10 @@ from airflow.exceptions import AirflowNotFoundException
 from datarobot_provider.operators.credentials import GetCredentialIdOperator
 
 
-def test_operator_get_credential_id(mocker):
+def test_operator_get_basic_credential_id(mocker):
     credential_mock = mocker.Mock()
     credential_mock.credential_id = "credential-id"
+    credential_mock.credential_type = 'datarobot_basic_credentials'
     credential_mock.name = "datarobot_basic_credentials_default"
     credential_mock.description = "Credentials managed by Airflow provider for Datarobot"
     mocker.patch.object(dr.Credential, "list", return_value=[credential_mock])
@@ -36,6 +37,7 @@ def test_operator_get_credential_not_found(mocker):
     credential_mock = mocker.Mock()
     credential_mock.credential_id = "credential-id"
     credential_mock.name = "datarobot_basic_credentials_default"
+    credential_mock.credential_type = 'datarobot_basic_credentials'
     credential_mock.description = "Credentials managed by Airflow provider for Datarobot"
     mocker.patch.object(dr.Credential, "list", return_value=[credential_mock])
     # should raise ValueError if credentials with provided name is not found
@@ -53,6 +55,7 @@ def test_operator_get_credential_not_found(mocker):
 def test_operator_get_gcp_credential_id(mocker):
     credential_mock = mocker.Mock()
     credential_mock.credential_id = "test-gcp-credentials-id"
+    credential_mock.credential_type = 'datarobot_gcp_credentials'
     credential_mock.name = "datarobot_gcp_credentials_test"
     credential_mock.description = "Credentials managed by Airflow provider for Datarobot"
     mocker.patch.object(dr.Credential, "list", return_value=[credential_mock])
@@ -71,6 +74,7 @@ def test_operator_get_gcp_credential_id(mocker):
 
 def test_operator_get_gcp_credential_not_found(mocker):
     credential_mock = mocker.Mock()
+    credential_mock.credential_type = 'datarobot_gcp_credentials'
     credential_mock.credential_id = "test-gcp-credentials-id"
     credential_mock.name = "datarobot_gcp_credentials_test"
     mocker.patch.object(dr.Credential, "list", return_value=[credential_mock])

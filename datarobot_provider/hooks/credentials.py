@@ -209,7 +209,7 @@ class GoogleCloudCredentialsHook(CredentialsBaseHook):
     def get_credential_data(self, conn) -> dict:
         # For methods that accept credential data instead of credential ID
         credential_data = {
-            "credentialType": "basic",
+            "credentialType": "gcp",
             "gcpKey": conn.extra_dejson.get('gcp_key', ''),
         }
         return credential_data
