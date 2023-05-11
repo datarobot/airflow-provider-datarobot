@@ -166,7 +166,7 @@ def mock_datarobot_gcp_credentials(mocker, dr_gcp_credentials_conn_details):
     )
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(autouse=True)
 def mock_airflow_connection_datarobot_gcp_credentials(mocker, dr_gcp_credentials_conn_details):
     conn = Connection(
         conn_type="datarobot_gcp_credentials",
