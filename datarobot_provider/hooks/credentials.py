@@ -109,7 +109,7 @@ class CredentialsBaseHook(BaseHook):
 
 class BasicCredentialsHook(CredentialsBaseHook):
     hook_name = 'DataRobot Basic Credentials'
-    conn_type = 'datarobot_basic_credentials'
+    conn_type = 'datarobot-basic-credentials'
 
     def __init__(
         self,

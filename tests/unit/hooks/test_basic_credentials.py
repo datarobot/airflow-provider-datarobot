@@ -9,7 +9,7 @@ from datarobot_provider.hooks.credentials import BasicCredentialsHook
 
 
 def test_datarobot_basic_credentials_conn(dr_basic_credentials_conn_details):
-    hook = BasicCredentialsHook(datarobot_credentials_conn_id="datarobot_basic_credentials_default")
+    hook = BasicCredentialsHook(datarobot_credentials_conn_id="datarobot_basic_credentials_test")
     credentials, credential_data = hook.get_conn()
 
     assert credential_data["user"] == dr_basic_credentials_conn_details["login"]
