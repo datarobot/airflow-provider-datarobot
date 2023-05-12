@@ -137,7 +137,7 @@ def mock_datarobot_basic_credentials(mocker, dr_basic_credentials_conn_details):
 @pytest.fixture(autouse=True)
 def mock_airflow_connection_datarobot_basic_credentials(mocker, dr_basic_credentials_conn_details):
     conn = Connection(
-        conn_type="datarobotcredentialsbasic",
+        conn_type="datarobot.credentials.basic",
         login=dr_basic_credentials_conn_details["login"],
         password=dr_basic_credentials_conn_details["password"],
         extra=json.dumps(
@@ -169,7 +169,7 @@ def mock_datarobot_gcp_credentials(mocker, dr_gcp_credentials_conn_details):
 @pytest.fixture(autouse=True)
 def mock_airflow_connection_datarobot_gcp_credentials(mocker, dr_gcp_credentials_conn_details):
     conn = Connection(
-        conn_type="datarobotcredentialsgcp",
+        conn_type="datarobot.credentials.gcp",
         extra=json.dumps(
             {
                 "gcp_key": dr_gcp_credentials_conn_details["gcp_key"],

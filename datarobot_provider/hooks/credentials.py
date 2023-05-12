@@ -109,7 +109,7 @@ class CredentialsBaseHook(BaseHook):
 
 class BasicCredentialsHook(CredentialsBaseHook):
     hook_name = 'DataRobot Basic Credentials'
-    conn_type = 'datarobotcredentialsbasic'
+    conn_type = 'datarobot.credentials.basic'
 
     def __init__(
         self,
@@ -176,7 +176,7 @@ class BasicCredentialsHook(CredentialsBaseHook):
 
 class GoogleCloudCredentialsHook(CredentialsBaseHook):
     hook_name = 'DataRobot GCP Credentials'
-    conn_type = 'datarobotcredentialsgcp'
+    conn_type = 'datarobot.credentials.gcp'
 
     def create_credentials(self, conn) -> Credential:
         """Returns Google Cloud credentials for params in connection object"""

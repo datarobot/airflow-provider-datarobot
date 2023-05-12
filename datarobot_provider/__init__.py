@@ -22,11 +22,11 @@ def get_provider_info():
             },
             {
                 "hook-class-name": "datarobot_provider.hooks.credentials.BasicCredentialsHook",
-                "connection-type": "datarobotcredentialsbasic",
+                "connection-type": "datarobot.credentials.basic",
             },
             {
                 "hook-class-name": "datarobot_provider.hooks.credentials.GoogleCloudCredentialsHook",
-                "connection-type": "datarobotcredentialsgcp",
+                "connection-type": "datarobot.credentials.gcp",
             },
         ],
         "extra-links": [],

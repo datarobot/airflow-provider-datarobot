@@ -16,7 +16,7 @@ from datarobot_provider.operators.credentials import GetCredentialIdOperator
 def test_operator_get_basic_credential_id(mocker):
     credential_mock = mocker.Mock()
     credential_mock.credential_id = "credential-id"
-    credential_mock.credential_type = 'datarobot-basic-credentials'
+    credential_mock.credential_type = 'datarobot.credentials.basic'
     credential_mock.name = "datarobot_basic_credentials_test"
     credential_mock.description = "Credentials managed by Airflow provider for Datarobot"
     mocker.patch.object(dr.Credential, "list", return_value=[credential_mock])
@@ -37,7 +37,7 @@ def test_operator_get_credential_not_found(mocker):
     credential_mock = mocker.Mock()
     credential_mock.credential_id = "credential-id"
     credential_mock.name = "datarobot_basic_credentials_test"
-    credential_mock.credential_type = 'datarobot-basic-credentials'
+    credential_mock.credential_type = 'datarobot.credentials.basic'
     credential_mock.description = "Credentials managed by Airflow provider for Datarobot"
     mocker.patch.object(dr.Credential, "list", return_value=[credential_mock])
     # should raise ValueError if credentials with provided name is not found
