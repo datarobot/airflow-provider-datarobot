@@ -13,6 +13,7 @@ from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 from datarobot import Credential
 
+from datarobot_provider.hooks.credentials import CredentialsBaseHook
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
 DATAROBOT_MAX_WAIT = 3600
@@ -39,11 +40,13 @@ class GetCredentialIdOperator(BaseOperator):
     def __init__(
         self,
         *,
+        credentials_param_name: str = "datarobot_credentials_name",
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.datarobot_conn_id = datarobot_conn_id
+        self.credentials_param_name = credentials_param_name
         if kwargs.get('xcom_push') is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
@@ -52,13 +55,19 @@ class GetCredentialIdOperator(BaseOperator):
     def execute(self, context: Dict[str, Any]) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
+        credential_name = context["params"][self.credentials_param_name]
         # Trying to find a credential associated with provided credential name:
         for credential in Credential.list():
-            if credential.name == context["params"]["datarobot_credentials_name"]:
+            if credential.name == credential_name:
                 self.log.info(
-                    f'Found Credentials :{credential.name} , id={credential.credential_id}'
+                    f'Found Credentials :{credential.name} , id={credential.credential_id} '
+                    f'for param {self.credentials_param_name}'
                 )
                 return credential.credential_id
         else:
-            raise ValueError('Credentials does not exist')
+            # Trying to find an Airflow preconfigured credentials for provided credential name
+            # to replicate credentials on DataRobot side:
+            credentials, credentials_data = CredentialsBaseHook.get_hook(
+                conn_id=credential_name
+            ).run()
+            return credentials.credential_id
