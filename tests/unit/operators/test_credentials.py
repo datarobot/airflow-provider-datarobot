@@ -12,27 +12,6 @@ from airflow.exceptions import AirflowNotFoundException
 
 from datarobot_provider.operators.credentials import GetCredentialIdOperator
 
-
-def test_operator_get_basic_credential_id(mocker):
-    credential_mock = mocker.Mock()
-    credential_mock.credential_id = "credential-id"
-    credential_mock.credential_type = 'datarobot.credentials.basic'
-    credential_mock.name = "datarobot_basic_credentials_test"
-    credential_mock.description = "Credentials managed by Airflow provider for Datarobot"
-    mocker.patch.object(dr.Credential, "list", return_value=[credential_mock])
-
-    operator = GetCredentialIdOperator(task_id='get_credentials')
-    credential_id = operator.execute(
-        context={
-            "params": {
-                "datarobot_credentials_name": "datarobot_basic_credentials_test",
-            },
-        }
-    )
-
-    assert credential_id == "credential-id"
-
-
 def test_operator_get_credential_not_found(mocker):
     credential_mock = mocker.Mock()
     credential_mock.credential_id = "credential-id"
@@ -46,10 +25,29 @@ def test_operator_get_credential_not_found(mocker):
         operator.execute(
             context={
                 "params": {
-                    "datarobot_credentials_name": "datarobot_basic_credentials_not_exist2",
+                    "datarobot_credentials_name": "datarobot_basic_credentials_not_exist",
                 },
             }
         )
+
+def test_operator_get_basic_credential_id(mocker):
+    credential_mock = mocker.Mock()
+    credential_mock.credential_id = "credential-id"
+    credential_mock.credential_type = 'datarobot.credentials.basic'
+    credential_mock.name = "datarobot_basic_credentials_test"
+    credential_mock.description = "Test Credentials"
+    mocker.patch.object(dr.Credential, "list", return_value=[credential_mock])
+
+    operator = GetCredentialIdOperator(task_id='get_credentials')
+    credential_id = operator.execute(
+        context={
+            "params": {
+                "datarobot_credentials_name": "datarobot_basic_credentials_test",
+            },
+        }
+    )
+
+    assert credential_id == "credential-id"
 
 
 # def test_operator_get_gcp_credential_id(mocker):
