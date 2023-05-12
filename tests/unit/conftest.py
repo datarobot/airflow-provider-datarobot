@@ -16,7 +16,7 @@ def dr_conn_details():
     return {"endpoint": "https://app.datarobot.com/api/v2", "api_key": "my-api-key"}
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(autouse=True)
 def mock_datarobot_client(mocker, dr_conn_details):
     client_mock = mocker.Mock(
         endpoint=dr_conn_details["endpoint"], token=dr_conn_details["api_key"]
@@ -24,7 +24,7 @@ def mock_datarobot_client(mocker, dr_conn_details):
     mocker.patch("datarobot_provider.hooks.datarobot.Client", return_value=client_mock)
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(autouse=True)
 def mock_airflow_connection(mocker, dr_conn_details):
     conn = Connection(
         conn_type="DataRobot",
@@ -83,7 +83,7 @@ def mock_datarobot_driver(mocker, dr_jdbc_conn_details):
     )
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(autouse=True)
 def mock_datarobot_datastore(mocker, dr_jdbc_conn_details):
     datastore_create_mock = mocker.Mock(
         id='test-datastore-id',
@@ -99,7 +99,7 @@ def mock_datarobot_datastore(mocker, dr_jdbc_conn_details):
     )
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(autouse=True)
 def mock_airflow_connection_datarobot_jdbc(mocker, dr_jdbc_conn_details):
     conn = Connection(
         conn_type="datarobot_jdbc_datasource",
@@ -116,7 +116,7 @@ def mock_airflow_connection_datarobot_jdbc(mocker, dr_jdbc_conn_details):
     mocker.patch.dict("os.environ", AIRFLOW_CONN_DATAROBOT_JDBC_DEFAULT=conn.get_uri())
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(autouse=True)
 def mock_datarobot_basic_credentials(mocker, dr_basic_credentials_conn_details):
     credentials_create_mock = mocker.Mock(
         credential_id='test-credentials-id',
@@ -134,7 +134,7 @@ def mock_datarobot_basic_credentials(mocker, dr_basic_credentials_conn_details):
     )
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(autouse=True)
 def mock_airflow_connection_datarobot_basic_credentials(mocker, dr_basic_credentials_conn_details):
     conn = Connection(
         conn_type="datarobot_basic_credentials",
@@ -149,7 +149,7 @@ def mock_airflow_connection_datarobot_basic_credentials(mocker, dr_basic_credent
     mocker.patch.dict("os.environ", AIRFLOW_CONN_DATAROBOT_BASIC_CREDENTIALS_DEFAULT=conn.get_uri())
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(autouse=True)
 def mock_datarobot_gcp_credentials(mocker, dr_gcp_credentials_conn_details):
     gcp_credentials_create_mock = mocker.Mock(
         credential_id='test-gcp-credentials-id',
@@ -166,7 +166,7 @@ def mock_datarobot_gcp_credentials(mocker, dr_gcp_credentials_conn_details):
     )
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(autouse=True)
 def mock_airflow_connection_datarobot_gcp_credentials(mocker, dr_gcp_credentials_conn_details):
     conn = Connection(
         conn_type="datarobot_gcp_credentials",
