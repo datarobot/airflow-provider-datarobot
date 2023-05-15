@@ -50,27 +50,8 @@ def dr_jdbc_conn_details():
     }
 
 
-# For Basic Credentials test
-@pytest.fixture
-def dr_basic_credentials_conn_details():
-    return {
-        "login": "test_login",
-        "password": "test_password",
-        "datarobot_connection": "datarobot_default",
-    }
-
-
-# For GCP Credentials test
-@pytest.fixture
-def dr_gcp_credentials_conn_details():
-    return {
-        "gcp_key": '{"gcp_credentials":"test"}',
-        "datarobot_connection": "datarobot_default",
-    }
-
-
 @pytest.fixture()
-def mock_datarobot_driver(mocker, dr_jdbc_conn_details):
+def mock_datarobot_driver(mocker):
     driver_list_mock = [
         mocker.Mock(
             id='test-jdbc-driver-id',
@@ -116,6 +97,16 @@ def mock_airflow_connection_datarobot_jdbc(mocker, dr_jdbc_conn_details, mock_da
     mocker.patch.dict("os.environ", AIRFLOW_CONN_DATAROBOT_JDBC_DEFAULT=conn.get_uri())
 
 
+# For Basic Credentials test
+@pytest.fixture
+def dr_basic_credentials_conn_details():
+    return {
+        "login": "test_login",
+        "password": "test_password",
+        "datarobot_connection": "datarobot_default",
+    }
+
+
 @pytest.fixture()
 def mock_datarobot_basic_credentials(mocker):
     credentials_create_mock = mocker.Mock(
@@ -149,8 +140,17 @@ def mock_airflow_connection_datarobot_basic_credentials(
     mocker.patch.dict("os.environ", AIRFLOW_CONN_DATAROBOT_BASIC_CREDENTIALS_TEST=conn.get_uri())
 
 
+# For GCP Credentials test
+@pytest.fixture
+def dr_gcp_credentials_conn_details():
+    return {
+        "gcp_key": '{"gcp_credentials":"test"}',
+        "datarobot_connection": "datarobot_default",
+    }
+
+
 @pytest.fixture()
-def mock_datarobot_gcp_credentials(mocker, dr_gcp_credentials_conn_details):
+def mock_datarobot_gcp_credentials(mocker):
     gcp_credentials_create_mock = mocker.Mock(
         credential_id='test-gcp-credentials-id',
         name='datarobot_gcp_credentials_test',
@@ -193,7 +193,7 @@ def dr_aws_credentials_conn_details():
 
 
 @pytest.fixture()
-def mock_datarobot_aws_credentials(mocker, dr_aws_credentials_conn_details):
+def mock_datarobot_aws_credentials(mocker):
     aws_credentials_create_mock = mocker.Mock(
         credential_id='test-aws-credentials-id',
         name='datarobot_aws_credentials_test',
@@ -214,6 +214,13 @@ def mock_airflow_connection_datarobot_aws_credentials(
 ):
     conn = Connection(
         conn_type="datarobot.credentials.aws",
-        extra=json.dumps(dr_aws_credentials_conn_details),
+        login=dr_aws_credentials_conn_details["aws_access_key_id"],
+        password=dr_aws_credentials_conn_details["aws_secret_access_key"],
+        extra=json.dumps(
+            {
+                "aws_session_token": dr_aws_credentials_conn_details["aws_session_token"],
+                "datarobot_connection": dr_aws_credentials_conn_details["datarobot_connection"],
+            }
+        ),
     )
     mocker.patch.dict("os.environ", AIRFLOW_CONN_DATAROBOT_AWS_CREDENTIALS_TEST=conn.get_uri())

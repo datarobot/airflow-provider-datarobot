@@ -90,3 +90,41 @@ def test_operator_get_gcp_credential_not_found(mocker):
                 },
             }
         )
+
+
+def test_operator_get_aws_credential_id(mocker, mock_airflow_connection_datarobot_aws_credentials):
+    credential_mock = mocker.Mock()
+    credential_mock.credential_id = "test-aws-credentials-id"
+    credential_mock.credential_type = 'datarobot.credentials.aws'
+    credential_mock.name = "datarobot_aws_credentials_test"
+    credential_mock.description = "Credentials managed by Airflow provider for Datarobot"
+    mocker.patch.object(dr.Credential, "list", return_value=[credential_mock])
+
+    operator = GetCredentialIdOperator(task_id='get_credentials')
+    credential_id = operator.execute(
+        context={
+            "params": {
+                "datarobot_credentials_name": "datarobot_aws_credentials_test",
+            },
+        }
+    )
+
+    assert credential_id == "test-aws-credentials-id"
+
+
+def test_operator_get_aws_credential_not_found(mocker):
+    credential_mock = mocker.Mock()
+    credential_mock.credential_type = 'datarobot.credentials.aws'
+    credential_mock.credential_id = "test-aws-credentials-id"
+    credential_mock.name = "datarobot_aws_credentials_test"
+    mocker.patch.object(dr.Credential, "list", return_value=[credential_mock])
+    # should raise ValueError if credentials with provided name is not found
+    with pytest.raises(AirflowNotFoundException):
+        operator = GetCredentialIdOperator(task_id='get_credentials')
+        operator.execute(
+            context={
+                "params": {
+                    "datarobot_credentials_name": "datarobot_aws_credentials_not_exist",
+                },
+            }
+        )

@@ -254,14 +254,10 @@ class AwsCredentialsHook(CredentialsBaseHook):
     def create_credentials(self, conn) -> Credential:
         """Returns AWS credentials for params in connection object"""
 
-        aws_access_key_id = conn.extra_dejson.get('aws_access_key_id', '')
-
-        if not aws_access_key_id:
+        if not conn.login:
             raise AirflowException("aws_access_key_id is not defined")
 
-        aws_secret_access_key = conn.extra_dejson.get('aws_secret_access_key', '')
-
-        if not aws_secret_access_key:
+        if not conn.password:
             raise AirflowException("aws_secret_access_key is not defined")
 
         # aws_session_token is optional:
@@ -271,8 +267,8 @@ class AwsCredentialsHook(CredentialsBaseHook):
             self.log.info(f"Creating AWS Credentials:{self.datarobot_credentials_conn_id}")
             credential = Credential.create_s3(
                 name=self.datarobot_credentials_conn_id,
-                aws_access_key_id=aws_access_key_id,
-                aws_secret_access_key=aws_secret_access_key,
+                aws_access_key_id=conn.login,
+                aws_secret_access_key=conn.password,
                 aws_session_token=aws_session_token,
                 description=self.default_credential_description,
             )
@@ -291,8 +287,8 @@ class AwsCredentialsHook(CredentialsBaseHook):
         # For methods that accept credential data instead of credential ID
         credential_data = {
             "credentialType": "s3",
-            "awsAccessKeyId": conn.extra_dejson.get('aws_access_key_id', ''),
-            "awsSecretAccessKey": conn.extra_dejson.get('aws_secret_access_key', ''),
+            "awsAccessKeyId": conn.login,
+            "awsSecretAccessKey": conn.password,
         }
         aws_session_token = conn.extra_dejson.get('aws_session_token', '')
 
@@ -315,14 +311,6 @@ class AwsCredentialsHook(CredentialsBaseHook):
                 widget=BS3TextFieldWidget(),
                 default='datarobot_default',
             ),
-            'aws_access_key_id': StringField(
-                lazy_gettext("AWS access key ID"),
-                widget=BS3TextFieldWidget(),
-            ),
-            'aws_secret_access_key': StringField(
-                lazy_gettext("AWS secret access key"),
-                widget=BS3TextFieldWidget(),
-            ),
             "aws_session_token": StringField(
                 lazy_gettext("AWS session token"),
                 widget=BS3TextAreaFieldWidget(),
@@ -333,7 +321,10 @@ class AwsCredentialsHook(CredentialsBaseHook):
     def get_ui_field_behaviour() -> Dict:
         """Returns custom field behaviour."""
         return {
-            "hidden_fields": ['host', 'schema', 'port', 'login', 'password', 'extra'],
-            "relabeling": {},
+            "hidden_fields": ['host', 'schema', 'port', 'extra'],
+            "relabeling": {
+                "login": "AWS Access Key ID",
+                "password": "AWS Secret Access Key",
+            },
             "placeholders": {'datarobot_connection': 'datarobot_default'},
         }
