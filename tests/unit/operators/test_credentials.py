@@ -32,7 +32,9 @@ def test_operator_get_credential_not_found(mocker):
         )
 
 
-def test_operator_get_basic_credential_id(mocker):
+def test_operator_get_basic_credential_id(
+    mocker, mock_airflow_connection_datarobot_basic_credentials
+):
     credential_mock = mocker.Mock()
     credential_mock.credential_id = "credential-id"
     credential_mock.credential_type = 'datarobot.credentials.basic'
@@ -52,7 +54,7 @@ def test_operator_get_basic_credential_id(mocker):
     assert credential_id == "credential-id"
 
 
-def test_operator_get_gcp_credential_id(mocker):
+def test_operator_get_gcp_credential_id(mocker, mock_airflow_connection_datarobot_gcp_credentials):
     credential_mock = mocker.Mock()
     credential_mock.credential_id = "test-gcp-credentials-id"
     credential_mock.credential_type = 'datarobot.credentials.gcp'

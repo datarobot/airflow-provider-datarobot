@@ -245,3 +245,95 @@ class GoogleCloudCredentialsHook(CredentialsBaseHook):
                 'gcp_key': 'Enter a valid JSON string',
             },
         }
+
+
+class AwsCredentialsHook(CredentialsBaseHook):
+    hook_name = 'DataRobot AWS Credentials'
+    conn_type = 'datarobot.credentials.aws'
+
+    def create_credentials(self, conn) -> Credential:
+        """Returns AWS credentials for params in connection object"""
+
+        aws_access_key_id = conn.extra_dejson.get('aws_access_key_id', '')
+
+        if not aws_access_key_id:
+            raise AirflowException("aws_access_key_id is not defined")
+
+        aws_secret_access_key = conn.extra_dejson.get('aws_secret_access_key', '')
+
+        if not aws_secret_access_key:
+            raise AirflowException("aws_secret_access_key is not defined")
+
+        # aws_session_token is optional:
+        aws_session_token = conn.extra_dejson.get('aws_session_token', None)
+
+        try:
+            self.log.info(f"Creating AWS Credentials:{self.datarobot_credentials_conn_id}")
+            credential = Credential.create_s3(
+                name=self.datarobot_credentials_conn_id,
+                aws_access_key_id=aws_access_key_id,
+                aws_secret_access_key=aws_secret_access_key,
+                aws_session_token=aws_session_token,
+                description=self.default_credential_description,
+            )
+
+            return credential
+
+        except Exception as e:
+            self.log.error(
+                f"Error creating AWS Credentials: {self.datarobot_credentials_conn_id}, message:{str(e)}"
+            )
+            raise AirflowException(
+                f"Error creating AWS Credentials: {self.datarobot_credentials_conn_id}"
+            )
+
+    def get_credential_data(self, conn) -> dict:
+        # For methods that accept credential data instead of credential ID
+        credential_data = {
+            "credentialType": "s3",
+            "awsAccessKeyId": conn.extra_dejson.get('aws_access_key_id', ''),
+            "awsSecretAccessKey": conn.extra_dejson.get('aws_secret_access_key', ''),
+        }
+        aws_session_token = conn.extra_dejson.get('aws_session_token', '')
+
+        if aws_session_token:
+            # if AWS Session Token is not empty:
+            credential_data["awsSessionToken"] = aws_session_token
+        return credential_data
+
+    @staticmethod
+    def get_connection_form_widgets() -> Dict[str, Any]:
+        """Returns connection widgets to add to connection form."""
+        from flask_appbuilder.fieldwidgets import BS3TextAreaFieldWidget
+        from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
+        from flask_babel import lazy_gettext
+        from wtforms import StringField
+
+        return {
+            "datarobot_connection": StringField(
+                lazy_gettext('DataRobot Connection'),
+                widget=BS3TextFieldWidget(),
+                default='datarobot_default',
+            ),
+            'aws_access_key_id': StringField(
+                lazy_gettext("AWS access key ID"),
+                widget=BS3TextFieldWidget(),
+            ),
+            'aws_secret_access_key': StringField(
+                lazy_gettext("AWS secret access key"),
+                widget=BS3TextFieldWidget(),
+            ),
+            "aws_session_token": StringField(
+                lazy_gettext("AWS session token"),
+                widget=BS3TextAreaFieldWidget(),
+            ),
+        }
+
+    @staticmethod
+    def get_ui_field_behaviour() -> Dict:
+        """Returns custom field behaviour."""
+        return {
+            "hidden_fields": ['host', 'schema', 'port', 'login', 'password', 'extra'],
+            "relabeling": {},
+            "placeholders": {'datarobot_connection': 'datarobot_default'},
+        }

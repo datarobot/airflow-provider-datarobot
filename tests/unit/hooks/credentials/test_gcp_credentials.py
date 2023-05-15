@@ -8,7 +8,9 @@
 from datarobot_provider.hooks.credentials import GoogleCloudCredentialsHook
 
 
-def test_datarobot_gcp_credentials_conn(dr_gcp_credentials_conn_details):
+def test_datarobot_gcp_credentials_conn(
+    dr_gcp_credentials_conn_details, mock_airflow_connection_datarobot_gcp_credentials
+):
     hook = GoogleCloudCredentialsHook(
         datarobot_credentials_conn_id="datarobot_gcp_credentials_test"
     )
