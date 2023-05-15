@@ -57,7 +57,7 @@ def test_operator_update_dataset_from_file(mocker):
     )
 
 
-def test_operator_create_dataset_from_jdbc(mocker):
+def test_operator_create_dataset_from_jdbc(mocker, mock_airflow_connection_datarobot_jdbc):
     credential_data = {"credentialType": "basic", "user": "test_login", "password": "test_password"}
     test_params = {
         "datarobot_jdbc_connection": "datarobot_jdbc_default",

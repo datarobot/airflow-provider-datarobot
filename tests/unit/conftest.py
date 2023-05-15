@@ -84,7 +84,7 @@ def mock_datarobot_driver(mocker, dr_jdbc_conn_details):
 
 
 @pytest.fixture()
-def mock_datarobot_datastore(mocker, dr_jdbc_conn_details):
+def mock_datarobot_datastore(mocker, dr_jdbc_conn_details, mock_datarobot_driver):
     datastore_create_mock = mocker.Mock(
         id='test-datastore-id',
         canonical_name='datarobot_jdbc_default',
@@ -133,7 +133,9 @@ def mock_datarobot_basic_credentials(mocker, dr_basic_credentials_conn_details):
 
 
 @pytest.fixture()
-def mock_airflow_connection_datarobot_basic_credentials(mocker, dr_basic_credentials_conn_details):
+def mock_airflow_connection_datarobot_basic_credentials(
+    mocker, dr_basic_credentials_conn_details, mock_datarobot_basic_credentials
+):
     conn = Connection(
         conn_type="datarobot.credentials.basic",
         login=dr_basic_credentials_conn_details["login"],
