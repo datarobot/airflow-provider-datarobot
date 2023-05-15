@@ -117,7 +117,7 @@ def mock_airflow_connection_datarobot_jdbc(mocker, dr_jdbc_conn_details, mock_da
 
 
 @pytest.fixture()
-def mock_datarobot_basic_credentials(mocker, dr_basic_credentials_conn_details):
+def mock_datarobot_basic_credentials(mocker):
     credentials_create_mock = mocker.Mock(
         credential_id='test-credentials-id',
         name='datarobot_basic_credentials_test',
