@@ -28,6 +28,10 @@ def get_provider_info():
                 "hook-class-name": "datarobot_provider.hooks.credentials.GoogleCloudCredentialsHook",
                 "connection-type": "datarobot.credentials.gcp",
             },
+            {
+                "hook-class-name": "datarobot_provider.hooks.credentials.AwsCredentialsHook",
+                "connection-type": "datarobot.credentials.aws",
+            },
         ],
         "extra-links": [],
     }

@@ -8,7 +8,7 @@
 from datarobot_provider.hooks.connections import JDBCDataSourceHook
 
 
-def test_datarobot_jdbc_get_conn(dr_jdbc_conn_details):
+def test_datarobot_jdbc_get_conn(dr_jdbc_conn_details, mock_airflow_connection_datarobot_jdbc):
     hook = JDBCDataSourceHook(datarobot_jdbc_conn_id="datarobot_jdbc_default")
     dr_credentials, dr_datastore = hook.get_conn()
 
