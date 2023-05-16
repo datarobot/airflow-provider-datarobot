@@ -224,3 +224,48 @@ def mock_airflow_connection_datarobot_aws_credentials(
         ),
     )
     mocker.patch.dict("os.environ", AIRFLOW_CONN_DATAROBOT_AWS_CREDENTIALS_TEST=conn.get_uri())
+
+
+# For Azure Storage Credentials test
+@pytest.fixture
+def dr_azure_credentials_conn_details():
+    return {
+        "azure_storage_account_name": "test_azure_account_name",
+        "azure_storage_account_key": "test_azure_account_key",
+        "datarobot_connection": "datarobot_default",
+        "azure_connection_string": "DefaultEndpointsProtocol=https;AccountName=test_azure_account_name;AccountKey"
+        "=test_azure_account_key;EndpointSuffix=core.windows.net",
+    }
+
+
+@pytest.fixture()
+def mock_datarobot_azure_credentials(mocker):
+    azure_credentials_create_mock = mocker.Mock(
+        credential_id='test-azure-credentials-id',
+        name='datarobot_azure_credentials_test',
+        credential_type='azure',
+        description="Credentials managed by Airflow provider for Datarobot",
+    )
+
+    mocker.patch("datarobot_provider.hooks.credentials.Credential.list", return_value=[])
+    mocker.patch(
+        "datarobot_provider.hooks.credentials.Credential.create_azure",
+        return_value=azure_credentials_create_mock,
+    )
+
+
+@pytest.fixture()
+def mock_airflow_connection_datarobot_azure_credentials(
+    mocker, dr_azure_credentials_conn_details, mock_datarobot_azure_credentials
+):
+    conn = Connection(
+        conn_type="datarobot.credentials.azure",
+        login=dr_azure_credentials_conn_details["azure_storage_account_name"],
+        password=dr_azure_credentials_conn_details["azure_storage_account_key"],
+        extra=json.dumps(
+            {
+                "datarobot_connection": dr_azure_credentials_conn_details["datarobot_connection"],
+            }
+        ),
+    )
+    mocker.patch.dict("os.environ", AIRFLOW_CONN_DATAROBOT_AZURE_CREDENTIALS_TEST=conn.get_uri())

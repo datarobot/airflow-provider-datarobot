@@ -328,3 +328,78 @@ class AwsCredentialsHook(CredentialsBaseHook):
             },
             "placeholders": {'datarobot_connection': 'datarobot_default'},
         }
+
+
+class AzureStorageCredentialsHook(CredentialsBaseHook):
+    hook_name = 'DataRobot Azure Storage Credentials'
+    conn_type = 'datarobot.credentials.azure'
+
+    def create_credentials(self, conn) -> Credential:
+        """Returns Azure Storage credentials for params in connection object"""
+
+        if not conn.login:
+            raise AirflowException("Storage Account Name is not defined")
+
+        if not conn.password:
+            raise AirflowException("Storage Account Key is not defined")
+
+        try:
+            self.log.info(
+                f"Creating Azure Storage Credentials:{self.datarobot_credentials_conn_id}"
+            )
+            credential = Credential.create_azure(
+                name=self.datarobot_credentials_conn_id,
+                azure_connection_string="DefaultEndpointsProtocol=https;"
+                "AccountName={};AccountKey={};EndpointSuffix=core.windows.net".format(
+                    conn.login, conn.password
+                ),
+                description=self.default_credential_description,
+            )
+
+            return credential
+
+        except Exception as e:
+            self.log.error(
+                f"Error creating Azure Credentials: {self.datarobot_credentials_conn_id}, message:{str(e)}"
+            )
+            raise AirflowException(
+                f"Error creating Azure Credentials: {self.datarobot_credentials_conn_id}"
+            )
+
+    def get_credential_data(self, conn) -> dict:
+        # For methods that accept credential data instead of credential ID
+        credential_data = {
+            "credentialType": "azure",
+            "azureConnectionString": "DefaultEndpointsProtocol=https;"
+            "AccountName={};AccountKey={};EndpointSuffix=core.windows.net".format(
+                conn.login, conn.password
+            ),
+        }
+        return credential_data
+
+    @staticmethod
+    def get_connection_form_widgets() -> Dict[str, Any]:
+        """Returns connection widgets to add to connection form."""
+        from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
+        from flask_babel import lazy_gettext
+        from wtforms import StringField
+
+        return {
+            "datarobot_connection": StringField(
+                lazy_gettext('DataRobot Connection'),
+                widget=BS3TextFieldWidget(),
+                default='datarobot_default',
+            ),
+        }
+
+    @staticmethod
+    def get_ui_field_behaviour() -> Dict:
+        """Returns custom field behaviour."""
+        return {
+            "hidden_fields": ['host', 'schema', 'port', 'extra'],
+            "relabeling": {
+                "login": "Azure Storage Account Name",
+                "password": "Azure Storage Account Key",
+            },
+            "placeholders": {'datarobot_connection': 'datarobot_default'},
+        }
