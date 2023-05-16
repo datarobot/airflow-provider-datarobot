@@ -345,7 +345,7 @@ class AzureStorageCredentialsHook(CredentialsBaseHook):
 
         try:
             self.log.info(
-                f"Creating Azure Storage Credentials:{self.datarobot_credentials_conn_id}"
+                f"Creating Azure Storage Credentials: {self.datarobot_credentials_conn_id}"
             )
             credential = Credential.create_azure(
                 name=self.datarobot_credentials_conn_id,
