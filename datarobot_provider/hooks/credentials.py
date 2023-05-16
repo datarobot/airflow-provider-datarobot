@@ -360,7 +360,7 @@ class AzureStorageCredentialsHook(CredentialsBaseHook):
 
         except Exception as e:
             self.log.error(
-                f"Error creating Azure Credentials: {self.datarobot_credentials_conn_id}, message:{str(e)}"
+                f"Error creating Azure Credentials: {self.datarobot_credentials_conn_id}, message:{e}"
             )
             raise AirflowException(
                 f"Error creating Azure Credentials: {self.datarobot_credentials_conn_id}"
