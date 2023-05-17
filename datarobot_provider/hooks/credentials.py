@@ -403,3 +403,82 @@ class AzureStorageCredentialsHook(CredentialsBaseHook):
             },
             "placeholders": {'datarobot_connection': 'datarobot_default'},
         }
+
+
+class OAuthCredentialsHook(CredentialsBaseHook):
+    hook_name = 'DataRobot OAuth Credentials'
+    conn_type = 'datarobot.credentials.oauth'
+
+    def create_credentials(self, conn) -> Credential:
+        """Returns OAuth credentials for params in connection object"""
+
+        if not conn.login:
+            raise AirflowException("OAuth Client Id is not defined")
+
+        if not conn.password:
+            raise AirflowException("OAuth Token is not defined")
+
+        refresh_token = conn.extra_dejson.get('refresh_token', '')
+        if not refresh_token:
+            raise AirflowException("OAuth Refresh Token is not defined")
+
+        try:
+            self.log.info(f"Creating OAuth Credentials: {self.datarobot_credentials_conn_id}")
+            credential = Credential.create_oauth(
+                name=self.datarobot_credentials_conn_id,
+                token=conn.password,
+                refresh_token=refresh_token,
+                description=self.default_credential_description,
+            )
+
+            return credential
+
+        except Exception as e:
+            self.log.error(
+                f"Error creating OAuth Credentials: {self.datarobot_credentials_conn_id}, message:{e}"
+            )
+            raise AirflowException(
+                f"Error creating OAuth Credentials: {self.datarobot_credentials_conn_id}"
+            )
+
+    def get_credential_data(self, conn) -> dict:
+        # For methods that accept credential data instead of credential ID
+        credential_data = {
+            "credentialType": "oauth",
+            "oauthRefreshToken": conn.extra_dejson.get('refresh_token', ''),
+            "oauthClientId": conn.login,
+            "oauthClientSecret": conn.password,
+        }
+        return credential_data
+
+    @staticmethod
+    def get_connection_form_widgets() -> Dict[str, Any]:
+        """Returns connection widgets to add to connection form."""
+        from flask_appbuilder.fieldwidgets import BS3PasswordFieldWidget
+        from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
+        from flask_babel import lazy_gettext
+        from wtforms import StringField
+
+        return {
+            "refresh_token": StringField(
+                lazy_gettext("OAuth Refresh Token"),
+                widget=BS3PasswordFieldWidget(),
+            ),
+            "datarobot_connection": StringField(
+                lazy_gettext('DataRobot Connection'),
+                widget=BS3TextFieldWidget(),
+                default='datarobot_default',
+            ),
+        }
+
+    @staticmethod
+    def get_ui_field_behaviour() -> Dict:
+        """Returns custom field behaviour."""
+        return {
+            "hidden_fields": ['host', 'schema', 'port', 'extra'],
+            "relabeling": {
+                "login": "OAuth Client Id",
+                "password": "OAuth Token",
+            },
+            "placeholders": {'datarobot_connection': 'datarobot_default'},
+        }
