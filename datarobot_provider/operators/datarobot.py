@@ -275,7 +275,7 @@ class ScorePredictionsOperator(BaseOperator):
     :param intake_credential_id: DataRobot Credentials ID for source connection
     :type intake_credential_id: str
     :param output_datastore_id: DataRobot DataStore ID for jdbc destination connection
-    :type deployment_id: str
+    :type output_datastore_id: str
     :param output_credential_id: DataRobot Credentials ID for destination connection
     :type output_credential_id: str
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
