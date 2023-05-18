@@ -268,9 +268,16 @@ class DeployRecommendedModelOperator(BaseOperator, DeployModelMixin):
 class ScorePredictionsOperator(BaseOperator):
     """
     Creates a batch prediction job in DataRobot, scores the data and saves prediction to the output.
-
     :param deployment_id: DataRobot deployment ID
     :type deployment_id: str
+    :param intake_datastore_id: DataRobot DataStore ID for jdbc source connection
+    :type intake_datastore_id: str
+    :param intake_credential_id: DataRobot Credentials ID for source connection
+    :type intake_credential_id: str
+    :param output_datastore_id: DataRobot DataStore ID for jdbc destination connection
+    :type deployment_id: str
+    :param output_credential_id: DataRobot Credentials ID for destination connection
+    :type output_credential_id: str
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
     :return: Batch predictions job ID
@@ -302,8 +309,8 @@ class ScorePredictionsOperator(BaseOperator):
     ) -> None:
         super().__init__(**kwargs)
         self.deployment_id = deployment_id
-        self.intake_credential_id = intake_credential_id
         self.intake_datastore_id = intake_datastore_id
+        self.intake_credential_id = intake_credential_id
         self.output_datastore_id = output_datastore_id
         self.output_credential_id = output_credential_id
         self.datarobot_conn_id = datarobot_conn_id
