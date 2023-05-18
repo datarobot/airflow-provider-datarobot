@@ -7,7 +7,7 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 """
 Example of Aiflow DAG for DataRobot Batch Scoring using S3 as source and destination,
-using a preconfigured "DataRobot AWS Credentials" from Airflow Connections.
+and using a preconfigured "DataRobot AWS Credentials" from Airflow Connections.
 DataRobot AWS Credentials can be configured using Airflow UI (Admin->Connections) or Airflow API
 Config example for this dag:
 {
