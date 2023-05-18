@@ -175,15 +175,33 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
     Scores batch predictions against the deployment.
 
     Prerequisites:
-    - [S3 credentials added to DataRobot via Python API client](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/admin/credentials.html#s3-credentials).
-      You need the `creds.credential_id` for the `credential_id` parameter in the config.
+    - You can use GetCredentialIdOperator to pass `credential_id` from preconfigured DataRobot Credentials (Airflow Connections)
+      or you can manually set `credential_id` parameter in the config. [S3 credentials added to DataRobot via Python API client](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/admin/credentials.html#s3-credentials).
     - OR a Dataset ID in the AI Catalog
+    - OR a DataStore ID for jdbc source connection
 
     Parameters:
   
-        deployment_id: str - DataRobot project ID
+        deployment_id: str - DataRobot deployment ID
+        intake_datastore_id: str - DataRobot DataStore ID for jdbc source connection
+        output_datastore_id: str - DataRobot DataStore ID for jdbc destination connection
+        intake_credential_id: str - DataRobot Credentials ID for source connection
+        output_credential_id: str - DataRobot Credentials ID for destination connection
 
-    Required config params:
+    Sample config params:
+
+        "score_settings": {
+            "intake_settings": {
+                "type": "s3",
+                "url": "s3://my-bucket/Diabetes10k.csv",
+            },
+            "output_settings": {
+                "type": "s3",
+                "url": "s3://my-bucket/Diabetes10k_predictions.csv",
+            }
+        }
+
+    Sample config params in case of manually set `credential_id` parameter in the config:
 
         "score_settings": {
             "intake_settings": {
