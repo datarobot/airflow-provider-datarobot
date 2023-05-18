@@ -5,9 +5,9 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+import pytest
 
 from datarobot_provider.example_dags.datarobot_score_dag import datarobot_score
-from tests.unit.dags.conftest import assert_dag_dict_equal
 
 
 def test_dag_loaded(dagbag):
@@ -19,7 +19,7 @@ def test_dag_loaded(dagbag):
 
 def test_dag_structure():
     dag = datarobot_score()
-    assert_dag_dict_equal(
+    pytest.helpers.assert_dag_dict_equal(
         {
             "score_predictions": ["check_scoring_complete"],
             "check_scoring_complete": [],
