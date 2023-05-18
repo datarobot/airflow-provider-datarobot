@@ -278,7 +278,13 @@ class ScorePredictionsOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["deployment_id"]
+    template_fields: Iterable[str] = [
+        "deployment_id",
+        "intake_datastore_id",
+        "intake_credential_id",
+        "output_datastore_id",
+        "output_credential_id",
+    ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
     ui_color = '#f4a460'
@@ -286,12 +292,20 @@ class ScorePredictionsOperator(BaseOperator):
     def __init__(
         self,
         *,
-        deployment_id: str,
+        deployment_id: str = None,
+        intake_datastore_id: str = None,
+        intake_credential_id: str = None,
+        output_datastore_id: str = None,
+        output_credential_id: str = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.deployment_id = deployment_id
+        self.intake_credential_id = intake_credential_id
+        self.intake_datastore_id = intake_datastore_id
+        self.output_datastore_id = output_datastore_id
+        self.output_credential_id = output_credential_id
         self.datarobot_conn_id = datarobot_conn_id
         if kwargs.get('xcom_push') is not None:
             raise AirflowException(
@@ -303,8 +317,29 @@ class ScorePredictionsOperator(BaseOperator):
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         score_settings = context["params"]["score_settings"]
+
+        # in case of deployment_id was not set from operator argument:
+        if self.deployment_id is None:
+            self.deployment_id = context["params"]["deployment_id"]
+
+        if self.intake_credential_id is not None:
+            score_settings["intake_settings"]["credential_id"] = self.intake_credential_id
+        if self.output_credential_id is not None:
+            score_settings["output_settings"]["credential_id"] = self.output_credential_id
+
         intake_settings = score_settings.get("intake_settings", dict())
+        output_settings = score_settings.get("output_settings", dict())
+
         intake_type = intake_settings.get("type")
+        output_type = output_settings.get("type")
+
+        # in case of JDBC intake from operator argument:
+        if intake_type == "jdbc" and self.intake_datastore_id is not None:
+            score_settings["intake_settings"]["data_store_id"] = self.intake_datastore_id
+
+        # in case of JDBC output from operator argument:
+        if output_type == "jdbc" and self.output_datastore_id is not None:
+            score_settings["output_settings"]["data_store_id"] = self.output_datastore_id
 
         # Score data
         self.log.info(

@@ -5,15 +5,8 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-import pytest
-from airflow.models import DagBag
 
 from datarobot_provider.example_dags.datarobot_pipeline_dag import datarobot_pipeline
-
-
-@pytest.fixture()
-def dagbag(provider_dir):
-    return DagBag(dag_folder=f"{str(provider_dir)}/example_dags", include_examples=False)
 
 
 def test_dag_loaded(dagbag):
