@@ -55,7 +55,7 @@ from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
         },
     },
 )
-def datarobot_azure_storage_batch_scoring(deployment_id="put_your_deployment_id"):
+def datarobot_azure_storage_batch_scoring(deployment_id=None):
     if not deployment_id:
         raise ValueError("Invalid or missing `deployment_id` value")
 
