@@ -7,7 +7,7 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 """
 Example of Aiflow DAG for DataRobot Batch Scoring using Google Cloud Storage as source and destination,
-using a preconfigured "DataRobot GCP Credentials" from Airflow Connection.
+and using a preconfigured "DataRobot GCP Credentials" from Airflow Connection.
 DataRobot GCP Credentials can be configured using Airflow UI (Admin->Connections) or Airflow API
 Config example for this dag:
 {
