@@ -15,7 +15,7 @@ def dagbag(provider_dir):
     return DagBag(dag_folder=f"{str(provider_dir)}/example_dags", include_examples=False)
 
 
-@pytest.helpers.can.haz.register
+@pytest.helpers.register
 def assert_dag_dict_equal(source, dag):
     assert dag.task_dict.keys() == source.keys()
     for task_id, downstream_list in source.items():
