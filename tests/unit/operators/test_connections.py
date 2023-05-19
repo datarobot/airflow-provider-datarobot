@@ -6,7 +6,6 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 
-import datarobot as dr
 import pytest
 from airflow.exceptions import AirflowNotFoundException
 
