@@ -10,7 +10,7 @@ def get_provider_info():
         "package-name": "airflow-provider-datarobot",
         "name": "DataRobot Airflow Provider",
         "description": "DataRobot Airflow provider.",
-        "versions": ["0.0.5"],
+        "versions": ["0.0.6"],
         "connection-types": [
             {
                 "hook-class-name": "datarobot_provider.hooks.datarobot.DataRobotHook",
