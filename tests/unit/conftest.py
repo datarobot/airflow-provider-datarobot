@@ -269,3 +269,48 @@ def mock_airflow_connection_datarobot_azure_credentials(
         ),
     )
     mocker.patch.dict("os.environ", AIRFLOW_CONN_DATAROBOT_AZURE_CREDENTIALS_TEST=conn.get_uri())
+
+
+# For OAuth Credentials test
+@pytest.fixture
+def dr_oauth_credentials_conn_details():
+    return {
+        "oauth_client_id": "test_oauth_client_id",
+        "token": "test_oauth_token",
+        "refresh_token": "test_oauth_refresh_token",
+        "datarobot_connection": "datarobot_default",
+    }
+
+
+@pytest.fixture()
+def mock_datarobot_oauth_credentials(mocker):
+    oauth_credentials_create_mock = mocker.Mock(
+        credential_id='test-oauth-credentials-id',
+        name='datarobot_oauth_credentials_test',
+        credential_type='oauth',
+        description="Credentials managed by Airflow provider for Datarobot",
+    )
+
+    mocker.patch("datarobot_provider.hooks.credentials.Credential.list", return_value=[])
+    mocker.patch(
+        "datarobot_provider.hooks.credentials.Credential.create_oauth",
+        return_value=oauth_credentials_create_mock,
+    )
+
+
+@pytest.fixture()
+def mock_airflow_connection_datarobot_oauth_credentials(
+    mocker, dr_oauth_credentials_conn_details, mock_datarobot_oauth_credentials
+):
+    conn = Connection(
+        conn_type="datarobot.credentials.oauth",
+        login=dr_oauth_credentials_conn_details["oauth_client_id"],
+        password=dr_oauth_credentials_conn_details["token"],
+        extra=json.dumps(
+            {
+                "datarobot_connection": dr_oauth_credentials_conn_details["datarobot_connection"],
+                "refresh_token": dr_oauth_credentials_conn_details["refresh_token"],
+            }
+        ),
+    )
+    mocker.patch.dict("os.environ", AIRFLOW_CONN_DATAROBOT_OAUTH_CREDENTIALS_TEST=conn.get_uri())

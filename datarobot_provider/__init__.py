@@ -36,6 +36,10 @@ def get_provider_info():
                 "hook-class-name": "datarobot_provider.hooks.credentials.AzureStorageCredentialsHook",
                 "connection-type": "datarobot.credentials.azure",
             },
+            {
+                "hook-class-name": "datarobot_provider.hooks.credentials.OAuthCredentialsHook",
+                "connection-type": "datarobot.credentials.oauth",
+            },
         ],
         "extra-links": [],
     }
