@@ -31,6 +31,32 @@ Create the API Key in the [DataRobot Developer Tools](https://app.datarobot.com/
 By default, all components use `datarobot_default` connection ID.
 
 
+## Creating DataRobot preconfigured Connections
+
+You can create preconfigured Connections to store and manage credentials 
+that can be used together with Airflow Operators to replicate connection 
+on DataRobot side ([Data connections](https://docs.datarobot.com/en/docs/data/connect-data/stored-creds.html)).
+Currently, supported the next types of credentials:
+
+* `DataRobot Basic Credentials` - to store login/password pairs
+* `DataRobot GCP Credentials` - to store Google Cloud Service account key
+* `DataRobot AWS Credentials` - to store AWS access keys
+* `DataRobot Azure Storage Credentials` - to store Azure Storage secret
+* `DataRobot OAuth Credentials` - to store OAuth tokens
+* `DataRobot JDBC DataSource` - to store JDBC connection attributes
+
+After creating preconfigured Connections using Airflow UI or Airflow API [Managing Connections](https://airflow.apache.org/docs/apache-airflow/stable/howto/connection.html)
+it can be used with GetCredentialIdOperator or GetOrCreateDataStoreOperator
+to replicate it on DataRobot side and retrieve corresponding credentials_id
+or datastore_id. 
+Examples of using preconfigured connection you can find
+in "datarobot_provider/example_dags" directory:
+
+* `datarobot_aws_s3_batch_scoring_dag.py` - example of using DataRobot AWS Credentials with ScorePredictionsOperator
+* `datarobot_azure_storage_batch_scoring_dag.py` - example of using DataRobot GCP Credentials with ScorePredictionsOperator
+* `datarobot_azure_storage_batch_scoring_dag.py` - example of using DataRobot Azure Storage Credentials with ScorePredictionsOperator
+* `datarobot_jdbc_dataset_dag.py` - example of using DataRobot JDBC Connection to upload dataset to AI Catalog
+
 ## Config JSON for dag run
 
 Operators and sensors use parameters from the [config](https://airflow.apache.org/docs/apache-airflow/stable/cli-and-env-variables-ref.html?highlight=config#Named%20Arguments_repeat21)
