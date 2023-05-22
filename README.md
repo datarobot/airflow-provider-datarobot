@@ -112,12 +112,12 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 - `GetOrCreateDataStoreOperator`
 
     Fetching DataStore by Connection name and return DataStore ID. 
-    I case if DataStore does not exist it will try to create it using Airflow preconfigured connection
+    In case if DataStore does not exist it will try to create it using Airflow preconfigured connection
     with the same connection name.
  
     Required config params:
 
-        connection_param_name: str - name of parameter in the config file to get Connection name
+        `connection_param_name`: str - name of parameter in the config file to get Connection name
 
     Returns a credential ID.
 
