@@ -47,8 +47,8 @@ Currently supported types of credentials:
 
 After creating preconfigured connections using Airflow UI or Airflow API [Managing Connections](https://airflow.apache.org/docs/apache-airflow/stable/howto/connection.html)
 it can be used with `GetOrCreateCredentialOperator` or `GetOrCreateDataStoreOperator`
-to replicate it on DataRobot side and retrieve corresponding credentials_id
-or datastore_id. 
+to replicate it on DataRobot side and retrieve corresponding `credentials_id`
+or `datastore_id`. 
 Examples of using preconfigured connection you can find
 in "datarobot_provider/example_dags" directory:
 
