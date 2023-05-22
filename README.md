@@ -127,12 +127,12 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
  
     Required config params:
 
-        datarobot_jdbc_connection: str - existing of preconfigured Datarobot Connection name
-        dataset_name: str - name of loaded dataset,
-        table_schema: str - database table schema,
-        table_name: str - source table name,
-        do_snapshot: bool - If unset, uses the server default: True. If true, creates a snapshot dataset; if false, creates a remote dataset. Creating snapshots from non-file sources may be disabled by the permission, Disable AI Catalog Snapshots.
-        persist_data_after_ingestion: bool - If unset, uses the server default: True. If true, will enforce saving all data (for download and sampling) and will allow a user to view extended data profile (which includes data statistics like min/max/median/mean, histogram, etc.). If false, will not enforce saving data. The data schema (feature names and types) still will be available. Specifying this parameter to false and doSnapshot to true will result in an error.
+        - `datarobot_jdbc_connection`: str - existing of preconfigured Datarobot Connection name
+        - `dataset_name`: str - name of loaded dataset
+        - `table_schema`: str - database table schema
+        - `table_name`: str - source table name
+        - `do_snapshot`: bool - If unset, uses the server default(`True`). If `True`, creates a snapshot dataset; if `False`, creates a remote dataset. Creating snapshots from non-file sources may be disabled by the permission, _Disable AI Catalog Snapshots_.
+        - `persist_data_after_ingestion`: bool - If unset, uses the server default(`True`). If `True`, will enforce saving all data (for download and sampling) and will allow a user to view extended data profile (which includes data statistics like min/max/median/mean, histogram, etc.). If `False`, will not enforce saving data. The data schema (feature names and types) still will be available. Specifying this parameter to **false** and `doSnapshot` to **true** will result in an error.
 
     Returns a Dataset ID.
 
