@@ -16,9 +16,8 @@ from airflow.models import BaseOperator
 from datarobot_provider.hooks.connections import JDBCDataSourceHook
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
-DATAROBOT_MAX_WAIT = 3600
-DATAROBOT_AUTOPILOT_TIMEOUT = 86400
-DATETIME_FORMAT = "%Y-%m-%d %H:%M:%s"
+# Time in seconds after which dataset uploading is considered unsuccessful.
+DATAROBOT_MAX_WAIT_SEC = 3600
 
 
 class UploadDatasetOperator(BaseOperator):
@@ -57,7 +56,10 @@ class UploadDatasetOperator(BaseOperator):
         # Upload Dataset to AI Catalog
         self.log.info("Upload Dataset to AI Catalog")
         # dataset_file_path a path to a local file
-        ai_catalog_dataset = dr.Dataset.create_from_file(context["params"]["dataset_file_path"])
+        ai_catalog_dataset = dr.Dataset.create_from_file(
+            file_path=context["params"]["dataset_file_path"],
+            max_wait=DATAROBOT_MAX_WAIT_SEC,
+        )
         self.log.info(f"Dataset created: dataset_id={ai_catalog_dataset.id}")
         return ai_catalog_dataset.id
 
@@ -111,7 +113,9 @@ class UpdateDatasetFromFileOperator(BaseOperator):
         file_path = context["params"]["dataset_file_path"]
         self.log.info(f"Update Dataset {dataset_id} in AI Catalog from the local file: {file_path}")
         ai_catalog_dataset = dr.Dataset.create_version_from_file(
-            dataset_id=dataset_id, file_path=file_path
+            dataset_id=dataset_id,
+            file_path=file_path,
+            max_wait=DATAROBOT_MAX_WAIT_SEC,
         )
         self.log.info(
             f"Dataset updated: dataset_id={ai_catalog_dataset.id}, dataset_version_id:{ai_catalog_dataset.version_id}"
@@ -120,7 +124,7 @@ class UpdateDatasetFromFileOperator(BaseOperator):
         return ai_catalog_dataset.version_id
 
 
-class CreateDatasetFromJDBCOperator(BaseOperator):
+class CreateDatasetFromDataStoreOperator(BaseOperator):
     """
     Loading dataset from JDBC Connection to DataRobot AI Catalog and return Dataset ID.
 
@@ -201,6 +205,7 @@ class CreateDatasetFromJDBCOperator(BaseOperator):
             credential_data=credential_data,
             persist_data_after_ingestion=context["params"]["persist_data_after_ingestion"],
             do_snapshot=context["params"]["do_snapshot"],
+            max_wait=DATAROBOT_MAX_WAIT_SEC,
         )
         self.log.info(f"Dataset created: dataset_id={ai_catalog_dataset.id}")
         return ai_catalog_dataset.id

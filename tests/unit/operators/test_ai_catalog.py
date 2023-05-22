@@ -8,7 +8,7 @@
 
 import datarobot as dr
 
-from datarobot_provider.operators.ai_catalog import CreateDatasetFromJDBCOperator
+from datarobot_provider.operators.ai_catalog import CreateDatasetFromDataStoreOperator
 from datarobot_provider.operators.ai_catalog import UpdateDatasetFromFileOperator
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 
@@ -30,7 +30,7 @@ def test_operator_upload_dataset(mocker):
     )
 
     assert dataset_id == "dataset-id"
-    upload_dataset_mock.assert_called_with("/path/to/local/file")
+    upload_dataset_mock.assert_called_with(file_path="/path/to/local/file", max_wait=3600)
 
 
 def test_operator_update_dataset_from_file(mocker):
@@ -53,7 +53,7 @@ def test_operator_update_dataset_from_file(mocker):
 
     assert dataset_version_id == "dataset-version-id"
     create_version_from_file_mock.assert_called_with(
-        dataset_id="dataset-id", file_path="/path/to/local/file"
+        dataset_id="dataset-id", file_path="/path/to/local/file", max_wait=3600
     )
 
 
@@ -67,6 +67,7 @@ def test_operator_create_dataset_from_jdbc(mocker, mock_airflow_connection_datar
         "query": 'SELECT * FROM "integration_demo"."test_table"',
         "persist_data_after_ingestion": True,
         "do_snapshot": True,
+        "max_wait": 3600,
     }
 
     datasource_params_mock = mocker.Mock(
@@ -88,7 +89,7 @@ def test_operator_create_dataset_from_jdbc(mocker, mock_airflow_connection_datar
         dr.Dataset, "create_from_data_source", return_value=dataset_mock
     )
 
-    operator = CreateDatasetFromJDBCOperator(task_id='load_jdbc_dataset')
+    operator = CreateDatasetFromDataStoreOperator(task_id='load_jdbc_dataset')
     dataset_id = operator.execute(
         context={
             "params": test_params,
@@ -102,4 +103,5 @@ def test_operator_create_dataset_from_jdbc(mocker, mock_airflow_connection_datar
         credential_data=credential_data,
         persist_data_after_ingestion=test_params["persist_data_after_ingestion"],
         do_snapshot=test_params["do_snapshot"],
+        max_wait=3600,
     )

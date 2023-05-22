@@ -31,7 +31,7 @@ from datetime import datetime
 
 from airflow.decorators import dag
 
-from datarobot_provider.operators.credentials import GetCredentialIdOperator
+from datarobot_provider.operators.credentials import GetOrCreateCredentialOperator
 from datarobot_provider.operators.datarobot import ScorePredictionsOperator
 from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
 
@@ -61,7 +61,7 @@ def datarobot_gcp_batch_scoring(deployment_id=None):
     if not deployment_id:
         raise ValueError("Invalid or missing `deployment_id` value")
 
-    get_gcp_credentials_op = GetCredentialIdOperator(
+    get_gcp_credentials_op = GetOrCreateCredentialOperator(
         task_id="get_gcp_credentials",
         credentials_param_name="datarobot_gcp_credentials",
     )

@@ -46,7 +46,7 @@ Currently, supported the next types of credentials:
 * `DataRobot JDBC DataSource` - to store JDBC connection attributes
 
 After creating preconfigured Connections using Airflow UI or Airflow API [Managing Connections](https://airflow.apache.org/docs/apache-airflow/stable/howto/connection.html)
-it can be used with GetCredentialIdOperator or GetOrCreateDataStoreOperator
+it can be used with GetOrCreateCredentialOperator or GetOrCreateDataStoreOperator
 to replicate it on DataRobot side and retrieve corresponding credentials_id
 or datastore_id. 
 Examples of using preconfigured connection you can find
@@ -95,7 +95,46 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
 ## Modules
 
-### [Operators](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/operators/datarobot.py)
+### [Operators](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/operators/)
+
+- `GetOrCreateCredentialOperator`
+
+    Fetching credentials by Credential name and return Credentials ID. 
+    I case if credential does not exist it will try to create it using Airflow preconfigured connection
+    with the same connection name.
+ 
+    Required config params:
+
+        credentials_param_name: str - name of parameter in the config file to get Credential name
+
+    Returns a credential ID.
+
+- `GetOrCreateDataStoreOperator`
+
+    Fetching DataStore by Connection name and return DataStore ID. 
+    I case if DataStore does not exist it will try to create it using Airflow preconfigured connection
+    with the same connection name.
+ 
+    Required config params:
+
+        connection_param_name: str - name of parameter in the config file to get Connection name
+
+    Returns a credential ID.
+
+- `CreateDatasetFromDataStoreOperator`
+
+    Loading dataset from JDBC Connection to DataRobot AI Catalog and return Dataset ID
+ 
+    Required config params:
+
+        datarobot_jdbc_connection: str - existing of preconfigured Datarobot Connection name
+        dataset_name: str - name of loaded dataset,
+        table_schema: str - database table schema,
+        table_name: str - source table name,
+        do_snapshot: bool - If unset, uses the server default: True. If true, creates a snapshot dataset; if false, creates a remote dataset. Creating snapshots from non-file sources may be disabled by the permission, Disable AI Catalog Snapshots.
+        persist_data_after_ingestion: bool - If unset, uses the server default: True. If true, will enforce saving all data (for download and sampling) and will allow a user to view extended data profile (which includes data statistics like min/max/median/mean, histogram, etc.). If false, will not enforce saving data. The data schema (feature names and types) still will be available. Specifying this parameter to false and doSnapshot to true will result in an error.
+
+    Returns a Dataset ID.
 
 - `UploadDatasetOperator`
 
@@ -201,10 +240,10 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
     Scores batch predictions against the deployment.
 
     Prerequisites:
-    - You can use GetCredentialIdOperator to pass `credential_id` from preconfigured DataRobot Credentials (Airflow Connections)
+    - You can use GetOrCreateCredentialOperator to pass `credential_id` from preconfigured DataRobot Credentials (Airflow Connections)
       or you can manually set `credential_id` parameter in the config. [S3 credentials added to DataRobot via Python API client](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/admin/credentials.html#s3-credentials).
     - OR a Dataset ID in the AI Catalog
-    - OR a DataStore ID for jdbc source connection
+    - OR a DataStore ID for jdbc source connection, you can use GetOrCreateDataStoreOperator to pass `datastore_id` from preconfigured Airflow Connection
 
     Parameters:
   
