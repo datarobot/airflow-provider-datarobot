@@ -21,7 +21,7 @@ from datetime import datetime
 
 from airflow.decorators import dag
 
-from datarobot_provider.operators.ai_catalog import CreateDatasetFromJDBCOperator
+from datarobot_provider.operators.ai_catalog import CreateDatasetFromDataStoreOperator
 
 
 @dag(
@@ -39,7 +39,7 @@ from datarobot_provider.operators.ai_catalog import CreateDatasetFromJDBCOperato
     },
 )
 def datarobot_dataset_connect():
-    dataset_connect_op = CreateDatasetFromJDBCOperator(
+    dataset_connect_op = CreateDatasetFromDataStoreOperator(
         task_id="create_dataset_jdbc",
     )
 

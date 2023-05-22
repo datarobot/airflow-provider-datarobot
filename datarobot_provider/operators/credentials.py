@@ -16,12 +16,8 @@ from datarobot import Credential
 from datarobot_provider.hooks.credentials import CredentialsBaseHook
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
-DATAROBOT_MAX_WAIT = 3600
-DATAROBOT_AUTOPILOT_TIMEOUT = 86400
-DATETIME_FORMAT = "%Y-%m-%d %H:%M:%s"
 
-
-class GetCredentialIdOperator(BaseOperator):
+class GetOrCreateCredentialOperator(BaseOperator):
     """
     Fetching credentials by Credential name and return Credentials ID.
 

@@ -10,7 +10,7 @@ import datarobot as dr
 import pytest
 from airflow.exceptions import AirflowNotFoundException
 
-from datarobot_provider.operators.credentials import GetCredentialIdOperator
+from datarobot_provider.operators.credentials import GetOrCreateCredentialOperator
 
 
 def test_operator_get_credential_not_found(mocker):
@@ -22,7 +22,7 @@ def test_operator_get_credential_not_found(mocker):
     mocker.patch.object(dr.Credential, "list", return_value=[credential_mock])
     # should raise ValueError if credentials with provided name is not found
     with pytest.raises(AirflowNotFoundException):
-        operator = GetCredentialIdOperator(task_id='get_credentials')
+        operator = GetOrCreateCredentialOperator(task_id='get_credentials')
         operator.execute(
             context={
                 "params": {
@@ -42,7 +42,7 @@ def test_operator_get_basic_credential_id(
     credential_mock.description = "Credentials managed by Airflow provider for Datarobot"
     mocker.patch.object(dr.Credential, "list", return_value=[credential_mock])
 
-    operator = GetCredentialIdOperator(task_id='get_credentials')
+    operator = GetOrCreateCredentialOperator(task_id='get_credentials')
     credential_id = operator.execute(
         context={
             "params": {
@@ -62,7 +62,7 @@ def test_operator_get_gcp_credential_id(mocker, mock_airflow_connection_datarobo
     credential_mock.description = "Credentials managed by Airflow provider for Datarobot"
     mocker.patch.object(dr.Credential, "list", return_value=[credential_mock])
 
-    operator = GetCredentialIdOperator(task_id='get_credentials')
+    operator = GetOrCreateCredentialOperator(task_id='get_credentials')
     credential_id = operator.execute(
         context={
             "params": {
@@ -82,7 +82,7 @@ def test_operator_get_gcp_credential_not_found(mocker):
     mocker.patch.object(dr.Credential, "list", return_value=[credential_mock])
     # should raise ValueError if credentials with provided name is not found
     with pytest.raises(AirflowNotFoundException):
-        operator = GetCredentialIdOperator(task_id='get_credentials')
+        operator = GetOrCreateCredentialOperator(task_id='get_credentials')
         operator.execute(
             context={
                 "params": {
@@ -100,7 +100,7 @@ def test_operator_get_aws_credential_id(mocker, mock_airflow_connection_datarobo
     credential_mock.description = "Credentials managed by Airflow provider for Datarobot"
     mocker.patch.object(dr.Credential, "list", return_value=[credential_mock])
 
-    operator = GetCredentialIdOperator(task_id='get_credentials')
+    operator = GetOrCreateCredentialOperator(task_id='get_credentials')
     credential_id = operator.execute(
         context={
             "params": {
@@ -120,7 +120,7 @@ def test_operator_get_aws_credential_not_found(mocker):
     mocker.patch.object(dr.Credential, "list", return_value=[credential_mock])
     # should raise ValueError if credentials with provided name is not found
     with pytest.raises(AirflowNotFoundException):
-        operator = GetCredentialIdOperator(task_id='get_credentials')
+        operator = GetOrCreateCredentialOperator(task_id='get_credentials')
         operator.execute(
             context={
                 "params": {
@@ -140,7 +140,7 @@ def test_operator_get_azure_credential_id(
     credential_mock.description = "Credentials managed by Airflow provider for Datarobot"
     mocker.patch.object(dr.Credential, "list", return_value=[credential_mock])
 
-    operator = GetCredentialIdOperator(task_id='get_credentials')
+    operator = GetOrCreateCredentialOperator(task_id='get_credentials')
     credential_id = operator.execute(
         context={
             "params": {
@@ -160,7 +160,7 @@ def test_operator_get_azure_credential_not_found(mocker):
     mocker.patch.object(dr.Credential, "list", return_value=[credential_mock])
     # should raise ValueError if credentials with provided name is not found
     with pytest.raises(AirflowNotFoundException):
-        operator = GetCredentialIdOperator(task_id='get_credentials')
+        operator = GetOrCreateCredentialOperator(task_id='get_credentials')
         operator.execute(
             context={
                 "params": {
