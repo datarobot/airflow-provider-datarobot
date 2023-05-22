@@ -36,7 +36,7 @@ By default, all components use `datarobot_default` connection ID.
 You can create preconfigured Connections to store and manage credentials 
 that can be used together with Airflow Operators to replicate connection 
 on DataRobot side ([Data connections](https://docs.datarobot.com/en/docs/data/connect-data/stored-creds.html)).
-Currently, supported the next types of credentials:
+Currently supported types of credentials:
 
 * `DataRobot Basic Credentials` - to store login/password pairs
 * `DataRobot GCP Credentials` - to store Google Cloud Service account key
