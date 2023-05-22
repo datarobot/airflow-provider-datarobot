@@ -100,12 +100,12 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 - `GetOrCreateCredentialOperator`
 
     Fetching credentials by Credential name and return Credentials ID. 
-    I case if credential does not exist it will try to create it using Airflow preconfigured connection
+    Attempt to find DataRobot credential with the provided name and in case if credential does not exist it will create it using Airflow preconfigured connection
     with the same connection name.
  
     Required config params:
 
-        credentials_param_name: str - name of parameter in the config file to get Credential name
+        `credentials_param_name`: str - name of parameter in the config file to get Credential name
 
     Returns a credential ID.
 
