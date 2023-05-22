@@ -240,7 +240,7 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
     Scores batch predictions against the deployment.
 
     Prerequisites:
-    - You can use GetOrCreateCredentialOperator to pass `credential_id` from preconfigured DataRobot Credentials (Airflow Connections)
+    - You can use `GetOrCreateCredentialOperator` to pass `credential_id` from preconfigured DataRobot Credentials (Airflow Connections)
       or you can manually set `credential_id` parameter in the config. [S3 credentials added to DataRobot via Python API client](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/admin/credentials.html#s3-credentials).
     - OR a Dataset ID in the AI Catalog
     - OR a DataStore ID for jdbc source connection, you can use GetOrCreateDataStoreOperator to pass `datastore_id` from preconfigured Airflow Connection
