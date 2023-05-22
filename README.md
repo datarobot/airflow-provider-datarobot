@@ -45,7 +45,7 @@ Currently supported types of credentials:
 * `DataRobot OAuth Credentials` - to store OAuth tokens
 * `DataRobot JDBC DataSource` - to store JDBC connection attributes
 
-After creating preconfigured Connections using Airflow UI or Airflow API [Managing Connections](https://airflow.apache.org/docs/apache-airflow/stable/howto/connection.html)
+After creating preconfigured connections using Airflow UI or Airflow API [Managing Connections](https://airflow.apache.org/docs/apache-airflow/stable/howto/connection.html)
 it can be used with GetOrCreateCredentialOperator or GetOrCreateDataStoreOperator
 to replicate it on DataRobot side and retrieve corresponding credentials_id
 or datastore_id. 
