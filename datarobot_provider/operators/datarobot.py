@@ -36,7 +36,7 @@ class CreateProjectOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["dataset_id", "dataset_version_id"]
+    template_fields: Iterable[str] = ["dataset_id", "dataset_version_id", "credential_id"]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
     ui_color = '#f4a460'
@@ -46,6 +46,7 @@ class CreateProjectOperator(BaseOperator):
         *,
         dataset_id: str = None,
         dataset_version_id: str = None,
+        credential_id: str = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
@@ -53,6 +54,7 @@ class CreateProjectOperator(BaseOperator):
         self.dataset_id = dataset_id
         self.dataset_version_id = dataset_version_id
         self.datarobot_conn_id = datarobot_conn_id
+        self.credential_id = credential_id
         if kwargs.get('xcom_push') is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
@@ -88,6 +90,7 @@ class CreateProjectOperator(BaseOperator):
             project = dr.Project.create_from_dataset(
                 dataset_id=training_dataset_id,
                 dataset_version_id=self.dataset_version_id,
+                credential_id=self.credential_id,
                 project_name=context['params']['project_name'],
             )
             self.log.info(

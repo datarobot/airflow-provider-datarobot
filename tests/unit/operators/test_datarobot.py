@@ -65,7 +65,10 @@ def test_operator_create_project_from_dataset(mocker):
 
     assert project_id == "project-id"
     create_project_mock.assert_called_with(
-        dataset_id='some_dataset_id', dataset_version_id=None, project_name='test project'
+        dataset_id='some_dataset_id',
+        dataset_version_id=None,
+        project_name='test project',
+        credential_id=None,
     )
 
 
@@ -91,7 +94,10 @@ def test_operator_create_project_from_dataset_id(mocker):
 
     assert project_id == "project-id"
     create_project_mock.assert_called_with(
-        dataset_id='some_dataset_id', dataset_version_id=None, project_name='test project'
+        dataset_id='some_dataset_id',
+        dataset_version_id=None,
+        project_name='test project',
+        credential_id=None,
     )
 
 
@@ -122,6 +128,7 @@ def test_operator_create_project_from_dataset_id_and_version_id(mocker):
         dataset_id='some_dataset_id',
         dataset_version_id='some_dataset_version_id',
         project_name='test project',
+        credential_id=None,
     )
 
 

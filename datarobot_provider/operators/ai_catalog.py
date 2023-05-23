@@ -158,8 +158,8 @@ class CreateDatasetFromDataStoreOperator(BaseOperator):
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         # Fetch stored JDBC Connection with credentials
-        credential_data, data_store = JDBCDataSourceHook(
-            datarobot_jdbc_conn_id=context["params"]["datarobot_jdbc_connection"]
+        credential, credential_data, data_store = JDBCDataSourceHook(
+            datarobot_credentials_conn_id=context["params"]["datarobot_jdbc_connection"]
         ).run()
 
         dataset_name = context["params"]["dataset_name"]

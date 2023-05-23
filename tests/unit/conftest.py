@@ -38,65 +38,6 @@ def mock_airflow_connection(mocker, dr_conn_details):
     mocker.patch.dict("os.environ", AIRFLOW_CONN_DATAROBOT_DEFAULT=conn.get_uri())
 
 
-# For JDBC Connection
-@pytest.fixture
-def dr_jdbc_conn_details():
-    return {
-        "login": "test_login",
-        "password": "test_password",
-        "datarobot_connection": "datarobot_default",
-        "jdbc_driver": "test JDBC Driver",
-        "jdbc_url": "jdbc:test_jdbc_connection_string",
-    }
-
-
-@pytest.fixture()
-def mock_datarobot_driver(mocker):
-    driver_list_mock = [
-        mocker.Mock(
-            id='test-jdbc-driver-id',
-            canonical_name='test JDBC Driver',
-        )
-    ]
-
-    mocker.patch(
-        "datarobot_provider.hooks.connections.DataDriver.list", return_value=driver_list_mock
-    )
-
-
-@pytest.fixture()
-def mock_datarobot_datastore(mocker, dr_jdbc_conn_details, mock_datarobot_driver):
-    datastore_create_mock = mocker.Mock(
-        id='test-datastore-id',
-        canonical_name='datarobot_jdbc_default',
-        params=mocker.Mock(
-            driver_id='test-jdbc-driver-id', jdbc_url=dr_jdbc_conn_details["jdbc_url"]
-        ),
-    )
-
-    mocker.patch("datarobot_provider.hooks.connections.DataStore.list", return_value=[])
-    mocker.patch(
-        "datarobot_provider.hooks.connections.DataStore.create", return_value=datastore_create_mock
-    )
-
-
-@pytest.fixture(autouse=True)
-def mock_airflow_connection_datarobot_jdbc(mocker, dr_jdbc_conn_details, mock_datarobot_datastore):
-    conn = Connection(
-        conn_type="datarobot_jdbc_datasource",
-        login=dr_jdbc_conn_details["login"],
-        password=dr_jdbc_conn_details["password"],
-        extra=json.dumps(
-            {
-                "datarobot_connection": dr_jdbc_conn_details["datarobot_connection"],
-                "jdbc_driver": dr_jdbc_conn_details["jdbc_driver"],
-                "jdbc_url": dr_jdbc_conn_details["jdbc_url"],
-            }
-        ),
-    )
-    mocker.patch.dict("os.environ", AIRFLOW_CONN_DATAROBOT_JDBC_DEFAULT=conn.get_uri())
-
-
 # For Basic Credentials test
 @pytest.fixture
 def dr_basic_credentials_conn_details():
@@ -314,3 +255,64 @@ def mock_airflow_connection_datarobot_oauth_credentials(
         ),
     )
     mocker.patch.dict("os.environ", AIRFLOW_CONN_DATAROBOT_OAUTH_CREDENTIALS_TEST=conn.get_uri())
+
+
+# For JDBC Connection
+@pytest.fixture
+def dr_jdbc_conn_details():
+    return {
+        "login": "test_login",
+        "password": "test_password",
+        "datarobot_connection": "datarobot_default",
+        "jdbc_driver": "test JDBC Driver",
+        "jdbc_url": "jdbc:test_jdbc_connection_string",
+    }
+
+
+@pytest.fixture()
+def mock_datarobot_driver(mocker):
+    driver_list_mock = [
+        mocker.Mock(
+            id='test-jdbc-driver-id',
+            canonical_name='test JDBC Driver',
+        )
+    ]
+
+    mocker.patch(
+        "datarobot_provider.hooks.connections.DataDriver.list", return_value=driver_list_mock
+    )
+
+
+@pytest.fixture()
+def mock_datarobot_datastore(mocker, dr_jdbc_conn_details, mock_datarobot_driver):
+    datastore_create_mock = mocker.Mock(
+        id='test-datastore-id',
+        canonical_name='datarobot_test_connection_jdbc_test',
+        params=mocker.Mock(
+            driver_id='test-jdbc-driver-id', jdbc_url=dr_jdbc_conn_details["jdbc_url"]
+        ),
+    )
+
+    mocker.patch("datarobot_provider.hooks.connections.DataStore.list", return_value=[])
+    mocker.patch(
+        "datarobot_provider.hooks.connections.DataStore.create", return_value=datastore_create_mock
+    )
+
+
+@pytest.fixture()
+def mock_airflow_connection_datarobot_jdbc(
+    mocker, dr_jdbc_conn_details, mock_datarobot_basic_credentials, mock_datarobot_datastore
+):
+    conn = Connection(
+        conn_type="datarobot.datasource.jdbc",
+        login=dr_jdbc_conn_details["login"],
+        password=dr_jdbc_conn_details["password"],
+        extra=json.dumps(
+            {
+                "datarobot_connection": dr_jdbc_conn_details["datarobot_connection"],
+                "jdbc_driver": dr_jdbc_conn_details["jdbc_driver"],
+                "jdbc_url": dr_jdbc_conn_details["jdbc_url"],
+            }
+        ),
+    )
+    mocker.patch.dict("os.environ", AIRFLOW_CONN_DATAROBOT_TEST_CONNECTION_JDBC_TEST=conn.get_uri())

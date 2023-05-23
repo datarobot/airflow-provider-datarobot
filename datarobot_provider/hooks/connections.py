@@ -9,25 +9,21 @@ from typing import Any
 from typing import Dict
 
 from airflow import AirflowException
-from airflow.hooks.base import BaseHook
+from datarobot import Credential
 from datarobot.models.data_store import DataStore
 from datarobot.models.driver import DataDriver
 
+from datarobot_provider.hooks.credentials import BasicCredentialsHook
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
 
-class JDBCDataSourceHook(BaseHook):
+class JDBCDataSourceHook(BasicCredentialsHook):
     """
     A hook that interacts with DataRobot via its public Python API library to
     manage JDBC connections with corresponding credentials.
-
-    :param datarobot_jdbc_conn_id: Connection ID, defaults to `datarobot_jdbc_default`
-    :type datarobot_jdbc_conn_id: str, optional
     """
 
-    conn_name_attr = 'datarobot_jdbc_conn_id'
-    default_datarobot_jdbc_conn_name = 'datarobot_jdbc_default'
-    conn_type = 'datarobot_jdbc_datasource'
+    conn_type = 'datarobot.datasource.jdbc'
     hook_name = 'DataRobot JDBC DataSource'
 
     @staticmethod
@@ -66,23 +62,14 @@ class JDBCDataSourceHook(BaseHook):
                 'datarobot_connection': 'datarobot_default',
                 'jdbc_driver': '',
                 'jdbc_url': 'jdbc:',
-                'login': '',
-                'password': '',
             },
         }
 
-    def __init__(
-        self,
-        datarobot_jdbc_conn_id: str = default_datarobot_jdbc_conn_name,
-    ) -> None:
-        super().__init__()
-        self.datarobot_jdbc_conn_id = datarobot_jdbc_conn_id
-
-    def get_conn(self) -> (dict, DataStore):
+    def get_conn(self) -> (Credential, dict, DataStore):
         """Retrieving corresponding DataStore object or creating if not exist,
         updating it with new parameters in case of changes."""
 
-        conn = self.get_connection(self.datarobot_jdbc_conn_id)
+        conn = self.get_connection(self.datarobot_credentials_conn_id)
 
         datarobot_connection_id = conn.extra_dejson.get('datarobot_connection', '')
 
@@ -108,12 +95,10 @@ class JDBCDataSourceHook(BaseHook):
         if not conn.password:
             raise AirflowException("password is not defined")
 
+        credential = self.get_or_create_credential(conn)
+
         # For methods that accept credential data instead of credential ID
-        credential_data = {
-            "credentialType": "basic",
-            "user": conn.login,
-            "password": conn.password,
-        }
+        credential_data = self.get_credential_data(conn)
 
         # Find the JDBC driver ID from name:
         for jdbc_drv_item in DataDriver.list():
@@ -128,37 +113,39 @@ class JDBCDataSourceHook(BaseHook):
 
         # Check if DataStore created already:
         for data_store in DataStore.list():
-            if data_store.canonical_name == self.datarobot_jdbc_conn_id:
+            if data_store.canonical_name == self.datarobot_credentials_conn_id:
                 self.log.info(
                     f"Found existing DataStore:{data_store.canonical_name} , id={data_store.id}"
                 )
                 break
         else:
             self.log.info(
-                f"DataStore:{self.datarobot_jdbc_conn_id} does not exist, trying to create it"
+                f"DataStore:{self.datarobot_credentials_conn_id} does not exist, trying to create it"
             )
             data_store = DataStore.create(
                 data_store_type='jdbc',
-                canonical_name=self.datarobot_jdbc_conn_id,
+                canonical_name=self.datarobot_credentials_conn_id,
                 driver_id=jdbc_driver_id,
                 jdbc_url=jdbc_url,
             )
             self.log.info(
-                f"DataStore:{self.datarobot_jdbc_conn_id} successfully created, id={data_store.id}"
+                f"DataStore:{self.datarobot_credentials_conn_id} successfully created, id={data_store.id}"
             )
 
         if jdbc_url != data_store.params.jdbc_url or jdbc_driver_id != data_store.params.driver_id:
-            self.log.info(f"Updating DataStore:{self.datarobot_jdbc_conn_id} with new params...")
+            self.log.info(
+                f"Updating DataStore:{self.datarobot_credentials_conn_id} with new params..."
+            )
             data_store.update(
-                canonical_name=self.datarobot_jdbc_conn_id,
+                canonical_name=self.datarobot_credentials_conn_id,
                 driver_id=jdbc_driver_id,
                 jdbc_url=jdbc_url,
             )
             self.log.info(
-                f"DataStore:{self.datarobot_jdbc_conn_id} successfully updated, id={data_store.id}"
+                f"DataStore:{self.datarobot_credentials_conn_id} successfully updated, id={data_store.id}"
             )
 
-        return credential_data, data_store
+        return credential, credential_data, data_store
 
     def run(self) -> Any:
         # get or create DataStore object updated with actual parameters

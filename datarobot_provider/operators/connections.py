@@ -63,8 +63,8 @@ class GetOrCreateDataStoreOperator(BaseOperator):
         connection_name = context["params"][self.connection_param_name]
 
         # Fetch stored JDBC Connection with credentials
-        credential_data, data_store = JDBCDataSourceHook(
-            datarobot_jdbc_conn_id=connection_name
+        credential, credential_data, data_store = JDBCDataSourceHook(
+            datarobot_credentials_conn_id=connection_name
         ).run()
 
         if data_store is not None:

@@ -68,6 +68,7 @@ class CredentialsBaseHook(BaseHook):
             self.log.info(
                 f"Credentials:{self.datarobot_credentials_conn_id} successfully created, id={credential.credential_id}"
             )
+        return credential
 
     def get_conn(self) -> (Credential, dict):
         """Get or Create DataRobot associated credentials managed by Airflow provider."""
@@ -112,7 +113,7 @@ class CredentialsBaseHook(BaseHook):
 
 class BasicCredentialsHook(CredentialsBaseHook):
     hook_name = 'DataRobot Basic Credentials'
-    conn_type = 'datarobot:credentials:basic'
+    conn_type = 'datarobot.credentials.basic'
 
     def __init__(
         self,
@@ -179,7 +180,7 @@ class BasicCredentialsHook(CredentialsBaseHook):
 
 class GoogleCloudCredentialsHook(CredentialsBaseHook):
     hook_name = 'DataRobot GCP Credentials'
-    conn_type = 'datarobot:credentials:gcp'
+    conn_type = 'datarobot.credentials.gcp'
 
     def create_credentials(self, conn) -> Credential:
         """Returns Google Cloud credentials for params in connection object"""
@@ -252,7 +253,7 @@ class GoogleCloudCredentialsHook(CredentialsBaseHook):
 
 class AwsCredentialsHook(CredentialsBaseHook):
     hook_name = 'DataRobot AWS Credentials'
-    conn_type = 'datarobot:credentials:aws'
+    conn_type = 'datarobot.credentials.aws'
 
     def create_credentials(self, conn) -> Credential:
         """Returns AWS credentials for params in connection object"""
@@ -335,7 +336,7 @@ class AwsCredentialsHook(CredentialsBaseHook):
 
 class AzureStorageCredentialsHook(CredentialsBaseHook):
     hook_name = 'DataRobot Azure Storage Credentials'
-    conn_type = 'datarobot:credentials:azure'
+    conn_type = 'datarobot.credentials.azure'
 
     def create_credentials(self, conn) -> Credential:
         """Returns Azure Storage credentials for params in connection object"""
@@ -410,7 +411,7 @@ class AzureStorageCredentialsHook(CredentialsBaseHook):
 
 class OAuthCredentialsHook(CredentialsBaseHook):
     hook_name = 'DataRobot OAuth Credentials'
-    conn_type = 'datarobot:credentials:oauth'
+    conn_type = 'datarobot.credentials.oauth'
 
     def create_credentials(self, conn) -> Credential:
         """Returns OAuth credentials for params in connection object"""

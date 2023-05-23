@@ -14,7 +14,7 @@ from datarobot_provider.operators.connections import GetOrCreateDataStoreOperato
 
 def test_operator_get_or_create_dataset(mock_airflow_connection_datarobot_jdbc):
     test_params = {
-        "datarobot_connection_name": "datarobot_jdbc_default",
+        "datarobot_connection_name": "datarobot_test_connection_jdbc_test",
     }
 
     operator = GetOrCreateDataStoreOperator(
