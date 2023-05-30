@@ -50,7 +50,6 @@ def test_operator_get_service_stat(mocker, service_stat_details):
     )
 
     operator = GetServiceStatsOperator(task_id="get_service_stat", deployment_id="deployment-id")
-    # service_stats_params = {"feature_drift": {"model_id": "test-model-id"}}
     service_stats_params = {}
     service_stats_result = operator.execute(context={'params': {}})
 

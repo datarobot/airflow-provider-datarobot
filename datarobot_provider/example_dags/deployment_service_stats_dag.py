@@ -21,7 +21,8 @@ from datarobot_provider.operators.monitoring import GetServiceStatsOperator
 def deployment_service_stats():
     service_stats_op = GetServiceStatsOperator(
         task_id="get_service_stats",
-        deployment_id="63eb7dfce1274472579f6e1c",
+        # you can pass deployment_id from previous operator here:
+        deployment_id="put your deployment_id here",
     )
 
     @task(task_id="example_processing_python")
