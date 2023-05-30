@@ -154,11 +154,13 @@ class JDBCDataSourceHook(BasicCredentialsHook):
     def test_connection(self):
         """Test DataRobot connection to JDBC DataSource"""
         try:
-            credential_data, data_store = self.run()
+            credential, credential_data, data_store = self.run()
+
             test_result = data_store.test(
                 username=credential_data["user"], password=credential_data["password"]
             )
 
-            return True, f"{test_result['message']}, datastore id={data_store.id}"
+            success_massage = f"{test_result['message']}"
+            return True, success_massage
         except Exception as e:
             return False, str(e)
