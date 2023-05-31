@@ -90,7 +90,7 @@ class DataRobotHook(BaseHook):
 
     def run(self) -> Any:
         # Initialize DataRobot client
-        self.get_conn()
+        return self.get_conn()
 
     def test_connection(self):
         """Test HTTP Connection"""
