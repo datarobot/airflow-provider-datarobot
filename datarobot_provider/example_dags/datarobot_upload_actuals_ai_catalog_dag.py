@@ -8,20 +8,15 @@
 """
 Config example for this dag:
 {
-    "datarobot_jdbc_connection": "datarobot_jdbc_test",
-    "dataset_name": "test_dataset_name",
-    "table_schema": "integration_demo",
-    "table_name": "test_table",
-    "query": 'SELECT * FROM "integration_demo"."test_table"',
-    "persist_data_after_ingestion": True,
-    "do_snapshot": True,
+    "actual_value_column": 'ACTUAL',
+    "association_id_column": 'id',
 }
 """
 from datetime import datetime
 
 from airflow.decorators import dag
 
-from datarobot_provider.operators.mlops import UploadActualsOperator
+from datarobot_provider.operators.mlops import SubmitActualsFromCatalogOperator
 from datarobot_provider.sensors.client import BaseAsyncResolutionSensor
 
 
@@ -31,38 +26,35 @@ from datarobot_provider.sensors.client import BaseAsyncResolutionSensor
     tags=['example'],
     # Default json config example:
     params={
-        "datarobot_jdbc_connection": "datarobot_jdbc_test_connection_name",
-        "dataset_name": "test_jdbc_dataset_name",
-        "table_schema": "test_jdbc_table_schema",
-        "table_name": "test_jdbc_table_name",
-        "persist_data_after_ingestion": True,
-        "do_snapshot": True,
+        "association_id_column": 'id',  # column name with a unique identifier used with a prediction.
+        "actual_value_column": 'ACTUAL',  # column name with the actual value of a prediction.
+        "timestamp_column": '',  # optional - column name with datetime or string in RFC3339 format.
+        "was_acted_on_column": '',
     },
 )
-def datarobot_upload_actuals_from_ai_catalog():
+def datarobot_submit_actuals_from_ai_catalog(deployment_id='646fcfe9b01540a797f224b3'):
+    if not deployment_id:
+        raise ValueError("Invalid or missing `deployment_id` value")
 
-    #dataset_connect_op = CreateDatasetFromDataStoreOperator(
-    #    task_id="create_dataset_jdbc",
-    #)
-
-    upload_actuals_op = UploadActualsOperator(
-        task_id='create_project',
-        deployment_id='646fcfe9b01540a797f224b3',
+    upload_actuals_op = SubmitActualsFromCatalogOperator(
+        task_id='upload_actuals',
+        deployment_id=deployment_id,
+        # dataset_id can be received from previous operator
         dataset_id='646fd3b7583f864e8a6c023e',
     )
 
     uploading_complete_sensor = BaseAsyncResolutionSensor(
-        task_id="check_scoring_complete",
+        task_id="check_uploading_actuals_complete",
         async_location=upload_actuals_op.output,
-        poke_interval=1,
+        poke_interval=5,
         mode="reschedule",
-        timeout=60,
+        timeout=3600,
     )
 
     upload_actuals_op >> uploading_complete_sensor
 
 
-datarobot_upload_actuals_from_ai_catalog_dag = datarobot_upload_actuals_from_ai_catalog()
+datarobot_upload_actuals_from_ai_catalog_dag = datarobot_submit_actuals_from_ai_catalog()
 
 if __name__ == "__main__":
     datarobot_upload_actuals_from_ai_catalog_dag.test()

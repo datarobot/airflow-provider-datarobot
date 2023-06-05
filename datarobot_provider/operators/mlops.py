@@ -1,4 +1,4 @@
-# Copyright 2022 DataRobot, Inc. and its affiliates.
+# Copyright 2023 DataRobot, Inc. and its affiliates.
 #
 # All rights reserved.
 #
@@ -8,25 +8,21 @@
 from typing import Any
 from typing import Dict
 from typing import Iterable
-from typing import List
 
 import datarobot as dr
-import datarobot.client as dr_client
 from airflow.exceptions import AirflowException
-from airflow.exceptions import AirflowFailException
 from airflow.models import BaseOperator
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
-DATAROBOT_MAX_WAIT = 3600
-DATAROBOT_AUTOPILOT_TIMEOUT = 86400
-DATETIME_FORMAT = "%Y-%m-%d %H:%M:%s"
 
-
-class UploadActualsOperator(BaseOperator):
-
+class SubmitActualsFromCatalogOperator(BaseOperator):
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["deployment_id", "dataset_id", "dataset_version_id", "credential_id"]
+    template_fields: Iterable[str] = [
+        "deployment_id",
+        "dataset_id",
+        "dataset_version_id",
+    ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
     ui_color = '#f4a460'
@@ -34,10 +30,9 @@ class UploadActualsOperator(BaseOperator):
     def __init__(
         self,
         *,
-        deployment_id: str = None,
-        dataset_id: str = None,
+        deployment_id: str,
+        dataset_id: str,
         dataset_version_id: str = None,
-        credential_id: str = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
@@ -46,7 +41,6 @@ class UploadActualsOperator(BaseOperator):
         self.dataset_id = dataset_id
         self.dataset_version_id = dataset_version_id
         self.datarobot_conn_id = datarobot_conn_id
-        self.credential_id = credential_id
         if kwargs.get('xcom_push') is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
@@ -54,28 +48,24 @@ class UploadActualsOperator(BaseOperator):
 
     def execute(self, context: Dict[str, Any]) -> str:
         # Initialize DataRobot client
-        client = DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
-        # Uploading Actuals from AI Catalog
         self.log.info("Uploading Actuals from AI Catalog")
 
-        actuals_config = {
-            'actualValueColumn': 'ACTUAL',
-            'associationIdColumn': 'id',
-            'datasetId': self.dataset_id,
-            # 'datasetVersionId' : dataset.version_id,
-            # 'timestampColumn' : '<INSERT COLUMN NAME>',
-            # 'wasActedOnColumn' : '<INSERT COLUMN NAME>'
-        }
+        deployment = dr.Deployment.get(deployment_id=self.deployment_id)
 
-        res = client.post(f'deployments/{self.deployment_id}/actuals/fromDataset', data=actuals_config)
+        if deployment is None:
+            raise ValueError(f"Deployment id={self.deployment_id} doesnt exist")
 
-        async_status_check = res.headers['Location']
-        print(async_status_check)
-        if True:
-            return async_status_check
+        job_id = deployment.submit_actuals_from_catalog_async(
+            dataset_id=self.dataset_id,
+            dataset_version_id=self.dataset_version_id,
+            actual_value_column=context["params"].get("actual_value_column", None),
+            association_id_column=context["params"].get("association_id_column", None),
+            timestamp_column=context["params"].get("timestamp_column", None),
+            was_acted_on_column=context["params"].get("was_acted_on_column", None),
+        )
 
-        else:
-            raise AirflowFailException(
-                'Error Message here'
-            )
+        self.log.debug(f"Uploading Actuals from AI Catalog, job_id: {job_id}")
+
+        return job_id

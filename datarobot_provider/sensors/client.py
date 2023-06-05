@@ -9,8 +9,8 @@ from typing import Any
 from typing import Dict
 
 import datarobot as dr
+from airflow import AirflowException
 from airflow.sensors.base import BaseSensorOperator
-from datarobot.errors import AsyncProcessUnsuccessfulError
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
@@ -43,18 +43,12 @@ class BaseAsyncResolutionSensor(BaseSensorOperator):
 
     def poke(self, context: Dict[Any, Any]) -> bool:
         # Initialize DataRobot client
-        client = DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        if not self.async_location:
+            raise AirflowException("async location status link is not defined")
+
         self.log.info("Checking if DataRobot API async call is complete")
-
-        join_endpoint = not self.async_location.startswith("http")  # Accept full qualified and relative urls
-        response = client.get(self.async_location, allow_redirects=False, join_endpoint=join_endpoint)
-        print(response)
-        if response.status_code not in (200, 303):
-            e_template = "The server gave an unexpected response. Status Code {}: {}"
-            print(e_template)
-            #raise errors.AsyncFailureError(e_template.format(response.status_code, response.text))
-        #is_successful = success_fn(response)
-        #if is_successful:
-        #    return is_successful
-
-        return False
+        async_status_check = dr.client.get_async_resolution_status(self.async_location)
+        self.log.debug(f"API async call status:{async_status_check}")
+        return async_status_check is not None
