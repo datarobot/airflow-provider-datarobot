@@ -10,6 +10,8 @@ Config example for this dag:
 {
     "actual_value_column": 'ACTUAL',
     "association_id_column": 'id',
+    "timestamp_column": 'timestamp',
+    "was_acted_on_column": 'acted',
 }
 """
 from datetime import datetime
@@ -29,7 +31,7 @@ from datarobot_provider.sensors.client import BaseAsyncResolutionSensor
         "association_id_column": 'id',  # column name with a unique identifier used with a prediction.
         "actual_value_column": 'ACTUAL',  # column name with the actual value of a prediction.
         "timestamp_column": '',  # optional - column name with datetime or string in RFC3339 format.
-        "was_acted_on_column": '',
+        "was_acted_on_column": '',  # optional
     },
 )
 def datarobot_submit_actuals_from_ai_catalog(deployment_id='646fcfe9b01540a797f224b3'):
