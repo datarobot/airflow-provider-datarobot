@@ -52,10 +52,10 @@ class SubmitActualsFromCatalogOperator(BaseOperator):
 
         self.log.info("Uploading Actuals from AI Catalog")
 
-        deployment = dr.Deployment.get(deployment_id=self.deployment_id)
+        if self.deployment_id is None:
+            raise ValueError("deployment_id is required to submit actuals.")
 
-        if deployment is None:
-            raise ValueError(f"Deployment id={self.deployment_id} doesnt exist")
+        deployment = dr.Deployment.get(deployment_id=self.deployment_id)
 
         job_id = deployment.submit_actuals_from_catalog_async(
             dataset_id=self.dataset_id,
