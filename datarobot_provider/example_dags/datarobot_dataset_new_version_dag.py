@@ -37,7 +37,7 @@ from datarobot_provider.operators.credentials import GetOrCreateCredentialOperat
     },
 )
 def datarobot_dataset_new_version(
-    deployment_id='646fcfe9b01540a797f224b3', dataset_id='647f3d5ec731b1fd66eadb29'
+    deployment_id=None, dataset_id=None
 ):
     if not deployment_id:
         raise ValueError("Invalid or missing `deployment_id` value")
