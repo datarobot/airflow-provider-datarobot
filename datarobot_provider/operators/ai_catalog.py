@@ -285,7 +285,7 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
     :type data_store_id: str
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
-    :return: DataRobot AI Catalog dataset ID
+    :return: DataRobot AI Catalog data source ID
     :rtype: str
     """
 
