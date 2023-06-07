@@ -14,7 +14,7 @@ from datarobot_provider.operators.monitoring import GetServiceStatsOperator
 
 
 @dag(
-    schedule_interval=None,
+    schedule=None,
     start_date=datetime(2023, 1, 1),
     tags=['example', 'mlops'],
 )
