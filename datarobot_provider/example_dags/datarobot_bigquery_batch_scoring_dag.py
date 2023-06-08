@@ -40,7 +40,7 @@ from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
 
 
 @dag(
-    schedule_interval=None,
+    schedule=None,
     start_date=datetime(2023, 1, 1),
     tags=['example', 'gcp', 'bigquery'],
     params={

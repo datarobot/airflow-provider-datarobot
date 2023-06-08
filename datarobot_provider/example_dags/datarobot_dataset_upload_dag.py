@@ -19,7 +19,7 @@ from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 
 
 @dag(
-    schedule_interval=None,
+    schedule=None,
     start_date=datetime(2022, 1, 1),
     tags=['example'],
     params={"dataset_file_path": "./titanic.csv"},
