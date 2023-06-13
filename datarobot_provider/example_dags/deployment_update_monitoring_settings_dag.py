@@ -25,7 +25,8 @@ from datarobot_provider.operators.monitoring import (
         "target_drift_enabled": False,
         "feature_drift_enabled": True,
         "association_id_column": ["id"],
-        "required_association_id_in_prediction_requests": False,
+        "required_association_id": False,
+        "enable_challenger_analysis": False,
     },
 )
 def deployment_monitoring_settings(deployment_id="646fcfe9b01540a797f224b3"):
@@ -59,13 +60,12 @@ def deployment_monitoring_settings(deployment_id="646fcfe9b01540a797f224b3"):
         print(f"settings:{str(model_monitoring_settings_after)}")
 
         settings_changed = {
-            a: model_monitoring_settings_after[a]
-            for a in model_monitoring_settings_after
-            if model_monitoring_settings_after[a] != model_monitoring_settings_before[a]
+            setting: model_monitoring_settings_after[setting]
+            for setting in model_monitoring_settings_after
+            if model_monitoring_settings_after[setting] != model_monitoring_settings_before[setting]
         }
 
         print(f"settings_changed:{str(settings_changed)}")
-
 
         total_predictions = 10
         return total_predictions

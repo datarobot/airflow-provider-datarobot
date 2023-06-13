@@ -10,8 +10,9 @@ from datetime import datetime
 import datarobot as dr
 import pytest
 from datarobot.models.deployment import ServiceStats, Accuracy
+from datarobot.models.deployment.deployment import DriftTrackingSettings
 
-from datarobot_provider.operators.monitoring import GetAccuracyOperator
+from datarobot_provider.operators.monitoring import GetAccuracyOperator, GetMonitoringSettingsOperator
 from datarobot_provider.operators.monitoring import GetServiceStatsOperator
 from datarobot_provider.operators.monitoring import _serialize_metrics
 
@@ -160,3 +161,36 @@ def test_operator_get_accuracy_with_params(mocker, accuracy_details):
 
     assert accuracy_result == expected_accuracy
     get_accuracy_mock.assert_called_with(**accuracy_params["accuracy"])
+
+def test_operator_get_monitoring_settings(mocker, monitoring_settings_details):
+    deployment_id = "deployment-id"
+
+    current_drift_tracking_settings = {
+            'target_drift': {'enabled': False},
+            'feature_drift': {'enabled': True}
+    }
+
+    updated_drift_tracking_settings = {
+            'target_drift': {'enabled': False},
+            'feature_drift': {'enabled': True}
+    }
+
+    monitoring_settings = {
+        "drift_tracking_settings": {
+            'target_drift': {'enabled': False},
+            'feature_drift': {'enabled': True}
+        }
+    }
+
+    expected_monitoring_settings = _serialize_metrics(monitoring_settings)
+
+    mocker.patch.object(dr.Deployment, "get", return_value=dr.Deployment(deployment_id))
+    get_drift_tracking_settings_mock = mocker.patch.object(dr.Deployment, "get_drift_tracking_settings", return_value=current_drift_tracking_settings)
+    update_drift_tracking_settings_mock = mocker.patch.object(dr.Deployment, "update_drift_tracking_settings")
+
+    operator = GetMonitoringSettingsOperator(task_id="get_monitoring_settings", deployment_id="deployment-id")
+    monitoring_settings_params = {}
+    monitoring_settings_result = operator.execute(context={'params': {}})
+
+    #assert monitoring_settings_result == expected_monitoring_settings
+    #get_accuracy_mock.assert_called_with(**accuracy_params)

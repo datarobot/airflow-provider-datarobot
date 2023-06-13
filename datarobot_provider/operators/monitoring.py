@@ -156,16 +156,12 @@ class GetMonitoringSettingsOperator(BaseOperator):
 
         drift_tracking_settings = deployment.get_drift_tracking_settings()
         association_id_settings = deployment.get_association_id_settings()
-        prediction_warning_settings = deployment.get_prediction_warning_settings()
         predictions_data_collection_settings = deployment.get_predictions_data_collection_settings()
-        segment_analysis_settings = deployment.get_segment_analysis_settings()
 
         monitoring_settings = {
             "drift_tracking_settings": drift_tracking_settings,
             "association_id_settings": association_id_settings,
-            "prediction_warning_settings": prediction_warning_settings,
             "predictions_data_collection_settings": predictions_data_collection_settings,
-            "segment_analysis_settings": segment_analysis_settings,
         }
 
         return monitoring_settings
@@ -223,6 +219,9 @@ class UpdateMonitoringSettingsOperator(BaseOperator):
         if (target_drift_enabled != current_drift_tracking_settings['target_drift']['enabled']) or (
             feature_drift_enabled != current_drift_tracking_settings['feature_drift']['enabled']
         ):
+            self.log.debug(
+                f"Trying to update drift settings for deployment_id={self.deployment_id}"
+            )
             deployment.update_drift_tracking_settings(
                 target_drift_enabled=target_drift_enabled,
                 feature_drift_enabled=feature_drift_enabled,
@@ -241,7 +240,7 @@ class UpdateMonitoringSettingsOperator(BaseOperator):
             "association_id_column", current_association_id_settings['column_names']
         )
         required_in_prediction_requests = context["params"].get(
-            "required_association_id_in_prediction_requests",
+            "required_association_id",
             current_association_id_settings['required_in_prediction_requests'],
         )
 
@@ -261,17 +260,20 @@ class UpdateMonitoringSettingsOperator(BaseOperator):
                 f"No need to update association_id settings for deployment_id={self.deployment_id}"
             )
 
-        if "enable_challenger_analysis" in context["params"]:
-            current_challenger_models_settings = deployment.get_challenger_models_settings()
-            challenger_models_settings = ""
-            if association_id_column != current_challenger_models_settings[""]:
-                deployment.update_challenger_models_settings(
-                    challenger_models_enabled=challenger_models_settings,
-                )
-                self.log.info(
-                    f"Deployment challenger analysis settings updated for deployment_id={self.deployment_id}"
-                )
-            else:
-                self.log.info(
-                    f"No need to update challenger analysis settings for deployment_id={self.deployment_id}"
-                )
+        current_predictions_data_collection_settings = deployment.predictions_data_collection_settings()
+        predictions_data_collection_settings = context["params"].get(
+            "enable_challenger_analysis", current_predictions_data_collection_settings["enabled"]
+        )
+        if predictions_data_collection_settings != current_predictions_data_collection_settings["enabled"]:
+            deployment.update_predictions_data_collection_settings(
+                enabled=predictions_data_collection_settings,
+            )
+            self.log.info(
+                f"Deployment predictions data collection settings updated for deployment_id={self.deployment_id}"
+            )
+        else:
+            self.log.info(
+                f"No need to update predictions data collection settings for deployment_id={self.deployment_id}"
+            )
+
+        #segment_analysis_settings = deployment.get_segment_analysis_settings()
