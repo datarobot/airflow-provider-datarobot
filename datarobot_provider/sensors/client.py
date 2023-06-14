@@ -11,8 +11,10 @@ from typing import Dict
 import datarobot as dr
 from airflow import AirflowException
 from airflow.sensors.base import BaseSensorOperator
+from datarobot.errors import AsyncProcessUnsuccessfulError
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
+from datarobot.models.status_check_job import StatusCheckJob
 
 
 class BaseAsyncResolutionSensor(BaseSensorOperator):
@@ -26,17 +28,17 @@ class BaseAsyncResolutionSensor(BaseSensorOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields = ["async_location"]
+    template_fields = ["job_id"]
 
     def __init__(
         self,
         *,
-        async_location: str,
+        job_id: str,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
-        self.async_location = async_location
+        self.job_id = job_id
         self.datarobot_conn_id = datarobot_conn_id
 
         self.hook = DataRobotHook(datarobot_conn_id)
@@ -45,10 +47,23 @@ class BaseAsyncResolutionSensor(BaseSensorOperator):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
-        if not self.async_location:
-            raise AirflowException("async location status link is not defined")
+        if not self.job_id:
+            raise AirflowException("job_id is not defined")
 
         self.log.info("Checking if DataRobot API async call is complete")
-        async_status_check = dr.client.get_async_resolution_status(self.async_location)
-        self.log.debug(f"API async call status:{async_status_check}")
-        return async_status_check is not None
+
+        status_check_job = StatusCheckJob.from_id(self.job_id)
+        job_status_result = status_check_job.get_status()
+
+        self.log.debug(f"API async call status:{job_status_result.status}")
+        self.log.debug(
+            f"API async call completed_resource_url:{job_status_result.completed_resource_url}"
+        )
+
+        if job_status_result.status in ["ERROR", "ABORT"]:
+            raise AsyncProcessUnsuccessfulError(
+                f"The job did not complete successfully. Job Data: {job_status_result.status}"
+            )
+        elif job_status_result.status == "COMPLETED":
+            return True
+        return False

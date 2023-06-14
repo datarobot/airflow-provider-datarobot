@@ -57,7 +57,7 @@ class SubmitActualsFromCatalogOperator(BaseOperator):
 
         deployment = dr.Deployment.get(deployment_id=self.deployment_id)
 
-        job_id = deployment.submit_actuals_from_catalog_async(
+        status_job = deployment.submit_actuals_from_catalog_async(
             dataset_id=self.dataset_id,
             dataset_version_id=self.dataset_version_id,
             actual_value_column=context["params"].get("actual_value_column", None),
@@ -66,6 +66,6 @@ class SubmitActualsFromCatalogOperator(BaseOperator):
             was_acted_on_column=context["params"].get("was_acted_on_column", None),
         )
 
-        self.log.debug(f"Uploading Actuals from AI Catalog, job_id: {job_id}")
+        self.log.debug(f"Uploading Actuals from AI Catalog, job_id: {status_job.job_id}")
 
-        return job_id
+        return status_job.job_id

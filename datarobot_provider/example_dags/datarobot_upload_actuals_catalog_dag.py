@@ -47,8 +47,8 @@ def datarobot_submit_actuals_from_ai_catalog(deployment_id='646fcfe9b01540a797f2
 
     uploading_complete_sensor = BaseAsyncResolutionSensor(
         task_id="check_uploading_actuals_complete",
-        async_location=upload_actuals_op.output,
-        poke_interval=5,
+        job_id=upload_actuals_op.output,
+        poke_interval=1,
         mode="reschedule",
         timeout=3600,
     )
