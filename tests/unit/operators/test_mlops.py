@@ -8,6 +8,7 @@
 
 import datarobot as dr
 import pytest
+from datarobot.models.status_check_job import StatusCheckJob
 
 from datarobot_provider.operators.mlops import SubmitActualsFromCatalogOperator
 
@@ -26,10 +27,12 @@ def test_operator_submit_actuals_from_catalog(mocker, submit_actuals_from_catalo
     deployment_id = "test-deployment-id"
     dataset_id = "test-dataset-id"
     dataset_version_id = "test-dataset-version-id"
-    status_link = "test-status-link"
+    status_check_job_id = "test-status-job-id"
     mocker.patch.object(dr.Deployment, "get", return_value=dr.Deployment(deployment_id))
     submit_actuals_mock = mocker.patch.object(
-        dr.Deployment, "submit_actuals_from_catalog_async", return_value=status_link
+        dr.Deployment,
+        "submit_actuals_from_catalog_async",
+        return_value=StatusCheckJob(job_id=status_check_job_id),
     )
 
     operator = SubmitActualsFromCatalogOperator(
@@ -38,13 +41,13 @@ def test_operator_submit_actuals_from_catalog(mocker, submit_actuals_from_catalo
         dataset_id=dataset_id,
         dataset_version_id=dataset_version_id,
     )
-    status_link = operator.execute(
+    job_status_id = operator.execute(
         context={
             "params": submit_actuals_from_catalog_settings,
         }
     )
 
-    assert status_link == "test-status-link"
+    assert job_status_id == status_check_job_id
     submit_actuals_mock.assert_called_with(
         dataset_id=dataset_id,
         dataset_version_id=dataset_version_id,
@@ -58,10 +61,12 @@ def test_operator_submit_actuals_from_catalog(mocker, submit_actuals_from_catalo
 def test_operator_submit_actuals_deployment_none(mocker, submit_actuals_from_catalog_settings):
     deployment_id = None
     dataset_id = "test-dataset-id"
-    status_link = "test-status-link"
+    status_check_job_id = "test-status-job-id"
     mocker.patch.object(dr.Deployment, "get", return_value=dr.Deployment(deployment_id))
     mocker.patch.object(
-        dr.Deployment, "submit_actuals_from_catalog_async", return_value=status_link
+        dr.Deployment,
+        "submit_actuals_from_catalog_async",
+        return_value=StatusCheckJob(job_id=status_check_job_id),
     )
 
     with pytest.raises(ValueError):

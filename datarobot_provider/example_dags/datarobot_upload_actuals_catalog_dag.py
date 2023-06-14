@@ -34,21 +34,23 @@ from datarobot_provider.sensors.client import BaseAsyncResolutionSensor
         "was_acted_on_column": '',  # optional
     },
 )
-def datarobot_submit_actuals_from_ai_catalog(deployment_id='646fcfe9b01540a797f224b3'):
+def datarobot_submit_actuals_from_ai_catalog(deployment_id=None, dataset_id=None):
     if not deployment_id:
         raise ValueError("Invalid or missing `deployment_id` value")
+    if not dataset_id:
+        raise ValueError("Invalid or missing `dataset_id` value")
 
     upload_actuals_op = SubmitActualsFromCatalogOperator(
         task_id='upload_actuals',
         deployment_id=deployment_id,
         # dataset_id can be received from previous operator
-        dataset_id='646fd3b7583f864e8a6c023e',
+        dataset_id=dataset_id,
     )
 
     uploading_complete_sensor = BaseAsyncResolutionSensor(
         task_id="check_uploading_actuals_complete",
         job_id=upload_actuals_op.output,
-        poke_interval=1,
+        poke_interval=5,
         mode="reschedule",
         timeout=3600,
     )

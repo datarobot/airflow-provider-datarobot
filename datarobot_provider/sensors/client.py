@@ -8,7 +8,6 @@
 from typing import Any
 from typing import Dict
 
-import datarobot as dr
 from airflow import AirflowException
 from airflow.sensors.base import BaseSensorOperator
 from datarobot.errors import AsyncProcessUnsuccessfulError
