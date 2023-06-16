@@ -9,7 +9,8 @@ from datetime import datetime
 
 import datarobot as dr
 import pytest
-from datarobot.models.deployment import ServiceStats, Accuracy
+from datarobot.models.deployment import Accuracy
+from datarobot.models.deployment import ServiceStats
 
 from datarobot_provider.operators.monitoring import GetAccuracyOperator
 from datarobot_provider.operators.monitoring import GetServiceStatsOperator
