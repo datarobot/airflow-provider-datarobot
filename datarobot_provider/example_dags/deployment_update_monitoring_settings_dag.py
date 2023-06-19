@@ -62,8 +62,6 @@ def deployment_monitoring_settings(deployment_id=None):
             if model_monitoring_settings_after[setting] != model_monitoring_settings_before[setting]
         }
 
-        print(f"settings_changed:{str(settings_changed)}")
-
         return settings_changed
 
     example_service_stat_processing = monitoring_settings_processing(
