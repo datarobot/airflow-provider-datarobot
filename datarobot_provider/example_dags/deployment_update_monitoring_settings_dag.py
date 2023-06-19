@@ -10,10 +10,8 @@ from datetime import datetime
 from airflow.decorators import dag
 from airflow.decorators import task
 
-from datarobot_provider.operators.monitoring import (
-    UpdateMonitoringSettingsOperator,
-    GetMonitoringSettingsOperator,
-)
+from datarobot_provider.operators.monitoring import GetMonitoringSettingsOperator
+from datarobot_provider.operators.monitoring import UpdateMonitoringSettingsOperator
 
 
 @dag(
@@ -22,14 +20,16 @@ from datarobot_provider.operators.monitoring import (
     tags=['example', 'mlops'],
     # Default json config example:
     params={
-        "target_drift_enabled": False,
+        "target_drift_enabled": True,
         "feature_drift_enabled": True,
         "association_id_column": ["id"],
         "required_association_id": False,
-        "enable_challenger_analysis": False,
+        "predictions_data_collection_enabled": False,
     },
 )
-def deployment_monitoring_settings(deployment_id="646fcfe9b01540a797f224b3"):
+def deployment_monitoring_settings(deployment_id=None):
+    if not deployment_id:
+        raise ValueError("Invalid or missing `deployment_id` value")
     get_monitoring_settings_before_op = GetMonitoringSettingsOperator(
         task_id="get_monitoring_settings_before",
         # you can pass deployment_id from previous operator here:
@@ -56,9 +56,6 @@ def deployment_monitoring_settings(deployment_id="646fcfe9b01540a797f224b3"):
 
         # Put your service stat processing logic here:
 
-        print(f"settings:{str(model_monitoring_settings_before)}")
-        print(f"settings:{str(model_monitoring_settings_after)}")
-
         settings_changed = {
             setting: model_monitoring_settings_after[setting]
             for setting in model_monitoring_settings_after
@@ -67,8 +64,7 @@ def deployment_monitoring_settings(deployment_id="646fcfe9b01540a797f224b3"):
 
         print(f"settings_changed:{str(settings_changed)}")
 
-        total_predictions = 10
-        return total_predictions
+        return settings_changed
 
     example_service_stat_processing = monitoring_settings_processing(
         model_monitoring_settings_before=get_monitoring_settings_before_op.output,

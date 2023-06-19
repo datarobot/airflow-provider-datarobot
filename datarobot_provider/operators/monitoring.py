@@ -200,7 +200,7 @@ class UpdateMonitoringSettingsOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> List[dict]:
+    def execute(self, context: Dict[str, Any]) -> None:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -260,11 +260,17 @@ class UpdateMonitoringSettingsOperator(BaseOperator):
                 f"No need to update association_id settings for deployment_id={self.deployment_id}"
             )
 
-        current_predictions_data_collection_settings = deployment.predictions_data_collection_settings()
-        predictions_data_collection_settings = context["params"].get(
-            "enable_challenger_analysis", current_predictions_data_collection_settings["enabled"]
+        current_predictions_data_collection_settings = (
+            deployment.get_predictions_data_collection_settings()
         )
-        if predictions_data_collection_settings != current_predictions_data_collection_settings["enabled"]:
+        predictions_data_collection_settings = context["params"].get(
+            "predictions_data_collection_enabled",
+            current_predictions_data_collection_settings["enabled"],
+        )
+        if (
+            predictions_data_collection_settings
+            != current_predictions_data_collection_settings["enabled"]
+        ):
             deployment.update_predictions_data_collection_settings(
                 enabled=predictions_data_collection_settings,
             )
@@ -275,5 +281,3 @@ class UpdateMonitoringSettingsOperator(BaseOperator):
             self.log.info(
                 f"No need to update predictions data collection settings for deployment_id={self.deployment_id}"
             )
-
-        #segment_analysis_settings = deployment.get_segment_analysis_settings()
