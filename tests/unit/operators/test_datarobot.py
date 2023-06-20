@@ -10,8 +10,8 @@ from datetime import datetime
 import datarobot as dr
 import pytest
 from airflow.exceptions import AirflowFailException
-from datarobot.models.deployment.data_drift import FeatureDrift
-from datarobot.models.deployment.data_drift import TargetDrift
+from datarobot.models.data_drift import FeatureDrift
+from datarobot.models.data_drift import TargetDrift
 
 from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.operators.datarobot import DeployModelOperator
