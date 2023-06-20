@@ -147,7 +147,7 @@ class GetMonitoringSettingsOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> List[dict]:
+    def execute(self, context: Dict[str, Any]) -> dict:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
