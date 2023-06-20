@@ -13,7 +13,9 @@ from datarobot.models.deployment import Accuracy
 from datarobot.models.deployment import ServiceStats
 
 from datarobot_provider.operators.monitoring import GetAccuracyOperator
+from datarobot_provider.operators.monitoring import GetMonitoringSettingsOperator
 from datarobot_provider.operators.monitoring import GetServiceStatsOperator
+from datarobot_provider.operators.monitoring import UpdateMonitoringSettingsOperator
 from datarobot_provider.operators.monitoring import _serialize_metrics
 
 
@@ -161,3 +163,168 @@ def test_operator_get_accuracy_with_params(mocker, accuracy_details):
 
     assert accuracy_result == expected_accuracy
     get_accuracy_mock.assert_called_with(**accuracy_params["accuracy"])
+
+
+@pytest.fixture
+def monitoring_settings_details():
+    return {
+        "drift_tracking_settings": {
+            'target_drift': {'enabled': False},
+            'feature_drift': {'enabled': False},
+        },
+        "association_id_settings": {
+            'column_names': ['id'],
+            'required_in_prediction_requests': False,
+        },
+        "predictions_data_collection_settings": {'enabled': False},
+    }
+
+
+def test_operator_get_monitoring_settings(mocker, monitoring_settings_details):
+    deployment_id = "deployment-id"
+
+    mocker.patch.object(dr.Deployment, "get", return_value=dr.Deployment(deployment_id))
+
+    mocker.patch.object(
+        dr.Deployment,
+        "get_drift_tracking_settings",
+        return_value=monitoring_settings_details["drift_tracking_settings"],
+    )
+
+    mocker.patch.object(
+        dr.Deployment,
+        "get_association_id_settings",
+        return_value=monitoring_settings_details["association_id_settings"],
+    )
+
+    mocker.patch.object(
+        dr.Deployment,
+        "get_predictions_data_collection_settings",
+        return_value=monitoring_settings_details["predictions_data_collection_settings"],
+    )
+
+    operator = GetMonitoringSettingsOperator(
+        task_id="get_monitoring_settings", deployment_id="deployment-id"
+    )
+
+    monitoring_settings_result = operator.execute(context={'params': {}})
+
+    assert monitoring_settings_result == monitoring_settings_details
+
+
+def test_operator_update_monitoring_settings(mocker, monitoring_settings_details):
+    deployment_id = "deployment-id"
+
+    monitoring_settings_params = {
+        "target_drift_enabled": True,
+        "feature_drift_enabled": True,
+        "association_id_column": ["association_id"],
+        "required_association_id": True,
+        "predictions_data_collection_enabled": True,
+    }
+
+    mocker.patch.object(dr.Deployment, "get", return_value=dr.Deployment(deployment_id))
+
+    mocker.patch.object(
+        dr.Deployment,
+        "get_drift_tracking_settings",
+        return_value=monitoring_settings_details["drift_tracking_settings"],
+    )
+
+    mocker.patch.object(
+        dr.Deployment,
+        "get_association_id_settings",
+        return_value=monitoring_settings_details["association_id_settings"],
+    )
+
+    mocker.patch.object(
+        dr.Deployment,
+        "get_predictions_data_collection_settings",
+        return_value=monitoring_settings_details["predictions_data_collection_settings"],
+    )
+
+    update_drift_tracking_settings_mock = mocker.patch.object(
+        dr.Deployment, "update_drift_tracking_settings"
+    )
+
+    update_association_id_settings_mock = mocker.patch.object(
+        dr.Deployment, "update_association_id_settings"
+    )
+
+    update_predictions_data_collection_settings_mock = mocker.patch.object(
+        dr.Deployment, "update_predictions_data_collection_settings", return_value=None
+    )
+
+    operator = UpdateMonitoringSettingsOperator(
+        task_id="update_monitoring_settings", deployment_id="deployment-id"
+    )
+
+    operator.execute(context={'params': monitoring_settings_params})
+
+    update_drift_tracking_settings_mock.assert_called_with(
+        target_drift_enabled=monitoring_settings_params['target_drift_enabled'],
+        feature_drift_enabled=monitoring_settings_params['feature_drift_enabled'],
+    )
+
+    update_association_id_settings_mock.assert_called_with(
+        column_names=monitoring_settings_params['association_id_column'],
+        required_in_prediction_requests=monitoring_settings_params['required_association_id'],
+    )
+
+    update_predictions_data_collection_settings_mock.assert_called_with(
+        enabled=monitoring_settings_params['predictions_data_collection_enabled']
+    )
+
+
+def test_operator_no_need_update_monitoring_settings(mocker, monitoring_settings_details):
+    deployment_id = "deployment-id"
+
+    monitoring_settings_params = {
+        "target_drift_enabled": False,
+        "feature_drift_enabled": False,
+        "association_id_column": ["id"],
+        "required_association_id": False,
+        "predictions_data_collection_enabled": False,
+    }
+
+    mocker.patch.object(dr.Deployment, "get", return_value=dr.Deployment(deployment_id))
+
+    mocker.patch.object(
+        dr.Deployment,
+        "get_drift_tracking_settings",
+        return_value=monitoring_settings_details["drift_tracking_settings"],
+    )
+
+    mocker.patch.object(
+        dr.Deployment,
+        "get_association_id_settings",
+        return_value=monitoring_settings_details["association_id_settings"],
+    )
+
+    mocker.patch.object(
+        dr.Deployment,
+        "get_predictions_data_collection_settings",
+        return_value=monitoring_settings_details["predictions_data_collection_settings"],
+    )
+
+    update_drift_tracking_settings_mock = mocker.patch.object(
+        dr.Deployment, "update_drift_tracking_settings"
+    )
+
+    update_association_id_settings_mock = mocker.patch.object(
+        dr.Deployment, "update_association_id_settings"
+    )
+
+    update_predictions_data_collection_settings_mock = mocker.patch.object(
+        dr.Deployment, "update_predictions_data_collection_settings", return_value=None
+    )
+
+    operator = UpdateMonitoringSettingsOperator(
+        task_id="update_monitoring_settings", deployment_id="deployment-id"
+    )
+
+    operator.execute(context={'params': monitoring_settings_params})
+
+    update_drift_tracking_settings_mock.assert_not_called()
+    update_association_id_settings_mock.assert_not_called()
+    update_predictions_data_collection_settings_mock.assert_not_called()
