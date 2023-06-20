@@ -6,7 +6,7 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 """
-Config example for this dag:
+Config example for batch monitoring dag example:
 {
     "deployment_id": "put_your_deployment_id_here",
     "datarobot_gcp_credentials": "demo_bigquery_test_credentials",
@@ -16,25 +16,17 @@ Config example for this dag:
         "table": "input_table_name",
         "bucket": "gcp_bucket_name",
     },
-    "intake_settings": {
-        "type": "jdbc",
-        "data_store_id": "645043933d4fbc3215f17e35",
-        "catalog": "SANDBOX",
-        "table": "10kDiabetes_output_actuals",
-        "schema": "SCORING_CODE_UDF_SCHEMA",
-        "credential_id": "645043b61a158045f66fb328"
-    },
     "monitoring_columns": {
         "predictions_columns": [
             {
                 "class_name": "True",
-                "column_name": "readmitted_True_PREDICTION"
+                "column_name": "target_True_PREDICTION"
             },
             {
                 "class_name": "False",
-                "column_name": "readmitted_False_PREDICTION"
+                "column_name": "target_False_PREDICTION"
             }
-        ],
+        ]
         "association_id_column": "rowID",
         "actuals_value_column": "ACTUALS"
     }
@@ -52,7 +44,7 @@ from datarobot_provider.sensors.monitoring_job import MonitoringJobCompleteSenso
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'gcp', 'bigquery'],
+    tags=['example', 'gcp', 'bigquery', 'monitoring'],
     params={
         "deployment_id": "646fcfe9b01540a797f224b3",
         "datarobot_gcp_credentials": "GCP_ai_engineering",
@@ -64,23 +56,23 @@ from datarobot_provider.sensors.monitoring_job import MonitoringJobCompleteSenso
                 "bucket": "datarobot_demo_airflow",
             },
             "monitoring_columns": {
-                # "predictions_columns": [
-                #     {
-                #         "class_name": "True",
-                #         "column_name": "readmitted_True_PREDICTION"
-                #     },
-                #     {
-                #         "class_name": "False",
-                #         "column_name": "readmitted_False_PREDICTION"
-                #     }
-                # ],
+                "predictions_columns": [
+                    {
+                        "class_name": "True",
+                        "column_name": "target_True_PREDICTION"
+                    },
+                    {
+                        "class_name": "False",
+                        "column_name": "target_False_PREDICTION"
+                    }
+                ],
                 "association_id_column": "id",
                 "actuals_value_column": "ACTUAL",
             },
         },
     },
 )
-def datarobot_batch_monitoring(deployment_id='646fcfe9b01540a797f224b3'):
+def datarobot_batch_monitoring(deployment_id=None):
     if not deployment_id:
         raise ValueError("Invalid or missing `deployment_id` value")
 
@@ -98,9 +90,9 @@ def datarobot_batch_monitoring(deployment_id='646fcfe9b01540a797f224b3'):
     batch_monitoring_complete_sensor = MonitoringJobCompleteSensor(
         task_id="check_monitoring_job_complete",
         job_id=batch_monitoring_op.output,
-        poke_interval=1,
+        poke_interval=15,  # status check each 15 sec
         mode="reschedule",
-        timeout=3600,
+        timeout=7200,  # timeout after 2h (2*60*60sec = 7200 sec)
     )
 
     (get_bigquery_credentials_op >> batch_monitoring_op >> batch_monitoring_complete_sensor)
