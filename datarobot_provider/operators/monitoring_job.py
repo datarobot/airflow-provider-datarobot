@@ -16,10 +16,6 @@ from datarobot import BatchMonitoringJob
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
-DATAROBOT_MAX_WAIT = 3600
-DATAROBOT_AUTOPILOT_TIMEOUT = 86400
-DATETIME_FORMAT = "%Y-%m-%d %H:%M:%s"
-
 
 class BatchMonitoringOperator(BaseOperator):
     """
