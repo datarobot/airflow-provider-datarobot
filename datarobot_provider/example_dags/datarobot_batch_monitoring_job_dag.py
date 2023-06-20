@@ -57,14 +57,8 @@ from datarobot_provider.sensors.monitoring_job import MonitoringJobCompleteSenso
             },
             "monitoring_columns": {
                 "predictions_columns": [
-                    {
-                        "class_name": "True",
-                        "column_name": "target_True_PREDICTION"
-                    },
-                    {
-                        "class_name": "False",
-                        "column_name": "target_False_PREDICTION"
-                    }
+                    {"class_name": "True", "column_name": "target_True_PREDICTION"},
+                    {"class_name": "False", "column_name": "target_False_PREDICTION"},
                 ],
                 "association_id_column": "id",
                 "actuals_value_column": "ACTUAL",

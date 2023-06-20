@@ -5,11 +5,12 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from datetime import datetime
 
 import datarobot as dr
 import pytest
+
 from datarobot_provider.operators.monitoring_job import BatchMonitoringOperator
+
 
 @pytest.fixture(
     scope="module",
@@ -27,25 +28,20 @@ from datarobot_provider.operators.monitoring_job import BatchMonitoringOperator
 )
 def monitoring_settings():
     return {
-        "intake_settings":  {
+        "intake_settings": {
             "type": "dataset",
             "dataset_id": "dataset-id",
         },
         "monitoring_columns": {
             "predictions_columns": [
-                {
-                   "class_name": "True",
-                   "column_name": "target_True_PREDICTION"
-                },
-                {
-                   "class_name": "False",
-                   "column_name": "target_False_PREDICTION"
-                }
+                {"class_name": "True", "column_name": "target_True_PREDICTION"},
+                {"class_name": "False", "column_name": "target_False_PREDICTION"},
             ],
             "association_id_column": "id",
             "actuals_value_column": "ACTUAL",
         },
     }
+
 
 def test_operator_batch_monitoring_job(mocker, monitoring_settings):
     job_id = "job-id"
@@ -53,7 +49,9 @@ def test_operator_batch_monitoring_job(mocker, monitoring_settings):
 
     job_mock = mocker.Mock()
     job_mock.id = job_id
-    monitoring_job_run_mock = mocker.patch.object(dr.BatchMonitoringJob, "run", return_value=job_mock)
+    monitoring_job_run_mock = mocker.patch.object(
+        dr.BatchMonitoringJob, "run", return_value=job_mock
+    )
 
     expected_intake_settings = monitoring_settings["intake_settings"].copy()
 
@@ -97,14 +95,8 @@ def test_operator_batch_monitoring_job_fails_when_no_dataset_id():
                         },
                         "monitoring_columns": {
                             "predictions_columns": [
-                                {
-                                    "class_name": "True",
-                                    "column_name": "target_True_PREDICTION"
-                                },
-                                {
-                                    "class_name": "False",
-                                    "column_name": "target_False_PREDICTION"
-                                }
+                                {"class_name": "True", "column_name": "target_True_PREDICTION"},
+                                {"class_name": "False", "column_name": "target_False_PREDICTION"},
                             ],
                             "association_id_column": "id",
                             "actuals_value_column": "ACTUAL",
