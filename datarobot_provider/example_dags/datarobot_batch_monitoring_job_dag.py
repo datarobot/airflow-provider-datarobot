@@ -46,8 +46,8 @@ from datarobot_provider.sensors.monitoring_job import MonitoringJobCompleteSenso
     start_date=datetime(2023, 1, 1),
     tags=['example', 'gcp', 'bigquery', 'monitoring'],
     params={
-        "deployment_id": "646fcfe9b01540a797f224b3",
-        "datarobot_gcp_credentials": "GCP_ai_engineering",
+        "deployment_id": "put_your_deployment_id_here",
+        "datarobot_gcp_credentials": "demo_bigquery_test_credentials",
         "monitoring_settings": {
             "intake_settings": {
                 "type": "bigquery",
