@@ -80,3 +80,27 @@ def test_operator_submit_actuals_deployment_is_none(mocker, submit_actuals_from_
                 "params": submit_actuals_from_catalog_settings,
             }
         )
+
+
+def test_operator_submit_actuals_dataset_is_none(mocker, submit_actuals_from_catalog_settings):
+    deployment_id = "test-deployment-id"
+    dataset_id = None
+    status_check_job_id = "test-status-job-id"
+    mocker.patch.object(dr.Deployment, "get", return_value=dr.Deployment(deployment_id))
+    mocker.patch.object(
+        dr.Deployment,
+        "submit_actuals_from_catalog_async",
+        return_value=StatusCheckJob(job_id=status_check_job_id),
+    )
+
+    with pytest.raises(ValueError):
+        operator = SubmitActualsFromCatalogOperator(
+            task_id='submit_actuals_form_catalog',
+            deployment_id=deployment_id,
+            dataset_id=dataset_id,
+        )
+        operator.execute(
+            context={
+                "params": submit_actuals_from_catalog_settings,
+            }
+        )

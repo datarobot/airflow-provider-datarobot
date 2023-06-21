@@ -55,6 +55,9 @@ class SubmitActualsFromCatalogOperator(BaseOperator):
         if self.deployment_id is None:
             raise ValueError("deployment_id is required to submit actuals.")
 
+        if self.dataset_id is None:
+            raise ValueError("dataset_id is required to submit actuals.")
+
         deployment = dr.Deployment.get(deployment_id=self.deployment_id)
 
         status_job = deployment.submit_actuals_from_catalog_async(
