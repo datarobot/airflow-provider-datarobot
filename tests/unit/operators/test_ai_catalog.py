@@ -9,6 +9,8 @@
 import datarobot as dr
 
 from datarobot_provider.operators.ai_catalog import CreateDatasetFromDataStoreOperator
+from datarobot_provider.operators.ai_catalog import CreateDatasetVersionOperator
+from datarobot_provider.operators.ai_catalog import CreateOrUpdateDataSourceOperator
 from datarobot_provider.operators.ai_catalog import UpdateDatasetFromFileOperator
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 
@@ -105,3 +107,134 @@ def test_operator_create_dataset_from_jdbc(mocker, mock_airflow_connection_datar
         do_snapshot=test_params["do_snapshot"],
         max_wait=3600,
     )
+
+
+def test_operator_create_dataset_version(mocker):
+    dataset_id = "test-dataset-id"
+    datasource_id = "test-datasource-id"
+    credential_id = "test-credential-id"
+
+    dataset_version_mock = mocker.Mock()
+    dataset_version_mock.version_id = "test-dataset-version-id"
+    create_dataset_version_mock = mocker.patch.object(
+        dr.Dataset, "create_version_from_data_source", return_value=dataset_version_mock
+    )
+
+    operator = CreateDatasetVersionOperator(
+        task_id='create_dataset_version',
+        dataset_id=dataset_id,
+        datasource_id=datasource_id,
+        credential_id=credential_id,
+    )
+    dataset_version_id = operator.execute(context={})
+
+    assert dataset_version_id == "test-dataset-version-id"
+    create_dataset_version_mock.assert_called_with(
+        dataset_id=dataset_id,
+        data_source_id=datasource_id,
+        credential_id=credential_id,
+        max_wait=3600,
+    )
+
+
+def test_operator_create_datasource_operator(mocker):
+    data_store_id = "test-data-store-id"
+
+    test_params = {
+        "datarobot_jdbc_connection": "datarobot_test_connection_jdbc_test",
+        "dataset_name": "test_dataset_name",
+        "table_schema": "integration_demo",
+        "table_name": "test_table",
+        "query": 'SELECT * FROM "integration_demo"."test_table"',
+        "persist_data_after_ingestion": True,
+        "do_snapshot": True,
+        "max_wait": 3600,
+    }
+
+    datastore_mock = mocker.Mock()
+    datastore_mock.version_id = data_store_id
+
+    datasource_params_mock = dr.DataSourceParameters(
+        query='SELECT * FROM "integration_demo"."test_new_table"'
+    )
+
+    other_datasource_mock = mocker.Mock()
+    other_datasource_mock.id = "test-other-datasource-id"
+    other_datasource_mock.canonical_name = "other-datasource-name"
+    other_datasource_mock.params = datasource_params_mock
+    mocker.patch.object(dr.DataSource, "list", return_value=[other_datasource_mock])
+
+    datasource_mock = mocker.Mock()
+    datasource_mock.id = "test-datasource-id"
+    datasource_mock.canonical_name = test_params["dataset_name"]
+    datasource_mock.params = datasource_params_mock
+    datastore_get_mock = mocker.patch.object(dr.DataStore, "get", return_value=datastore_mock)
+    mocker.patch.object(dr.DataSource, "create", return_value=datasource_mock)
+
+    datasource_update_mock = mocker.patch.object(datasource_mock, "update")
+
+    create_dataset_mock = mocker.patch.object(dr.DataSource, "create", return_value=datasource_mock)
+
+    operator = CreateOrUpdateDataSourceOperator(
+        task_id='create_dataset_version',
+        data_store_id=data_store_id,
+    )
+    data_source_id = operator.execute(
+        context={
+            "params": test_params,
+        }
+    )
+
+    assert data_source_id == "test-datasource-id"
+    datastore_get_mock.assert_called_with(data_store_id=data_store_id)
+
+    datasource_update_mock.assert_not_called()
+    create_dataset_mock.assert_called()
+
+
+def test_operator_update_datasource_operator(mocker):
+    data_store_id = "test-data-store-id"
+
+    test_params = {
+        "datarobot_jdbc_connection": "datarobot_test_connection_jdbc_test",
+        "dataset_name": "test_dataset_name",
+        "table_schema": "integration_demo",
+        "table_name": "test_table",
+        "query": 'SELECT * FROM "integration_demo"."test_table22"',
+        "persist_data_after_ingestion": True,
+        "do_snapshot": True,
+        "max_wait": 3600,
+    }
+
+    datastore_mock = mocker.Mock()
+    datastore_mock.version_id = data_store_id
+
+    datasource_mock = mocker.Mock()
+    datasource_mock.id = "test-datasource-id"
+    datasource_mock.canonical_name = test_params["dataset_name"]
+    datasource_mock.params = dr.DataSourceParameters(
+        query='SELECT * FROM "integration_demo"."test_table"'
+    )
+    datastore_get_mock = mocker.patch.object(dr.DataStore, "get", return_value=datastore_mock)
+    mocker.patch.object(dr.DataSource, "list", return_value=[datasource_mock])
+    mocker.patch.object(dr.DataSource, "create", return_value=datasource_mock)
+
+    datasource_update_mock = mocker.patch.object(datasource_mock, "update")
+
+    create_dataset_mock = mocker.patch.object(dr.DataSource, "create", return_value=datasource_mock)
+
+    operator = CreateOrUpdateDataSourceOperator(
+        task_id='create_dataset_version',
+        data_store_id=data_store_id,
+    )
+    data_source_id = operator.execute(
+        context={
+            "params": test_params,
+        }
+    )
+
+    assert data_source_id == "test-datasource-id"
+    datastore_get_mock.assert_called_with(data_store_id=data_store_id)
+
+    datasource_update_mock.assert_called()
+    create_dataset_mock.assert_not_called()

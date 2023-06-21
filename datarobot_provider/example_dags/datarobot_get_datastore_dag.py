@@ -19,7 +19,7 @@ from datarobot_provider.operators.connections import GetOrCreateDataStoreOperato
 
 
 @dag(
-    schedule_interval=None,
+    schedule=None,
     start_date=datetime(2023, 1, 1),
     tags=['example'],
     # Default json config example:

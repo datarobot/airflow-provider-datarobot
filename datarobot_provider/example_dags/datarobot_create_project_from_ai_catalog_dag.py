@@ -26,7 +26,7 @@ from datarobot_provider.operators.datarobot import CreateProjectOperator
 
 
 @dag(
-    schedule_interval=None,
+    schedule=None,
     start_date=datetime(2022, 1, 1),
     tags=['example'],
     params={

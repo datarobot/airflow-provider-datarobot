@@ -209,3 +209,149 @@ class CreateDatasetFromDataStoreOperator(BaseOperator):
         )
         self.log.info(f"Dataset created: dataset_id={ai_catalog_dataset.id}")
         return ai_catalog_dataset.id
+
+
+class CreateDatasetVersionOperator(BaseOperator):
+    """
+    Creating new version of existing dataset in AI Catalog and return dataset version ID.
+
+    :param dataset_id: DataRobot AI Catalog dataset ID
+    :type dataset_id: str
+    :param datasource_id: existing DataRobot datasource ID
+    :type datasource_id: str
+    :param credential_id: existing DataRobot credential ID
+    :type credential_id: str
+    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
+    :type datarobot_conn_id: str, optional
+    :return: DataRobot AI Catalog dataset version ID
+    :rtype: str
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Iterable[str] = ["dataset_id", "datasource_id", "credential_id"]
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Iterable[str] = ()
+    ui_color = '#f4a460'
+
+    def __init__(
+        self,
+        *,
+        dataset_id: str,
+        datasource_id: str,
+        credential_id: str,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.dataset_id = dataset_id
+        self.datasource_id = datasource_id
+        self.credential_id = credential_id
+        self.datarobot_conn_id = datarobot_conn_id
+        if kwargs.get('xcom_push') is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Dict[str, Any]) -> str:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        self.log.debug(
+            f"Creation new version of dataset: dataset_id={self.dataset_id}, "
+            f"using datasource: datasource_id={self.datasource_id}, "
+            f"with credentials: credentials_id={self.credential_id}."
+        )
+
+        ai_catalog_dataset = dr.Dataset.create_version_from_data_source(
+            dataset_id=self.dataset_id,
+            data_source_id=self.datasource_id,
+            credential_id=self.credential_id,
+            max_wait=DATAROBOT_MAX_WAIT_SEC,
+        )
+
+        self.log.info(
+            f"Dataset version created: dataset_id={ai_catalog_dataset.id},"
+            f" version_id={ai_catalog_dataset.version_id}"
+        )
+
+        return ai_catalog_dataset.version_id
+
+
+class CreateOrUpdateDataSourceOperator(BaseOperator):
+    """
+    Creates the data source or updates it if its already exist and return data source ID.
+
+    :param data_store_id: DataRobot data store ID
+    :type data_store_id: str
+    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
+    :type datarobot_conn_id: str, optional
+    :return: DataRobot AI Catalog data source ID
+    :rtype: str
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Iterable[str] = ["data_store_id"]
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Iterable[str] = ()
+    ui_color = '#f4a460'
+
+    def __init__(
+        self,
+        *,
+        data_store_id: str,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.data_store_id = data_store_id
+        self.datarobot_conn_id = datarobot_conn_id
+        if kwargs.get('xcom_push') is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Dict[str, Any]) -> str:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        self.log.debug(f"Trying to get existing DataStore by data_store_id={self.data_store_id}")
+        data_store = dr.DataStore.get(data_store_id=self.data_store_id)
+        self.log.debug(f"Found existing DataStore: {data_store.canonical_name}, id={data_store.id}")
+
+        dataset_name = context["params"]["dataset_name"]
+
+        # Creating DataSourceParameters:
+        if "query" in context["params"] and context["params"]["query"]:
+            # using sql statement if provided:
+            params = dr.DataSourceParameters(query=context["params"]["query"])
+        else:
+            # otherwise using schema and table:
+            params = dr.DataSourceParameters(
+                schema=context["params"]["table_schema"], table=context["params"]["table_name"]
+            )
+
+        self.log.debug(f"Trying to get existing DataSource by name={dataset_name}")
+        for dr_source_item in dr.DataSource.list():
+            if dr_source_item.canonical_name == dataset_name:
+                data_source = dr_source_item
+                self.log.info(f"Found existing DataSource:{dataset_name}, id={data_source.id}")
+                # Checking if there are any changes in params:
+                if params != data_source.params:
+                    # If params in changed, updating data source:
+                    self.log.info(f"Updating DataSource:{dataset_name} with new params")
+                    data_source.update(canonical_name=dataset_name, params=params)
+                    self.log.info(
+                        f"DataSource:{dataset_name} successfully updated, id={data_source.id}"
+                    )
+                break
+        else:
+            # Adding data_store_id to params (required for DataSource creation):
+            params.data_store_id = data_store.id
+            # Creating DataSource using params with data_store_id
+            self.log.info(f"Creating DataSource: {dataset_name}")
+            data_source = dr.DataSource.create(
+                data_source_type='jdbc', canonical_name=dataset_name, params=params
+            )
+            self.log.info(f"DataSource:{dataset_name} successfully created, id={data_source.id}")
+
+        return data_source.id
