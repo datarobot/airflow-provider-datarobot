@@ -11,9 +11,9 @@ from typing import Dict
 from airflow import AirflowException
 from airflow.sensors.base import BaseSensorOperator
 from datarobot.errors import AsyncProcessUnsuccessfulError
+from datarobot.models.status_check_job import StatusCheckJob
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
-from datarobot.models.status_check_job import StatusCheckJob
 
 
 class BaseAsyncResolutionSensor(BaseSensorOperator):

@@ -58,7 +58,7 @@ def test_operator_submit_actuals_from_catalog(mocker, submit_actuals_from_catalo
     )
 
 
-def test_operator_submit_actuals_deployment_none(mocker, submit_actuals_from_catalog_settings):
+def test_operator_submit_actuals_deployment_is_none(mocker, submit_actuals_from_catalog_settings):
     deployment_id = None
     dataset_id = "test-dataset-id"
     status_check_job_id = "test-status-job-id"
