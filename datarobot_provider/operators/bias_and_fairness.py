@@ -125,10 +125,15 @@ class UpdateBiasAndFairnessSettingsOperator(BaseOperator):
             "preferable_target_value", current_bias_and_fairness_settings['preferable_target_value']
         )
 
-        if (protected_features != current_bias_and_fairness_settings['protected_features']) or (
-            fairness_metrics_set != current_bias_and_fairness_settings['fairness_metrics_set']) or (
-            fairness_threshold != current_bias_and_fairness_settings['fairness_threshold']) or (
-            preferable_target_value != current_bias_and_fairness_settings['preferable_target_value']) or (
+        if (
+            (protected_features != current_bias_and_fairness_settings['protected_features'])
+            or (fairness_metrics_set != current_bias_and_fairness_settings['fairness_metrics_set'])
+            or (fairness_threshold != current_bias_and_fairness_settings['fairness_threshold'])
+            or (
+                preferable_target_value
+                != current_bias_and_fairness_settings['preferable_target_value']
+            )
+            or ()
         ):
             self.log.debug(
                 f"Trying to update bias and fairness settings for deployment_id={self.deployment_id}"

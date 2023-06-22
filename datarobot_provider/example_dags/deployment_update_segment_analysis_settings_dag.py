@@ -31,7 +31,7 @@ from datarobot_provider.operators.segment_analysis import (
         'protected_features': ['gender'],
         'preferable_target_value': 'True',
         'fairness_metrics_set': 'equalParity',
-        'fairness_threshold': 0.1
+        'fairness_threshold': 0.1,
     },
 )
 def deployment_segment_analysis_settings(deployment_id='641db050023431666af91a90'):
@@ -93,7 +93,8 @@ def deployment_segment_analysis_settings(deployment_id='641db050023431666af91a90
         bias_and_fairness_settings_changed = {
             setting: bias_and_fairness_settings_after[setting]
             for setting in bias_and_fairness_settings_after
-            if bias_and_fairness_settings_after[setting] != bias_and_fairness_settings_before[setting]
+            if bias_and_fairness_settings_after[setting]
+            != bias_and_fairness_settings_before[setting]
         }
 
         return segment_analysis_settings_changed, bias_and_fairness_settings_changed
