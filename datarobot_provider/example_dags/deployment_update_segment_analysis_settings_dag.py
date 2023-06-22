@@ -30,7 +30,7 @@ from datarobot_provider.operators.segment_analysis import UpdateSegmentAnalysisS
         'fairness_threshold': 0.1,
     },
 )
-def deployment_segment_analysis_settings(deployment_id='641db050023431666af91a90'):
+def deployment_segment_analysis_settings(deployment_id=None):
     if not deployment_id:
         raise ValueError("Invalid or missing `deployment_id` value")
     get_segment_analysis_settings_before_op = GetSegmentAnalysisSettingsOperator(
