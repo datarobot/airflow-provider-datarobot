@@ -131,7 +131,6 @@ class UpdateBiasAndFairnessSettingsOperator(BaseOperator):
                 preferable_target_value
                 != current_bias_and_fairness_settings['preferable_target_value']
             )
-            or ()
         ):
             self.log.debug(
                 f"Trying to update bias and fairness settings for deployment_id={self.deployment_id}"
