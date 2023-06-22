@@ -5,15 +5,12 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from datetime import datetime
 
 import datarobot as dr
 import pytest
 
-from datarobot_provider.operators.segment_analysis import (
-    GetSegmentAnalysisSettingsOperator,
-    UpdateSegmentAnalysisSettingsOperator,
-)
+from datarobot_provider.operators.segment_analysis import GetSegmentAnalysisSettingsOperator
+from datarobot_provider.operators.segment_analysis import UpdateSegmentAnalysisSettingsOperator
 
 
 @pytest.fixture
@@ -76,7 +73,9 @@ def test_operator_update_segment_analysis_settings(mocker, segment_analysis_sett
     )
 
 
-def test_operator_non_need_update_segment_analysis_settings(mocker, segment_analysis_settings_details):
+def test_operator_non_need_update_segment_analysis_settings(
+    mocker, segment_analysis_settings_details
+):
     deployment_id = "deployment-id"
 
     segment_analysis_settings_params = {

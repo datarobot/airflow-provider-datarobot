@@ -5,15 +5,12 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from datetime import datetime
 
 import datarobot as dr
 import pytest
 
-from datarobot_provider.operators.bias_and_fairness import (
-    GetBiasAndFairnessSettingsOperator,
-    UpdateBiasAndFairnessSettingsOperator,
-)
+from datarobot_provider.operators.bias_and_fairness import GetBiasAndFairnessSettingsOperator
+from datarobot_provider.operators.bias_and_fairness import UpdateBiasAndFairnessSettingsOperator
 
 
 @pytest.fixture
@@ -81,7 +78,10 @@ def test_operator_update_bias_and_fairness_settings(mocker, bias_and_fairness_se
         preferable_target_value=bias_and_fairness_settings_params['preferable_target_value'],
     )
 
-def test_operator_no_need_update_bias_and_fairness_settings(mocker, bias_and_fairness_settings_details):
+
+def test_operator_no_need_update_bias_and_fairness_settings(
+    mocker, bias_and_fairness_settings_details
+):
     deployment_id = "deployment-id"
 
     bias_and_fairness_settings_params = {
