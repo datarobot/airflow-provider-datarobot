@@ -100,14 +100,12 @@ class UpdateBiasAndFairnessSettingsOperator(BaseOperator):
         current_bias_and_fairness_settings = deployment.get_bias_and_fairness_settings()
 
         if current_bias_and_fairness_settings is None:
-            current_bias_and_fairness_settings = dict.fromkeys(
-                [
-                    'protected_features',
-                    'fairness_metrics_set',
-                    'fairness_threshold',
-                    'preferable_target_value',
-                ]
-            )
+            current_bias_and_fairness_settings = {
+                "protected_features": None,
+                "fairness_metrics_set": None,
+                "fairness_threshold": None,
+                "preferable_target_value": None,
+            }
 
         protected_features = context["params"].get(
             "protected_features", current_bias_and_fairness_settings['protected_features']
