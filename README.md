@@ -322,6 +322,22 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
     Returns a dict with the feature drift data.
 
+- `GetServiceStatsOperator`
+
+    Gets service stats measurements from a deployment.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+
+    No config params are required. [Optional params](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_service_stats) may be passed in the config as follows:
+
+        "service_stats": {
+            ...
+        }
+
+    Returns a dict with the service stats measurements data.
+
 ### [Sensors](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/sensors/datarobot.py)
 
 - `AutopilotCompleteSensor`
