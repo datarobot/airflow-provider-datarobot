@@ -48,14 +48,7 @@ Currently supported types of credentials:
 After creating preconfigured connections using Airflow UI or Airflow API [Managing Connections](https://airflow.apache.org/docs/apache-airflow/stable/howto/connection.html)
 it can be used with `GetOrCreateCredentialOperator` or `GetOrCreateDataStoreOperator`
 to replicate it on DataRobot side and retrieve corresponding `credentials_id`
-or `datastore_id`. 
-Examples of using preconfigured connection you can find
-in "datarobot_provider/example_dags" directory:
-
-* `datarobot_aws_s3_batch_scoring_dag.py` - example of using DataRobot AWS Credentials with ScorePredictionsOperator
-* `datarobot_azure_storage_batch_scoring_dag.py` - example of using DataRobot GCP Credentials with ScorePredictionsOperator
-* `datarobot_azure_storage_batch_scoring_dag.py` - example of using DataRobot Azure Storage Credentials with ScorePredictionsOperator
-* `datarobot_jdbc_dataset_dag.py` - example of using DataRobot JDBC Connection to upload dataset to AI Catalog
+or `datastore_id`.
 
 ## Config JSON for dag run
 
@@ -144,7 +137,7 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
         dataset_file_path: str - local path to training dataset
 
-    Returns a dataset ID.
+    Returns a Dataset ID.
 
 - `CreateProjectOperator`
 
@@ -365,6 +358,13 @@ The modules described above allows to construct a standard DataRobot pipeline in
 
 See the [**examples**](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/example_dags) directory for the example DAGs.
 
+Examples of using preconfigured connection you can find
+in "datarobot_provider/example_dags" directory:
+
+* `datarobot_aws_s3_batch_scoring_dag.py` - example of using DataRobot AWS Credentials with ScorePredictionsOperator
+* `datarobot_azure_storage_batch_scoring_dag.py` - example of using DataRobot GCP Credentials with ScorePredictionsOperator
+* `datarobot_azure_storage_batch_scoring_dag.py` - example of using DataRobot Azure Storage Credentials with ScorePredictionsOperator
+* `datarobot_jdbc_dataset_dag.py` - example of using DataRobot JDBC Connection to upload dataset to AI Catalog
 
 ## Issues
 
