@@ -80,7 +80,7 @@ class GetAccuracyOperator(BaseOperator):
     :type deployment_id: str
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
-    :return: Service stats for a Deployment
+    :return: accuracy for a Deployment
     :rtype: List[dict]
     """
 
@@ -169,7 +169,7 @@ class GetMonitoringSettingsOperator(BaseOperator):
 
 class UpdateMonitoringSettingsOperator(BaseOperator):
     """
-    Update monitoring settings for deployment.
+    Updates monitoring settings for a deployment.
 
     :param deployment_id: DataRobot deployment ID
     :type deployment_id: str
@@ -193,7 +193,7 @@ class UpdateMonitoringSettingsOperator(BaseOperator):
     ) -> None:
         super().__init__(**kwargs)
         self.deployment_id = deployment_id
-        self.monitoring_settings = (monitoring_settings,)
+        self.monitoring_settings = monitoring_settings
         self.datarobot_conn_id = datarobot_conn_id
         if kwargs.get("xcom_push") is not None:
             raise AirflowException(

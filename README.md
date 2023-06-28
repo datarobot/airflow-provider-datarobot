@@ -338,6 +338,122 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
     Returns a dict with the service stats measurements data.
 
+- `GetAccuracyOperator`
+
+    Gets the accuracy of a deployment’s predictions.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+
+    No config params are required. [Optional params](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_accuracy) may be passed in the config as follows:
+
+        "accuracy": {
+            ...
+        }
+
+    Returns a dict with the accuracy for a Deployment.
+
+- `GetMonitoringSettingsOperator`
+
+    Get monitoring settings for deployment.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+
+    No config params are required.
+
+    Returns a dict with the config params for a Deployment as follows:
+
+        {
+            "drift_tracking_settings": { ... } 
+            "association_id_settings": { ... }
+            "predictions_data_collection_settings": { ... }
+        }
+
+    where: - drift_tracking_settings: [drift tracking settings for this deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_drift_tracking_settings)
+           - association_id_settings: [association ID setting for this deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_association_id_settings)
+           - predictions_data_collection_settings: [predictions data collection settings of this deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=predictions_data_collection_settings#datarobot.models.Deployment.get_predictions_data_collection_settings)
+           
+- `UpdateMonitoringSettingsOperator`
+
+    Updates monitoring settings for a deployment.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+
+    Sample config params:
+
+        "target_drift_enabled": True,
+        "feature_drift_enabled": True,
+        "association_id_column": ["id"],
+        "required_association_id": False,
+        "predictions_data_collection_enabled": False,
+
+- `BatchMonitoringOperator`
+
+    Creates a batch monitoring job for the deployment.
+
+    Prerequisites:
+    - You can use `GetOrCreateCredentialOperator` to pass `credential_id` from preconfigured DataRobot Credentials (Airflow Connections)
+      or you can manually set `credential_id` parameter in the config. [S3 credentials added to DataRobot via Python API client](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/admin/credentials.html#s3-credentials).
+    - OR a Dataset ID in the AI Catalog
+    - OR a DataStore ID for jdbc source connection, you can use `GetOrCreateDataStoreOperator` to pass `datastore_id` from preconfigured Airflow Connection
+
+    Parameters:
+  
+        deployment_id: str - DataRobot Deployment ID
+        datastore_id: str - DataRobot DataStore ID
+        credential_id: str - DataRobot Credentials ID
+
+    Sample config params:
+
+        "deployment_id": "61150a2fadb5586af4118980",
+        "monitoring_settings": {
+            "intake_settings": {
+                "type": "bigquery",
+                "dataset": "integration_example_demo",
+                "table": "actuals_demo",
+                "bucket": "datarobot_demo_airflow",
+            },
+            "monitoring_columns": {
+                "predictions_columns": [
+                    {"class_name": "True", "column_name": "target_True_PREDICTION"},
+                    {"class_name": "False", "column_name": "target_False_PREDICTION"},
+                ],
+                "association_id_column": "id",
+                "actuals_value_column": "ACTUAL",
+            },
+        }
+
+    Sample config params in case of manually set `credential_id` parameter in the config:
+
+        "deployment_id": "61150a2fadb5586af4118980",
+        "monitoring_settings": {
+            "intake_settings": {
+                "type": "bigquery",
+                "dataset": "integration_example_demo",
+                "table": "actuals_demo",
+                "bucket": "datarobot_demo_airflow",
+                "credential_id": "63eb7dfce1274472579f6e1c"
+            },
+            "monitoring_columns": {
+                "predictions_columns": [
+                    {"class_name": "True", "column_name": "target_True_PREDICTION"},
+                    {"class_name": "False", "column_name": "target_False_PREDICTION"},
+                ],
+                "association_id_column": "id",
+                "actuals_value_column": "ACTUAL",
+            },
+        }
+    
+    For more [batch monitoring settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.BatchMonitoringJob.run) see the DataRobot docs.
+
+    Returns a batch monitoring job ID.
+
+
 ### [Sensors](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/sensors/datarobot.py)
 
 - `AutopilotCompleteSensor`
