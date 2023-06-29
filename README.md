@@ -472,6 +472,22 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
         job_id: str - Batch prediction job ID
 
+- `MonitoringJobCompleteSensor`
+
+    Checks whether monitoring job is complete.
+
+    Parameters:
+
+        job_id: str - Batch Monitoring job ID
+
+- `BaseAsyncResolutionSensor`
+
+    Checks if the DataRobot Async API call has completed.
+
+    Parameters:
+
+        job_id: str - DataRobot async API call status check ID
+
 ### [Hooks](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/hooks/datarobot.py)
 
 - `DataRobotHook`
