@@ -551,6 +551,25 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
         "include_prediction_explanations": False,
         "include_prediction_intervals": False,
 
+- `SubmitActualsFromCatalogOperator`
+
+    Downloads scoring code artifact from a deployment.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+        dataset_id: str - DataRobot Catalog dataset ID
+        dataset_version_id: str - DataRobot Catalog dataset version ID
+
+    Sample config params:
+
+        "association_id_column": 'id',
+        "actual_value_column": 'ACTUAL',
+        "timestamp_column": 'timestamp',
+        "was_acted_on_column": 'acted_on',
+
+    Returns a uploading actuals job ID.
+
 ### [Sensors](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/sensors/datarobot.py)
 
 - `AutopilotCompleteSensor`
