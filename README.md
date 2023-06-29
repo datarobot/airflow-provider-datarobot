@@ -659,10 +659,28 @@ See the [**examples**](https://github.com/datarobot/airflow-provider-datarobot/b
 Examples of using preconfigured connection you can find
 in "datarobot_provider/example_dags" directory:
 
-* `datarobot_aws_s3_batch_scoring_dag.py` - example of using DataRobot AWS Credentials with ScorePredictionsOperator
-* `datarobot_azure_storage_batch_scoring_dag.py` - example of using DataRobot GCP Credentials with ScorePredictionsOperator
-* `datarobot_azure_storage_batch_scoring_dag.py` - example of using DataRobot Azure Storage Credentials with ScorePredictionsOperator
+* `datarobot_pipeline_dag.py` -  example of Airflow DAG for DataRobot basic end to end workflow.
+* `datarobot_score_dag.py` -  example of Airflow DAG for DataRobot Batch Scoring.
+* `datarobot_jdbc_batch_scoring_dag.py` -  example of Airflow DAG for Batch Scoring with JDBC data source.
+* `datarobot_aws_s3_batch_scoring_dag.py` - example of Airflow DAG for using DataRobot AWS Credentials with ScorePredictionsOperator
+* `datarobot_gcp_storage_batch_scoring_dag.py` - example of Airflow DAG for using DataRobot GCP Credentials with ScorePredictionsOperator
+* `datarobot_bigquery_batch_scoring_dag.py` - example of Airflow DAG for using DataRobot GCP Credentials with ScorePredictionsOperator
+* `datarobot_azure_storage_batch_scoring_dag.py` - example of Airflow DAG for using DataRobot Azure Storage Credentials with ScorePredictionsOperator
 * `datarobot_jdbc_dataset_dag.py` - example of using DataRobot JDBC Connection to upload dataset to AI Catalog
+* `datarobot_batch_monitoring_job_dag.py` - example of Airflow DAG to run Batch Monitoring Job
+* `datarobot_create_project_from_ai_catalog_dag.py` - example of Airflow DAG for creating DataRobot Project from AI Catalog dataset
+* `datarobot_create_project_from_dataset_version_dag.py` -  example of Airflow DAG for creating DataRobot Project from specific version of  dataset in AI Catalog
+* `datarobot_dataset_new_version_dag.py` -  example of creating new version of existing dataset in AI Catalog
+* `datarobot_dataset_upload_dag.py` -  example of Airflow DAG for uploading local file to the DataRobot AI Catalog
+* `datarobot_get_datastore_dag.py` -  example of Airflow DAG with GetOrCreateDataStoreOperator to create Datarobot DataStore
+* `datarobot_jdbc_dataset_dag.py` -  example of Airflow DAG for creating DataRobot Project from JDBC data source.
+* `datarobot_jdbc_dynamic_dataset_dag.py` -  example of Airflow DAG for creating DataRobot Project from JDBC dynamic data source.
+* `datarobot_upload_actuals_catalog_dag.py` -  example of Airflow DAG for uploading actuals from AI Catalog
+* `deployment_service_stats_dag.py` -  example of Airflow DAG for getting Deployment service statistics with GetServiceStatsOperator
+* `deployment_stat_and_accuracy_dag.py` -  example of Airflow DAG for getting Deployment service statistics and accuracy
+* `deployment_update_monitoring_settings_dag.py` -  example of Airflow DAG for updating Deployment monitoring settings
+* `deployment_update_segment_analysis_settings_dag.py` -  example of Airflow DAG for updating Deployment segment analysis settings
+* `download_scoring_code_from_deployment_dag.py` -  example of Airflow DAG for downloading scoring code (jar file) from a DataRobot Deployment
 
 ## Issues
 
