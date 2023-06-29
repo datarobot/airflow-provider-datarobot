@@ -354,6 +354,58 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
     Returns a dict with the accuracy for a Deployment.
 
+- `GetBiasAndFairnessSettingsOperator`
+
+    Get Bias And Fairness settings for deployment.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+
+    No config params are required.
+
+    Returns a dict with the Bias And Fairness settings for a Deployment. More details: [get_bias_and_fairness_settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_bias_and_fairness_settings)
+ 
+- `UpdateBiasAndFairnessSettingsOperator`
+
+    Update Bias And Fairness settings for deployment.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+
+    Sample config params:
+
+        "protected_features": ['attribute1'],
+        "preferable_target_value": 'True',
+        "fairness_metrics_set": 'equalParity',
+        "fairness_threshold": 0.1,
+
+- `GetSegmentAnalysisSettingsOperator`
+
+    Get segment analysis settings for a deployment.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+
+    No config params are required.
+
+    Returns a dict with segment analysis settings for a Deployment. More details: [get_segment_analysis_settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_segment_analysis_settings)
+
+- `UpdateSegmentAnalysisSettingsOperator`
+
+    Updates segment analysis settings for a deployment.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+
+    Sample config params:
+
+        "segment_analysis_enabled": True,
+        "segment_analysis_attributes": ['attribute1', 'attribute2'],
+
 - `GetMonitoringSettingsOperator`
 
     Get monitoring settings for deployment.
