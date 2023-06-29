@@ -139,6 +139,40 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
     Returns a Dataset ID.
 
+- `UpdateDatasetFromFileOperator`
+
+    Operator that creates a new Dataset version from a file.
+    Returns when the new dataset version has been successfully uploaded.
+ 
+    Required config params:
+
+        dataset_id: str - DataRobot AI Catalog dataset ID
+        dataset_file_path: str - local path to training dataset
+
+    Returns a Dataset version ID.
+
+- `CreateDatasetVersionOperator`
+
+    Creating new version of existing dataset in AI Catalog and return dataset version ID.
+ 
+    Required config params:
+
+        dataset_id: str - DataRobot AI Catalog dataset ID
+        datasource_id: str - existing DataRobot datasource ID
+        credential_id: str - existing DataRobot credential ID
+
+    Returns a Dataset version ID.
+
+- `CreateOrUpdateDataSourceOperator`
+
+    Creates the data source or updates it if its already exist and return DataSource ID.
+ 
+    Required config params:
+
+        data_store_id: str - DataRobot data store ID
+
+    Returns a DataRobot DataSource ID.
+
 - `CreateProjectOperator`
 
     Creates a DataRobot project and returns its ID.
