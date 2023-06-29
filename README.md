@@ -501,10 +501,55 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
             },
         }
     
-    For more [batch monitoring settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.BatchMonitoringJob.run) see the DataRobot docs.
+    For more details: [batch monitoring settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.BatchMonitoringJob.run) see the DataRobot docs.
 
     Returns a batch monitoring job ID.
 
+- `DownloadModelScoringCodeOperator`
+
+    Downloads scoring code artifact from a Model.
+
+    Parameters:
+
+        project_id: str - DataRobot Project ID
+        model_id: str - DataRobot Model ID
+        base_path: str - base path for storing a downloaded model artifact
+
+    Sample config params: [download scoring code parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=scoring_code#datarobot.models.Model.download_scoring_code) see the DataRobot docs.
+
+        "source_code": False,
+
+- `DownloadDeploymentScoringCodeOperator`
+
+    Downloads scoring code artifact from a deployment.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+        base_path: str - base path for storing a downloaded model artifact
+
+    Sample config params: [download scoring code parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=scoring_code#datarobot.models.Deployment.download_scoring_code) see the DataRobot docs.
+
+        "source_code": False,
+        "include_agent": False,
+        "include_prediction_explanations": False,
+        "include_prediction_intervals": False,
+
+- `DownloadDeploymentScoringCodeOperator`
+
+    Downloads scoring code artifact from a deployment.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+        base_path: str - base path for storing a downloaded model artifact
+
+    Sample config params:
+
+        "source_code": False,
+        "include_agent": False,
+        "include_prediction_explanations": False,
+        "include_prediction_intervals": False,
 
 ### [Sensors](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/sensors/datarobot.py)
 
