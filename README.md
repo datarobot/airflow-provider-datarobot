@@ -666,21 +666,21 @@ in "datarobot_provider/example_dags" directory:
 * `datarobot_gcp_storage_batch_scoring_dag.py` - example of Airflow DAG for using DataRobot GCP Credentials with ScorePredictionsOperator
 * `datarobot_bigquery_batch_scoring_dag.py` - example of Airflow DAG for using DataRobot GCP Credentials with ScorePredictionsOperator
 * `datarobot_azure_storage_batch_scoring_dag.py` - example of Airflow DAG for using DataRobot Azure Storage Credentials with ScorePredictionsOperator
-* `datarobot_jdbc_dataset_dag.py` - example of using DataRobot JDBC Connection to upload dataset to AI Catalog
-* `datarobot_batch_monitoring_job_dag.py` - example of Airflow DAG to run Batch Monitoring Job
-* `datarobot_create_project_from_ai_catalog_dag.py` - example of Airflow DAG for creating DataRobot Project from AI Catalog dataset
-* `datarobot_create_project_from_dataset_version_dag.py` -  example of Airflow DAG for creating DataRobot Project from specific version of  dataset in AI Catalog
-* `datarobot_dataset_new_version_dag.py` -  example of creating new version of existing dataset in AI Catalog
-* `datarobot_dataset_upload_dag.py` -  example of Airflow DAG for uploading local file to the DataRobot AI Catalog
-* `datarobot_get_datastore_dag.py` -  example of Airflow DAG with GetOrCreateDataStoreOperator to create Datarobot DataStore
-* `datarobot_jdbc_dataset_dag.py` -  example of Airflow DAG for creating DataRobot Project from JDBC data source.
-* `datarobot_jdbc_dynamic_dataset_dag.py` -  example of Airflow DAG for creating DataRobot Project from JDBC dynamic data source.
-* `datarobot_upload_actuals_catalog_dag.py` -  example of Airflow DAG for uploading actuals from AI Catalog
-* `deployment_service_stats_dag.py` -  example of Airflow DAG for getting Deployment service statistics with GetServiceStatsOperator
-* `deployment_stat_and_accuracy_dag.py` -  example of Airflow DAG for getting Deployment service statistics and accuracy
-* `deployment_update_monitoring_settings_dag.py` -  example of Airflow DAG for updating Deployment monitoring settings
-* `deployment_update_segment_analysis_settings_dag.py` -  example of Airflow DAG for updating Deployment segment analysis settings
-* `download_scoring_code_from_deployment_dag.py` -  example of Airflow DAG for downloading scoring code (jar file) from a DataRobot Deployment
+* `datarobot_jdbc_dataset_dag.py` - example of using a DataRobot JDBC connection to upload a dataset to the AI Catalog
+* `datarobot_batch_monitoring_job_dag.py` - example of Airflow DAG to run a batch monitoring job
+* `datarobot_create_project_from_ai_catalog_dag.py` - example of Airflow DAG for creating a DataRobot project from an AI Catalog dataset
+* `datarobot_create_project_from_dataset_version_dag.py` -  example of Airflow DAG for creating a DataRobot project from a specific dataset version in the AI Catalog
+* `datarobot_dataset_new_version_dag.py` -  example of creating new version of an existing dataset in AI Catalog
+* `datarobot_dataset_upload_dag.py` -  example of Airflow DAG for uploading a local file to the DataRobot AI Catalog
+* `datarobot_get_datastore_dag.py` -  example of Airflow DAG with GetOrCreateDataStoreOperator to create a Datarobot DataStore
+* `datarobot_jdbc_dataset_dag.py` -  example of Airflow DAG for creating a DataRobot project from a JDBC data source
+* `datarobot_jdbc_dynamic_dataset_dag.py` -  example of Airflow DAG for creating a DataRobot project from a JDBC dynamic data source
+* `datarobot_upload_actuals_catalog_dag.py` -  example of Airflow DAG for uploading actuals from the AI Catalog
+* `deployment_service_stats_dag.py` -  example of Airflow DAG for getting a deployment's service statistics with GetServiceStatsOperator
+* `deployment_stat_and_accuracy_dag.py` -  example of Airflow DAG for getting a deployment's service statistics and accuracy
+* `deployment_update_monitoring_settings_dag.py` -  example of Airflow DAG for updating a deployment's monitoring settings
+* `deployment_update_segment_analysis_settings_dag.py` -  example of Airflow DAG for updating a deployment's segment analysis settings
+* `download_scoring_code_from_deployment_dag.py` -  example of Airflow DAG for downloading scoring code (jar file) from a DataRobot deployment
 
 ## Issues
 
