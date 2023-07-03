@@ -153,7 +153,7 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
 - `CreateDatasetVersionOperator`
 
-    Creating new version of existing dataset in AI Catalog and return dataset version ID.
+    Creates a new version of the existing dataset in the AI Catalog and returns the dataset version ID.
  
     Required config params:
 
