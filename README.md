@@ -660,7 +660,7 @@ Examples of using preconfigured connection you can find
 in "datarobot_provider/example_dags" directory:
 
 * `datarobot_pipeline_dag.py` -  example of Airflow DAG for the basic end-to-end workflow in DataRobot.
-* `datarobot_score_dag.py` -  example of Airflow DAG for DataRobot Batch Scoring.
+* `datarobot_score_dag.py` -  example of Airflow DAG for DataRobot batch scoring.
 * `datarobot_jdbc_batch_scoring_dag.py` -  example of Airflow DAG for Batch Scoring with JDBC data source.
 * `datarobot_aws_s3_batch_scoring_dag.py` - example of Airflow DAG for using DataRobot AWS Credentials with ScorePredictionsOperator
 * `datarobot_gcp_storage_batch_scoring_dag.py` - example of Airflow DAG for using DataRobot GCP Credentials with ScorePredictionsOperator
