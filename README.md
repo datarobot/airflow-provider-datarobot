@@ -50,7 +50,7 @@ it can be used with `GetOrCreateCredentialOperator` or `GetOrCreateDataStoreOper
 to replicate it on DataRobot side and retrieve corresponding `credentials_id`
 or `datastore_id`.
 
-## Config JSON for dag run
+## Config JSON for DAG run
 
 Operators and sensors use parameters from the [config](https://airflow.apache.org/docs/apache-airflow/stable/cli-and-env-variables-ref.html?highlight=config#Named%20Arguments_repeat21)
 which must be submitted when triggering the dag. Example config JSON with required parameters:
