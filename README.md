@@ -147,7 +147,7 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
     Required config params:
 
         dataset_id: str - DataRobot AI Catalog dataset ID
-        dataset_file_path: str - local path to training dataset
+        dataset_file_path: str - local path to the training dataset
 
     Returns a Dataset version ID.
 
