@@ -569,22 +569,6 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
         "include_prediction_explanations": False,
         "include_prediction_intervals": False,
 
-- `DownloadDeploymentScoringCodeOperator`
-
-    Downloads scoring code artifact from a deployment.
-
-    Parameters:
-
-        deployment_id: str - DataRobot deployment ID
-        base_path: str - base path for storing a downloaded model artifact
-
-    Sample config params:
-
-        "source_code": False,
-        "include_agent": False,
-        "include_prediction_explanations": False,
-        "include_prediction_intervals": False,
-
 - `SubmitActualsFromCatalogOperator`
 
     Downloads scoring code artifact from a deployment.
