@@ -18,7 +18,7 @@ from datarobot_provider.hooks.datarobot import DataRobotHook
 
 class GetSegmentAnalysisSettingsOperator(BaseOperator):
     """
-    Get segment analysis settings for deployment.
+    Get segment analysis settings for a deployment.
 
     :param deployment_id: DataRobot deployment ID
     :type deployment_id: str
@@ -61,7 +61,7 @@ class GetSegmentAnalysisSettingsOperator(BaseOperator):
 
 class UpdateSegmentAnalysisSettingsOperator(BaseOperator):
     """
-    Update segment analysis settings for deployment.
+    Updates segment analysis settings for a deployment.
 
     :param deployment_id: DataRobot deployment ID
     :type deployment_id: str

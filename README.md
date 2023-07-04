@@ -45,19 +45,12 @@ Currently supported types of credentials:
 * `DataRobot OAuth Credentials` - to store OAuth tokens
 * `DataRobot JDBC DataSource` - to store JDBC connection attributes
 
-After creating preconfigured connections using Airflow UI or Airflow API [Managing Connections](https://airflow.apache.org/docs/apache-airflow/stable/howto/connection.html)
+After creating preconfigured connections using Airflow UI or Airflow API [Managing Connections](https://airflow.apache.org/docs/apache-airflow/stable/howto/connection.html),
 it can be used with `GetOrCreateCredentialOperator` or `GetOrCreateDataStoreOperator`
-to replicate it on DataRobot side and retrieve corresponding `credentials_id`
-or `datastore_id`. 
-Examples of using preconfigured connection you can find
-in "datarobot_provider/example_dags" directory:
+to replicate it in DataRobot and retrieve the corresponding `credentials_id`
+or `datastore_id`.
 
-* `datarobot_aws_s3_batch_scoring_dag.py` - example of using DataRobot AWS Credentials with ScorePredictionsOperator
-* `datarobot_azure_storage_batch_scoring_dag.py` - example of using DataRobot GCP Credentials with ScorePredictionsOperator
-* `datarobot_azure_storage_batch_scoring_dag.py` - example of using DataRobot Azure Storage Credentials with ScorePredictionsOperator
-* `datarobot_jdbc_dataset_dag.py` - example of using DataRobot JDBC Connection to upload dataset to AI Catalog
-
-## Config JSON for dag run
+## Config JSON for DAG run
 
 Operators and sensors use parameters from the [config](https://airflow.apache.org/docs/apache-airflow/stable/cli-and-env-variables-ref.html?highlight=config#Named%20Arguments_repeat21)
 which must be submitted when triggering the dag. Example config JSON with required parameters:
@@ -144,7 +137,41 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
         dataset_file_path: str - local path to training dataset
 
-    Returns a dataset ID.
+    Returns a Dataset ID.
+
+- `UpdateDatasetFromFileOperator`
+
+    Operator that creates a new Dataset version from a file.
+    Returns when the new dataset version has been successfully uploaded.
+ 
+    Required config params:
+
+        dataset_id: str - DataRobot AI Catalog dataset ID
+        dataset_file_path: str - local path to the training dataset
+
+    Returns a Dataset version ID.
+
+- `CreateDatasetVersionOperator`
+
+    Creates a new version of the existing dataset in the AI Catalog and returns the dataset version ID.
+ 
+    Required config params:
+
+        dataset_id: str - DataRobot AI Catalog dataset ID
+        datasource_id: str - existing DataRobot datasource ID
+        credential_id: str - existing DataRobot credential ID
+
+    Returns a Dataset version ID.
+
+- `CreateOrUpdateDataSourceOperator`
+
+    Creates the data source or updates it if its already exist and return DataSource ID.
+ 
+    Required config params:
+
+        data_store_id: str - DataRobot data store ID
+
+    Returns a DataRobot DataSource ID.
 
 - `CreateProjectOperator`
 
@@ -243,13 +270,13 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
     - You can use `GetOrCreateCredentialOperator` to pass `credential_id` from preconfigured DataRobot Credentials (Airflow Connections)
       or you can manually set `credential_id` parameter in the config. [S3 credentials added to DataRobot via Python API client](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/admin/credentials.html#s3-credentials).
     - OR a Dataset ID in the AI Catalog
-    - OR a DataStore ID for jdbc source connection, you can use `GetOrCreateDataStoreOperator` to pass `datastore_id` from preconfigured Airflow Connection
+    - OR a DataStore ID for JDBC source connection, you can use `GetOrCreateDataStoreOperator` to pass `datastore_id` from preconfigured Airflow Connection
 
     Parameters:
   
         deployment_id: str - DataRobot deployment ID
-        intake_datastore_id: str - DataRobot DataStore ID for jdbc source connection
-        output_datastore_id: str - DataRobot DataStore ID for jdbc destination connection
+        intake_datastore_id: str - DataRobot DataStore ID for JDBC source connection
+        output_datastore_id: str - DataRobot DataStore ID for JDBC destination connection
         intake_credential_id: str - DataRobot Credentials ID for source connection
         output_credential_id: str - DataRobot Credentials ID for destination connection
 
@@ -329,6 +356,238 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
 
     Returns a dict with the feature drift data.
 
+- `GetServiceStatsOperator`
+
+    Gets service stats measurements from a deployment.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+
+    No config params are required. [Optional params](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_service_stats) may be passed in the config as follows:
+
+        "service_stats": {
+            ...
+        }
+
+    Returns a dict with the service stats measurements data.
+
+- `GetAccuracyOperator`
+
+    Gets the accuracy of a deployment’s predictions.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+
+    No config params are required. [Optional params](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_accuracy) may be passed in the config as follows:
+
+        "accuracy": {
+            ...
+        }
+
+    Returns a dict with the accuracy for a Deployment.
+
+- `GetBiasAndFairnessSettingsOperator`
+
+    Get Bias And Fairness settings for deployment.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+
+    No config params are required.
+
+    Returns a dict with the Bias And Fairness settings for a Deployment. More details: [get_bias_and_fairness_settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_bias_and_fairness_settings)
+ 
+- `UpdateBiasAndFairnessSettingsOperator`
+
+    Update Bias And Fairness settings for deployment.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+
+    Sample config params:
+
+        "protected_features": ['attribute1'],
+        "preferable_target_value": 'True',
+        "fairness_metrics_set": 'equalParity',
+        "fairness_threshold": 0.1,
+
+- `GetSegmentAnalysisSettingsOperator`
+
+    Get segment analysis settings for a deployment.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+
+    No config params are required.
+
+    Returns a dict with segment analysis settings for a Deployment. More details: [get_segment_analysis_settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_segment_analysis_settings)
+
+- `UpdateSegmentAnalysisSettingsOperator`
+
+    Updates segment analysis settings for a deployment.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+
+    Sample config params:
+
+        "segment_analysis_enabled": True,
+        "segment_analysis_attributes": ['attribute1', 'attribute2'],
+
+- `GetMonitoringSettingsOperator`
+
+    Get monitoring settings for deployment.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+
+    No config params are required.
+
+    Returns a dict with the config params for a Deployment as follows:
+
+        {
+            "drift_tracking_settings": { ... } 
+            "association_id_settings": { ... }
+            "predictions_data_collection_settings": { ... }
+        }
+
+    where: - drift_tracking_settings: [drift tracking settings for this deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_drift_tracking_settings)
+           - association_id_settings: [association ID setting for this deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_association_id_settings)
+           - predictions_data_collection_settings: [predictions data collection settings of this deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=predictions_data_collection_settings#datarobot.models.Deployment.get_predictions_data_collection_settings)
+           
+- `UpdateMonitoringSettingsOperator`
+
+    Updates monitoring settings for a deployment.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+
+    Sample config params:
+
+        "target_drift_enabled": True,
+        "feature_drift_enabled": True,
+        "association_id_column": ["id"],
+        "required_association_id": False,
+        "predictions_data_collection_enabled": False,
+
+- `BatchMonitoringOperator`
+
+    Creates a batch monitoring job for the deployment.
+
+    Prerequisites:
+    - You can use `GetOrCreateCredentialOperator` to pass `credential_id` from preconfigured DataRobot Credentials (Airflow Connections)
+      or you can manually set `credential_id` parameter in the config. [S3 credentials added to DataRobot via Python API client](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/admin/credentials.html#s3-credentials).
+    - OR a Dataset ID in the AI Catalog
+    - OR a DataStore ID for JDBC source connection, you can use `GetOrCreateDataStoreOperator` to pass `datastore_id` from preconfigured Airflow Connection
+
+    Parameters:
+  
+        deployment_id: str - DataRobot Deployment ID
+        datastore_id: str - DataRobot DataStore ID
+        credential_id: str - DataRobot Credentials ID
+
+    Sample config params:
+
+        "deployment_id": "61150a2fadb5586af4118980",
+        "monitoring_settings": {
+            "intake_settings": {
+                "type": "bigquery",
+                "dataset": "integration_example_demo",
+                "table": "actuals_demo",
+                "bucket": "datarobot_demo_airflow",
+            },
+            "monitoring_columns": {
+                "predictions_columns": [
+                    {"class_name": "True", "column_name": "target_True_PREDICTION"},
+                    {"class_name": "False", "column_name": "target_False_PREDICTION"},
+                ],
+                "association_id_column": "id",
+                "actuals_value_column": "ACTUAL",
+            },
+        }
+
+    Sample config params in case of manually set `credential_id` parameter in the config:
+
+        "deployment_id": "61150a2fadb5586af4118980",
+        "monitoring_settings": {
+            "intake_settings": {
+                "type": "bigquery",
+                "dataset": "integration_example_demo",
+                "table": "actuals_demo",
+                "bucket": "datarobot_demo_airflow",
+                "credential_id": "63eb7dfce1274472579f6e1c"
+            },
+            "monitoring_columns": {
+                "predictions_columns": [
+                    {"class_name": "True", "column_name": "target_True_PREDICTION"},
+                    {"class_name": "False", "column_name": "target_False_PREDICTION"},
+                ],
+                "association_id_column": "id",
+                "actuals_value_column": "ACTUAL",
+            },
+        }
+    
+    For more details: [batch monitoring settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.BatchMonitoringJob.run) see the DataRobot docs.
+
+    Returns a batch monitoring job ID.
+
+- `DownloadModelScoringCodeOperator`
+
+    Downloads scoring code artifact from a Model.
+
+    Parameters:
+
+        project_id: str - DataRobot Project ID
+        model_id: str - DataRobot Model ID
+        base_path: str - base path for storing a downloaded model artifact
+
+    Sample config params: [download scoring code parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=scoring_code#datarobot.models.Model.download_scoring_code) see the DataRobot docs.
+
+        "source_code": False,
+
+- `DownloadDeploymentScoringCodeOperator`
+
+    Downloads scoring code artifact from a deployment.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+        base_path: str - base path for storing a downloaded model artifact
+
+    Sample config params: [download scoring code parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=scoring_code#datarobot.models.Deployment.download_scoring_code) see the DataRobot docs.
+
+        "source_code": False,
+        "include_agent": False,
+        "include_prediction_explanations": False,
+        "include_prediction_intervals": False,
+
+- `SubmitActualsFromCatalogOperator`
+
+    Downloads scoring code artifact from a deployment.
+
+    Parameters:
+
+        deployment_id: str - DataRobot deployment ID
+        dataset_id: str - DataRobot Catalog dataset ID
+        dataset_version_id: str - DataRobot Catalog dataset version ID
+
+    Sample config params:
+
+        "association_id_column": 'id',
+        "actual_value_column": 'ACTUAL',
+        "timestamp_column": 'timestamp',
+        "was_acted_on_column": 'acted_on',
+
+    Returns a uploading actuals job ID.
+
 ### [Sensors](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/sensors/datarobot.py)
 
 - `AutopilotCompleteSensor`
@@ -346,6 +605,22 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
     Parameters:
 
         job_id: str - Batch prediction job ID
+
+- `MonitoringJobCompleteSensor`
+
+    Checks whether monitoring job is complete.
+
+    Parameters:
+
+        job_id: str - Batch Monitoring job ID
+
+- `BaseAsyncResolutionSensor`
+
+    Checks if the DataRobot Async API call has completed.
+
+    Parameters:
+
+        job_id: str - DataRobot async API call status check ID
 
 ### [Hooks](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/hooks/datarobot.py)
 
@@ -365,6 +640,31 @@ The modules described above allows to construct a standard DataRobot pipeline in
 
 See the [**examples**](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/example_dags) directory for the example DAGs.
 
+Examples of using a preconfigured connection you can find
+in "datarobot_provider/example_dags" directory:
+
+* `datarobot_pipeline_dag.py` -  example of an Airflow DAG for the basic end-to-end workflow in DataRobot.
+* `datarobot_score_dag.py` -  example of an Airflow DAG for DataRobot batch scoring.
+* `datarobot_jdbc_batch_scoring_dag.py` -  example of an Airflow DAG for Batch Scoring with a JDBC data source.
+* `datarobot_aws_s3_batch_scoring_dag.py` - example of an Airflow DAG for using DataRobot AWS Credentials with ScorePredictionsOperator
+* `datarobot_gcp_storage_batch_scoring_dag.py` - example of an Airflow DAG for using DataRobot GCP Credentials with ScorePredictionsOperator
+* `datarobot_bigquery_batch_scoring_dag.py` - example of an Airflow DAG for using DataRobot GCP Credentials with ScorePredictionsOperator
+* `datarobot_azure_storage_batch_scoring_dag.py` - example of an Airflow DAG for using DataRobot Azure Storage Credentials with ScorePredictionsOperator
+* `datarobot_jdbc_dataset_dag.py` - example of using a DataRobot JDBC connection to upload a dataset to the AI Catalog
+* `datarobot_batch_monitoring_job_dag.py` - example of an Airflow DAG to run a batch monitoring job
+* `datarobot_create_project_from_ai_catalog_dag.py` - example of an Airflow DAG for creating a DataRobot project from an AI Catalog dataset
+* `datarobot_create_project_from_dataset_version_dag.py` -  example of an Airflow DAG for creating a DataRobot project from a specific dataset version in the AI Catalog
+* `datarobot_dataset_new_version_dag.py` -  example of creating new version of an existing dataset in AI Catalog
+* `datarobot_dataset_upload_dag.py` -  example of an Airflow DAG for uploading a local file to the DataRobot AI Catalog
+* `datarobot_get_datastore_dag.py` -  example of an Airflow DAG with GetOrCreateDataStoreOperator to create a Datarobot DataStore
+* `datarobot_jdbc_dataset_dag.py` -  example of an Airflow DAG for creating a DataRobot project from a JDBC data source
+* `datarobot_jdbc_dynamic_dataset_dag.py` -  example of an Airflow DAG for creating a DataRobot project from a JDBC dynamic data source
+* `datarobot_upload_actuals_catalog_dag.py` -  example of an Airflow DAG for uploading actuals from the AI Catalog
+* `deployment_service_stats_dag.py` -  example of an Airflow DAG for getting a deployment's service statistics with GetServiceStatsOperator
+* `deployment_stat_and_accuracy_dag.py` -  example of Airflow an DAG for getting a deployment's service statistics and accuracy
+* `deployment_update_monitoring_settings_dag.py` -  example of an Airflow DAG for updating a deployment's monitoring settings
+* `deployment_update_segment_analysis_settings_dag.py` -  example of an Airflow DAG for updating a deployment's segment analysis settings
+* `download_scoring_code_from_deployment_dag.py` -  example of an Airflow DAG for downloading scoring code (jar file) from a DataRobot deployment
 
 ## Issues
 
