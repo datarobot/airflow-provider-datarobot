@@ -270,13 +270,13 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
     - You can use `GetOrCreateCredentialOperator` to pass `credential_id` from preconfigured DataRobot Credentials (Airflow Connections)
       or you can manually set `credential_id` parameter in the config. [S3 credentials added to DataRobot via Python API client](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/admin/credentials.html#s3-credentials).
     - OR a Dataset ID in the AI Catalog
-    - OR a DataStore ID for jdbc source connection, you can use `GetOrCreateDataStoreOperator` to pass `datastore_id` from preconfigured Airflow Connection
+    - OR a DataStore ID for JDBC source connection, you can use `GetOrCreateDataStoreOperator` to pass `datastore_id` from preconfigured Airflow Connection
 
     Parameters:
   
         deployment_id: str - DataRobot deployment ID
-        intake_datastore_id: str - DataRobot DataStore ID for jdbc source connection
-        output_datastore_id: str - DataRobot DataStore ID for jdbc destination connection
+        intake_datastore_id: str - DataRobot DataStore ID for JDBC source connection
+        output_datastore_id: str - DataRobot DataStore ID for JDBC destination connection
         intake_credential_id: str - DataRobot Credentials ID for source connection
         output_credential_id: str - DataRobot Credentials ID for destination connection
 
@@ -486,7 +486,7 @@ in the `context["params"]` variable, e.g. getting a training data you would use 
     - You can use `GetOrCreateCredentialOperator` to pass `credential_id` from preconfigured DataRobot Credentials (Airflow Connections)
       or you can manually set `credential_id` parameter in the config. [S3 credentials added to DataRobot via Python API client](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/admin/credentials.html#s3-credentials).
     - OR a Dataset ID in the AI Catalog
-    - OR a DataStore ID for jdbc source connection, you can use `GetOrCreateDataStoreOperator` to pass `datastore_id` from preconfigured Airflow Connection
+    - OR a DataStore ID for JDBC source connection, you can use `GetOrCreateDataStoreOperator` to pass `datastore_id` from preconfigured Airflow Connection
 
     Parameters:
   
@@ -656,31 +656,31 @@ The modules described above allows to construct a standard DataRobot pipeline in
 
 See the [**examples**](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/example_dags) directory for the example DAGs.
 
-Examples of using preconfigured connection you can find
+Examples of using a preconfigured connection you can find
 in "datarobot_provider/example_dags" directory:
 
-* `datarobot_pipeline_dag.py` -  example of Airflow DAG for the basic end-to-end workflow in DataRobot.
-* `datarobot_score_dag.py` -  example of Airflow DAG for DataRobot batch scoring.
-* `datarobot_jdbc_batch_scoring_dag.py` -  example of Airflow DAG for Batch Scoring with a JDBC data source.
-* `datarobot_aws_s3_batch_scoring_dag.py` - example of Airflow DAG for using DataRobot AWS Credentials with ScorePredictionsOperator
-* `datarobot_gcp_storage_batch_scoring_dag.py` - example of Airflow DAG for using DataRobot GCP Credentials with ScorePredictionsOperator
-* `datarobot_bigquery_batch_scoring_dag.py` - example of Airflow DAG for using DataRobot GCP Credentials with ScorePredictionsOperator
-* `datarobot_azure_storage_batch_scoring_dag.py` - example of Airflow DAG for using DataRobot Azure Storage Credentials with ScorePredictionsOperator
+* `datarobot_pipeline_dag.py` -  example of an Airflow DAG for the basic end-to-end workflow in DataRobot.
+* `datarobot_score_dag.py` -  example of an Airflow DAG for DataRobot batch scoring.
+* `datarobot_jdbc_batch_scoring_dag.py` -  example of an Airflow DAG for Batch Scoring with a JDBC data source.
+* `datarobot_aws_s3_batch_scoring_dag.py` - example of an Airflow DAG for using DataRobot AWS Credentials with ScorePredictionsOperator
+* `datarobot_gcp_storage_batch_scoring_dag.py` - example of an Airflow DAG for using DataRobot GCP Credentials with ScorePredictionsOperator
+* `datarobot_bigquery_batch_scoring_dag.py` - example of an Airflow DAG for using DataRobot GCP Credentials with ScorePredictionsOperator
+* `datarobot_azure_storage_batch_scoring_dag.py` - example of an Airflow DAG for using DataRobot Azure Storage Credentials with ScorePredictionsOperator
 * `datarobot_jdbc_dataset_dag.py` - example of using a DataRobot JDBC connection to upload a dataset to the AI Catalog
-* `datarobot_batch_monitoring_job_dag.py` - example of Airflow DAG to run a batch monitoring job
-* `datarobot_create_project_from_ai_catalog_dag.py` - example of Airflow DAG for creating a DataRobot project from an AI Catalog dataset
-* `datarobot_create_project_from_dataset_version_dag.py` -  example of Airflow DAG for creating a DataRobot project from a specific dataset version in the AI Catalog
+* `datarobot_batch_monitoring_job_dag.py` - example of an Airflow DAG to run a batch monitoring job
+* `datarobot_create_project_from_ai_catalog_dag.py` - example of an Airflow DAG for creating a DataRobot project from an AI Catalog dataset
+* `datarobot_create_project_from_dataset_version_dag.py` -  example of an Airflow DAG for creating a DataRobot project from a specific dataset version in the AI Catalog
 * `datarobot_dataset_new_version_dag.py` -  example of creating new version of an existing dataset in AI Catalog
-* `datarobot_dataset_upload_dag.py` -  example of Airflow DAG for uploading a local file to the DataRobot AI Catalog
-* `datarobot_get_datastore_dag.py` -  example of Airflow DAG with GetOrCreateDataStoreOperator to create a Datarobot DataStore
-* `datarobot_jdbc_dataset_dag.py` -  example of Airflow DAG for creating a DataRobot project from a JDBC data source
-* `datarobot_jdbc_dynamic_dataset_dag.py` -  example of Airflow DAG for creating a DataRobot project from a JDBC dynamic data source
-* `datarobot_upload_actuals_catalog_dag.py` -  example of Airflow DAG for uploading actuals from the AI Catalog
-* `deployment_service_stats_dag.py` -  example of Airflow DAG for getting a deployment's service statistics with GetServiceStatsOperator
-* `deployment_stat_and_accuracy_dag.py` -  example of Airflow DAG for getting a deployment's service statistics and accuracy
-* `deployment_update_monitoring_settings_dag.py` -  example of Airflow DAG for updating a deployment's monitoring settings
-* `deployment_update_segment_analysis_settings_dag.py` -  example of Airflow DAG for updating a deployment's segment analysis settings
-* `download_scoring_code_from_deployment_dag.py` -  example of Airflow DAG for downloading scoring code (jar file) from a DataRobot deployment
+* `datarobot_dataset_upload_dag.py` -  example of an Airflow DAG for uploading a local file to the DataRobot AI Catalog
+* `datarobot_get_datastore_dag.py` -  example of an Airflow DAG with GetOrCreateDataStoreOperator to create a Datarobot DataStore
+* `datarobot_jdbc_dataset_dag.py` -  example of an Airflow DAG for creating a DataRobot project from a JDBC data source
+* `datarobot_jdbc_dynamic_dataset_dag.py` -  example of an Airflow DAG for creating a DataRobot project from a JDBC dynamic data source
+* `datarobot_upload_actuals_catalog_dag.py` -  example of an Airflow DAG for uploading actuals from the AI Catalog
+* `deployment_service_stats_dag.py` -  example of an Airflow DAG for getting a deployment's service statistics with GetServiceStatsOperator
+* `deployment_stat_and_accuracy_dag.py` -  example of Airflow an DAG for getting a deployment's service statistics and accuracy
+* `deployment_update_monitoring_settings_dag.py` -  example of an Airflow DAG for updating a deployment's monitoring settings
+* `deployment_update_segment_analysis_settings_dag.py` -  example of an Airflow DAG for updating a deployment's segment analysis settings
+* `download_scoring_code_from_deployment_dag.py` -  example of an Airflow DAG for downloading scoring code (jar file) from a DataRobot deployment
 
 ## Issues
 
