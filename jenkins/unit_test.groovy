@@ -7,6 +7,7 @@ stage('Unit Test') {
               set -xe
               virtualenv .venv -p python3.8
               source .venv/bin/activate
+              pip install apache-airflow==2.5.1
               pip install -r requirements.txt
               airflow db init
               airflow db check
