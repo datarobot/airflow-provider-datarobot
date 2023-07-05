@@ -36,10 +36,7 @@ from datarobot_provider.operators.credentials import GetOrCreateCredentialOperat
         "table_name": "actuals_demo",
     },
 )
-def datarobot_dataset_new_version(deployment_id=None, dataset_id=None):
-    if not deployment_id:
-        raise ValueError("Invalid or missing `deployment_id` value")
-
+def datarobot_dataset_new_version(dataset_id=None):
     get_credentials_op = GetOrCreateCredentialOperator(
         task_id="get_jdbc_credentials",
         credentials_param_name="datarobot_jdbc_connection",
