@@ -221,7 +221,7 @@ class GoogleCloudCredentialsHook(CredentialsBaseHook):
     @staticmethod
     def get_connection_form_widgets() -> Dict[str, Any]:
         """Returns connection widgets to add to connection form."""
-        from flask_appbuilder.fieldwidgets import BS3TextAreaFieldWidget
+        from flask_appbuilder.fieldwidgets import BS3PasswordFieldWidget
         from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
         from flask_babel import lazy_gettext
         from wtforms import StringField
@@ -233,8 +233,8 @@ class GoogleCloudCredentialsHook(CredentialsBaseHook):
                 default='datarobot_default',
             ),
             "gcp_key": StringField(
-                lazy_gettext('GCP Key (Service Account)'),
-                widget=BS3TextAreaFieldWidget(),
+                lazy_gettext('GCP Key json content (Service Account)'),
+                widget=BS3PasswordFieldWidget(),
             ),
         }
 

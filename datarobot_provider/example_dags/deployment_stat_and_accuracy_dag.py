@@ -36,13 +36,12 @@ def deployment_service_stats_and_accuracy(deployment_id=None):
 
         # Put your service stat processing logic here:
         current_model_id = model_accuracy['model_id']
+
         total_predictions = model_service_stat['metrics']['totalPredictions']
         print(f"model_id:{current_model_id}, total_predictions:{total_predictions}")
+        print(f"model_id:{current_model_id}, model_accuracy: {model_accuracy}")
 
-        rmse = model_accuracy['metrics']['RMSE']['value']
-        print(f"model_id:{current_model_id}, rmse:{rmse}")
-
-        return rmse
+        return total_predictions
 
     metrics_processing = example_metrics_processing(
         model_service_stat=service_stats_op.output, model_accuracy=get_accuracy_op.output
