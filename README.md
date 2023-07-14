@@ -665,6 +665,7 @@ in "datarobot_provider/example_dags" directory:
 * `deployment_update_monitoring_settings_dag.py` -  example of an Airflow DAG for updating a deployment's monitoring settings
 * `deployment_update_segment_analysis_settings_dag.py` -  example of an Airflow DAG for updating a deployment's segment analysis settings
 * `download_scoring_code_from_deployment_dag.py` -  example of an Airflow DAG for downloading scoring code (jar file) from a DataRobot deployment
+* `advanced_datarobot_pipeline_jdbc_dag.py` -  example of an Airflow DAG for the advanced end-to-end workflow in DataRobot.
 
 ## Issues
 
