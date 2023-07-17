@@ -167,17 +167,6 @@ def advanced_datarobot_pipeline_jdbc():
         deployment_id=deploy_model_op.output,
     )
 
-    @task(task_id="example_processing_python")
-    def service_stat_processing(model_service_stat, feature_drift, target_drift, accuracy):
-        """Example of custom logic based on service stats from the deployment."""
-
-        # Put your service stat processing logic here:
-        current_model_id = model_service_stat['model_id']
-        total_predictions = model_service_stat['metrics']['totalPredictions']
-        print(f"model_id:{current_model_id}, total_predictions:{total_predictions}")
-
-        return total_predictions
-
     batch_monitoring_op = BatchMonitoringOperator(
         task_id="batch_monitoring",
         deployment_id=deploy_model_op.output,
@@ -196,6 +185,16 @@ def advanced_datarobot_pipeline_jdbc():
     get_accuracy_op = GetAccuracyOperator(
         task_id="get_accuracy", deployment_id=deploy_model_op.output
     )
+
+    @task(task_id="example_processing_python")
+    def service_stat_processing(model_service_stat, feature_drift, target_drift, accuracy):
+        """Example of custom logic based on service stats from the deployment."""
+
+        # Put your service stat processing logic here:
+        current_model_id = model_service_stat['model_id']
+        total_predictions = model_service_stat['metrics']['totalPredictions']
+        # example of custom logic:
+        return {"model_id": current_model_id, "alive": total_predictions > 0}
 
     example_service_stat_processing = service_stat_processing(
         model_service_stat=service_stats_op.output,
