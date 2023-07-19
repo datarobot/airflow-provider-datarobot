@@ -19,9 +19,7 @@ from datarobot_provider.operators.deployment import ReplaceModelOperator
     start_date=datetime(2023, 1, 1),
     tags=['example', 'mlops'],
 )
-def deployment_replace_model(
-    deployment_id='64a7f478649035b2b2d348cf', new_model_id='64a7f27e8e0fd5cae6282a8d'
-):
+def deployment_replace_model(deployment_id=None, new_model_id=None):
     if not deployment_id:
         raise ValueError("Invalid or missing `deployment_id` value")
     if not new_model_id:
