@@ -9,6 +9,7 @@ from datetime import datetime
 
 from airflow.decorators import dag
 from airflow.decorators import task
+from datarobot.enums import MODEL_REPLACEMENT_REASON
 
 from datarobot_provider.operators.deployment import GetDeploymentModelOperator
 from datarobot_provider.operators.deployment import ReplaceModelOperator
@@ -34,7 +35,7 @@ def deployment_replace_model(deployment_id=None, new_model_id=None):
         task_id="replace_deployment_model",
         deployment_id=deployment_id,
         new_model_id=new_model_id,
-        reason='ACCURACY',
+        reason=MODEL_REPLACEMENT_REASON.ACCURACY,
     )
 
     get_deployment_model_after_op = GetDeploymentModelOperator(
