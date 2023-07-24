@@ -18,9 +18,7 @@ from datarobot_provider.sensors.model_insights import ComputeFeatureImpactSensor
     start_date=datetime(2023, 1, 1),
     tags=['example', 'insights'],
 )
-def compute_model_insights(
-    project_id="64ba468e6390ef69973c97ab", model_id="64ba48f7d0a7b82c0ae5d4eb"
-):
+def compute_model_insights(project_id=None, model_id=None):
     if not project_id:
         raise ValueError("Invalid or missing `project_id` value")
     if not model_id:
