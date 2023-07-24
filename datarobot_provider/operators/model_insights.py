@@ -16,16 +16,16 @@ from airflow.models import BaseOperator
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
 
-class ComputePredictionExplanationsOperator(BaseOperator):
+class ComputeFeatureImpactOperator(BaseOperator):
     """
-    Creates Predictions Explanation job in DataRobot.
+    Creates Feature Impact job in DataRobot.
     :param project_id: DataRobot project ID
     :type project_id: str
     :param model_id: DataRobot model ID
     :type model_id: str
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
-    :return: Predictions Explanation job ID
+    :return: Feature Impact job ID
     :rtype: str
     """
 
@@ -60,15 +60,15 @@ class ComputePredictionExplanationsOperator(BaseOperator):
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         if self.project_id is None:
-            raise ValueError("project_id is required to compute predictions explanation.")
+            raise ValueError("project_id is required to compute Feature Impact.")
 
         if self.model_id is None:
-            raise ValueError("model_id is required to compute predictions explanation.")
+            raise ValueError("model_id is required to compute Feature Impact.")
 
         model = dr.models.Model.get(self.project_id, self.model_id)
 
         job = model.request_feature_impact()
 
-        self.log.info(f"Compute Predictions Explanation Job submitted job_id={job.id}")
+        self.log.info(f"Feature Impact Job submitted, job_id={job.id}")
 
         return job.id

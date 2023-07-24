@@ -15,13 +15,13 @@ from datarobot.errors import AsyncProcessUnsuccessfulError
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
 
-class ComputePredictionExplanationsSensor(BaseSensorOperator):
+class ComputeFeatureImpactSensor(BaseSensorOperator):
     """
-    Checks whether Compute Prediction Explanations job is complete.
+    Checks whether Compute Feature Impact job is complete.
 
     :param project_id: DataRobot project ID
     :type project_id: str
-    :param job_id: Compute Prediction Explanations job ID
+    :param job_id: Compute Feature Impact job ID
     :type job_id: str
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
@@ -51,7 +51,7 @@ class ComputePredictionExplanationsSensor(BaseSensorOperator):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
-        self.log.info("Checking if Compute Prediction Explanations job is complete")
+        self.log.info("Checking if Compute Feature Impact job is complete")
 
         job = FeatureImpactJob.get(project_id=self.project_id, job_id=self.job_id)
 

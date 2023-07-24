@@ -9,8 +9,8 @@ from datetime import datetime
 
 from airflow.decorators import dag
 
-from datarobot_provider.operators.model_insights import ComputePredictionExplanationsOperator
-from datarobot_provider.sensors.model_insights import ComputePredictionExplanationsSensor
+from datarobot_provider.operators.model_insights import ComputeFeatureImpactOperator
+from datarobot_provider.sensors.model_insights import ComputeFeatureImpactSensor
 
 
 @dag(
@@ -18,7 +18,7 @@ from datarobot_provider.sensors.model_insights import ComputePredictionExplanati
     start_date=datetime(2023, 1, 1),
     tags=['example', 'insights'],
 )
-def compute_prediction_explanations(
+def compute_model_insights(
     project_id="64ba468e6390ef69973c97ab", model_id="64ba48f7d0a7b82c0ae5d4eb"
 ):
     if not project_id:
@@ -26,24 +26,24 @@ def compute_prediction_explanations(
     if not model_id:
         raise ValueError("Invalid or missing `model_id` value")
 
-    compute_prediction_explanations_op = ComputePredictionExplanationsOperator(
-        task_id="compute_prediction_explanations",
+    compute_feature_impact_op = ComputeFeatureImpactOperator(
+        task_id="compute_feature_impact",
         project_id=project_id,
         model_id=model_id,
     )
 
-    prediction_explanations_complete_sensor = ComputePredictionExplanationsSensor(
-        task_id="prediction_explanations_complete",
+    feature_impact_complete_sensor = ComputeFeatureImpactSensor(
+        task_id="feature_impact_complete",
         project_id=project_id,
-        job_id=compute_prediction_explanations_op.output,
+        job_id=compute_feature_impact_op.output,
         poke_interval=5,
         timeout=3600,
     )
 
-    compute_prediction_explanations_op >> prediction_explanations_complete_sensor
+    compute_feature_impact_op >> feature_impact_complete_sensor
 
 
-compute_prediction_explanations_dag = compute_prediction_explanations()
+compute_model_insights_dag = compute_model_insights()
 
 if __name__ == "__main__":
-    compute_prediction_explanations_dag.test()
+    compute_model_insights_dag.test()
