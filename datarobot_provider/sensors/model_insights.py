@@ -9,19 +9,19 @@ from typing import Any
 from typing import Dict
 
 from airflow.sensors.base import BaseSensorOperator
-from datarobot import FeatureImpactJob
+from datarobot import Job
 from datarobot.errors import AsyncProcessUnsuccessfulError
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
 
-class ComputeFeatureImpactSensor(BaseSensorOperator):
+class DataRobotJobSensor(BaseSensorOperator):
     """
-    Checks whether Compute Feature Impact job is complete.
+    Checks whether DataRobot Job is complete.
 
     :param project_id: DataRobot project ID
     :type project_id: str
-    :param job_id: Compute Feature Impact job ID
+    :param job_id: DataRobot Job ID
     :type job_id: str
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
@@ -51,9 +51,9 @@ class ComputeFeatureImpactSensor(BaseSensorOperator):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
-        self.log.info("Checking if Compute Feature Impact job is complete")
+        self.log.info("Checking if DataRobot Job is complete")
 
-        job = FeatureImpactJob.get(project_id=self.project_id, job_id=self.job_id)
+        job = Job.get(project_id=self.project_id, job_id=self.job_id)
 
         if job.status.lower() in ["error", "abort"]:
             raise AsyncProcessUnsuccessfulError(
