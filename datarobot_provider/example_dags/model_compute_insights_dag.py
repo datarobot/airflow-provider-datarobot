@@ -9,8 +9,9 @@ from datetime import datetime
 
 from airflow.decorators import dag
 
+from datarobot_provider.operators.model_insights import ComputeFeatureEffectsOperator
 from datarobot_provider.operators.model_insights import ComputeFeatureImpactOperator
-from datarobot_provider.sensors.model_insights import ComputeFeatureImpactSensor
+from datarobot_provider.sensors.model_insights import DataRobotJobSensor
 
 
 @dag(
@@ -30,7 +31,13 @@ def compute_model_insights(project_id=None, model_id=None):
         model_id=model_id,
     )
 
-    feature_impact_complete_sensor = ComputeFeatureImpactSensor(
+    compute_feature_effects_op = ComputeFeatureEffectsOperator(
+        task_id="compute_feature_effects",
+        project_id=project_id,
+        model_id=model_id,
+    )
+
+    feature_impact_complete_sensor = DataRobotJobSensor(
         task_id="feature_impact_complete",
         project_id=project_id,
         job_id=compute_feature_impact_op.output,
@@ -38,7 +45,16 @@ def compute_model_insights(project_id=None, model_id=None):
         timeout=3600,
     )
 
+    feature_feature_effects_sensor = DataRobotJobSensor(
+        task_id="feature_effects_complete",
+        project_id=project_id,
+        job_id=compute_feature_effects_op.output,
+        poke_interval=5,
+        timeout=3600,
+    )
+
     compute_feature_impact_op >> feature_impact_complete_sensor
+    compute_feature_effects_op >> feature_feature_effects_sensor
 
 
 compute_model_insights_dag = compute_model_insights()
