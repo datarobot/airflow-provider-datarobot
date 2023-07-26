@@ -23,9 +23,9 @@ from datarobot_provider.sensors.model_insights import DataRobotJobSensor
     tags=['example', 'dataset'],
 )
 def compute_model_predictions(
-    project_id='64a7f21f1110f0df910ddb4f',
-    model_id="64a7f27e8e0fd5cae6282a8b",
-    dataset_id="64bfc36171d728b6fa2e369c",
+    project_id=None,
+    model_id=None,
+    dataset_id=None,
 ):
     if not project_id:
         raise ValueError("Invalid or missing `project_id` value")
