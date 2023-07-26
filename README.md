@@ -29,8 +29,6 @@ The next step is to create a connection from Airflow to DataRobot:
 
 3. In the **Add Connection** dialog box, configure the following fields:
 
-    ![](images/airflow-add-connection.png)
-
     | Field          | Description |
     |----------------|-------------|
     |Connection Id   | `datarobot_default` (this name is used by default in all operators) |
@@ -118,6 +116,8 @@ Required config parameters:
 |--------------------------|------|-------------|
 | `credentials_param_name` | str  | The name of parameter in the config file for the credential name. |
 
+----
+
 #### `GetOrCreateDataStoreOperator`
 
 Fetches a DataStore by Connection name. If the DataStore does not exist, the operator attempts to create it using Airflow preconfigured connection with the same connection name.
@@ -129,6 +129,8 @@ Required config params:
 | Parameter                | Type | Description |
 |--------------------------|------|-------------|
 | `connection_param_name`  | str  | The name of the parameter in the config file for the connection name. |
+
+---
 
 #### `CreateDatasetFromDataStoreOperator`
 
@@ -147,6 +149,8 @@ Required config params:
 | `do_snapshot`               | bool | If `True`, creates a snapshot dataset. If `False`, creates a remote dataset. If unset, uses the server default (`True`). Creating snapshots from non-file sources may be disabled by the _Disable AI Catalog Snapshots_ permission. |
 | `persist_data_after_ingestion` | bool | If `True`, enforce saving all data (for download and sampling) and allow a user to view the extended data profile (which includes data statistics like min, max, median, mean, histogram, etc.). If `False`, don't enforce saving data. If unset, uses the server default (`True`). The data schema (feature names and types) will still be available. Specifying this parameter to `False` and `doSnapshot` to `True` results in an error. |
 
+---
+
 #### `UploadDatasetOperator`
 
 Uploads a local file to the DataRobot AI Catalog.
@@ -158,6 +162,8 @@ Required config params:
 | Parameter                   | Type | Description |
 |-----------------------------|------|-------------|
 | `dataset_file_path`         | str  | The local path to the training dataset. |
+
+---
 
 #### `UpdateDatasetFromFileOperator`
 
@@ -171,6 +177,8 @@ Required config params:
 |-----------------------------|------|-------------|
 | `dataset_id`                | str  | The DataRobot AI Catalog dataset ID. |
 | `dataset_file_path`         | str  | The local path to the training dataset. |
+
+---
 
 #### `CreateDatasetVersionOperator`
 
@@ -186,6 +194,8 @@ Required config params:
 | `datasource_id`             | str  | The existing DataRobot datasource ID. |
 | `credential_id `            | str  | The existing DataRobot credential ID. |
 
+---
+
 #### `CreateOrUpdateDataSourceOperator`
 
 Creates a data source or updates it if it already exists.
@@ -197,6 +207,8 @@ Required config params:
 | Parameter                   | Type | Description |
 |-----------------------------|------|-------------|
 | `data_store_id`             | str  | THe DataRobot datastore ID. |
+
+---
 
 #### `CreateProjectOperator`
 
@@ -221,7 +233,7 @@ Required config params:
 
 > **Note:** In case of an S3 input, the `training_data` value must be a [pre-signed AWS S3 URL](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html).
 
-</details
+</details>
   
 <details>
 
@@ -236,7 +248,7 @@ Required config params:
 | `training_dataset_id`       | str  | The dataset ID corresponding to existing dataset in the DataRobot AI Catalog. |
 | `project_name`              | str  | The project name. |
 
-</details
+</details>
 
 <details>
 
@@ -252,9 +264,11 @@ Required config params:
 |-----------------------------|------|-------------|
 | `project_name`              | str  | The project name. |
 
-</details
+</details>
 
 For more [project settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#project), see the DataRobot documentation.
+
+---
 
 #### `TrainModelsOperator`
 
@@ -282,6 +296,8 @@ Required config params:
 
 For more [autopilot settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Project.set_target), see the DataRobot documentation.
 
+---
+
 #### `DeployModelOperator`
 
 Deploy a specified model.
@@ -302,6 +318,8 @@ Required config params:
 
 For more [deployment settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment), see the DataRobot documentation.
 
+---
+
 #### `DeployRecommendedModelOperator`
 
 Deploys a recommended model.
@@ -321,6 +339,8 @@ Required config params:
 `deployment_label`            | str  | The deployment label name. |
 
 For more [deployment settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment), see the DataRobot documentation.
+
+---
 
 #### `ScorePredictionsOperator`
 
@@ -404,6 +424,8 @@ Parameters:
 
 For more [batch prediction settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.BatchPredictionJob.score), see the DataRobot documentation.
 
+---
+
 #### `GetTargetDriftOperator`
 
 Gets the target drift from a deployment.
@@ -423,6 +445,8 @@ No config params are required; however, the [optional params](https://datarobot-
     ...
 }
 ```
+
+---
 
 #### `GetFeatureDriftOperator`
 
@@ -444,6 +468,8 @@ No config params are required; however, the [optional params](https://datarobot-
 }
 ```
 
+---
+
 #### `GetServiceStatsOperator`
 
 Gets service stats measurements from a deployment.
@@ -463,6 +489,8 @@ No config params are required; however, the [optional params](https://datarobot-
     ...
 }
 ```
+
+---
 
 #### `GetAccuracyOperator`
 
@@ -484,6 +512,8 @@ No config params are required; however, the [optional params](https://datarobot-
 }
 ```
 
+---
+
 #### `GetBiasAndFairnessSettingsOperator`
 
 Gets the Bias And Fairness settings for deployment.
@@ -497,6 +527,8 @@ Parameters:
 | `deployment_id`             | str  | THe DataRobot deployment ID. |
 
 No config params are required.
+
+---
 
 #### `UpdateBiasAndFairnessSettingsOperator`
 
@@ -517,6 +549,8 @@ Sample config params:
 "fairness_threshold": 0.1,
 ```
 
+---
+
 #### `GetSegmentAnalysisSettingsOperator`
 
 Gets the segment analysis settings for a deployment.
@@ -530,6 +564,8 @@ Parameters:
 | `deployment_id`             | str  | THe DataRobot deployment ID. |
 
 No config params are required.
+
+---
 
 #### `UpdateSegmentAnalysisSettingsOperator`
 
@@ -547,6 +583,8 @@ Sample config params:
 "segment_analysis_enabled": True,
 "segment_analysis_attributes": ['attribute1', 'attribute2'],
 ```
+
+---
 
 #### `GetMonitoringSettingsOperator`
 
@@ -577,6 +615,8 @@ Sample monitoring settings:
 |`drift_tracking_settings`  | The [drift tracking settings for this deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_drift_tracking_settings). |
 | `association_id_settings` | The [association ID settings for this deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_association_id_settings) |
 | `predictions_data_collection_settings` | The [predictions data collection settings of this deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=predictions_data_collection_settings#datarobot.models.Deployment.get_predictions_data_collection_settings) |
+
+---
     
 #### `UpdateMonitoringSettingsOperator`
 
@@ -597,6 +637,8 @@ Sample config params:
 "required_association_id": False,
 "predictions_data_collection_enabled": False,
 ```
+
+---
 
 #### `BatchMonitoringOperator`
 
@@ -672,8 +714,11 @@ Sample config params:
 }
 ```
 
+</details>
+
 For more [batch monitoring settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.BatchMonitoringJob.run), see the DataRobot documentation.
 
+---
 
 #### `DownloadModelScoringCodeOperator`
 
@@ -694,6 +739,8 @@ Sample config params:
 ```
 
 For more [scoring code download parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=scoring_code#datarobot.models.Model.download_scoring_code), see the DataRobot documentation.
+
+---
 
 #### `DownloadDeploymentScoringCodeOperator`
 
@@ -717,6 +764,8 @@ Sample config params:
 
 For more [scoring code download parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=scoring_code#datarobot.models.Deployment.download_scoring_code), see the DataRobot documentation.
 
+---
+
 #### `SubmitActualsFromCatalogOperator`
 
 Downloads scoring code artifact from a deployment.
@@ -737,8 +786,9 @@ Sample config params:
 "association_id_column": 'id',
 "actual_value_column": 'ACTUAL',
 "timestamp_column": 'timestamp',
-"was_acted_on_column": 'acted_on',
 ```
+
+---
 
 ### [Sensors](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/sensors/datarobot.py)
 
@@ -752,6 +802,8 @@ Parameters:
 |-----------------------------|------|-------------|
 | `project_id`                | str  | The DataRobot project ID. |
 
+---
+
 #### `ScoringCompleteSensor`
 
 Checks if batch scoring is complete.
@@ -761,6 +813,8 @@ Parameters:
 | Parameter                   | Type | Description |
 |-----------------------------|------|-------------|
 | `job_id`                    | str  | The batch prediction job ID. |
+
+---
 
 #### `MonitoringJobCompleteSensor`
 
@@ -772,6 +826,8 @@ Parameters:
 |-----------------------------|------|-------------|
 | `job_id`                    | str  | The batch monitoring job ID. |
 
+---
+
 #### `BaseAsyncResolutionSensor`
 
 Checks if the DataRobot Async API call is complete.
@@ -782,11 +838,15 @@ Parameters:
 |-----------------------------|------|-------------|
 | `job_id`                    | str  | The DataRobot async API call status check ID. |
 
+----
+
 ### [Hooks](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/hooks/datarobot.py)
 
 #### `DataRobotHook`
 
 A hook to initialize the DataRobot Public API client.
+
+----
 
 ## Pipeline
 
