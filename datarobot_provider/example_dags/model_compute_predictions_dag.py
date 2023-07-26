@@ -8,8 +8,13 @@
 from datetime import datetime
 
 from airflow.decorators import dag
+from airflow.decorators import task
+from datarobot import PredictJob
 
+from datarobot_provider.hooks.datarobot import DataRobotHook
 from datarobot_provider.operators.model_predictions import AddExternalDatasetOperator
+from datarobot_provider.operators.model_predictions import RequestModelPredictionsOperator
+from datarobot_provider.sensors.model_insights import DataRobotJobSensor
 
 
 @dag(
@@ -17,9 +22,15 @@ from datarobot_provider.operators.model_predictions import AddExternalDatasetOpe
     start_date=datetime(2023, 1, 1),
     tags=['example', 'dataset'],
 )
-def add_external_dataset(project_id=None, dataset_id=None):
+def compute_model_predictions(
+    project_id='64a7f21f1110f0df910ddb4f',
+    model_id="64a7f27e8e0fd5cae6282a8b",
+    dataset_id="64bfc36171d728b6fa2e369c",
+):
     if not project_id:
         raise ValueError("Invalid or missing `project_id` value")
+    if not model_id:
+        raise ValueError("Invalid or missing `model_id` value")
     if not dataset_id:
         raise ValueError("Invalid or missing `dataset_id` value")
 
@@ -29,10 +40,47 @@ def add_external_dataset(project_id=None, dataset_id=None):
         dataset_id=dataset_id,
     )
 
-    add_external_dataset_op
+    request_model_predictions_op = RequestModelPredictionsOperator(
+        task_id="request_model_predictions",
+        project_id=project_id,
+        model_id=model_id,
+        external_dataset_id=add_external_dataset_op.output,
+    )
+
+    model_predictions_sensor = DataRobotJobSensor(
+        task_id="model_predictions_complete",
+        project_id=project_id,
+        job_id=request_model_predictions_op.output,
+        poke_interval=5,
+        timeout=3600,
+    )
+
+    @task(task_id="example_custom_python_code")
+    def using_custom_python_code(project_id, predict_job_id, datarobot_conn_id='datarobot_default'):
+        """Example of using custom python code:"""
+
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id).run()
+
+        # Should be used only with a very small datasets (not higher than a few megabytes).
+        output_df = PredictJob.get_predictions(project_id=project_id, predict_job_id=predict_job_id)
+
+        # Put your logic with the model predictions output dataframe here, for example:
+        return output_df["positive_probability"].mean() > 0.5
+
+    example_custom_python_code = using_custom_python_code(
+        project_id=project_id, predict_job_id=request_model_predictions_op.output
+    )
+
+    (
+        add_external_dataset_op
+        >> request_model_predictions_op
+        >> model_predictions_sensor
+        >> example_custom_python_code
+    )
 
 
-add_external_dataset_dag = add_external_dataset()
+compute_model_predictions_dag = compute_model_predictions()
 
 if __name__ == "__main__":
-    add_external_dataset_dag.test()
+    compute_model_predictions_dag.test()
