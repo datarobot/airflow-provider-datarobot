@@ -151,10 +151,10 @@ def compute_model_prediction_explanations(
         add_external_dataset_op
         >> compute_feature_impact_op
         >> feature_impact_complete_sensor
-        >> request_model_predictions_op
-        >> model_predictions_sensor
         >> prediction_explanations_initialization_op
         >> prediction_explanations_initialization_sensor
+        >> request_model_predictions_op
+        >> model_predictions_sensor
         >> compute_prediction_explanations_op
         >> compute_prediction_explanations_sensor
         >> example_custom_python_code
