@@ -12,8 +12,10 @@ from airflow.decorators import task
 from datarobot import PredictJob
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
-from datarobot_provider.operators.model_predictions import AddExternalDatasetOperator
-from datarobot_provider.operators.model_predictions import RequestModelPredictionsOperator
+from datarobot_provider.operators.model_predictions import (
+    AddExternalDatasetOperator,
+    RequestModelPredictionsOperator,
+)
 from datarobot_provider.sensors.model_insights import DataRobotJobSensor
 
 
