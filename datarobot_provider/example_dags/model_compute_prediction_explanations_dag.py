@@ -6,8 +6,8 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from datetime import datetime
-import datarobot as dr
 
+import datarobot as dr
 from airflow.decorators import dag
 from airflow.decorators import task
 
@@ -16,8 +16,10 @@ from datarobot_provider.operators.model_insights import ComputeFeatureImpactOper
 from datarobot_provider.operators.model_predictions import AddExternalDatasetOperator
 from datarobot_provider.operators.model_predictions import RequestModelPredictionsOperator
 from datarobot_provider.operators.prediction_explanations import (
-    PredictionExplanationsInitializationOperator,
     ComputePredictionExplanationsOperator,
+)
+from datarobot_provider.operators.prediction_explanations import (
+    PredictionExplanationsInitializationOperator,
 )
 from datarobot_provider.sensors.model_insights import DataRobotJobSensor
 
@@ -38,7 +40,7 @@ In order to create Prediction Explanations for a particular model and dataset, y
     # Default json config example:
     params={'threshold_high': 0.9, 'threshold_low': 0.1, 'max_explanations': 3},
 )
-def compute_model_predictions(
+def compute_model_prediction_explanations(
     project_id='64a7f21f1110f0df910ddb4f',
     model_id="64a7f27e8e0fd5cae6282a90",
     dataset_id="64bfc36171d728b6fa2e369c",
@@ -159,7 +161,7 @@ def compute_model_predictions(
     )
 
 
-compute_model_predictions_dag = compute_model_predictions()
+compute_model_prediction_explanations_dag = compute_model_prediction_explanations()
 
 if __name__ == "__main__":
-    compute_model_predictions_dag.test()
+    compute_model_prediction_explanations_dag.test()
