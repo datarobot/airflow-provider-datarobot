@@ -8,12 +8,8 @@
 
 import datarobot as dr
 
-from datarobot_provider.operators.model_predictions import AddExternalDatasetOperator
-from datarobot_provider.operators.model_predictions import RequestModelPredictionsOperator
 from datarobot_provider.operators.prediction_explanations import (
     ComputePredictionExplanationsOperator,
-)
-from datarobot_provider.operators.prediction_explanations import (
     PredictionExplanationsInitializationOperator,
 )
 

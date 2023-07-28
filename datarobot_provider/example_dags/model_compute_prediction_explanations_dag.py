@@ -13,12 +13,12 @@ from airflow.decorators import task
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 from datarobot_provider.operators.model_insights import ComputeFeatureImpactOperator
-from datarobot_provider.operators.model_predictions import AddExternalDatasetOperator
-from datarobot_provider.operators.model_predictions import RequestModelPredictionsOperator
-from datarobot_provider.operators.prediction_explanations import (
-    ComputePredictionExplanationsOperator,
+from datarobot_provider.operators.model_predictions import (
+    AddExternalDatasetOperator,
+    RequestModelPredictionsOperator,
 )
 from datarobot_provider.operators.prediction_explanations import (
+    ComputePredictionExplanationsOperator,
     PredictionExplanationsInitializationOperator,
 )
 from datarobot_provider.sensors.model_insights import DataRobotJobSensor
@@ -41,9 +41,9 @@ In order to create Prediction Explanations for a particular model and dataset, y
     params={'threshold_high': 0.9, 'threshold_low': 0.1, 'max_explanations': 3},
 )
 def compute_model_prediction_explanations(
-    project_id='64a7f21f1110f0df910ddb4f',
-    model_id="64a7f27e8e0fd5cae6282a90",
-    dataset_id="64bfc36171d728b6fa2e369c",
+    project_id=None,
+    model_id=None,
+    dataset_id=None,
 ):
     if not project_id:
         raise ValueError("Invalid or missing `project_id` value")
