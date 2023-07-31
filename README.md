@@ -543,9 +543,9 @@ Parameters:
 Sample config params:
 
 ``` json
-"protected_features": ['attribute1'],
-"preferable_target_value": 'True',
-"fairness_metrics_set": 'equalParity',
+"protected_features": ["attribute1"],
+"preferable_target_value": "True",
+"fairness_metrics_set": "equalParity",
 "fairness_threshold": 0.1,
 ```
 
@@ -575,13 +575,13 @@ Parameters:
 
 | Parameter                   | Type | Description |
 |-----------------------------|------|-------------|
-| `deployment_id`             | str  | THe DataRobot deployment ID. |
+| `deployment_id`             | str  | The DataRobot deployment ID. |
 
 Sample config params:
 
 ``` json
 "segment_analysis_enabled": True,
-"segment_analysis_attributes": ['attribute1', 'attribute2'],
+"segment_analysis_attributes": ["attribute1", "attribute2"],
 ```
 
 ---
@@ -783,9 +783,9 @@ Parameters:
 Sample config params:
 
 ``` json
-"association_id_column": 'id',
-"actual_value_column": 'ACTUAL',
-"timestamp_column": 'timestamp',
+"association_id_column": "id",
+"actual_value_column": "ACTUAL",
+"timestamp_column": "timestamp",
 ```
 
 ---
