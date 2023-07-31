@@ -415,9 +415,7 @@ Parameters:
         "type": "dataset",
         "dataset_id": "<datasetId>",
     },
-    "output_settings": {
-        ...
-    }
+    "output_settings": { }
 }
 ```
 </details>
