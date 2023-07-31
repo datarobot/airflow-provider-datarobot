@@ -4,7 +4,7 @@ This package provides operators, sensors, and a hook to integrate [DataRobot](ht
 Using these components, you should be able to build the essential DataRobot pipeline - create a project, train models, deploy a model,
 and score predictions against the model deployment.
 
-## Install the Airflow Provider
+## Install the Airflow provider
 
 The DataRobot provider for Apache Airflow requires an environment with the following dependencies installed:
 
@@ -350,10 +350,10 @@ Returns a batch prediction job ID.
 
 Prerequisites:
 
-- Use `GetOrCreateCredentialOperator` to pass `credential_id` from preconfigured DataRobot Credentials (Airflow Connections)
-    or you can manually set `credential_id` parameter in the config. [S3 credentials added to DataRobot via Python API client](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/admin/credentials.html#s3-credentials).
-- OR a Dataset ID in the AI Catalog.
-- OR a DataStore ID for JDBC source connection, you can use `GetOrCreateDataStoreOperator` to pass `datastore_id` from preconfigured Airflow Connection.
+- Use `GetOrCreateCredentialOperator` to pass a `credential_id` from the preconfigured DataRobot Credentials (Airflow Connections) or manually set the `credential_id` parameter in the config. 
+    > **Note:** You can [add S3 credentials to DataRobot via the Python API client](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/admin/credentials.html#s3-credentials).
+- _Or_ use a Dataset ID from the DataRobot AI Catalog.
+- _Or_ use a DataStore ID for a JDBC source connection; you can use `GetOrCreateDataStoreOperator` to pass `datastore_id` from a preconfigured Airflow Connection.
 
 Parameters:
 
@@ -638,10 +638,10 @@ Returns a batch monitoring job ID.
 
 Prerequisites:
 
-- You can use `GetOrCreateCredentialOperator` to pass `credential_id` from preconfigured DataRobot Credentials (Airflow Connections)
-    or you can manually set `credential_id` parameter in the config. [S3 credentials added to DataRobot via Python API client](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/admin/credentials.html#s3-credentials).
-- OR a Dataset ID in the AI Catalog
-- OR a DataStore ID for JDBC source connection, you can use `GetOrCreateDataStoreOperator` to pass `datastore_id` from preconfigured Airflow Connection
+- Use `GetOrCreateCredentialOperator` to pass a `credential_id` from the preconfigured DataRobot Credentials (Airflow Connections) or manually set the `credential_id` parameter in the config. 
+    > **Note:** You can [add S3 credentials to DataRobot via the Python API client](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/admin/credentials.html#s3-credentials).
+- _Or_ use a Dataset ID from the DataRobot AI Catalog.
+- _Or_ use a DataStore ID for a JDBC source connection; you can use `GetOrCreateDataStoreOperator` to pass `datastore_id` from a preconfigured Airflow Connection.
 
 Parameters:
 
@@ -655,7 +655,7 @@ Sample config params:
 
 <details>
 
-<summary>Sample config</summary
+<summary>Sample config</summary>
 
 ``` json
 "deployment_id": "61150a2fadb5586af4118980",
