@@ -350,8 +350,10 @@ Returns a batch prediction job ID.
 
 Prerequisites:
 
-- Use `GetOrCreateCredentialOperator` to pass a `credential_id` from the preconfigured DataRobot Credentials (Airflow Connections) or manually set the `credential_id` parameter in the config. 
+- Use `GetOrCreateCredentialOperator` to pass a `credential_id` from the preconfigured DataRobot Credentials (Airflow Connections) or manually set the `credential_id` parameter in the config.
+
     > **Note:** You can [add S3 credentials to DataRobot via the Python API client](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/admin/credentials.html#s3-credentials).
+    
 - _Or_ use a Dataset ID from the DataRobot AI Catalog.
 - _Or_ use a DataStore ID for a JDBC source connection; you can use `GetOrCreateDataStoreOperator` to pass `datastore_id` from a preconfigured Airflow Connection.
 
@@ -638,8 +640,10 @@ Returns a batch monitoring job ID.
 
 Prerequisites:
 
-- Use `GetOrCreateCredentialOperator` to pass a `credential_id` from the preconfigured DataRobot Credentials (Airflow Connections) or manually set the `credential_id` parameter in the config. 
+- Use `GetOrCreateCredentialOperator` to pass a `credential_id` from the preconfigured DataRobot Credentials (Airflow Connections) or manually set the `credential_id` parameter in the config.
+
     > **Note:** You can [add S3 credentials to DataRobot via the Python API client](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/admin/credentials.html#s3-credentials).
+
 - _Or_ use a Dataset ID from the DataRobot AI Catalog.
 - _Or_ use a DataStore ID for a JDBC source connection; you can use `GetOrCreateDataStoreOperator` to pass `datastore_id` from a preconfigured Airflow Connection.
 
