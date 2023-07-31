@@ -726,7 +726,7 @@ Parameters:
 
 Sample config params: 
 
-``` json
+```
 "source_code": False,
 ```
 
@@ -747,7 +747,7 @@ Parameters:
 
 Sample config params:
 
-``` json
+```
 "source_code": False,
 "include_agent": False,
 "include_prediction_explanations": False,
@@ -774,7 +774,7 @@ Parameters:
 
 Sample config params:
 
-``` json
+```
 "association_id_column": "id",
 "actual_value_column": "ACTUAL",
 "timestamp_column": "timestamp",
