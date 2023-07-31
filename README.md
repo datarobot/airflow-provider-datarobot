@@ -441,9 +441,7 @@ Parameters:
 No config params are required; however, the [optional params](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_target_drift) may be passed in the config as follows:
 
 ``` json
-"target_drift": {
-    ...
-}
+"target_drift": { }
 ```
 
 ---
@@ -463,9 +461,7 @@ Parameters:
 No config params are required; however, the [optional params](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_feature_drift) may be passed in the config as follows:
 
 ``` json
-"feature_drift": {
-    ...
-}
+"feature_drift": { }
 ```
 
 ---
@@ -485,9 +481,7 @@ Parameters:
 No config params are required; however, the [optional params](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_service_stats) may be passed in the config as follows:
 
 ``` json
-"service_stats": {
-    ...
-}
+"service_stats": { }
 ```
 
 ---
@@ -507,9 +501,7 @@ Parameters:
 No config params are required; however, the [optional params](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_accuracy) may be passed in the config as follows:
 
 ``` json
-"accuracy": {
-    ...
-}
+"accuracy": { }
 ```
 
 ---
@@ -542,7 +534,7 @@ Parameters:
 
 Sample config params:
 
-``` json
+```
 "protected_features": ["attribute1"],
 "preferable_target_value": "True",
 "fairness_metrics_set": "equalParity",
@@ -579,7 +571,7 @@ Parameters:
 
 Sample config params:
 
-``` json
+```
 "segment_analysis_enabled": True,
 "segment_analysis_attributes": ["attribute1", "attribute2"],
 ```
@@ -602,11 +594,11 @@ No config params are required.
 
 Sample monitoring settings:
 
-``` py
+```
 {
-"drift_tracking_settings": { ... } 
-"association_id_settings": { ... }
-"predictions_data_collection_settings": { ... }
+"drift_tracking_settings": {  } 
+"association_id_settings": {  }
+"predictions_data_collection_settings": {  }
 }
 ```
 
@@ -630,7 +622,7 @@ Parameters:
 
 Sample config params:
 
-``` json
+```
 "target_drift_enabled": True,
 "feature_drift_enabled": True,
 "association_id_column": ["id"],
