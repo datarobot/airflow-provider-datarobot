@@ -256,7 +256,7 @@ Required config params:
 
 Create a project from an existing dataset in the DataRobot AI Catalog using a dataset ID from the previous operator. 
 In this case, your previous operator must return a valid dataset ID (for example `UploadDatasetOperator`) 
-and you should use this output value as a `dataset_id` argument in `CreateProjectOperator` object creation step.
+and you should use this output value as a `dataset_id` argument in the `CreateProjectOperator` object creation step.
 
 Required config params:
 
@@ -454,7 +454,7 @@ Parameters:
 
 | Parameter                   | Type | Description |
 |-----------------------------|------|-------------|
-| `deployment_id`             | str  | THe DataRobot deployment ID. |
+| `deployment_id`             | str  | The DataRobot deployment ID. |
 
 No config params are required; however, the [optional params](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_feature_drift) may be passed in the config as follows:
 
@@ -488,13 +488,13 @@ No config params are required; however, the [optional params](https://datarobot-
 
 Gets the accuracy of a deployment’s predictions.
 
-Returns a dict with the accuracy for a Deployment.
+Returns a dict with the accuracy for a deployment.
 
 Parameters:
 
 | Parameter                   | Type | Description |
 |-----------------------------|------|-------------|
-| `deployment_id`             | str  | THe DataRobot deployment ID. |
+| `deployment_id`             | str  | The DataRobot deployment ID. |
 
 No config params are required; however, the [optional params](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_accuracy) may be passed in the config as follows:
 
@@ -508,13 +508,13 @@ No config params are required; however, the [optional params](https://datarobot-
 
 Gets the Bias And Fairness settings for deployment.
 
-Returns a dict with the [Bias And Fairness settings for a Deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_bias_and_fairness_settings)
+Returns a dict with the [Bias And Fairness settings for a Deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_bias_and_fairness_settings).
 
 Parameters:
 
 | Parameter                   | Type | Description |
 |-----------------------------|------|-------------|
-| `deployment_id`             | str  | THe DataRobot deployment ID. |
+| `deployment_id`             | str  | The DataRobot deployment ID. |
 
 No config params are required.
 
@@ -528,7 +528,7 @@ Parameters:
 
 | Parameter                   | Type | Description |
 |-----------------------------|------|-------------|
-| `deployment_id`             | str  | THe DataRobot deployment ID. |
+| `deployment_id`             | str  | The DataRobot deployment ID. |
 
 Sample config params:
 
@@ -545,13 +545,13 @@ Sample config params:
 
 Gets the segment analysis settings for a deployment.
 
-Returns a dict with the [segment analysis settings for a Deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_segment_analysis_settings)
+Returns a dict with the [segment analysis settings for a deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_segment_analysis_settings)
 
 Parameters:
 
 | Parameter                   | Type | Description |
 |-----------------------------|------|-------------|
-| `deployment_id`             | str  | THe DataRobot deployment ID. |
+| `deployment_id`             | str  | The DataRobot deployment ID. |
 
 No config params are required.
 
@@ -586,7 +586,7 @@ Parameters:
 
 | Parameter                   | Type | Description |
 |-----------------------------|------|-------------|
-| `deployment_id`             | str  | THe DataRobot deployment ID. |
+| `deployment_id`             | str  | The DataRobot deployment ID. |
 
 No config params are required.
 
@@ -603,8 +603,8 @@ Sample monitoring settings:
 | Dictionary | Description  |
 |------------|--------------|
 |`drift_tracking_settings`  | The [drift tracking settings for this deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_drift_tracking_settings). |
-| `association_id_settings` | The [association ID settings for this deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_association_id_settings) |
-| `predictions_data_collection_settings` | The [predictions data collection settings of this deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=predictions_data_collection_settings#datarobot.models.Deployment.get_predictions_data_collection_settings) |
+| `association_id_settings` | The [association ID settings for this deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Deployment.get_association_id_settings). |
+| `predictions_data_collection_settings` | The [predictions data collection settings of this deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=predictions_data_collection_settings#datarobot.models.Deployment.get_predictions_data_collection_settings). |
 
 ---
     
@@ -616,7 +616,7 @@ Parameters:
 
 | Parameter                   | Type | Description |
 |-----------------------------|------|-------------|
-| `deployment_id`             | str  | THe DataRobot deployment ID. |
+| `deployment_id`             | str  | The DataRobot deployment ID. |
 
 Sample config params:
 
@@ -712,7 +712,7 @@ For more [batch monitoring settings](https://datarobot-public-api-client.readthe
 
 #### `DownloadModelScoringCodeOperator`
 
-Downloads scoring code artifact from a Model.
+Downloads scoring code artifact from a model.
 
 Parameters:
 
@@ -879,13 +879,13 @@ You can find the following examples using a preconfigured connection in the `dat
 The advanced end-to-end workflow in DataRobot (`advanced_datarobot_pipeline_jdbc_dag.py`) contains the following steps:
 
 - Ingest a dataset to the AI Catalog from JDBC datasource
-- Create a DataRobot Project
+- Create a DataRobot project
 - Train models using Autopilot
-- Deploy the Recommended model
-- Change Deployment settings (enable monitoring settings, segment analysis, and bias and fairness)
-- Run Batch Scoring using JDBC datasource
-- Upload Actuals from JDBC datasource
-- Collect Deployment metrics: service statistics, features drift, target drift, accuracy and process it with custom python operator.
+- Deploy the recommended model
+- Change deployment settings (enable monitoring settings, segment analysis, and bias and fairness)
+- Run batch scoring using a JDBC datasource
+- Upload actuals from a JDBC datasource
+- Collect deployment metrics: service statistics, features drift, target drift, accuracy and process it with custom python operator.
 
 ## Issues
 
