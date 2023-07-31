@@ -77,12 +77,12 @@ Operators and sensors use parameters from the [config](https://airflow.apache.or
         "intake_settings": {
             "type": "s3",
             "url": "s3://path/to/scoring-data/Diabetes10k.csv",
-            "credential_id": "62160b511fb29da8dd5f2c81"
+            "credential_id": "<credential_id>"
         },
         "output_settings": {
             "type": "s3",
             "url": "s3://path/to/results-dir/Diabetes10k_predictions.csv",
-            "credential_id": "62160b511fb29da8dd5f2c81"
+            "credential_id": "<credential_id>"
         }
     }
 }
@@ -395,12 +395,12 @@ Parameters:
     "intake_settings": {
         "type": "s3",
         "url": "s3://my-bucket/Diabetes10k.csv",
-        "credential_id": "62160b511fb29da8dd5f2c81"
+        "credential_id": "<credential_id>"
     },
     "output_settings": {
         "type": "s3",
         "url": "s3://my-bucket/Diabetes10k_predictions.csv",
-        "credential_id": "62160b511fb29da8dd5f2c81"
+        "credential_id": "<credential_id>"
     }
 }
 ```
@@ -695,7 +695,7 @@ Sample config params:
         "dataset": "integration_example_demo",
         "table": "actuals_demo",
         "bucket": "datarobot_demo_airflow",
-        "credential_id": "63eb7dfce1274472579f6e1c"
+        "credential_id": "<credential_id>"
     },
     "monitoring_columns": {
         "predictions_columns": [
