@@ -1,6 +1,6 @@
 apache-airflow>=2.3.0
 black>=22.12.0
-datarobot>=3.2.0b1
+datarobot>=3.2.0
 flake8>=4.0.1
 isort>=5.11.4
 mypy>=0.931
