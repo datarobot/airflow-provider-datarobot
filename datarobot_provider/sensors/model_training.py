@@ -8,16 +8,15 @@
 from typing import Any
 from typing import Dict
 
-from airflow.sensors.base import BaseSensorOperator
-from datarobot import Job
-from datarobot.errors import AsyncProcessUnsuccessfulError
+from airflow.sensors.base import PokeReturnValue
+from datarobot import ModelJob
 
-from datarobot_provider.hooks.datarobot import DataRobotHook
+from datarobot_provider.sensors.model_insights import DataRobotJobSensor
 
 
-class ModelTrainingJobSensor(BaseSensorOperator):
+class ModelTrainingJobSensor(DataRobotJobSensor):
     """
-    Checks whether DataRobot Job is complete.
+    Checks whether DataRobot Model Training Job is complete.
 
     :param project_id: DataRobot project ID
     :type project_id: str
@@ -25,40 +24,10 @@ class ModelTrainingJobSensor(BaseSensorOperator):
     :type job_id: str
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
-    :return: False if not yet completed
-    :rtype: bool
+    :return: False if not yet completed, PokeReturnValue(True, trained_model.id) if model training completed
+    :rtype: bool | PokeReturnValue
     """
 
-    # Specify the arguments that are allowed to parse with jinja templating
-    template_fields = ["project_id", "job_id"]
-
-    def __init__(
-        self,
-        *,
-        project_id: str,
-        job_id: str,
-        datarobot_conn_id: str = "datarobot_default",
-        **kwargs: Any,
-    ) -> None:
-        super().__init__(**kwargs)
-        self.project_id = project_id
-        self.job_id = job_id
-        self.datarobot_conn_id = datarobot_conn_id
-
-        self.hook = DataRobotHook(datarobot_conn_id)
-
-    def poke(self, context: Dict[Any, Any]) -> bool:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
-        self.log.info("Checking if DataRobot Job is complete")
-
-        job = Job.get(project_id=self.project_id, job_id=self.job_id)
-
-        if job.status.lower() in ["error", "abort"]:
-            raise AsyncProcessUnsuccessfulError(
-                f"The job did not complete successfully. Job Status: {job.status}"
-            )
-        if job.status.lower() == "completed":
-            return True
-        return False
+    def get_job_result(self, context: Dict[Any, Any]) -> PokeReturnValue:
+        trained_model = ModelJob.get_model(self.project_id, self.job_id)
+        return PokeReturnValue(True, trained_model.id)

@@ -5,19 +5,14 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+import logging
 from datetime import datetime
 
 from airflow.decorators import dag
 from airflow.decorators import task
-from datarobot import PredictJob
 
-from datarobot_provider.hooks.datarobot import DataRobotHook
-from datarobot_provider.operators.model_predictions import (
-    AddExternalDatasetOperator,
-    RequestModelPredictionsOperator,
-)
 from datarobot_provider.operators.model_training import TrainModelOperator
-from datarobot_provider.sensors.model_insights import DataRobotJobSensor
+from datarobot_provider.sensors.model_training import ModelTrainingJobSensor
 
 
 @dag(
@@ -26,8 +21,8 @@ from datarobot_provider.sensors.model_insights import DataRobotJobSensor
     tags=['example', 'dataset'],
 )
 def train_model(
-    project_id='64be056fdcee417faf6ec832',
-    blueprint_id='27f50e490d5cf54850a231ce7f1844a4',
+    project_id=None,
+    blueprint_id=None,
 ):
     if not project_id:
         raise ValueError("Invalid or missing `project_id` value")
@@ -40,7 +35,7 @@ def train_model(
         blueprint_id=blueprint_id,
     )
 
-    model_training_sensor = DataRobotJobSensor(
+    model_training_sensor = ModelTrainingJobSensor(
         task_id="model_training_complete",
         project_id=project_id,
         job_id=request_model_training_op.output,
@@ -48,7 +43,16 @@ def train_model(
         timeout=3600,
     )
 
-    request_model_training_op >> model_training_sensor
+    @task(task_id="example_custom_python_code")
+    def using_custom_python_code(trained_model_id):
+        """Example of using custom python code:"""
+        logging.info(msg=f"New trained model id is: {trained_model_id}")
+
+    example_custom_python_code = using_custom_python_code(
+        trained_model_id=model_training_sensor.output
+    )
+
+    request_model_training_op >> model_training_sensor >> example_custom_python_code
 
 
 train_model_dag = train_model()

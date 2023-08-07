@@ -12,18 +12,24 @@ from typing import Iterable
 import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
-from datarobot import BatchMonitoringJob, Blueprint
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
 
 class TrainModelOperator(BaseOperator):
     """
-    Submit a job to the queue to train a model.
+    Submit a job to the queue to train a model from specific blueprint.
     :param project_id: DataRobot project ID
     :type project_id: str
     :param blueprint_id: DataRobot blueprint ID
     :type blueprint_id: str
+    :param featurelist_id: The identifier of the featurelist to use.
+        If not defined, the default for this project is used.
+    :type featurelist_id: str, optional
+    :source_project_id: Which project created this blueprint_id.
+        If ``None``, it defaults to looking in this project.
+        Note that you must have read permissions in this project.
+    :source_project_id: str, optional
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
     :return: model training job ID
@@ -34,6 +40,8 @@ class TrainModelOperator(BaseOperator):
     template_fields: Iterable[str] = [
         "project_id",
         "blueprint_id",
+        "featurelist_id",
+        "source_project_id",
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
@@ -44,12 +52,16 @@ class TrainModelOperator(BaseOperator):
         *,
         project_id: str = None,
         blueprint_id: str = None,
+        featurelist_id: str = None,
+        source_project_id: str = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.project_id = project_id
         self.blueprint_id = blueprint_id
+        self.featurelist_id = featurelist_id
+        self.source_project_id = source_project_id
         self.datarobot_conn_id = datarobot_conn_id
         if kwargs.get('xcom_push') is not None:
             raise AirflowException(
@@ -60,10 +72,24 @@ class TrainModelOperator(BaseOperator):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
-        project = dr.Project.get(self.project_id)
-        blueprint = Blueprint.get(project.id, self.blueprint_id)
+        if self.project_id is None:
+            raise ValueError("project_id is required.")
 
-        job_id = project.train(blueprint, training_row_count=project.max_train_rows)
+        if self.blueprint_id is None:
+            raise ValueError("blueprint_id is required.")
+
+        project = dr.Project.get(self.project_id)
+        blueprint = dr.Blueprint.get(project.id, self.blueprint_id)
+
+        job_id = project.train(
+            blueprint,
+            sample_pct=context["params"].get("sample_pct", None),
+            featurelist_id=self.featurelist_id,
+            source_project_id=self.source_project_id,
+            scoring_type=context["params"].get("scoring_type", None),
+            training_row_count=context["params"].get("training_row_count", None),
+            n_clusters=context["params"].get("sample_pct", None),
+        )
 
         self.log.info(f"Monitoring Job submitted job_id={job_id}")
 
