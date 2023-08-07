@@ -7,6 +7,7 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from typing import Any
 from typing import Dict
+from typing import Union
 
 from airflow.sensors.base import BaseSensorOperator
 from airflow.sensors.base import PokeReturnValue
@@ -52,7 +53,7 @@ class DataRobotJobSensor(BaseSensorOperator):
         # Default implementation return True if job is completed:
         return True
 
-    def poke(self, context: Dict[Any, Any]) -> bool | PokeReturnValue:
+    def poke(self, context: Dict[Any, Any]) -> Union[bool, PokeReturnValue]:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
