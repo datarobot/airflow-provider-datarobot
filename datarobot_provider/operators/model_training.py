@@ -91,6 +91,6 @@ class TrainModelOperator(BaseOperator):
             n_clusters=context["params"].get("sample_pct", None),
         )
 
-        self.log.info(f"Monitoring Job submitted job_id={job_id}")
+        self.log.info(f"Model Training Job submitted job_id={job_id}")
 
         return job_id
