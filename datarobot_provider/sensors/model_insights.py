@@ -7,8 +7,10 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from typing import Any
 from typing import Dict
+from typing import Union
 
 from airflow.sensors.base import BaseSensorOperator
+from airflow.sensors.base import PokeReturnValue
 from datarobot import Job
 from datarobot.errors import AsyncProcessUnsuccessfulError
 
@@ -47,7 +49,11 @@ class DataRobotJobSensor(BaseSensorOperator):
 
         self.hook = DataRobotHook(datarobot_conn_id)
 
-    def poke(self, context: Dict[Any, Any]) -> bool:
+    def get_job_result(self, context: Dict[Any, Any]) -> bool:
+        # Default implementation return True if job is completed:
+        return True
+
+    def poke(self, context: Dict[Any, Any]) -> Union[bool, PokeReturnValue]:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -60,5 +66,5 @@ class DataRobotJobSensor(BaseSensorOperator):
                 f"The job did not complete successfully. Job Status: {job.status}"
             )
         if job.status.lower() == "completed":
-            return True
+            return self.get_job_result(context)
         return False
