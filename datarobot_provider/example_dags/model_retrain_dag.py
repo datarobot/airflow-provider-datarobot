@@ -27,8 +27,8 @@ from datarobot_provider.sensors.model_training import ModelTrainingJobSensor
     },
 )
 def retrain_model(
-    project_id="64d5c07082d7c261b65d4342",
-    model_id="64d5c09fa0ef6a6440c3b303",
+    project_id=None,
+    model_id=None,
 ):
     if not project_id:
         raise ValueError("Invalid or missing `project_id` value")
