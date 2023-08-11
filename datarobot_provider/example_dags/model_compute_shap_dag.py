@@ -18,7 +18,7 @@ from datarobot_provider.sensors.model_insights import DataRobotJobSensor
     start_date=datetime(2023, 1, 1),
     tags=['example', 'insights'],
 )
-def compute_model_shap(project_id="64d64ce68b2faa0a4908b955", model_id="64d64d7c764d63adb2a1ffcf"):
+def compute_model_shap(project_id=None, model_id=None):
     if not project_id:
         raise ValueError("Invalid or missing `project_id` value")
     if not model_id:
