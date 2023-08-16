@@ -37,7 +37,6 @@ from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
     },
 )
 def datarobot_timeseries_pipeline():
-
     dataset_uploading_op = UploadDatasetOperator(
         task_id="dataset_uploading",
     )
