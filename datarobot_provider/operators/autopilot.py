@@ -79,37 +79,43 @@ class StartAutopilotOperator(BaseOperator):
         # Train models
         project = dr.Project.get(self.project_id)
         if project.target:
-            self.log.info(f"Models are already trained for project_id={project.id}")
-        else:
-            self.log.info(
-                f"Starting DataRobot Autopilot for project_id={project.id} "
-                f"with settings={context['params']['autopilot_settings']}"
+            raise ValueError(f"Models are already trained for project_id={project.id}")
+
+        autopilot_settings = context['params']['autopilot_settings']
+
+        self.log.info(
+            f"Starting DataRobot Autopilot for project_id={project.id} "
+            f"with settings={autopilot_settings}"
+        )
+
+        if self.featurelist_id:
+            autopilot_settings['featurelist_id'] = self.featurelist_id
+
+        if self.relationships_configuration_id:
+            autopilot_settings[
+                'relationships_configuration_id'
+            ] = self.relationships_configuration_id
+
+        if self.segmentation_task_id:
+            autopilot_settings['segmentation_task_id'] = self.segmentation_task_id
+
+        autopilot_settings['max_wait'] = self.max_wait_sec
+
+        if (
+            'datetime_partitioning_settings' in context['params']
+            and 'partitioning_settings' in context['params']
+        ):
+            raise ValueError(
+                "parameters: timedatetime_partitioning_settings and partitioning_settings are mutually exclusive"
             )
 
-            autopilot_settings = context['params']['autopilot_settings']
+        if 'datetime_partitioning_settings' in context['params']:
+            project.set_datetime_partitioning(**context['params']['datetime_partitioning_settings'])
+        elif 'partitioning_settings' in context['params']:
+            project.set_partitioning_method(**context['params']['partitioning_settings'])
 
-            if self.featurelist_id:
-                autopilot_settings['featurelist_id'] = self.featurelist_id
+        if 'advanced_options' in context['params']:
+            project.set_advanced_options(**context['params']['advanced_options'])
 
-            if self.relationships_configuration_id:
-                autopilot_settings[
-                    'relationships_configuration_id'
-                ] = self.relationships_configuration_id
-
-            if self.segmentation_task_id:
-                autopilot_settings['segmentation_task_id'] = self.segmentation_task_id
-
-            autopilot_settings['max_wait'] = self.max_wait_sec
-
-            if 'datetime_partitioning_settings' in context['params']:
-                project.set_datetime_partitioning(
-                    **context['params']['datetime_partitioning_settings']
-                )
-            elif 'partitioning_settings' in context['params']:
-                project.set_partitioning_method(**context['params']['partitioning_settings'])
-
-            if 'advanced_options' in context['params']:
-                project.set_advanced_options(**context['params']['advanced_options'])
-
-            # finalize the project and start the autopilot
-            project.analyze_and_model(**autopilot_settings)
+        # finalize the project and start the autopilot
+        project.analyze_and_model(**autopilot_settings)
