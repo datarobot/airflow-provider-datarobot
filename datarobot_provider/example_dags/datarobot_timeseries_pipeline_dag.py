@@ -10,6 +10,7 @@ from datetime import datetime
 from airflow.decorators import dag
 from datarobot import AUTOPILOT_MODE
 
+from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.operators.project import StartAutopilotOperator
 from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
@@ -20,7 +21,7 @@ from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
     start_date=datetime(2022, 1, 1),
     tags=['example', 'timeseries'],
     params={
-        "training_dataset_id": "64b69bea24283d39946413f8",
+        "dataset_file_path": "./timeseries_dataset.csv",
         "project_name": "test airflow project timeseries",
         "autopilot_settings": {
             "target": "y",
@@ -36,7 +37,15 @@ from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
     },
 )
 def datarobot_timeseries_pipeline():
-    create_project_op = CreateProjectOperator(task_id='create_project')
+
+    dataset_uploading_op = UploadDatasetOperator(
+        task_id="dataset_uploading",
+    )
+
+    create_project_op = CreateProjectOperator(
+        task_id='create_project',
+        dataset_id=dataset_uploading_op.output,
+    )
 
     train_models_op = StartAutopilotOperator(
         task_id="train_timeseries_models",
@@ -48,7 +57,7 @@ def datarobot_timeseries_pipeline():
         project_id=create_project_op.output,
     )
 
-    create_project_op >> train_models_op >> autopilot_complete_sensor
+    dataset_uploading_op >> create_project_op >> train_models_op >> autopilot_complete_sensor
 
 
 datarobot_timeseries_pipeline_dag = datarobot_timeseries_pipeline()
