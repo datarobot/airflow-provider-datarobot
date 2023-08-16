@@ -102,19 +102,14 @@ class StartAutopilotOperator(BaseOperator):
             autopilot_settings['max_wait'] = self.max_wait_sec
 
             if 'datetime_partitioning_settings' in context['params']:
-                # Creating Datetime Partitioning Specification from provided params:
-                partitioning_spec = dr.DatetimePartitioningSpecification(
+                project.set_datetime_partitioning(
                     **context['params']['datetime_partitioning_settings']
                 )
-
-                project.set_datetime_partitioning(partitioning_spec)
             elif 'partitioning_settings' in context['params']:
-                # Creating Partitioning Specification from provided params:
                 project.set_partitioning_method(**context['params']['partitioning_settings'])
 
             if 'advanced_options' in context['params']:
-                advanced_options = dr.AdvancedOptions(**context['params']['advanced_options'])
-                project.set_advanced_options(advanced_options)
+                project.set_advanced_options(**context['params']['advanced_options'])
 
             # finalize the project and start the autopilot
             project.analyze_and_model(**autopilot_settings)

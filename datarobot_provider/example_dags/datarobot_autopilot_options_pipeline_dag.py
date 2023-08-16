@@ -22,21 +22,19 @@ from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
     tags=['example', 'timeseries'],
     params={
         "dataset_file_path": "/dataset.csv",
-        "project_name": "test airflow project timeseries",
+        "project_name": "test airflow project advanced options",
         "autopilot_settings": {
             "target": "y",
             "mode": AUTOPILOT_MODE.QUICK,
         },
-        "datetime_partitioning_settings": {
-            "use_time_series": True,
-            "datetime_partition_column": 'datetime',
-            "multiseries_id_columns": ['location'],
+        "advanced_options": {
+            "scoring_code_only": True,
         },
         "unsupervised_mode": False,
         "use_feature_discovery": False,
     },
 )
-def datarobot_timeseries_pipeline():
+def datarobot_advanced_options_pipeline():
     dataset_uploading_op = UploadDatasetOperator(
         task_id="dataset_uploading",
     )
@@ -59,7 +57,7 @@ def datarobot_timeseries_pipeline():
     dataset_uploading_op >> create_project_op >> train_models_op >> autopilot_complete_sensor
 
 
-datarobot_timeseries_pipeline_dag = datarobot_timeseries_pipeline()
+datarobot_advanced_options_pipeline_dag = datarobot_advanced_options_pipeline()
 
 if __name__ == "__main__":
-    datarobot_timeseries_pipeline_dag.test()
+    datarobot_advanced_options_pipeline_dag.test()

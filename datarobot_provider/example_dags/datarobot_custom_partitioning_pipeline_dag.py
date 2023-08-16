@@ -9,6 +9,8 @@ from datetime import datetime
 
 from airflow.decorators import dag
 from datarobot import AUTOPILOT_MODE
+from datarobot.enums import CV_METHOD
+from datarobot.enums import VALIDATION_TYPE
 
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 from datarobot_provider.operators.autopilot import StartAutopilotOperator
@@ -22,21 +24,20 @@ from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
     tags=['example', 'timeseries'],
     params={
         "dataset_file_path": "/dataset.csv",
-        "project_name": "test airflow project timeseries",
+        "project_name": "test airflow project custom partitioning",
         "autopilot_settings": {
             "target": "y",
             "mode": AUTOPILOT_MODE.QUICK,
         },
-        "datetime_partitioning_settings": {
-            "use_time_series": True,
-            "datetime_partition_column": 'datetime',
-            "multiseries_id_columns": ['location'],
+        "partitioning_settings": {
+            "cv_method": CV_METHOD.RANDOM,
+            "validation_type": VALIDATION_TYPE.TVH,
+            "validation_pct": 20,
+            "holdout_pct": 15,
         },
-        "unsupervised_mode": False,
-        "use_feature_discovery": False,
     },
 )
-def datarobot_timeseries_pipeline():
+def datarobot_custom_partitioning_pipeline():
     dataset_uploading_op = UploadDatasetOperator(
         task_id="dataset_uploading",
     )
@@ -47,7 +48,7 @@ def datarobot_timeseries_pipeline():
     )
 
     train_models_op = StartAutopilotOperator(
-        task_id="train_timeseries_models",
+        task_id="train_custom_partitioning_models",
         project_id=create_project_op.output,
     )
 
@@ -59,7 +60,7 @@ def datarobot_timeseries_pipeline():
     dataset_uploading_op >> create_project_op >> train_models_op >> autopilot_complete_sensor
 
 
-datarobot_timeseries_pipeline_dag = datarobot_timeseries_pipeline()
+datarobot_custom_partitioning_pipeline_dag = datarobot_custom_partitioning_pipeline()
 
 if __name__ == "__main__":
-    datarobot_timeseries_pipeline_dag.test()
+    datarobot_custom_partitioning_pipeline_dag.test()
