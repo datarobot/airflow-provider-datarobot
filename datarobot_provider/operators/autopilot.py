@@ -115,7 +115,7 @@ class StartAutopilotOperator(BaseOperator):
             project.set_partitioning_method(**context['params']['partitioning_settings'])
 
         if 'advanced_options' in context['params']:
-            project.set_advanced_options(**context['params']['advanced_options'])
+            project.set_options(**context['params']['advanced_options'])
 
         # finalize the project and start the autopilot
         project.analyze_and_model(**autopilot_settings)
