@@ -45,7 +45,7 @@ def test_operator_start_autopilot_timeseries(mocker):
     )
     project_mock.set_datetime_partitioning.assert_called_with(**datetime_partitioning_settings)
     project_mock.set_partitioning_method.assert_not_called()
-    project_mock.set_advanced_options.assert_not_called()
+    project_mock.set_options.assert_not_called()
     project_mock.set_datetime_partitioning.assert_called_with(**datetime_partitioning_settings)
     project_mock.analyze_and_model.assert_called_with(**autopilot_settings)
 
@@ -72,7 +72,7 @@ def test_operator_start_autopilot_partitioning_settings(mocker):
     )
     project_mock.set_datetime_partitioning.assert_not_called()
     project_mock.set_partitioning_method.assert_called_with(**partitioning_settings)
-    project_mock.set_advanced_options.assert_not_called()
+    project_mock.set_options.assert_not_called()
     project_mock.analyze_and_model.assert_called_with(**autopilot_settings)
 
 
@@ -98,5 +98,5 @@ def test_operator_start_autopilot_advanced_options(mocker):
     )
     project_mock.set_datetime_partitioning.assert_not_called()
     project_mock.set_partitioning_method.assert_not_called()
-    project_mock.set_advanced_options.assert_called_with(**advanced_options)
+    project_mock.set_options.assert_called_with(**advanced_options)
     project_mock.analyze_and_model.assert_called_with(**autopilot_settings)
