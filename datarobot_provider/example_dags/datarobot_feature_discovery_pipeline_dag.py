@@ -7,16 +7,14 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from datetime import datetime
 
-from airflow.decorators import dag, task
+from airflow.decorators import dag
 from datarobot import AUTOPILOT_MODE
 
 from datarobot_provider.operators.autopilot import StartAutopilotOperator
 from datarobot_provider.operators.datarobot import CreateProjectOperator
-from datarobot_provider.operators.feature_discovery import (
-    RelationshipsConfigurationOperator,
-    DatasetDefinitionOperator,
-    DatasetRelationshipOperator,
-)
+from datarobot_provider.operators.feature_discovery import DatasetDefinitionOperator
+from datarobot_provider.operators.feature_discovery import DatasetRelationshipOperator
+from datarobot_provider.operators.feature_discovery import RelationshipsConfigurationOperator
 from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
 
 

@@ -5,9 +5,11 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from typing import Any, List, Optional
+from typing import Any
 from typing import Dict
 from typing import Iterable
+from typing import List
+from typing import Optional
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
@@ -96,7 +98,7 @@ class RelationshipsConfigurationOperator(BaseOperator):
 class DatasetDefinitionOperator(BaseOperator):
     """
     Dataset definition for the Feature Discovery
-    
+
     :param dataset_identifier: Alias of the dataset (used directly as part of the generated feature names)
     :type dataset_identifier: str
     :param dataset_id: Identifier of the dataset in DataRobot AI Catalog
@@ -105,8 +107,8 @@ class DatasetDefinitionOperator(BaseOperator):
     :type dataset_version_id: str, optional
     :param primary_temporal_key: Name of the column indicating time of record creation
     :type primary_temporal_key: str, optional
-    :param featurelist_id: Specifies which feature list to use.
-    :type featurelist_id: str, optional
+    :param feature_list_id: Specifies which feature list to use.
+    :type feature_list_id: str, optional
     :param snapshot_policy: Policy to use  when creating a project or making predictions.
         If omitted, by default endpoint will use 'latest'.
         Must be one of the following values:
@@ -124,7 +126,7 @@ class DatasetDefinitionOperator(BaseOperator):
         "dataset_id",
         "dataset_version_id",
         "primary_temporal_key",
-        "featurelist_id",
+        "feature_list_id",
         "snapshot_policy",
     ]
     template_fields_renderers: Dict[str, str] = {}
