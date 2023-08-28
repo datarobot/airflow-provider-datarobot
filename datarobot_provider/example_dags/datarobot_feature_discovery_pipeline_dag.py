@@ -137,8 +137,8 @@ def datarobot_feature_discovery_pipeline(
     )
 
     (
-        create_project_op
-        >> (profile_dataset_definition_op, transaction_dataset_definition_op)
+        (profile_dataset_definition_op, transaction_dataset_definition_op)
+        >> create_project_op
         >> (primary_profile_relationship_op, relationships_configuration_op)
         >> train_models_op
         >> autopilot_complete_sensor

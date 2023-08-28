@@ -5,13 +5,14 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from typing import Any
+from typing import Any, List, Optional
 from typing import Dict
 from typing import Iterable
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
+from datarobot import SNAPSHOT_POLICY
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
@@ -146,9 +147,11 @@ class DatasetDefinitionOperator(BaseOperator):
         self,
         *,
         dataset_identifier: str,
-        dataset_id: str,
+        dataset_id: Optional[str],
         dataset_version_id: str,
-        primary_temporal_key: str = None,
+        snapshot_policy: str = SNAPSHOT_POLICY.LATEST,
+        feature_list_id: Optional[str] = None,
+        primary_temporal_key: Optional[str] = None,
         max_wait_sec: int = DATAROBOT_MAX_WAIT,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
@@ -157,6 +160,8 @@ class DatasetDefinitionOperator(BaseOperator):
         self.dataset_identifier = dataset_identifier
         self.dataset_id = dataset_id
         self.dataset_version_id = dataset_version_id
+        self.snapshot_policy = snapshot_policy
+        self.feature_list_id = feature_list_id
         self.primary_temporal_key = primary_temporal_key
         self.max_wait_sec = max_wait_sec
         self.datarobot_conn_id = datarobot_conn_id
@@ -171,9 +176,9 @@ class DatasetDefinitionOperator(BaseOperator):
             identifier=self.dataset_identifier,
             catalog_id=self.dataset_id,
             catalog_version_id=self.dataset_version_id,
+            feature_list_id=self.feature_list_id,
             primary_temporal_key=self.primary_temporal_key,
-            # primary_temporal_key='Date',
-            # snapshot_policy='dynamic'  # requires a jdbc source
+            snapshot_policy=self.snapshot_policy,  # requires a jdbc source
         )
 
         return dataset_definition.to_payload()
@@ -235,6 +240,12 @@ class DatasetRelationshipOperator(BaseOperator):
         "dataset2_identifier",
         "dataset1_keys",
         "dataset2_keys",
+        "feature_derivation_window_start",
+        "feature_derivation_window_end",
+        "feature_derivation_window_time_unit",
+        "feature_derivation_windows",
+        "prediction_point_rounding",
+        "prediction_point_rounding_time_unit",
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
@@ -243,13 +254,16 @@ class DatasetRelationshipOperator(BaseOperator):
     def __init__(
         self,
         *,
-        dataset1_identifier: str = None,
-        dataset2_identifier: str = None,
-        dataset1_keys: str = None,
-        dataset2_keys: str = None,
-        feature_derivation_windows=None,
-        prediction_point_rounding=None,
-        prediction_point_rounding_time_unit: str = None,
+        dataset2_identifier: str,
+        dataset1_keys: List[str],
+        dataset2_keys: List[str],
+        dataset1_identifier: Optional[str] = None,
+        feature_derivation_window_start: Optional[int] = None,
+        feature_derivation_window_end: Optional[int] = None,
+        feature_derivation_window_time_unit: Optional[int] = None,
+        feature_derivation_windows: Optional[dict] = None,
+        prediction_point_rounding: Optional[int] = None,
+        prediction_point_rounding_time_unit: Optional[str] = None,
         max_wait_sec: int = DATAROBOT_MAX_WAIT,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
@@ -259,6 +273,9 @@ class DatasetRelationshipOperator(BaseOperator):
         self.dataset2_identifier = dataset2_identifier
         self.dataset1_keys = dataset1_keys
         self.dataset2_keys = dataset2_keys
+        self.feature_derivation_window_start = feature_derivation_window_start
+        self.feature_derivation_window_end = feature_derivation_window_end
+        self.feature_derivation_window_time_unit = feature_derivation_window_time_unit
         self.feature_derivation_windows = feature_derivation_windows
         self.prediction_point_rounding = prediction_point_rounding
         self.prediction_point_rounding_time_unit = prediction_point_rounding_time_unit
@@ -279,6 +296,9 @@ class DatasetRelationshipOperator(BaseOperator):
             feature_derivation_windows=self.feature_derivation_windows,
             prediction_point_rounding=self.prediction_point_rounding,
             prediction_point_rounding_time_unit=self.prediction_point_rounding_time_unit,
+            feature_derivation_window_start=self.feature_derivation_window_start,
+            feature_derivation_window_end=self.feature_derivation_window_end,
+            feature_derivation_window_time_unit=self.feature_derivation_window_time_unit,
         )
 
         return relationship.to_payload()
