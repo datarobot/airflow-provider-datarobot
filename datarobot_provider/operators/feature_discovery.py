@@ -95,29 +95,6 @@ class RelationshipsConfigurationOperator(BaseOperator):
 
 class DatasetDefinitionOperator(BaseOperator):
     """
-        Attributes
-    ----------
-    identifier: string
-        Alias of the dataset (used directly as part of the generated feature names)
-    catalog_id: string, optional
-        Identifier of the catalog item
-    catalog_version_id: string
-        Identifier of the catalog item version
-    primary_temporal_key: string, optional
-        Name of the column indicating time of record creation
-    feature_list_id: string, optional
-        Identifier of the feature list. This decides which columns in the dataset are
-        used for feature generation
-    snapshot_policy: string, optional
-        Policy to use  when creating a project or making predictions.
-        If omitted, by default endpoint will use 'latest'.
-        Must be one of the following values:
-        'specified': Use specific snapshot specified by catalogVersionId
-        'latest': Use latest snapshot from the same catalog item
-        'dynamic': Get data from the source (only applicable for JDBC datasets)
-    """
-
-    """
     Dataset definition for the Feature Discovery
     
     :param dataset_identifier: Alias of the dataset (used directly as part of the generated feature names)
@@ -125,9 +102,18 @@ class DatasetDefinitionOperator(BaseOperator):
     :param dataset_id: Identifier of the dataset in DataRobot AI Catalog
     :type dataset_id: str
     :param dataset_version_id: str,
-    :type dataset_version_id: str = None,
+    :type dataset_version_id: str, optional
+    :param primary_temporal_key: Name of the column indicating time of record creation
+    :type primary_temporal_key: str, optional
     :param featurelist_id: Specifies which feature list to use.
     :type featurelist_id: str, optional
+    :param snapshot_policy: Policy to use  when creating a project or making predictions.
+        If omitted, by default endpoint will use 'latest'.
+        Must be one of the following values:
+        'specified': Use specific snapshot specified by catalogVersionId
+        'latest': Use latest snapshot from the same catalog item
+        'dynamic': Get data from the source (only applicable for JDBC datasets)
+    :type snapshot_policy: str, optional
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
     """
@@ -138,6 +124,8 @@ class DatasetDefinitionOperator(BaseOperator):
         "dataset_id",
         "dataset_version_id",
         "primary_temporal_key",
+        "featurelist_id",
+        "snapshot_policy",
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
