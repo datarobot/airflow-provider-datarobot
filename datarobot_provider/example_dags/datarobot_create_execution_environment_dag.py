@@ -10,8 +10,10 @@ from datetime import datetime
 
 from airflow.decorators import dag
 
-from datarobot_provider.operators.execution_environment import CreateExecutionEnvironmentOperator, \
-    CreateExecutionEnvironmentVersionOperator
+from datarobot_provider.operators.execution_environment import CreateExecutionEnvironmentOperator
+from datarobot_provider.operators.execution_environment import (
+    CreateExecutionEnvironmentVersionOperator,
+)
 
 
 @dag(
@@ -24,7 +26,7 @@ from datarobot_provider.operators.execution_environment import CreateExecutionEn
         "programming_language": "python",
         "required_metadata_keys": [{"field_name": "test_key", "display_name": "test_display_name"}],
         "docker_context_path": "./datarobot-user-models-master/",
-        "environment_version_description": "created by Airflow provider"
+        "environment_version_description": "created by Airflow provider",
     },
 )
 def create_execution_environment():

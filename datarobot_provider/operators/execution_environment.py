@@ -16,7 +16,7 @@ from datarobot.models.execution_environment import RequiredMetadataKey
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
-DEFAULT_MAX_WAIT_SEC = 3600 # 1 hour timeout by default
+DEFAULT_MAX_WAIT_SEC = 3600  # 1 hour timeout by default
 
 
 class CreateExecutionEnvironmentOperator(BaseOperator):
@@ -127,7 +127,7 @@ class CreateExecutionEnvironmentVersionOperator(BaseOperator):
         "execution_environment_id",
         "docker_context_path",
         "environment_version_label",
-        "environment_version_description"
+        "environment_version_description",
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
