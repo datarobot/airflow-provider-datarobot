@@ -106,7 +106,7 @@ class StartAutopilotOperator(BaseOperator):
             and 'partitioning_settings' in context['params']
         ):
             raise ValueError(
-                "parameters: timedatetime_partitioning_settings and partitioning_settings are mutually exclusive"
+                "parameters: datetime_partitioning_settings and partitioning_settings are mutually exclusive"
             )
 
         if 'datetime_partitioning_settings' in context['params']:
