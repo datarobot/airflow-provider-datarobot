@@ -74,16 +74,26 @@ class CreateExecutionEnvironmentOperator(BaseOperator):
                 for key in required_metadata_keys
             ]
 
+        execution_environment_name = (
+            context["params"].get("execution_environment_name", None)
+            if self.name is None
+            else self.name
+        )
+        execution_environment_description = (
+            context["params"].get("execution_environment_description", None)
+            if self.description is None
+            else self.description
+        )
+        programming_language = (
+            context["params"].get("programming_language", None)
+            if self.programming_language is None
+            else self.programming_language
+        )
+
         execution_environment = dr.ExecutionEnvironment.create(
-            name=self.name
-            if self.name is not None
-            else context["params"].get("execution_environment_name", None),
-            description=self.description
-            if self.description is not None
-            else context["params"].get("execution_environment_description", None),
-            programming_language=self.programming_language
-            if self.programming_language is not None
-            else context["params"].get("programming_language", None),
+            name=execution_environment_name,
+            description=execution_environment_description,
+            programming_language=programming_language,
             required_metadata_keys=metadata_keys,
         )
 
