@@ -51,7 +51,7 @@ def datarobot_datetime_partitioning_pipeline():
     )
 
     train_models_op = StartAutopilotOperator(
-        task_id="train_timeseries_models",
+        task_id="train_otv_models",
         project_id=create_project_op.output,
     )
 
