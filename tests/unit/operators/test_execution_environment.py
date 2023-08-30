@@ -9,8 +9,8 @@
 import datarobot as dr
 import pytest
 
-from datarobot_provider.operators.execution_environment import CreateExecutionEnvironmentOperator
-from datarobot_provider.operators.execution_environment import (
+from datarobot_provider.operators.custom_models import CreateExecutionEnvironmentOperator
+from datarobot_provider.operators.custom_models import (
     CreateExecutionEnvironmentVersionOperator,
 )
 

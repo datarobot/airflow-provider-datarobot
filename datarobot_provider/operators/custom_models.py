@@ -12,6 +12,7 @@ from typing import Iterable
 import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
+
 from datarobot.models.execution_environment import RequiredMetadataKey
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
@@ -189,3 +190,173 @@ class CreateExecutionEnvironmentVersionOperator(BaseOperator):
         )
 
         return environment_version.id
+
+
+class CreateCustomInferenceModelOperator(BaseOperator):
+    """
+    Create a custom inference model.
+    :param name: Name of the custom model.
+    :type name: str
+    :param description: Description of the custom model.
+    :type description: str
+    :return: created custom model ID
+    :rtype: str
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Iterable[str] = [
+        "name",
+        "description",
+    ]
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Iterable[str] = ()
+    ui_color = '#f4a460'
+
+    def __init__(
+        self,
+        *,
+        name: str = None,
+        description: str = None,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.name = name
+        self.description = description
+        self.datarobot_conn_id = datarobot_conn_id
+        if kwargs.get('xcom_push') is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Dict[str, Any]) -> str:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        custom_model_name = (
+            context["params"].get("custom_model_name", None) if self.name is None else self.name
+        )
+
+        custom_model_description = (
+            context["params"].get("custom_model_description", None)
+            if self.description is None
+            else self.description
+        )
+
+        custom_model = dr.CustomInferenceModel.create(
+            name=custom_model_name,
+            description=custom_model_description,
+            target_type=context["params"].get("target_type", None),
+            target_name=context["params"].get("target_name", None),
+            language=context["params"].get("programming_language", None),
+            positive_class_label=context["params"].get("positive_class_label", None),
+            negative_class_label=context["params"].get("negative_class_label", None),
+            prediction_threshold=context["params"].get("prediction_threshold", None),
+            class_labels=context["params"].get("class_labels", None),
+            class_labels_file=context["params"].get("class_labels_file", None),
+            network_egress_policy=context["params"].get("network_egress_policy", None),
+            maximum_memory=context["params"].get("maximum_memory", None),
+            replicas=context["params"].get("replicas", None),
+            is_training_data_for_versions_permanently_enabled=context["params"].get(
+                "is_training_data_for_versions_permanently_enabled", None
+            ),
+        )
+
+        self.log.info(f"Custom Inference Model created, custom_model_id={custom_model.id}")
+
+        return custom_model.id
+
+
+class CreateCustomModelVersionOperator(BaseOperator):
+    """
+    Create a custom model version without files from previous versions.
+
+    :param custom_model_id: The ID of the custom model.
+    :type custom_model_id: str
+    :param base_environment_id: The ID of the base environment to use with the custom model version.
+    :type base_environment_id: str
+    :param training_dataset_id: The ID of the training dataset to assign to the custom model.
+    :type training_dataset_id: str, optional
+    :param holdout_dataset_id: The ID of the holdout dataset to assign to the custom model.
+            Can only be assigned for unstructured models.
+    :type holdout_dataset_id: str, optional
+
+    :param custom_model_folder: The ID of the holdout dataset to assign to the custom model.
+            Can only be assigned for unstructured models.
+    :type custom_model_folder: str, optional
+
+    :param max_wait:  Max time to wait for training data assignment.
+    :type max_wait: int, optional
+    :return: created custom model version ID
+    :rtype: str
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Iterable[str] = [
+        "custom_model_id",
+        "base_environment_id",
+        "training_dataset_id",
+        "holdout_dataset_id",
+        "custom_model_folder",
+    ]
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Iterable[str] = ()
+    ui_color = '#f4a460'
+
+    def __init__(
+        self,
+        *,
+        custom_model_id: str,
+        base_environment_id: str,
+        training_dataset_id: str = None,
+        holdout_dataset_id: str = None,
+        custom_model_folder: str = None,
+        max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.custom_model_id = custom_model_id
+        self.base_environment_id = base_environment_id
+        self.training_dataset_id = training_dataset_id
+        self.holdout_dataset_id = holdout_dataset_id
+        self.custom_model_folder = custom_model_folder
+        self.max_wait_sec = max_wait_sec
+        self.datarobot_conn_id = datarobot_conn_id
+        if kwargs.get('xcom_push') is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Dict[str, Any]) -> str:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        folder_path = (
+            context["params"].get("custom_model_folder", None)
+            if self.custom_model_folder is None
+            else self.custom_model_folder
+        )
+
+        custom_model_version = dr.CustomModelVersion.create_clean(
+            custom_model_id=self.custom_model_id,
+            training_dataset_id=self.training_dataset_id,
+            base_environment_id=self.base_environment_id,
+            holdout_dataset_id=self.holdout_dataset_id,
+            folder_path=folder_path,
+            is_major_update=context["params"].get("is_major_update", None),
+            files=context["params"].get("is_major_update", None),
+            network_egress_policy=context["params"].get("network_egress_policy", None),
+            maximum_memory=context["params"].get("maximum_memory", None),
+            replicas=context["params"].get("replicas", None),
+            required_metadata_values=context["params"].get("required_metadata_values", None),
+            partition_column=context["params"].get("partition_column", None),
+            keep_training_holdout_data=context["params"].get("partition_column", None),
+            max_wait=self.max_wait_sec,
+        )
+
+        self.log.info(
+            f"Custom Model Version created, custom_model_version_id={custom_model_version.id}"
+        )
+
+        return custom_model_version.id
