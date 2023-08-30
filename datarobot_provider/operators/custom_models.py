@@ -342,13 +342,13 @@ class CreateCustomModelVersionOperator(BaseOperator):
             holdout_dataset_id=self.holdout_dataset_id,
             folder_path=folder_path,
             is_major_update=context["params"].get("is_major_update", None),
-            files=context["params"].get("is_major_update", None),
+            files=context["params"].get("files", None),
             network_egress_policy=context["params"].get("network_egress_policy", None),
             maximum_memory=context["params"].get("maximum_memory", None),
             replicas=context["params"].get("replicas", None),
             required_metadata_values=context["params"].get("required_metadata_values", None),
             partition_column=context["params"].get("partition_column", None),
-            keep_training_holdout_data=context["params"].get("partition_column", None),
+            keep_training_holdout_data=context["params"].get("keep_training_holdout_data", None),
             max_wait=self.max_wait_sec,
         )
 
