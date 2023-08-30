@@ -12,7 +12,6 @@ from typing import Iterable
 import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
-
 from datarobot.models.execution_environment import RequiredMetadataKey
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
@@ -280,11 +279,9 @@ class CreateCustomModelVersionOperator(BaseOperator):
     :param holdout_dataset_id: The ID of the holdout dataset to assign to the custom model.
             Can only be assigned for unstructured models.
     :type holdout_dataset_id: str, optional
-
     :param custom_model_folder: The ID of the holdout dataset to assign to the custom model.
             Can only be assigned for unstructured models.
     :type custom_model_folder: str, optional
-
     :param max_wait:  Max time to wait for training data assignment.
     :type max_wait: int, optional
     :return: created custom model version ID

@@ -11,14 +11,10 @@ from datetime import datetime
 from airflow.decorators import dag
 from datarobot import TARGET_TYPE
 
-from datarobot_provider.operators.custom_models import (
-    CreateExecutionEnvironmentOperator,
-    CreateCustomInferenceModelOperator,
-    CreateCustomModelVersionOperator,
-)
-from datarobot_provider.operators.custom_models import (
-    CreateExecutionEnvironmentVersionOperator,
-)
+from datarobot_provider.operators.custom_models import CreateCustomInferenceModelOperator
+from datarobot_provider.operators.custom_models import CreateCustomModelVersionOperator
+from datarobot_provider.operators.custom_models import CreateExecutionEnvironmentOperator
+from datarobot_provider.operators.custom_models import CreateExecutionEnvironmentVersionOperator
 
 
 @dag(

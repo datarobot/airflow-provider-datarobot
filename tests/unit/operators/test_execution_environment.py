@@ -10,9 +10,7 @@ import datarobot as dr
 import pytest
 
 from datarobot_provider.operators.custom_models import CreateExecutionEnvironmentOperator
-from datarobot_provider.operators.custom_models import (
-    CreateExecutionEnvironmentVersionOperator,
-)
+from datarobot_provider.operators.custom_models import CreateExecutionEnvironmentVersionOperator
 
 
 @pytest.fixture
