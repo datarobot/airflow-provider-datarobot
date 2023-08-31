@@ -32,9 +32,6 @@ def custom_model_params():
         "custom_model_name": "Airflow Custom model Demo",
         "target_type": TARGET_TYPE.REGRESSION,
         "target_name": 'Grade 2014',
-        'description': 'This is a custom model created by Airflow',
-        'language': 'python',
-        'name': 'Airflow Custom model Demo',
         'is_major_update': True,
         'files': ['file1', 'file2'],
         'network_egress_policy': NETWORK_EGRESS_POLICY.ALL,
@@ -88,6 +85,36 @@ def test_operator_create_custom_model_op(mocker, custom_model_params):
     assert operator_result == custom_model_mock.id
 
 
+def test_operator_create_custom_model_name_not_provided_op(mocker, custom_model_params):
+    custom_model_mock = mocker.Mock(target=None)
+    custom_model_mock.id = "test-custom-model-id"
+
+    operator = CreateCustomInferenceModelOperator(
+        task_id='create_custom_inference_model',
+    )
+
+    custom_model_params_name_not_provided = custom_model_params.copy()
+    custom_model_params_name_not_provided.pop("custom_model_name", None)
+
+    with pytest.raises(ValueError):
+        operator.execute(context={"params": custom_model_params_name_not_provided})
+
+
+def test_operator_create_custom_model_target_type_not_provided_op(mocker, custom_model_params):
+    custom_model_mock = mocker.Mock(target=None)
+    custom_model_mock.id = "test-custom-model-id"
+
+    operator = CreateCustomInferenceModelOperator(
+        task_id='create_custom_inference_model',
+    )
+
+    custom_model_params_target_type_not_provided = custom_model_params.copy()
+    custom_model_params_target_type_not_provided.pop("target_type", None)
+
+    with pytest.raises(ValueError):
+        operator.execute(context={"params": custom_model_params_target_type_not_provided})
+
+
 def test_operator_create_custom_model_version_op(mocker, custom_model_params):
     custom_model_version_mock = mocker.Mock(target=None)
     custom_model_version_mock.id = "test-custom-model-version-id"
@@ -129,3 +156,23 @@ def test_operator_create_custom_model_version_op(mocker, custom_model_params):
     )
 
     assert operator_result == custom_model_version_mock.id
+
+
+def test_operator_create_custom_model_version_no_custom_model_id_op(mocker, custom_model_params):
+    custom_model_version_mock = mocker.Mock(target=None)
+    custom_model_version_mock.id = "test-custom-model-version-id"
+
+    training_dataset_id = "training-dataset-id"
+    base_environment_id = "base-environment-id"
+    holdout_dataset_id = "holdout-dataset-id"
+
+    operator = CreateCustomModelVersionOperator(
+        task_id='create_custom_model_version',
+        custom_model_id=None,
+        training_dataset_id=training_dataset_id,
+        base_environment_id=base_environment_id,
+        holdout_dataset_id=holdout_dataset_id,
+    )
+
+    with pytest.raises(ValueError):
+        operator.execute(context={"params": custom_model_params})

@@ -236,11 +236,23 @@ class CreateCustomInferenceModelOperator(BaseOperator):
             context["params"].get("custom_model_name", None) if self.name is None else self.name
         )
 
+        if custom_model_name is None:
+            raise ValueError(
+                "Custom model name is required attribute for CreateCustomInferenceModelOperator"
+            )
+
         custom_model_description = (
             context["params"].get("custom_model_description", None)
             if self.description is None
             else self.description
         )
+
+        target_type = context["params"].get("target_type", None)
+
+        if target_type is None:
+            raise ValueError(
+                "target_type is required attribute for CreateCustomInferenceModelOperator"
+            )
 
         custom_model = dr.CustomInferenceModel.create(
             name=custom_model_name,
@@ -334,6 +346,16 @@ class CreateCustomModelVersionOperator(BaseOperator):
             if self.custom_model_folder is None
             else self.custom_model_folder
         )
+
+        if self.custom_model_id is None:
+            raise ValueError(
+                "custom_model_id is required attribute for CreateCustomModelVersionOperator"
+            )
+
+        if self.base_environment_id is None:
+            raise ValueError(
+                "base_environment_id is required attribute for CreateCustomModelVersionOperator"
+            )
 
         custom_model_version = dr.CustomModelVersion.create_clean(
             custom_model_id=self.custom_model_id,
