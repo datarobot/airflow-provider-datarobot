@@ -10,6 +10,7 @@ from datetime import datetime
 from airflow.decorators import dag
 from datarobot import AUTOPILOT_MODE
 from datarobot.enums import DATETIME_AUTOPILOT_DATA_SELECTION_METHOD
+from datarobot.helpers.partitioning_methods import construct_duration_string
 
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 from datarobot_provider.operators.autopilot import StartAutopilotOperator
@@ -33,8 +34,8 @@ from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
             "datetime_partition_column": 'datetime',
             "number_of_backtests": 1,
             "autopilot_data_selection_method": DATETIME_AUTOPILOT_DATA_SELECTION_METHOD.DURATION,
-            "validation_duration": "P1Y0M0D",
-            "gap_duration": "P0Y0M0D",
+            "validation_duration": construct_duration_string(years=1),
+            "gap_duration": construct_duration_string(days=1),
         },
         "unsupervised_mode": False,
         "use_feature_discovery": False,
