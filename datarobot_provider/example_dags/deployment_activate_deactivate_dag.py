@@ -19,7 +19,7 @@ from datarobot_provider.operators.deployment import GetDeploymentStatusOperator
     start_date=datetime(2023, 1, 1),
     tags=['example', 'mlops'],
 )
-def deployment_deactivate_activate(deployment_id="64a7e4add4efa2b707e17daa"):
+def deployment_deactivate_activate(deployment_id=None):
     if not deployment_id:
         raise ValueError("Invalid or missing `deployment_id` value")
 
