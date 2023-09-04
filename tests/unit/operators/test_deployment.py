@@ -11,7 +11,9 @@ import datarobot as dr
 import pytest
 from airflow.exceptions import AirflowFailException
 
+from datarobot_provider.operators.deployment import ActivateDeploymentOperator
 from datarobot_provider.operators.deployment import GetDeploymentModelOperator
+from datarobot_provider.operators.deployment import GetDeploymentStatusOperator
 from datarobot_provider.operators.deployment import ReplaceModelOperator
 
 
@@ -141,3 +143,118 @@ def test_operator_replace_deployment_model_failed(
     )
 
     replace_model_mock.assert_not_called()
+
+
+def test_operator_activate_deployment(mocker):
+    deployment_id = "deployment-id"
+    deployment = dr.Deployment(deployment_id)
+
+    deployment.status = 'active'
+
+    get_deployment_mock = mocker.patch.object(dr.Deployment, "get", return_value=deployment)
+
+    activate_deployment_mock = mocker.patch.object(
+        dr.Deployment,
+        "activate",
+        return_value=None,
+    )
+
+    deactivate_deployment_mock = mocker.patch.object(
+        dr.Deployment,
+        "deactivate",
+        return_value=None,
+    )
+
+    operator = ActivateDeploymentOperator(
+        task_id="replace_deployment_model",
+        deployment_id=deployment_id,
+        activate=True,
+        max_wait_sec=1000,
+    )
+
+    operator_result = operator.execute(context={'params': {}})
+    get_deployment_mock.assert_called_with(deployment_id)
+    activate_deployment_mock.assert_called_with(max_wait=1000)
+    deactivate_deployment_mock.assert_not_called()
+
+    assert operator_result == 'active'
+
+
+def test_operator_deactivate_deployment(mocker):
+    deployment_id = "deployment-id"
+    deployment = dr.Deployment(deployment_id)
+
+    deployment.status = 'inactive'
+
+    get_deployment_mock = mocker.patch.object(dr.Deployment, "get", return_value=deployment)
+
+    activate_deployment_mock = mocker.patch.object(
+        dr.Deployment,
+        "activate",
+        return_value=None,
+    )
+
+    deactivate_deployment_mock = mocker.patch.object(
+        dr.Deployment,
+        "deactivate",
+        return_value=None,
+    )
+
+    operator = ActivateDeploymentOperator(
+        task_id="activate_deployment",
+        deployment_id=deployment_id,
+        activate=False,
+        max_wait_sec=1000,
+    )
+
+    operator_result = operator.execute(context={'params': {}})
+    get_deployment_mock.assert_called_with(deployment_id)
+    deactivate_deployment_mock.assert_called_with(max_wait=1000)
+    activate_deployment_mock.assert_not_called()
+
+    assert operator_result == 'inactive'
+
+
+def test_operator_activate_deployment_not_provided(mocker):
+    deployment_id = None
+
+    operator = ActivateDeploymentOperator(
+        task_id="activate_deployment",
+        deployment_id=deployment_id,
+        activate=True,
+        max_wait_sec=1000,
+    )
+
+    with pytest.raises(ValueError):
+        operator.execute(operator.execute(context={'params': {}}))
+
+
+def test_operator_get_deployment_status(mocker):
+    deployment_id = "deployment-id"
+    deployment = dr.Deployment(deployment_id)
+
+    deployment.status = 'inactive'
+
+    get_deployment_mock = mocker.patch.object(dr.Deployment, "get", return_value=deployment)
+
+    operator = GetDeploymentStatusOperator(
+        task_id="get_deployment_status",
+        deployment_id=deployment_id,
+    )
+
+    operator_result = operator.execute(context={'params': {}})
+    get_deployment_mock.assert_called_with(deployment_id)
+
+    assert operator_result == 'inactive'
+
+
+def test_operator_get_deployment_status_not_provided(mocker):
+    deployment_id = None
+
+    operator = GetDeploymentStatusOperator(
+        task_id="get_deployment_status",
+        deployment_id=deployment_id,
+    )
+
+    with pytest.raises(ValueError):
+        operator.execute(operator.execute(context={'params': {}}))

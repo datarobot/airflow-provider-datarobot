@@ -155,7 +155,7 @@ class ActivateDeploymentOperator(BaseOperator):
     :type max_wait_sec: int
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
-    :return: Deployment
+    :return: Deployment status (active/inactive)
     :rtype: str
     """
 
@@ -188,6 +188,9 @@ class ActivateDeploymentOperator(BaseOperator):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
+        if self.deployment_id is None:
+            raise ValueError("Invalid or missing `deployment_id` value")
+
         self.log.info(f"Getting Deployment with deployment_id={self.deployment_id}")
         deployment = dr.Deployment.get(self.deployment_id)
         if self.activate:
@@ -199,13 +202,13 @@ class ActivateDeploymentOperator(BaseOperator):
 
 class GetDeploymentStatusOperator(BaseOperator):
     """
-    Get a Deployment status (activate/deactivated).
+    Get a Deployment status (active/inactive).
 
     :param deployment_id: DataRobot deployment ID
     :type deployment_id: str
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
-    :return: Deployment
+    :return: Deployment status (active/inactive)
     :rtype: str
     """
 
@@ -233,6 +236,9 @@ class GetDeploymentStatusOperator(BaseOperator):
     def execute(self, context: Dict[str, Any]) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        if self.deployment_id is None:
+            raise ValueError("Invalid or missing `deployment_id` value")
 
         self.log.info(f"Getting Deployment for deployment_id={self.deployment_id}")
         deployment = dr.Deployment.get(self.deployment_id)
