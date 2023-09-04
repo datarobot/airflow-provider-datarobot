@@ -235,4 +235,5 @@ class GetDeploymentStatusOperator(BaseOperator):
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         self.log.info(f"Getting Deployment for deployment_id={self.deployment_id}")
-        return dr.Deployment.get(self.deployment_id)
+        deployment = dr.Deployment.get(self.deployment_id)
+        return deployment.status

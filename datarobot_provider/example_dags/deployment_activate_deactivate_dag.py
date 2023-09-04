@@ -6,11 +6,12 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from datetime import datetime
-import time
+
 from airflow.decorators import dag
-from airflow.operators.python import PythonOperator
+from airflow.operators.python import BranchPythonOperator
 
 from datarobot_provider.operators.deployment import ActivateDeploymentOperator
+from datarobot_provider.operators.deployment import GetDeploymentStatusOperator
 
 
 @dag(
@@ -22,15 +23,26 @@ def deployment_deactivate_activate(deployment_id="64a7e4add4efa2b707e17daa"):
     if not deployment_id:
         raise ValueError("Invalid or missing `deployment_id` value")
 
+    get_deployment_status_initial_op = GetDeploymentStatusOperator(
+        task_id="get_deployment_status_initial",
+        deployment_id=deployment_id,
+    )
+
+    def choose_branch(deployment_status):
+        if deployment_status == "inactive":
+            return ['activate_deployment']
+        return ['deactivate_deployment']
+
+    branching = BranchPythonOperator(
+        task_id='branching',
+        python_callable=choose_branch,
+        op_args=[get_deployment_status_initial_op.output],
+    )
+
     deactivate_deployment_op = ActivateDeploymentOperator(
         task_id="deactivate_deployment",
         activate=False,
         deployment_id=deployment_id,
-    )
-
-    custom_python_op: PythonOperator = PythonOperator(
-        task_id="custom_python_task",
-        python_callable=lambda: time.sleep(600)
     )
 
     activate_deployment_op = ActivateDeploymentOperator(
@@ -39,7 +51,11 @@ def deployment_deactivate_activate(deployment_id="64a7e4add4efa2b707e17daa"):
         deployment_id=deployment_id,
     )
 
-    deactivate_deployment_op >> custom_python_op >> activate_deployment_op
+    (
+        get_deployment_status_initial_op
+        >> branching
+        >> (activate_deployment_op, deactivate_deployment_op)
+    )
 
 
 deployment_deactivate_activate_dag = deployment_deactivate_activate()
