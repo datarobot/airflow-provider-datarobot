@@ -59,13 +59,13 @@ class GetOrCreateCredentialOperator(BaseOperator):
                     f'Found Credentials :{credential.name} , id={credential.credential_id} '
                     f'for param {self.credentials_param_name}'
                 )
-                if CredentialsBaseHook.default_credential_description == credential.description:
-                    self.log.info(
-                        f'Credentials :{credential.name} , id={credential.credential_id} is managed by Airflow'
-                    )
-                    credential, credentials_data = CredentialsBaseHook.get_hook(
-                        conn_id=credential_name
-                    ).run()
+                # if CredentialsBaseHook.default_credential_description == credential.description:
+                #     self.log.info(
+                #         f'Credentials :{credential.name} , id={credential.credential_id} is managed by Airflow'
+                #     )
+                #     credential, credentials_data = CredentialsBaseHook.get_hook(
+                #         conn_id=credential_name
+                #     ).run()
                 return credential.credential_id
         else:
             # Trying to find an Airflow preconfigured credentials for provided credential name

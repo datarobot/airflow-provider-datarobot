@@ -51,25 +51,24 @@ class CredentialsBaseHook(BaseHook):
         raise NotImplementedError()
 
     def get_or_create_credential(self, conn) -> Credential:
-        # Trying to find existing DataRobot Credentials managed by Airflow provider:
+        # Trying to find existing DataRobot Credentials:
         for credential in Credential.list():
             if credential.name == self.datarobot_credentials_conn_id:
+                self.log.info(
+                    f"Found Existing Credentials :{credential.name} , id={credential.credential_id}"
+                )
                 if self.default_credential_description in credential.description:
-                    self.log.info(
-                        f"Found Existing Credentials :{credential.name} , id={credential.credential_id}"
-                    )
-                    # credential_creation_date = Variable.get(key=self.datarobot_credentials_conn_id)
                     self.log.info(
                         f"Trying to update provided credential:{credential.name} using Airflow preconfigured"
                         f" credentials"
                     )
                     self.update_credentials(conn, credential)
-                    break
-                else:
-                    raise AirflowException(
-                        f"Found Existing Credentials :{credential.name} , id={credential.credential_id}"
-                        f" not managed by Airflow provider: {credential.description}"
-                    )
+                break
+                # else:
+                #     raise AirflowException(
+                #         f"Found Existing Credentials :{credential.name} , id={credential.credential_id}"
+                #         f" not managed by Airflow provider: {credential.description}"
+                #     )
         else:
             self.log.info(
                 f"Credentials:{self.datarobot_credentials_conn_id} does not exist, trying to create it"
