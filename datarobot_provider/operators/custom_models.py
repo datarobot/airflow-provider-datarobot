@@ -379,3 +379,118 @@ class CreateCustomModelVersionOperator(BaseOperator):
         )
 
         return custom_model_version.id
+
+
+class CustomModelTestOperator(BaseOperator):
+    """
+    Create and start a custom model test.
+
+    :param custom_model_id: The ID of the custom model.
+    :type custom_model_id: str
+    :param custom_model_version_id: The ID of the custom model version.
+    :type custom_model_version_id: str
+    :param dataset_id: The id of the testing dataset for non-unstructured custom models.
+            Ignored and not required for unstructured models.
+    :type dataset_id: str, optional
+    :param max_wait:  Max time to wait for training data assignment.
+    :type max_wait: int, optional
+    :return: created custom model test ID
+    :rtype: str
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Iterable[str] = ["custom_model_id", "custom_model_version_id", "dataset_id"]
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Iterable[str] = ()
+    ui_color = '#f4a460'
+
+    def __init__(
+        self,
+        *,
+        custom_model_id: str,
+        custom_model_version_id: str,
+        dataset_id: str = None,
+        max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.custom_model_id = custom_model_id
+        self.custom_model_version_id = custom_model_version_id
+        self.dataset_id = dataset_id
+        self.max_wait_sec = max_wait_sec
+        self.datarobot_conn_id = datarobot_conn_id
+        if kwargs.get('xcom_push') is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Dict[str, Any]) -> str:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        if self.custom_model_id is None:
+            raise ValueError("custom_model_id is required attribute")
+
+        if self.custom_model_version_id is None:
+            raise ValueError("custom_model_version_id is required attribute")
+
+        # Perform custom model tests
+        custom_model_test = dr.CustomModelTest.create(
+            custom_model_id=self.custom_model_id,
+            custom_model_version_id=self.custom_model_version_id,
+            dataset_id=self.dataset_id,
+            max_wait=self.max_wait_sec,
+            network_egress_policy=context["params"].get("network_egress_policy", None),
+            maximum_memory=context["params"].get("maximum_memory", None),
+            replicas=context["params"].get("replicas", None),
+        )
+
+        self.log.info(f"Overall testing status: {custom_model_test.overall_status}")
+
+        return custom_model_test.id
+
+
+class GetCustomModelTestOverallStatusOperator(BaseOperator):
+    """
+    Get a custom model testing overall status.
+
+    :param custom_model_test_id: The ID of the custom model test.
+    :type custom_model_test_id: str
+    :return: custom model test overall status
+    :rtype: dict
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Iterable[str] = ["custom_model_test_id"]
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Iterable[str] = ()
+    ui_color = '#f4a460'
+
+    def __init__(
+        self,
+        *,
+        custom_model_test_id: str,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.custom_model_test_id = custom_model_test_id
+        self.datarobot_conn_id = datarobot_conn_id
+        if kwargs.get('xcom_push') is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Dict[str, Any]) -> str:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        if self.custom_model_test_id is None:
+            raise ValueError("custom_model_test_id is required attribute")
+
+        custom_model_test = dr.CustomModelTest.get(custom_model_test_id=self.custom_model_test_id)
+
+        self.log.info(f"Overall testing status: {custom_model_test.overall_status}")
+
+        return custom_model_test.overall_status
