@@ -63,12 +63,12 @@ class CredentialsBaseHook(BaseHook):
                         f" credentials"
                     )
                     self.update_credentials(conn, credential)
-                break
-                # else:
-                #     raise AirflowException(
-                #         f"Found Existing Credentials :{credential.name} , id={credential.credential_id}"
-                #         f" not managed by Airflow provider: {credential.description}"
-                #     )
+                    break
+                else:
+                    raise AirflowException(
+                        f"Found Existing Credentials :{credential.name} , id={credential.credential_id}"
+                        f" not managed by Airflow provider: {credential.description}"
+                    )
         else:
             self.log.info(
                 f"Credentials:{self.datarobot_credentials_conn_id} does not exist, trying to create it"
