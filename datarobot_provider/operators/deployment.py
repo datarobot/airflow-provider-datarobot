@@ -141,3 +141,105 @@ class ReplaceModelOperator(BaseOperator):
         self.log.info(
             f"Trying to replace a model for deployment_id={self.deployment_id} to new_model_id={self.new_model_id}"
         )
+
+
+class ActivateDeploymentOperator(BaseOperator):
+    """
+    Activate or deactivate a Deployment.
+
+    :param deployment_id: DataRobot deployment ID
+    :type deployment_id: str
+    :param activate:
+    :type activate: boolean
+    :param max_wait_sec: The maximum time in seconds to wait for deployment activation/deactivation to complete
+    :type max_wait_sec: int
+    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
+    :type datarobot_conn_id: str, optional
+    :return: Deployment status (active/inactive)
+    :rtype: str
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Iterable[str] = ["deployment_id", "activate"]
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Iterable[str] = ()
+    ui_color = "#f4a460"
+
+    def __init__(
+        self,
+        *,
+        deployment_id: str,
+        activate: bool = True,
+        max_wait_sec: int = 600,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.deployment_id = deployment_id
+        self.activate = activate
+        self.max_wait_sec = max_wait_sec
+        self.datarobot_conn_id = datarobot_conn_id
+        if kwargs.get("xcom_push") is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Dict[str, Any]) -> str:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        if self.deployment_id is None:
+            raise ValueError("Invalid or missing `deployment_id` value")
+
+        self.log.info(f"Getting Deployment with deployment_id={self.deployment_id}")
+        deployment = dr.Deployment.get(self.deployment_id)
+        if self.activate:
+            deployment.activate(max_wait=self.max_wait_sec)
+        else:
+            deployment.deactivate(max_wait=self.max_wait_sec)
+        return deployment.status
+
+
+class GetDeploymentStatusOperator(BaseOperator):
+    """
+    Get a Deployment status (active/inactive).
+
+    :param deployment_id: DataRobot deployment ID
+    :type deployment_id: str
+    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
+    :type datarobot_conn_id: str, optional
+    :return: Deployment status (active/inactive)
+    :rtype: str
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Iterable[str] = ["deployment_id"]
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Iterable[str] = ()
+    ui_color = "#f4a460"
+
+    def __init__(
+        self,
+        *,
+        deployment_id: str,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.deployment_id = deployment_id
+        self.datarobot_conn_id = datarobot_conn_id
+        if kwargs.get("xcom_push") is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Dict[str, Any]) -> str:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        if self.deployment_id is None:
+            raise ValueError("Invalid or missing `deployment_id` value")
+
+        self.log.info(f"Getting Deployment for deployment_id={self.deployment_id}")
+        deployment = dr.Deployment.get(self.deployment_id)
+        return deployment.status
