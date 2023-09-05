@@ -496,7 +496,7 @@ class GetCustomModelTestOverallStatusOperator(BaseOperator):
         return custom_model_test.overall_status
 
 
-class DeployCustomModelOperator(BaseOperator):
+class CreateCustomModelDeploymentOperator(BaseOperator):
     """
     Create a deployment from a DataRobot custom model image.
 

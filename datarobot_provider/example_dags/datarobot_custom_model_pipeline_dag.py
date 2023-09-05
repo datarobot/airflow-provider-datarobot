@@ -9,13 +9,14 @@
 from datetime import datetime
 
 from airflow.decorators import dag
+from airflow.operators.empty import EmptyOperator
+from airflow.operators.python import BranchPythonOperator
 from datarobot import TARGET_TYPE
+from datarobot.enums import DEPLOYMENT_IMPORTANCE
 
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
-from datarobot_provider.operators.custom_models import (
-    CreateCustomInferenceModelOperator,
-    DeployCustomModelOperator,
-)
+from datarobot_provider.operators.custom_models import CreateCustomInferenceModelOperator
+from datarobot_provider.operators.custom_models import CreateCustomModelDeploymentOperator
 from datarobot_provider.operators.custom_models import CreateCustomModelVersionOperator
 from datarobot_provider.operators.custom_models import CreateExecutionEnvironmentOperator
 from datarobot_provider.operators.custom_models import CreateExecutionEnvironmentVersionOperator
@@ -43,60 +44,78 @@ from datarobot_provider.operators.custom_models import GetCustomModelTestOverall
         "dataset_file_path": "/datarobot-user-models/tests/testdata/juniors_3_year_stats_regression.csv",
     },
 )
-def create_custom_model_pipeline():
-    # create_execution_environment_op = CreateExecutionEnvironmentOperator(
-    #     task_id='create_execution_environment',
-    # )
-    #
-    # create_execution_environment_version_op = CreateExecutionEnvironmentVersionOperator(
-    #     task_id='create_execution_environment_version',
-    #     execution_environment_id=create_execution_environment_op.output,
-    # )
-    #
-    # create_custom_inference_model_op = CreateCustomInferenceModelOperator(
-    #     task_id='create_custom_inference_model',
-    # )
-    #
-    # create_custom_model_version_op = CreateCustomModelVersionOperator(
-    #     task_id='create_custom_model_version',
-    #     custom_model_id=create_custom_inference_model_op.output,
-    #     base_environment_id=create_execution_environment_op.output,
-    # )
-    #
-    # dataset_uploading_op = UploadDatasetOperator(
-    #     task_id="dataset_uploading",
-    # )
-    #
-    # custom_model_test_op = CustomModelTestOperator(
-    #     task_id='custom_model_test',
-    #     custom_model_id=create_custom_inference_model_op.output,
-    #     custom_model_version_id=create_custom_model_version_op.output,
-    #     dataset_id=dataset_uploading_op.output,
-    # )
-    #
-    # custom_model_test_overall_status_op = GetCustomModelTestOverallStatusOperator(
-    #     task_id='custom_model_test_overall_status',
-    #     custom_model_test_id=custom_model_test_op.output,
-    # )
-    #
-    # (
-    #     create_execution_environment_op
-    #     >> create_execution_environment_version_op
-    #     >> create_custom_inference_model_op
-    #     >> create_custom_model_version_op
-    #     >> dataset_uploading_op
-    #     >> custom_model_test_op
-    #     >> custom_model_test_overall_status_op
-    # )
-
-    deploy_custom_model_op = DeployCustomModelOperator(
-        task_id='deploy_custom_model',
-        custom_model_version_id="64f70a4f5066d75368d0725b",
-        deployment_label="TEST",
-        prediction_server_id="5fbc1924ccfc5a0025c424bf",
+def create_custom_model_pipeline(
+    prediction_server_id="5fbc1924ccfc5a0025c424bf", deployment_name="Demo Deployment"
+):
+    create_execution_environment_op = CreateExecutionEnvironmentOperator(
+        task_id='create_execution_environment',
     )
 
-    deploy_custom_model_op
+    create_execution_environment_version_op = CreateExecutionEnvironmentVersionOperator(
+        task_id='create_execution_environment_version',
+        execution_environment_id=create_execution_environment_op.output,
+    )
+
+    create_custom_inference_model_op = CreateCustomInferenceModelOperator(
+        task_id='create_custom_inference_model',
+    )
+
+    create_custom_model_version_op = CreateCustomModelVersionOperator(
+        task_id='create_custom_model_version',
+        custom_model_id=create_custom_inference_model_op.output,
+        base_environment_id=create_execution_environment_op.output,
+    )
+
+    dataset_uploading_op = UploadDatasetOperator(
+        task_id="dataset_uploading",
+    )
+
+    custom_model_test_op = CustomModelTestOperator(
+        task_id='custom_model_test',
+        custom_model_id=create_custom_inference_model_op.output,
+        custom_model_version_id=create_custom_model_version_op.output,
+        dataset_id=dataset_uploading_op.output,
+    )
+
+    custom_model_test_overall_status_op = GetCustomModelTestOverallStatusOperator(
+        task_id='custom_model_test_overall_status',
+        custom_model_test_id=custom_model_test_op.output,
+    )
+
+    def choose_branch(custom_model_test_overall_status):
+        if custom_model_test_overall_status == "succeeded":
+            return ['deploy_custom_model']
+        return ['custom_model_test_fail']
+
+    branching = BranchPythonOperator(
+        task_id='if_tests_succeed',
+        python_callable=choose_branch,
+        op_args=[custom_model_test_overall_status_op.output],
+    )
+
+    deploy_custom_model_op = CreateCustomModelDeploymentOperator(
+        task_id='deploy_custom_model',
+        custom_model_version_id=create_custom_model_version_op.output,
+        deployment_name=deployment_name,
+        prediction_server_id=prediction_server_id,
+        importance=DEPLOYMENT_IMPORTANCE.LOW,
+    )
+
+    custom_model_test_fail_case_op = EmptyOperator(
+        task_id='custom_model_test_fail',
+    )
+
+    (
+        create_execution_environment_op
+        >> create_execution_environment_version_op
+        >> create_custom_inference_model_op
+        >> create_custom_model_version_op
+        >> dataset_uploading_op
+        >> custom_model_test_op
+        >> custom_model_test_overall_status_op
+        >> branching
+        >> [deploy_custom_model_op, custom_model_test_fail_case_op]
+    )
 
 
 create_custom_model_pipeline_dag = create_custom_model_pipeline()
