@@ -25,8 +25,8 @@ from datarobot_provider.operators.custom_models import GetCustomModelTestOverall
     start_date=datetime(2023, 1, 1),
     tags=['example', 'custom model'],
     params={
-        "execution_environment_name": "Demo Execution Environment v2",
-        "execution_environment_description": "Demo Execution Environment for Airflow provider v2",
+        "execution_environment_name": "Demo Execution Environment",
+        "execution_environment_description": "Demo Execution Environment for Airflow provider",
         "programming_language": "python",
         "required_metadata_keys": [],  # example: [{"field_name": "test_key", "display_name": "test_display_name"}],
         "custom_model_description": 'This is a custom model created by Airflow',
@@ -35,9 +35,9 @@ from datarobot_provider.operators.custom_models import GetCustomModelTestOverall
         "target_type": TARGET_TYPE.REGRESSION,
         "target_name": 'Grade 2014',
         "is_major_update": True,
-        "docker_context_path": "/Users/oleksandr.saienko/development/dr/datarobot-user-models/public_dropin_environments/python3_pytorch/",
-        "custom_model_folder": "/Users/oleksandr.saienko/development/dr/datarobot-user-models/model_templates/python3_pytorch/",
-        "dataset_file_path": "/Users/oleksandr.saienko/development/dr/datarobot-user-models/tests/testdata/juniors_3_year_stats_regression.csv",
+        "docker_context_path": "/datarobot-user-models/public_dropin_environments/python3_pytorch/",
+        "custom_model_folder": "/datarobot-user-models/model_templates/python3_pytorch/",
+        "dataset_file_path": "/datarobot-user-models/tests/testdata/juniors_3_year_stats_regression.csv",
     },
 )
 def create_custom_model_pipeline():
