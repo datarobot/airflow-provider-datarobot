@@ -399,11 +399,7 @@ class CustomModelTestOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
-        "custom_model_id",
-        "custom_model_version_id",
-        "dataset_id"
-    ]
+    template_fields: Iterable[str] = ["custom_model_id", "custom_model_version_id", "dataset_id"]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
     ui_color = '#f4a460'
@@ -434,14 +430,10 @@ class CustomModelTestOperator(BaseOperator):
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         if self.custom_model_id is None:
-            raise ValueError(
-                "custom_model_id is required attribute"
-            )
+            raise ValueError("custom_model_id is required attribute")
 
         if self.custom_model_version_id is None:
-            raise ValueError(
-                "custom_model_version_id is required attribute"
-            )
+            raise ValueError("custom_model_version_id is required attribute")
 
         # Perform custom model tests
         custom_model_test = dr.CustomModelTest.create(
@@ -454,8 +446,51 @@ class CustomModelTestOperator(BaseOperator):
             replicas=context["params"].get("replicas", None),
         )
 
-        self.log.info(
-            f"Overall testing status: {custom_model_test.overall_status}"
-        )
+        self.log.info(f"Overall testing status: {custom_model_test.overall_status}")
 
         return custom_model_test.id
+
+
+class GetCustomModelTestOverallStatusOperator(BaseOperator):
+    """
+    Get a custom model testing overall status.
+
+    :param custom_model_test_id: The ID of the custom model test.
+    :type custom_model_test_id: str
+    :return: custom model test overall status
+    :rtype: dict
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Iterable[str] = ["custom_model_test_id"]
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Iterable[str] = ()
+    ui_color = '#f4a460'
+
+    def __init__(
+        self,
+        *,
+        custom_model_test_id: str,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.custom_model_test_id = custom_model_test_id
+        self.datarobot_conn_id = datarobot_conn_id
+        if kwargs.get('xcom_push') is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Dict[str, Any]) -> str:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        if self.custom_model_test_id is None:
+            raise ValueError("custom_model_test_id is required attribute")
+
+        custom_model_test = dr.CustomModelTest.get(custom_model_test_id=self.custom_model_test_id)
+
+        self.log.info(f"Overall testing status: {custom_model_test.overall_status}")
+
+        return custom_model_test.overall_status
