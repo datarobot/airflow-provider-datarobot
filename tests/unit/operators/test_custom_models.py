@@ -12,6 +12,7 @@ from datarobot import NETWORK_EGRESS_POLICY
 from datarobot import TARGET_TYPE
 
 from datarobot_provider.operators.custom_models import CreateCustomInferenceModelOperator
+from datarobot_provider.operators.custom_models import CreateCustomModelDeploymentOperator
 from datarobot_provider.operators.custom_models import CreateCustomModelVersionOperator
 from datarobot_provider.operators.custom_models import CustomModelTestOperator
 from datarobot_provider.operators.custom_models import GetCustomModelTestOverallStatusOperator
@@ -284,6 +285,73 @@ def test_operator_get_custom_model_test_no_custom_model_test_id_op():
     operator = GetCustomModelTestOverallStatusOperator(
         task_id='create_custom_model_test',
         custom_model_test_id=custom_model_test_id,
+    )
+
+    with pytest.raises(ValueError):
+        operator.execute(context={"params": custom_model_params})
+
+
+def test_operator_create_custom_model_deployment_op(mocker, custom_model_params):
+    custom_model_deployment_mock = mocker.Mock(target=None)
+    custom_model_deployment_mock.id = "custom-model-deployment-id"
+
+    create_custom_model_deployment_mock = mocker.patch.object(
+        dr.Deployment, "create_from_custom_model_version", return_value=custom_model_deployment_mock
+    )
+
+    custom_model_version_id = "custom-model-version-id"
+    prediction_server_id = "prediction-server-id"
+    deployment_name = "Demo Test"
+    description = "Test Description"
+    max_wait_sec = 1000
+    importance = dr.enums.DEPLOYMENT_IMPORTANCE.LOW
+
+    operator = CreateCustomModelDeploymentOperator(
+        task_id='deploy_custom_model',
+        custom_model_version_id=custom_model_version_id,
+        deployment_name=deployment_name,
+        description=description,
+        prediction_server_id=prediction_server_id,
+        importance=importance,
+        max_wait_sec=max_wait_sec,
+    )
+
+    operator_result = operator.execute(context={"params": custom_model_params})
+
+    create_custom_model_deployment_mock.assert_called_with(
+        custom_model_version_id=custom_model_version_id,
+        label=deployment_name,
+        description=description,
+        default_prediction_server_id=prediction_server_id,
+        importance=importance,
+        max_wait=max_wait_sec,
+    )
+
+    assert operator_result == custom_model_deployment_mock.id
+
+
+def test_operator_create_custom_model_deployment_no_custom_model_id_op():
+    custom_model_version_id = None
+    deployment_name = "deployment-name"
+
+    operator = CreateCustomModelDeploymentOperator(
+        task_id='deploy_custom_model',
+        custom_model_version_id=custom_model_version_id,
+        deployment_name=deployment_name,
+    )
+
+    with pytest.raises(ValueError):
+        operator.execute(context={"params": custom_model_params})
+
+
+def test_operator_create_custom_model_deployment_no_deployment_name_op():
+    custom_model_version_id = "custom-model-test-id"
+    deployment_name = None
+
+    operator = CreateCustomModelDeploymentOperator(
+        task_id='deploy_custom_model',
+        custom_model_version_id=custom_model_version_id,
+        deployment_name=deployment_name,
     )
 
     with pytest.raises(ValueError):

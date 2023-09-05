@@ -9,10 +9,14 @@
 from datetime import datetime
 
 from airflow.decorators import dag
+from airflow.operators.empty import EmptyOperator
+from airflow.operators.python import BranchPythonOperator
 from datarobot import TARGET_TYPE
+from datarobot.enums import DEPLOYMENT_IMPORTANCE
 
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 from datarobot_provider.operators.custom_models import CreateCustomInferenceModelOperator
+from datarobot_provider.operators.custom_models import CreateCustomModelDeploymentOperator
 from datarobot_provider.operators.custom_models import CreateCustomModelVersionOperator
 from datarobot_provider.operators.custom_models import CreateExecutionEnvironmentOperator
 from datarobot_provider.operators.custom_models import CreateExecutionEnvironmentVersionOperator
@@ -40,7 +44,9 @@ from datarobot_provider.operators.custom_models import GetCustomModelTestOverall
         "dataset_file_path": "/datarobot-user-models/tests/testdata/juniors_3_year_stats_regression.csv",
     },
 )
-def create_custom_model_pipeline():
+def create_custom_model_pipeline(
+    prediction_server_id="5fbc1924ccfc5a0025c424bf", deployment_name="Demo Deployment"
+):
     create_execution_environment_op = CreateExecutionEnvironmentOperator(
         task_id='create_execution_environment',
     )
@@ -76,6 +82,29 @@ def create_custom_model_pipeline():
         custom_model_test_id=custom_model_test_op.output,
     )
 
+    def choose_branch(custom_model_test_overall_status):
+        if custom_model_test_overall_status == "succeeded":
+            return ['deploy_custom_model']
+        return ['custom_model_test_fail']
+
+    branching = BranchPythonOperator(
+        task_id='if_tests_succeed',
+        python_callable=choose_branch,
+        op_args=[custom_model_test_overall_status_op.output],
+    )
+
+    deploy_custom_model_op = CreateCustomModelDeploymentOperator(
+        task_id='deploy_custom_model',
+        custom_model_version_id=create_custom_model_version_op.output,
+        deployment_name=deployment_name,
+        prediction_server_id=prediction_server_id,
+        importance=DEPLOYMENT_IMPORTANCE.LOW,
+    )
+
+    custom_model_test_fail_case_op = EmptyOperator(
+        task_id='custom_model_test_fail',
+    )
+
     (
         create_execution_environment_op
         >> create_execution_environment_version_op
@@ -84,6 +113,8 @@ def create_custom_model_pipeline():
         >> dataset_uploading_op
         >> custom_model_test_op
         >> custom_model_test_overall_status_op
+        >> branching
+        >> [deploy_custom_model_op, custom_model_test_fail_case_op]
     )
 
 
