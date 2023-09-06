@@ -11,6 +11,7 @@ from typing import Iterable
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
+from airflow.exceptions import AirflowFailException
 from airflow.models import BaseOperator
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
@@ -39,7 +40,7 @@ class CreateExternalModelPackageOperator(BaseOperator):
     def __init__(
         self,
         *,
-        model_package_json: dict = None,
+        model_package_json: Dict[str, Any] = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
@@ -52,12 +53,17 @@ class CreateExternalModelPackageOperator(BaseOperator):
             )
 
     # Utility method to support old Model Registry API
-    def create_model_package_from_json(self, model_info: Dict[str, Any]) -> str:
-        response = dr.client.get_client().post("modelPackages/fromJSON/", data=model_info)
-        response_json = response.json()
-        model_package_id = response_json["id"]
-        self.log.info(f"Created Model Package, id={model_package_id}")
-        return model_package_id
+    def create_model_package_from_json(self) -> str:
+        response = dr.client.get_client().post(
+            "modelPackages/fromJSON/", data=self.model_package_json
+        )
+        if response.status_code == 201:
+            response_json = response.json()
+            model_package_id = response_json["id"]
+            return model_package_id
+        else:
+            e_msg = "Server unexpectedly returned status code {}"
+            raise AirflowFailException(e_msg.format(response.status_code))
 
     def execute(self, context: Dict[str, Any]) -> str:
         # Initialize DataRobot client
@@ -70,7 +76,7 @@ class CreateExternalModelPackageOperator(BaseOperator):
         if self.model_package_json is None:
             raise ValueError("model_package_json is required.")
 
-        model_package_id = self.create_model_package_from_json(self.model_package_json)
+        model_package_id = self.create_model_package_from_json()
 
         self.log.info(f"External Model Package Created, model_package_id={model_package_id}")
 

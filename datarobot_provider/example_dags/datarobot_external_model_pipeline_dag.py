@@ -75,11 +75,11 @@ Example JSON for a multiclass classification model:
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'custom model'],
+    tags=['example', 'mlops', 'external model'],
     params={
-        "model_package": {
-            "name": "Lending club regression",
-            "modelDescription": {"description": "Regression on lending club dataset"},
+        "model_package_json": {
+            "name": "Demo Regression Model",
+            "modelDescription": {"description": "Regression on demo dataset"},
             "target": {"type": TARGET_TYPE.REGRESSION, "name": 'Grade 2014'},
         },
     },
