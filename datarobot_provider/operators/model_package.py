@@ -18,7 +18,7 @@ from datarobot_provider.hooks.datarobot import DataRobotHook
 DEFAULT_MAX_WAIT_SEC = 600
 
 
-class CreateModelPackageOperator(BaseOperator):
+class CreateExternalModelPackageOperator(BaseOperator):
     """
     Create an external model package in DataRobot MLOps from JSON configuration
 

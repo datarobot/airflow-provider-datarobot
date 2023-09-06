@@ -11,7 +11,7 @@ from datetime import datetime
 from airflow.decorators import dag
 from datarobot import TARGET_TYPE
 
-from datarobot_provider.operators.model_package import CreateModelPackageOperator
+from datarobot_provider.operators.model_package import CreateExternalModelPackageOperator
 
 """
 Example of JSON configuration for a regression model:
@@ -85,7 +85,7 @@ Example JSON for a multiclass classification model:
     },
 )
 def create_external_deployment_pipeline():
-    create_model_package_op = CreateModelPackageOperator(
+    create_model_package_op = CreateExternalModelPackageOperator(
         task_id='create_model_package',
     )
 
