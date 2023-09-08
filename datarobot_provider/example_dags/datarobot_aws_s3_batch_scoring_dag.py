@@ -11,7 +11,7 @@ and using a preconfigured "DataRobot AWS Credentials" from Airflow Connections.
 DataRobot AWS Credentials can be configured using Airflow UI (Admin->Connections) or Airflow API
 Config example for this dag:
 {
-    "datarobot_aws_credentials": "demo_aws_s3_test_credentials2",
+    "datarobot_aws_credentials": "demo_aws_s3_test_credentials",
     "deployment_id": "put_your_deployment_id",  # you can set deployment_id here
     "score_settings": {
         "intake_settings": {
