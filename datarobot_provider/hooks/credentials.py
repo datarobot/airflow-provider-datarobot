@@ -457,7 +457,7 @@ class AzureStorageCredentialsHook(CredentialsBaseHook):
         """Updates Azure Storage credentials for params in connection object"""
 
         azure_credentials = {"azure_connection_string": self.create_azure_connection_string(conn)}
-        self.log.info(f"Updating Azure Storage Credentials:{self.datarobot_credentials_conn_id}")
+        self.log.info(f"Updating Azure Storage Credentials: {self.datarobot_credentials_conn_id}")
         try:
             credential.update(**azure_credentials)
 
