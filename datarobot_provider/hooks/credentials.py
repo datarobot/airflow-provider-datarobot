@@ -559,7 +559,7 @@ class OAuthCredentialsHook(CredentialsBaseHook):
             "refresh_token": refresh_token,
         }
 
-        self.log.info(f"Updating OAuth Credentials:{self.datarobot_credentials_conn_id}")
+        self.log.info(f"Updating OAuth Credentials: {self.datarobot_credentials_conn_id}")
         try:
             credential.update(**oauth_credentials)
 
