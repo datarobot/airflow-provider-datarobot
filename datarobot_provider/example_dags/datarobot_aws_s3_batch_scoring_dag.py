@@ -76,7 +76,7 @@ def datarobot_s3_batch_scoring(deployment_id=None):
         job_id=score_predictions_op.output,
     )
 
-    (get_credentials_op >> score_predictions_op >> scoring_complete_sensor)
+    get_credentials_op >> score_predictions_op >> scoring_complete_sensor
 
 
 datarobot_s3_batch_scoring_dag = datarobot_s3_batch_scoring()
