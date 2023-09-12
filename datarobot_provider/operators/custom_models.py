@@ -280,7 +280,7 @@ class CreateCustomInferenceModelOperator(BaseOperator):
 
 class CreateCustomModelVersionOperator(BaseOperator):
     """
-    Create a custom model version without files from previous versions.
+    Create a custom model version.
 
     :param custom_model_id: The ID of the custom model.
     :type custom_model_id: str
@@ -294,6 +294,10 @@ class CreateCustomModelVersionOperator(BaseOperator):
     :param custom_model_folder: The ID of the holdout dataset to assign to the custom model.
             Can only be assigned for unstructured models.
     :type custom_model_folder: str, optional
+    :create_from_previous: if set to True - creates a custom model version containing files from a previous version.
+        if set to False - creates a custom model version without files from previous versions.
+        value by default is: False.
+    :create_from_previous: bool, optional
     :param max_wait:  Max time to wait for training data assignment.
     :type max_wait: int, optional
     :return: created custom model version ID
@@ -307,6 +311,7 @@ class CreateCustomModelVersionOperator(BaseOperator):
         "training_dataset_id",
         "holdout_dataset_id",
         "custom_model_folder",
+        "create_from_previous",
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
@@ -320,6 +325,7 @@ class CreateCustomModelVersionOperator(BaseOperator):
         training_dataset_id: str = None,
         holdout_dataset_id: str = None,
         custom_model_folder: str = None,
+        create_from_previous: bool = False,
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
@@ -330,6 +336,7 @@ class CreateCustomModelVersionOperator(BaseOperator):
         self.training_dataset_id = training_dataset_id
         self.holdout_dataset_id = holdout_dataset_id
         self.custom_model_folder = custom_model_folder
+        self.create_from_previous = create_from_previous
         self.max_wait_sec = max_wait_sec
         self.datarobot_conn_id = datarobot_conn_id
         if kwargs.get('xcom_push') is not None:
@@ -357,22 +364,45 @@ class CreateCustomModelVersionOperator(BaseOperator):
                 "base_environment_id is required attribute for CreateCustomModelVersionOperator"
             )
 
-        custom_model_version = dr.CustomModelVersion.create_clean(
-            custom_model_id=self.custom_model_id,
-            training_dataset_id=self.training_dataset_id,
-            base_environment_id=self.base_environment_id,
-            holdout_dataset_id=self.holdout_dataset_id,
-            folder_path=folder_path,
-            is_major_update=context["params"].get("is_major_update", None),
-            files=context["params"].get("files", None),
-            network_egress_policy=context["params"].get("network_egress_policy", None),
-            maximum_memory=context["params"].get("maximum_memory", None),
-            replicas=context["params"].get("replicas", None),
-            required_metadata_values=context["params"].get("required_metadata_values", None),
-            partition_column=context["params"].get("partition_column", None),
-            keep_training_holdout_data=context["params"].get("keep_training_holdout_data", None),
-            max_wait=self.max_wait_sec,
-        )
+        if self.create_from_previous:
+            custom_model_version = dr.CustomModelVersion.create_from_previous(
+                custom_model_id=self.custom_model_id,
+                training_dataset_id=self.training_dataset_id,
+                base_environment_id=self.base_environment_id,
+                holdout_dataset_id=self.holdout_dataset_id,
+                folder_path=folder_path,
+                is_major_update=context["params"].get("is_major_update", None),
+                files=context["params"].get("files", None),
+                files_to_delete=context["params"].get("files_to_delete", None),
+                network_egress_policy=context["params"].get("network_egress_policy", None),
+                maximum_memory=context["params"].get("maximum_memory", None),
+                replicas=context["params"].get("replicas", None),
+                required_metadata_values=context["params"].get("required_metadata_values", None),
+                partition_column=context["params"].get("partition_column", None),
+                keep_training_holdout_data=context["params"].get(
+                    "keep_training_holdout_data", None
+                ),
+                max_wait=self.max_wait_sec,
+            )
+        else:
+            custom_model_version = dr.CustomModelVersion.create_clean(
+                custom_model_id=self.custom_model_id,
+                training_dataset_id=self.training_dataset_id,
+                base_environment_id=self.base_environment_id,
+                holdout_dataset_id=self.holdout_dataset_id,
+                folder_path=folder_path,
+                is_major_update=context["params"].get("is_major_update", None),
+                files=context["params"].get("files", None),
+                network_egress_policy=context["params"].get("network_egress_policy", None),
+                maximum_memory=context["params"].get("maximum_memory", None),
+                replicas=context["params"].get("replicas", None),
+                required_metadata_values=context["params"].get("required_metadata_values", None),
+                partition_column=context["params"].get("partition_column", None),
+                keep_training_holdout_data=context["params"].get(
+                    "keep_training_holdout_data", None
+                ),
+                max_wait=self.max_wait_sec,
+            )
 
         self.log.info(
             f"Custom Model Version created, custom_model_version_id={custom_model_version.id}"
