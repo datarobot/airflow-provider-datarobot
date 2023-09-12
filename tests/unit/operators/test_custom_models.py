@@ -37,6 +37,7 @@ def custom_model_params():
         "target_name": 'Grade 2014',
         'is_major_update': True,
         'files': ['file1', 'file2'],
+        'files_to_delete': ['file3', 'file4'],
         'network_egress_policy': NETWORK_EGRESS_POLICY.ALL,
         'maximum_memory': 2048,
         'replicas': 1,
@@ -122,8 +123,12 @@ def test_operator_create_custom_model_version_op(mocker, custom_model_params):
     custom_model_version_mock = mocker.Mock(target=None)
     custom_model_version_mock.id = "test-custom-model-version-id"
 
-    custom_model_version_create_mock = mocker.patch.object(
+    custom_model_version_create_clean_mock = mocker.patch.object(
         dr.CustomModelVersion, "create_clean", return_value=custom_model_version_mock
+    )
+
+    custom_model_version_create_from_previous_mock = mocker.patch.object(
+        dr.CustomModelVersion, "create_from_previous", return_value=custom_model_version_mock
     )
 
     custom_model_id = "custom-model-id"
@@ -141,7 +146,7 @@ def test_operator_create_custom_model_version_op(mocker, custom_model_params):
 
     operator_result = operator.execute(context={"params": custom_model_params})
 
-    custom_model_version_create_mock.assert_called_with(
+    custom_model_version_create_clean_mock.assert_called_with(
         custom_model_id=custom_model_id,
         training_dataset_id=training_dataset_id,
         base_environment_id=base_environment_id,
@@ -157,6 +162,59 @@ def test_operator_create_custom_model_version_op(mocker, custom_model_params):
         keep_training_holdout_data=custom_model_params["keep_training_holdout_data"],
         max_wait=3600,
     )
+
+    custom_model_version_create_from_previous_mock.assert_not_called()
+
+    assert operator_result == custom_model_version_mock.id
+
+
+def test_operator_create_custom_model_version_from_previous_op(mocker, custom_model_params):
+    custom_model_version_mock = mocker.Mock(target=None)
+    custom_model_version_mock.id = "test-custom-model-version-id"
+
+    custom_model_version_create_clean_mock = mocker.patch.object(
+        dr.CustomModelVersion, "create_clean", return_value=custom_model_version_mock
+    )
+
+    custom_model_version_create_from_previous_mock = mocker.patch.object(
+        dr.CustomModelVersion, "create_from_previous", return_value=custom_model_version_mock
+    )
+
+    custom_model_id = "custom-model-id"
+    training_dataset_id = "training-dataset-id"
+    base_environment_id = "base-environment-id"
+    holdout_dataset_id = "holdout-dataset-id"
+
+    operator = CreateCustomModelVersionOperator(
+        task_id='create_custom_model_version',
+        custom_model_id=custom_model_id,
+        training_dataset_id=training_dataset_id,
+        base_environment_id=base_environment_id,
+        holdout_dataset_id=holdout_dataset_id,
+        create_from_previous=True,
+    )
+
+    operator_result = operator.execute(context={"params": custom_model_params})
+
+    custom_model_version_create_from_previous_mock.assert_called_with(
+        custom_model_id=custom_model_id,
+        training_dataset_id=training_dataset_id,
+        base_environment_id=base_environment_id,
+        holdout_dataset_id=holdout_dataset_id,
+        folder_path=custom_model_params["custom_model_folder"],
+        is_major_update=custom_model_params["is_major_update"],
+        files=custom_model_params["files"],
+        files_to_delete=custom_model_params["files_to_delete"],
+        network_egress_policy=custom_model_params["network_egress_policy"],
+        maximum_memory=custom_model_params["maximum_memory"],
+        replicas=custom_model_params["replicas"],
+        required_metadata_values=custom_model_params["required_metadata_values"],
+        partition_column=custom_model_params["partition_column"],
+        keep_training_holdout_data=custom_model_params["keep_training_holdout_data"],
+        max_wait=3600,
+    )
+
+    custom_model_version_create_clean_mock.assert_not_called()
 
     assert operator_result == custom_model_version_mock.id
 
