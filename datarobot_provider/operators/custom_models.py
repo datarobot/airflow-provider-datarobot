@@ -281,8 +281,6 @@ class CreateCustomInferenceModelOperator(BaseOperator):
 class CreateCustomModelVersionOperator(BaseOperator):
     """
     Create a custom model version.
-    Create a custom model version containing files from a previous version.
-     without files from previous versions.
 
     :param custom_model_id: The ID of the custom model.
     :type custom_model_id: str
@@ -298,7 +296,7 @@ class CreateCustomModelVersionOperator(BaseOperator):
     :type custom_model_folder: str, optional
     :create_from_previous: if set to True - creates a custom model version containing files from a previous version.
         if set to False - creates a custom model version without files from previous versions.
-        valuer by default is: False.
+        value by default is: False.
     :create_from_previous: bool, optional
     :param max_wait:  Max time to wait for training data assignment.
     :type max_wait: int, optional
