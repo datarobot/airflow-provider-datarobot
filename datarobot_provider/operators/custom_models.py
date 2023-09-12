@@ -575,3 +575,62 @@ class CreateCustomModelDeploymentOperator(BaseOperator):
 
         self.log.info(f"Deployment created, deployment_id: {deployment.id}")
         return deployment.id
+
+
+class AssignTrainingDataCustomModelOperator(BaseOperator):
+    """
+    Assign training data to Custom Inference Model.
+
+    :param custom_model_id: The ID of the custom model.
+    :type custom_model_id: str
+    :param training_dataset_id: The ID of the training dataset to assign to the custom model.
+    :type training_dataset_id: str, optional
+    :param max_wait:  Max time to wait in seconds for training data assignment.
+    :type max_wait: int, optional
+    :return:
+    :rtype: dict
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Iterable[str] = ["custom_model_id", "training_dataset_id", "partition_column"]
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Iterable[str] = ()
+    ui_color = '#f4a460'
+
+    def __init__(
+        self,
+        *,
+        custom_model_id: str,
+        training_dataset_id: str,
+        partition_column: str = None,
+        max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.custom_model_id = custom_model_id
+        self.training_dataset_id = training_dataset_id
+        self.partition_column = partition_column
+        self.max_wait_sec = max_wait_sec
+        self.datarobot_conn_id = datarobot_conn_id
+        if kwargs.get('xcom_push') is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Dict[str, Any]) -> None:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        if self.custom_model_id is None:
+            raise ValueError("custom_model_id is required attribute")
+
+        if self.training_dataset_id is None:
+            raise ValueError("training_dataset_id is required attribute")
+
+        custom_model = dr.CustomInferenceModel.get(self.custom_model_id)
+        custom_model.assign_training_data(
+            dataset_id=self.training_dataset_id,
+            partition_column=self.partition_column,
+            max_wait=self.max_wait_sec,
+        )
