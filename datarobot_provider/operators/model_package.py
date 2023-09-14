@@ -159,33 +159,45 @@ class DeployModelPackageOperator(BaseOperator):
 
     # Utility method to support creating Deployment from Model Package
     # Will be refactored after release 3.3 of DataRobot public python client
-    def _create_from_model_package(self) -> str:
+    @classmethod
+    def _create_from_model_package(
+        cls,
+        model_package_id: str,
+        deployment_name: str,
+        description: str = None,
+        default_prediction_server_id: str = None,
+        prediction_environment_id: str = None,
+        importance: str = None,
+        user_provided_id: str = None,
+        additional_metadata: Dict[str, str] = None,
+        max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
+    ) -> str:
         deployment_payload: Dict[str, Any] = {
-            "model_package_id": self.model_package_id,
-            "label": self.deployment_name,
-            "description": self.description,
+            "model_package_id": model_package_id,
+            "label": deployment_name,
+            "description": description,
         }
-        if self.default_prediction_server_id and self.prediction_environment_id:
+        if default_prediction_server_id and prediction_environment_id:
             raise ValueError(
                 "When working with prediction environments, default prediction server Id should not be provided"
             )
-        elif self.default_prediction_server_id and self.prediction_environment_id is None:
-            deployment_payload["default_prediction_server_id"] = self.default_prediction_server_id
-        elif self.prediction_environment_id and self.default_prediction_server_id is None:
-            deployment_payload["prediction_environment_id"] = self.prediction_environment_id
+        elif default_prediction_server_id and prediction_environment_id is None:
+            deployment_payload["default_prediction_server_id"] = default_prediction_server_id
+        elif prediction_environment_id and default_prediction_server_id is None:
+            deployment_payload["prediction_environment_id"] = prediction_environment_id
 
-        if self.importance:
-            deployment_payload["importance"] = self.importance
-        if self.user_provided_id:
-            deployment_payload["user_provided_id"] = self.user_provided_id
-        if self.additional_metadata:
-            deployment_payload["additional_metadata"] = self.additional_metadata
+        if importance:
+            deployment_payload["importance"] = importance
+        if user_provided_id:
+            deployment_payload["user_provided_id"] = user_provided_id
+        if additional_metadata:
+            deployment_payload["additional_metadata"] = additional_metadata
         dr_client = dr.client.get_client()
 
         response = dr_client.post("deployments/fromModelPackage/", data=deployment_payload)
 
         if response.status_code == 202 and "Location" in response.headers:
-            wait_for_async_resolution(dr_client, response.headers["Location"], self.max_wait_sec)
+            wait_for_async_resolution(dr_client, response.headers["Location"], max_wait_sec)
             deployment_id = response.json()["id"]
             return deployment_id
         else:
@@ -206,7 +218,17 @@ class DeployModelPackageOperator(BaseOperator):
             # If additional_metadata not provided, trying to get it from DAG params:
             self.additional_metadata = context["params"].get("additional_metadata")
 
-        deployment_id = self._create_from_model_package()
+        deployment_id = self._create_from_model_package(
+            model_package_id=self.model_package_id,
+            deployment_name=self.deployment_name,
+            description=self.description,
+            default_prediction_server_id=self.default_prediction_server_id,
+            prediction_environment_id=self.prediction_environment_id,
+            importance=self.importance,
+            user_provided_id=self.user_provided_id,
+            additional_metadata=self.additional_metadata,
+            max_wait_sec=self.max_wait_sec,
+        )
 
         self.log.info(f"Deployment Created, deployment_id={deployment_id}")
 
