@@ -10,8 +10,10 @@ from datetime import datetime
 
 from airflow.decorators import dag
 from datarobot import TARGET_TYPE
+from datarobot.enums import DEPLOYMENT_IMPORTANCE
 
 from datarobot_provider.operators.model_package import CreateExternalModelPackageOperator
+from datarobot_provider.operators.model_package import DeployModelPackageOperator
 
 """
 Example of JSON configuration for a regression model:
@@ -84,12 +86,24 @@ Example JSON for a multiclass classification model:
         },
     },
 )
-def create_external_deployment_pipeline():
+def create_external_deployment_pipeline(prediction_environment_id=None):
+    if not prediction_environment_id:
+        raise ValueError("Invalid or missing `prediction_environment_id` value")
+
     create_model_package_op = CreateExternalModelPackageOperator(
         task_id='create_model_package',
     )
 
-    create_model_package_op
+    deploy_model_package_op = DeployModelPackageOperator(
+        task_id="deployment_from_model_package",
+        deployment_name="demo_airflow_deployment",
+        description="demo_airflow_deployment",
+        model_package_id=create_model_package_op.output,
+        prediction_environment_id=prediction_environment_id,
+        importance=DEPLOYMENT_IMPORTANCE.LOW,
+    )
+
+    create_model_package_op >> deploy_model_package_op
 
 
 create_external_deployment_pipeline_dag = create_external_deployment_pipeline()
