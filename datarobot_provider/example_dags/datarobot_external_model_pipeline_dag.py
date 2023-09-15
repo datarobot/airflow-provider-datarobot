@@ -14,6 +14,7 @@ from datarobot.enums import DEPLOYMENT_IMPORTANCE
 
 from datarobot_provider.operators.model_package import CreateExternalModelPackageOperator
 from datarobot_provider.operators.model_package import DeployModelPackageOperator
+from datarobot_provider.operators.monitoring import UpdateMonitoringSettingsOperator
 
 """
 Example of JSON configuration for a regression model:
@@ -84,6 +85,11 @@ Example JSON for a multiclass classification model:
             "modelDescription": {"description": "Regression on demo dataset"},
             "target": {"type": TARGET_TYPE.REGRESSION, "name": 'Grade 2014'},
         },
+        "target_drift_enabled": True,
+        "feature_drift_enabled": True,
+        "association_id_column": ["id"],
+        "required_association_id": False,
+        "predictions_data_collection_enabled": False,
     },
 )
 def create_external_deployment_pipeline(prediction_environment_id=None):
@@ -103,7 +109,12 @@ def create_external_deployment_pipeline(prediction_environment_id=None):
         importance=DEPLOYMENT_IMPORTANCE.LOW,
     )
 
-    create_model_package_op >> deploy_model_package_op
+    update_monitoring_settings_op = UpdateMonitoringSettingsOperator(
+        task_id="update_monitoring_settings",
+        deployment_id=deploy_model_package_op.output,
+    )
+
+    create_model_package_op >> deploy_model_package_op >> update_monitoring_settings_op
 
 
 create_external_deployment_pipeline_dag = create_external_deployment_pipeline()

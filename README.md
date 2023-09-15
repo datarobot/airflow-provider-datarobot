@@ -784,6 +784,84 @@ Sample config params:
 
 ---
 
+#### `StartAutopilotOperator`
+
+Triggers DataRobot Autopilot to train set of models.
+
+Parameters:
+
+| Parameter                   | Type | Description |
+|-----------------------------|------|-------------|
+| `project_id`             | str  | The DataRobot project ID. |
+| `featurelist_id`                | str  | Specifies which feature list to use. |
+| `relationships_configuration_id`        | str  | ID of the relationships configuration to use. |
+| `segmentation_task_id`        | str  | ID of the relationships configuration to use. |
+
+Sample config params:
+
+```
+"autopilot_settings": {
+    "target": "column_name",
+    "mode": AUTOPILOT_MODE.QUICK,
+}
+```
+
+For more [analyze_and_model parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Project.analyze_and_model), see the DataRobot documentation.
+
+---
+
+#### `CreateExecutionEnvironmentOperator`
+
+Create an execution environment.
+
+Returns an execution environment ID.
+
+Parameters:
+
+| Parameter                   | Type | Description                                   |
+|-----------------------------|------|-----------------------------------------------|
+| `name`             | str  | The execution environment name.               |
+| `description`                | str  | execution environment description.          |
+| `programming_language`        | str  | programming language of the environment to be created. |
+
+Sample config params:
+
+```
+"execution_environment_name": "My Demo Env",
+"custom_model_description": "This is a custom model created by Airflow",
+"programming_language": "python",
+```
+
+For more [execution environment creation parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=executionenvironmentversion%20create#datarobot.ExecutionEnvironment.create), see the DataRobot documentation.
+
+---
+
+
+CreateExecutionEnvironmentVersionOperator
+CreateCustomInferenceModelOperator
+CreateCustomModelVersionOperator
+CustomModelTestOperator
+GetCustomModelTestOverallStatusOperator
+CreateCustomModelDeploymentOperator
+GetDeploymentModelOperator
+ReplaceModelOperator
+ActivateDeploymentOperator
+GetDeploymentStatusOperator
+RelationshipsConfigurationOperator
+DatasetDefinitionOperator
+DatasetRelationshipOperator
+ComputeFeatureImpactOperator
+ComputeFeatureEffectsOperator
+ComputeShapOperator
+CreateExternalModelPackageOperator
+DeployModelPackageOperator
+AddExternalDatasetOperator
+RequestModelPredictionsOperator
+TrainModelOperator
+RetrainModelOperator
+PredictionExplanationsInitializationOperator
+ComputePredictionExplanationsOperator
+
 ### [Sensors](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/sensors/datarobot.py)
 
 #### `AutopilotCompleteSensor`
