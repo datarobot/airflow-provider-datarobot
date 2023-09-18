@@ -1173,6 +1173,23 @@ For more [request_feature_effect](https://datarobot-public-api-client.readthedoc
 
 ---
 
+#### `ComputeShapOperator`
+
+Submit request to compute SHAP impact job for the model.
+
+Returns SHAP impact job ID
+
+Parameters:
+
+| Parameter      | Type | Description             |
+|----------------|------|-------------------------|
+| `project_id`   | str  | DataRobot project ID    |
+| `model_id`     | str  | DataRobot model ID      |
+
+For more [shap-impact](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/modeling/model.html?highlight=ShapImpact#shap-impact), see the DataRobot documentation.
+
+---
+
 
 
 
