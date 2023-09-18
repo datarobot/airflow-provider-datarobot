@@ -24,8 +24,8 @@ class CreateExternalModelPackageOperator(BaseOperator):
     """
     Create an external model package in DataRobot MLOps from JSON configuration
 
-    :param model_info: A JSON object of external model parameters.
-    :type model_info: dict
+    :param model_package_json: A JSON object of external model parameters.
+    :type model_package_json: dict
     :return: A model package ID of newly created ModelPackage.
     :rtype: str
     """

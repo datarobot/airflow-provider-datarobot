@@ -1190,10 +1190,80 @@ For more [shap-impact](https://datarobot-public-api-client.readthedocs-hosted.co
 
 ---
 
+#### `CreateExternalModelPackageOperator`
+
+Create an external model package in DataRobot MLOps from JSON configuration.
+
+Returns a model package ID of newly created ModelPackage.
+
+Parameters:
+
+| Parameter      | Type | Description                                 |
+|----------------|------|---------------------------------------------|
+| `model_info`   | str  | A JSON object of external model parameters. |
+
+Example of JSON configuration for a regression model:
+
+.. code-block:: python
+
+    {
+         "name": "Lending club regression",
+         "modelDescription": {
+                 "description": "Regression on lending club dataset"
+             }
+         "target": {
+             "type": "Regression",
+             "name": "loan_amnt"
+         }
+    }
+
+
+Example JSON for a binary classification model:
+
+.. code-block:: python
+
+    {
+        "name": "Surgical Model",
+        "modelDescription": {
+            "description": "Binary classification on surgical dataset",
+            "location": "/tmp/myModel"
+            },
+            "target": {
+                "type": "Binary",
+                "name": "complication",
+                "classNames": ["Yes","No"],  # minority/positive class should be listed first
+                "predictionThreshold": 0.5
+            }
+        }
+    }
+
+Example JSON for a multiclass classification model:
+
+.. code-block:: python
+
+    {
+        "name": "Iris classifier",
+        "modelDescription": {
+        "description": "Classification on iris dataset",
+        "location": "/tmp/myModel"
+    },
+        "target": {
+            "type": "Multiclass",
+            "name": "Species",
+            "classNames": [
+                "Iris-versicolor",
+                "Iris-virginica",
+                "Iris-setosa"
+            ]
+        }
+    }
+
+---
 
 
 
-ComputeShapOperator
+
+
 CreateExternalModelPackageOperator
 DeployModelPackageOperator
 AddExternalDatasetOperator
