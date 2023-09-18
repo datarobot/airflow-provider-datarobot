@@ -204,8 +204,7 @@ class DatasetRelationshipOperator(BaseOperator):
         feature derivation window should end.  Will be a non-positive integer, if present.
         If present, the feature engineering Graph will perform time-aware joins.
     :type feature_derivation_window_end: int, optional
-    :param feature_derivation_window_time_unit: int, optional
-        Time unit of the feature derivation window.
+    :param feature_derivation_window_time_unit: Time unit of the feature derivation window.
         One of ``datarobot.enums.AllowedTimeUnitsSAFER``
         If present, time-aware joins will be used.
         Only applicable when dataset1_identifier is not provided.
@@ -214,17 +213,19 @@ class DatasetRelationshipOperator(BaseOperator):
         If present, time-aware joins will be used.
         Only allowed when feature_derivation_window_start,
         feature_derivation_window_end and feature_derivation_window_time_unit are not provided.
-    :type feature_derivation_window_time_unit: int, optional
-    :param feature_derivation_windows: list of dict, or None
+    :type feature_derivation_windows: int, optional
+    :param prediction_point_rounding: list of dict, or None
         Closest value of prediction_point_rounding_time_unit to round the prediction point
         into the past when applying the feature derivation window. Will be a positive integer,
         if present.Only applicable when dataset1_identifier is not provided.
-    :type feature_derivation_windows: list[dict], optional
+    :type prediction_point_rounding: list[dict], optional
     :param prediction_point_rounding_time_unit: Time unit of the prediction point rounding.
         One of ``datarobot.enums.AllowedTimeUnitsSAFER`` Only applicable when dataset1_identifier is not provided.
-    :type feature_derivation_windows:  str, optional
+    :type prediction_point_rounding_time_unit:  str, optional
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
+    :return: Relationship definition
+    :rtype: dict
     """
 
     # Specify the arguments that are allowed to parse with jinja templating

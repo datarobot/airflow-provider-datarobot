@@ -1076,7 +1076,7 @@ For more [feature-discovery](https://datarobot-public-api-client.readthedocs-hos
 
 #### `DatasetDefinitionOperator`
 
-Dataset definition for the Feature Discovery.
+Create a Dataset definition for the Feature Discovery.
 
 Returns Dataset definition dict
 
@@ -1096,9 +1096,33 @@ For more [create-dataset-definitions-and-relationships-using-helper-functions](h
 
 ---
 
+#### `DatasetRelationshipOperator`
+
+Create a Relationship between dataset defined in DatasetDefinition.
+
+Returns Dataset definition dict
+
+Parameters:
+
+| Parameter              | Type | Description                                                                                                                                                                                                                                                                             |
+|------------------------|------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `dataset1_identifier`   | str  | Identifier of the first dataset in this relationship. This is specified in the identifier field of dataset_definition structure. If None, then the relationship is with the primary dataset.                                                                                            |
+| `dataset2_identifier`           | str  | Identifier of the second dataset in this relationship. This is specified in the identifier field of dataset_definition schema.                                                                                                                                                          |
+| `dataset1_keys`   | str  | list of string (max length: 10 min length: 1). Column(s) from the first dataset which are used to join to the second dataset                                                                                                                                                            |
+| `dataset2_keys` | str  | list of string (max length: 10 min length: 1). Column(s) from the second dataset that are used to join to the first dataset                                                                                                                                                             |
+| `feature_derivation_window_start`      | str  | How many time units of each dataset's primary temporal key into the past relative to the datetimePartitionColumn the feature derivation window should begin. Will be a negative integer, If present, the feature engineering Graph will perform time-aware joins.                       |
+| `feature_derivation_window_end`      | str  | How many time units of each dataset's record primary temporal key into the past relative to the datetimePartitionColumn the feature derivation window should end.  Will be a non-positive integer, if present. If present, the feature engineering Graph will perform time-aware joins. |
+| `feature_derivation_window_time_unit`      | str  | Time unit of the feature derivation window. One of ``datarobot.enums.AllowedTimeUnitsSAFER`` If present, time-aware joins will be used. Only applicable when dataset1_identifier is not provided.                                                                                       |
+| `feature_derivation_windows`      | int  | List of feature derivation windows settings. If present, time-aware joins will be used. Only allowed when feature_derivation_window_start, feature_derivation_window_end and feature_derivation_window_time_unit are not provided.                                                      |
+| `prediction_point_rounding`      | list[dict]  | Closest value of prediction_point_rounding_time_unit to round the prediction point into the past when applying the feature deri if present.Only applicable when dataset1_identifier is not provided.                                                                                    |
+| `prediction_point_rounding_time_unit`      | str  | Time unit of the prediction point rounding. One of ``datarobot.enums.AllowedTimeUnitsSAFER`` Only applicable when dataset1_identifier is not provided.                                                                                                                                  |
 
 
-DatasetRelationshipOperator
+For more [create-dataset-definitions-and-relationships-using-helper-functions](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/data/feature_discovery.html?highlight=DatasetDefinition#create-dataset-definitions-and-relationships-using-helper-functions), see the DataRobot documentation.
+
+---
+
+
 ComputeFeatureImpactOperator
 ComputeFeatureEffectsOperator
 ComputeShapOperator
