@@ -30,9 +30,10 @@ class RelationshipsConfigurationOperator(BaseOperator):
     :type dataset_definitions: Iterable[dict]
     :param relationships: list of relationships
         Each element is a dict retrieved from DatasetRelationshipOperator operator
-    :type dataset_definitions: Iterable[dict]
+    :type relationships: Iterable[dict]
     :param feature_discovery_settings: list of feature discovery settings, optional
         If not provided, it will be retrieved from DAG configuration params otherwise default settings will be used.
+    :type feature_discovery_settings: dict
     :param max_wait_sec: For some settings, an asynchronous task must be run to analyze the dataset.  max_wait
             governs the maximum time (in seconds) to wait before giving up.
     :type max_wait_sec: int, optional

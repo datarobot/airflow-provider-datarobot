@@ -1055,9 +1055,26 @@ For more [deployment](https://datarobot-public-api-client.readthedocs-hosted.com
 
 ---
 
+#### `RelationshipsConfigurationOperator`
+
+Create a Relationships Configuration.
+
+Returns Relationships Configuration ID
+
+Parameters:
+
+| Parameter                   | Type | Description                                                                                                                                                |
+|-----------------------------|------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `dataset_definitions`       | str  | list of dataset definitions. Each element is a dict retrieved from DatasetDefinitionOperator operator                                                      |
+| `relationships`             | str  | list of relationships. Each element is a dict retrieved from DatasetRelationshipOperator operator                                                          |
+| `feature_discovery_settings`| str  | list of feature discovery settings, optional. If not provided, it will be retrieved from DAG configuration params otherwise default settings will be used. |
 
 
-RelationshipsConfigurationOperator
+For more [feature-discovery](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/data/feature_discovery.html?highlight=Featue%20Discovery#feature-discovery), see the DataRobot documentation.
+
+---
+
+
 DatasetDefinitionOperator
 DatasetRelationshipOperator
 ComputeFeatureImpactOperator
