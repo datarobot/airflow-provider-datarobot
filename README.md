@@ -1039,8 +1039,24 @@ For more [activate deployment](https://datarobot-public-api-client.readthedocs-h
 
 ---
 
+#### `GetDeploymentStatusOperator`
 
-GetDeploymentStatusOperator
+Get a Deployment status (active/inactive).
+
+Returns the Deployment status (active/inactive)
+
+Parameters:
+
+| Parameter                   | Type | Description                                                                                                                                                                                                                         |
+|-----------------------------|------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `deployment_id`             | str  | DataRobot deployment ID                                                                                                                                                                                                             |
+
+For more [deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=replace_model#datarobot.models.Deployment.activate), see the DataRobot documentation.
+
+---
+
+
+
 RelationshipsConfigurationOperator
 DatasetDefinitionOperator
 DatasetRelationshipOperator
