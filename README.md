@@ -984,13 +984,29 @@ Parameters:
 | `description`             | str  | a human readable description of the deployment                                                         |
 | `importance`             | str  | deployment importance                                                         |
 | `description`             | str  | a human readable description of the deployment                                                         |
+
 For more [create_from_custom_model_version parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=create_from_custom_model_version#datarobot.models.Deployment.create_from_custom_model_version), see the DataRobot documentation.
+
+---
+
+#### `GetDeploymentModelOperator`
+
+Gets current model info from a deployment.
+
+Returns a model info from a Deployment
+
+Parameters:
+
+| Parameter                   | Type | Description                                                                                          |
+|-----------------------------|------|------------------------------------------------------------------------------------------------------|
+| `deployment_id`             | str  | DataRobot deployment ID                                     |
+
+For more [get deployment parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=Deployment.get#datarobot.models.Deployment.get), see the DataRobot documentation.
 
 ---
 
 
 
-GetDeploymentModelOperator
 ReplaceModelOperator
 ActivateDeploymentOperator
 GetDeploymentStatusOperator
