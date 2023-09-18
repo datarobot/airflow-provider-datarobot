@@ -1078,21 +1078,21 @@ For more [feature-discovery](https://datarobot-public-api-client.readthedocs-hos
 
 Dataset definition for the Feature Discovery.
 
-Returns Relationships Configuration ID
+Returns Dataset definition dict
 
 Parameters:
 
-| Parameter              | Type | Description |
-|------------------------|------|-------------|
-| `dataset_identifier`   | str  |             |
-| `dataset_id`           | str  |             |
-| `dataset_version_id`   | str  |             |
-| `primary_temporal_key` | str  |             |
-| `feature_list_id`      | str  |             |
-| `snapshot_policy`      | str  |             |
+| Parameter              | Type | Description                                                                                                      |
+|------------------------|------|------------------------------------------------------------------------------------------------------------------|
+| `dataset_identifier`   | str  | Alias of the dataset (used directly as part of the generated feature names)                                      |
+| `dataset_id`           | str  | Identifier of the dataset in DataRobot AI Catalog                                                                |
+| `dataset_version_id`   | str  | Identifier of the dataset version in DataRobot AI Catalog                                                        |
+| `primary_temporal_key` | str  | Name of the column indicating time of record creation                                                            |
+| `feature_list_id`      | str  | Specifies which feature list to use.                                                                             |
+| `snapshot_policy`      | str  | Policy to use  when creating a project or making predictions. If omitted, by default endpoint will use 'latest'. |
 
 
-For more [feature-discovery](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/data/feature_discovery.html?highlight=Featue%20Discovery#feature-discovery), see the DataRobot documentation.
+For more [create-dataset-definitions-and-relationships-using-helper-functions](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/data/feature_discovery.html?highlight=DatasetDefinition#create-dataset-definitions-and-relationships-using-helper-functions), see the DataRobot documentation.
 
 ---
 

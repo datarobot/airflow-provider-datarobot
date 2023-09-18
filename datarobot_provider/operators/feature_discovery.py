@@ -104,7 +104,7 @@ class DatasetDefinitionOperator(BaseOperator):
     :type dataset_identifier: str
     :param dataset_id: Identifier of the dataset in DataRobot AI Catalog
     :type dataset_id: str
-    :param dataset_version_id: str,
+    :param dataset_version_id: Identifier of the dataset version in DataRobot AI Catalog
     :type dataset_version_id: str, optional
     :param primary_temporal_key: Name of the column indicating time of record creation
     :type primary_temporal_key: str, optional
