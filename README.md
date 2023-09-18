@@ -1461,6 +1461,34 @@ Parameters:
 |-----------------------------|------|-------------|
 | `job_id`                    | str  | The DataRobot async API call status check ID. |
 
+---
+
+#### `DataRobotJobSensor`
+
+Checks whether DataRobot Job is complete.
+
+Parameters:
+
+| Parameter                   | Type | Description           |
+|-----------------------------|------|-----------------------|
+| `project_id`                | str  | DataRobot project ID. |
+| `job_id`                    | str  | DataRobot Job ID.     |
+
+---
+
+#### `ModelTrainingJobSensor`
+
+Checks whether DataRobot Model Training Job is complete.
+
+Returns False if job not yet completed, PokeReturnValue(True, trained_model.id) if model training completed
+
+Parameters:
+
+| Parameter                   | Type | Description           |
+|-----------------------------|------|-----------------------|
+| `project_id`                | str  | DataRobot project ID. |
+| `job_id`                    | str  | DataRobot Job ID.     |
+
 ----
 
 ### [Hooks](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/hooks/datarobot.py)
