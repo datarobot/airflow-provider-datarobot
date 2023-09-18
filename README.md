@@ -1356,7 +1356,7 @@ Parameters:
 | Parameter            | Type | Description                                                                                     |
 |----------------------|------|-------------------------------------------------------------------------------------------------|
 | `project_id`         | str  | DataRobot project ID                                                                            |
-| `model_id`           | str  | DataRobot blueprint ID                                                                          |
+| `model_id`           | str  | DataRobot model ID                                                                              |
 | `featurelist_id`     | str  | The identifier of the featurelist to use. If not defined, the default for this project is used. |
 
 Example of DAG config params:
@@ -1370,11 +1370,48 @@ For more [train-a-model-on-a-different-sample-size](https://datarobot-public-api
 
 ---
 
+#### `PredictionExplanationsInitializationOperator`
 
+Triggering a prediction explanations initialization of a model.
 
+Returns a Prediction Explanations Initialization job ID
 
-PredictionExplanationsInitializationOperator
-ComputePredictionExplanationsOperator
+Parameters:
+
+| Parameter            | Type | Description          |
+|----------------------|------|----------------------|
+| `project_id`         | str  | DataRobot project ID |
+| `model_id`           | str  | DataRobot model ID   |
+
+For more [prediction-explanations](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=PredictionExplanationsInitialization#prediction-explanations), see the DataRobot documentation.
+
+---
+
+#### `ComputePredictionExplanationsOperator`
+
+Create prediction explanations for the specified dataset.
+
+Returns a Triggered prediction explanations for the specified dataset job ID
+
+Parameters:
+
+| Parameter             | Type | Description                    |
+|-----------------------|------|--------------------------------|
+| `project_id`          | str  | DataRobot project ID           |
+| `model_id`            | str  | DataRobot model ID             |
+| `external_dataset_id` | str  | DataRobot external dataset ID  |
+
+Example of DAG config params:
+
+{
+    "max_explanations"
+    "threshold_low"
+    "threshold_high"
+}
+
+For more [prediction-explanations](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=PredictionExplanationsInitialization#prediction-explanations), see the DataRobot documentation.
+
+---
 
 ### [Sensors](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/sensors/datarobot.py)
 
