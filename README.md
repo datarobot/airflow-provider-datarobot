@@ -1300,8 +1300,25 @@ For more [upload_dataset_from_catalog](https://datarobot-public-api-client.readt
 
 ---
 
+#### `RequestModelPredictionsOperator`
 
-RequestModelPredictionsOperator
+Requests predictions against a previously uploaded dataset.
+
+Returns model predictions job ID
+
+Parameters:
+
+| Parameter             | Type | Description                   |
+|-----------------------|------|-------------------------------|
+| `project_id`          | str  | DataRobot project ID          |
+| `model_id`            | str  | DataRobot model ID            |
+| `external_dataset_id` | str  | DataRobot external dataset ID |
+
+For more [request_predictions](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=request_predictions#datarobot.models.Model.request_predictions), see the DataRobot documentation.
+
+---
+
+
 TrainModelOperator
 RetrainModelOperator
 PredictionExplanationsInitializationOperator

@@ -106,7 +106,7 @@ class RequestModelPredictionsOperator(BaseOperator):
     :type external_dataset_id: str
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
-    :return: Feature Effects job ID
+    :return: Model predictions job ID
     :rtype: str
     """
 
