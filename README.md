@@ -1318,8 +1318,35 @@ For more [request_predictions](https://datarobot-public-api-client.readthedocs-h
 
 ---
 
+#### `TrainModelOperator`
 
-TrainModelOperator
+Submit a job to the queue to train a model from specific blueprint.
+
+Returns model training job ID
+
+Parameters:
+
+| Parameter              | Type | Description                                                                                                                                             |
+|------------------------|------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `project_id`           | str  | DataRobot project ID                                                                                                                                    |
+| `blueprint_id`         | str  | DataRobot blueprint ID                                                                                                                                  |
+| `featurelist_id`       | str  | DataRobot external dataset ID                                                                                                                           |
+| `source_project_id`    | str  | Which project created this blueprint_id. If ``None``, it defaults to looking in this project. Note that you must have read permissions in this project. |
+
+Example of DAG config params:
+{
+    "sample_pct":
+    "scoring_type":
+    "training_row_count":
+    "n_clusters":
+}
+
+For more [start-training-a-model](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/modeling/model.html?highlight=project.train#start-training-a-model), see the DataRobot documentation.
+
+---
+
+
+
 RetrainModelOperator
 PredictionExplanationsInitializationOperator
 ComputePredictionExplanationsOperator
