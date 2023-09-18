@@ -836,9 +836,62 @@ For more [execution environment creation parameters](https://datarobot-public-ap
 
 ---
 
+#### `CreateExecutionEnvironmentVersionOperator`
 
-CreateExecutionEnvironmentVersionOperator
-CreateCustomInferenceModelOperator
+Create an execution environment version.
+
+Returns a created execution environment version ID
+
+Parameters:
+
+| Parameter                   | Type | Description                                            |
+|-----------------------------|------|--------------------------------------------------------|
+| `execution_environment_id`             | str  | The id of the execution environment.                   |
+| `docker_context_path`                | str  | The path to a docker context archive or folder.        |
+| `environment_version_label`        | str  | short human readable string to label the version. |
+| `environment_version_description`        | str  | execution environment version description. |
+
+For more [execution environment version creation parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/mlops/custom_model.html?highlight=ExecutionEnvironmentVersion#create-execution-environment), see the DataRobot documentation.
+
+---
+
+#### `CreateCustomInferenceModelOperator`
+
+Create a custom inference model.
+
+Returns a created custom model ID
+
+Parameters:
+
+| Parameter                   | Type | Description                                            |
+|-----------------------------|------|--------------------------------------------------------|
+| `name`             | str  | Name of the custom model.                   |
+| `description`                | str  | Description of the custom model.        |
+
+Sample DAG config params:
+
+```
+"target_type": - Target type of the custom inference model.
+    Values: [`datarobot.TARGET_TYPE.BINARY`, `datarobot.TARGET_TYPE.REGRESSION`,
+    `datarobot.TARGET_TYPE.MULTICLASS`, `datarobot.TARGET_TYPE.UNSTRUCTURED`]
+"target_name": - Target feature name.
+    It is optional(ignored if provided) for `datarobot.TARGET_TYPE.UNSTRUCTURED` target type.
+"programming_language": - Programming language of the custom learning model.
+"positive_class_label": - Custom inference model positive class label for binary classification.
+"negative_class_label": - Custom inference model negative class label for binary classification.
+"prediction_threshold": - Custom inference model prediction threshold.
+"class_labels": - Custom inference model class labels for multiclass classification.
+"network_egress_policy": - Determines whether the given custom model is isolated, or can access the public network.
+"maximum_memory": - The maximum memory that might be allocated by the custom-model.
+"replicas": - A fixed number of replicas that will be deployed in the cluster.
+```
+
+For more [custom inference model creation parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/mlops/custom_model.html?highlight=CustomInferenceModel#create-custom-inference-model), see the DataRobot documentation.
+
+---
+
+
+
 CreateCustomModelVersionOperator
 CustomModelTestOperator
 GetCustomModelTestOverallStatusOperator
