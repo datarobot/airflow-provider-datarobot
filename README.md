@@ -983,7 +983,6 @@ Parameters:
 | `default_prediction_server_id`             | str  | an identifier of a prediction server to be used as the default prediction server      |
 | `description`             | str  | a human readable description of the deployment                                                         |
 | `importance`             | str  | deployment importance                                                         |
-| `description`             | str  | a human readable description of the deployment                                                         |
 
 For more [create_from_custom_model_version parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=create_from_custom_model_version#datarobot.models.Deployment.create_from_custom_model_version), see the DataRobot documentation.
 
@@ -1005,10 +1004,42 @@ For more [get deployment parameters](https://datarobot-public-api-client.readthe
 
 ---
 
+#### `ReplaceModelOperator`
+
+Replaces the current model for a deployment.
+
+Returns a model info from a Deployment
+
+Parameters:
+
+| Parameter                   | Type | Description                                                                                                                                                                                                                         |
+|-----------------------------|------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `deployment_id`             | str  | DataRobot deployment ID                                                                                                                                                                                                             |
+| `new_model_id`             | str  | The id of the new model to use. If replacing the deployment's model with a CustomInferenceModel, a specific CustomModelVersion ID must be used.                                                                                     |
+| `reason`             | str  | The reason for the model replacement. Must be one of 'ACCURACY', 'DATA_DRIFT', 'ERRORS', 'SCHEDULED_REFRESH', 'SCORING_SPEED', or 'OTHER'. This value will be stored in the model history to keep track of why a model was replaced |
+
+For more [replace_model parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=replace_model#datarobot.models.Deployment.replace_model), see the DataRobot documentation.
+
+---
+
+#### `ActivateDeploymentOperator`
+
+Activate or deactivate a Deployment.
+
+Returns the Deployment status (active/inactive)
+
+Parameters:
+
+| Parameter                   | Type | Description                                                                                                                                                                                                                         |
+|-----------------------------|------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `deployment_id`             | str  | DataRobot deployment ID                                                                                                                                                                                                             |
+| `activate`             | str  | if set to True - activate deployment, if set to False - deactivate deployment                                                                                     |
+
+For more [activate deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=replace_model#datarobot.models.Deployment.activate), see the DataRobot documentation.
+
+---
 
 
-ReplaceModelOperator
-ActivateDeploymentOperator
 GetDeploymentStatusOperator
 RelationshipsConfigurationOperator
 DatasetDefinitionOperator
