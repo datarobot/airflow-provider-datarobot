@@ -952,9 +952,24 @@ For more [custom model test creation parameters](https://datarobot-public-api-cl
 
 ---
 
+#### `GetCustomModelTestOverallStatusOperator`
+
+Get a custom model testing overall status.
+
+Returns a custom model test overall status
+
+Parameters:
+
+| Parameter                   | Type | Description                                                                                                         |
+|-----------------------------|------|---------------------------------------------------------------------------------------------------------------------|
+| `custom_model_test_id`             | str  | The ID of the custom model test.                                                                                         |
+
+For more [custom model test get status parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/mlops/custom_model.html?highlight=CustomModelTest#retrieve-custom-model-test), see the DataRobot documentation.
+
+---
 
 
-GetCustomModelTestOverallStatusOperator
+
 CreateCustomModelDeploymentOperator
 GetDeploymentModelOperator
 ReplaceModelOperator
