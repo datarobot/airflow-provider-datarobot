@@ -108,7 +108,7 @@ class RetrainModelOperator(BaseOperator):
     :type featurelist_id: str, optional
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
-    :return: model training job ID
+    :return: model retraining job ID
     :rtype: str
     """
 
