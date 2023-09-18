@@ -890,9 +890,44 @@ For more [custom inference model creation parameters](https://datarobot-public-a
 
 ---
 
+#### `CreateCustomModelVersionOperator`
+
+Create a custom model version.
+
+Returns a created custom model version ID
+
+Parameters:
+
+| Parameter                   | Type | Description                                            |
+|-----------------------------|------|--------------------------------------------------------|
+| `custom_model_id`             | str  | The ID of the custom model.                   |
+| `base_environment_id`                | str  | The ID of the base environment to use with the custom model version.        |
+| `training_dataset_id`                | str  | The ID of the training dataset to assign to the custom model.        |
+| `holdout_dataset_id`                | str  | The ID of the holdout dataset to assign to the custom model.        |
+| `custom_model_folder`                | str  | The ID of the holdout dataset to assign to the custom model.        |
+| `create_from_previous`                | bool | if set to True - creates a custom model version containing files from a previous version.|
 
 
-CreateCustomModelVersionOperator
+Sample DAG config params:
+
+```
+"is_major_update" - The flag defining if a custom model version will be a minor or a major version.
+"files" - The list of tuples, where values in each tuple are the local filesystem path and
+            the path the file should be placed in the model.
+"files_to_delete" - The list of a file items ids to be deleted.
+"network_egress_policy": - Determines whether the given custom model is isolated, or can access the public network.
+"maximum_memory": - The maximum memory that might be allocated by the custom-model.
+"replicas": - A fixed number of replicas that will be deployed in the cluster.
+"required_metadata_values" - Additional parameters required by the execution environment.
+"keep_training_holdout_data" - If the version should inherit training and holdout data from the previous version.
+```
+
+For more [custom inference model creation parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/mlops/custom_model.html?highlight=CustomInferenceModel#create-custom-inference-model), see the DataRobot documentation.
+
+---
+
+
+
 CustomModelTestOperator
 GetCustomModelTestOverallStatusOperator
 CreateCustomModelDeploymentOperator
