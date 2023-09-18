@@ -1511,31 +1511,46 @@ See the the [`datarobot_provider/example_dags`](https://github.com/datarobot/air
 
 You can find the following examples using a preconfigured connection in the `datarobot_provider/example_dags` directory:
 
-| Example DAG                                            | Description |
-|--------------------------------------------------------|-------------|
-| `datarobot_pipeline_dag.py`                            | Run the basic end-to-end workflow in DataRobot. |
-| `datarobot_score_dag.py`                               | Perform DataRobot batch scoring. |
-| `datarobot_jdbc_batch_scoring_dag.py`                  | Perform DataRobot batch scoring with a JDBC data source. |
-| `datarobot_aws_s3_batch_scoring_dag.py`                | Use DataRobot AWS Credentials with `ScorePredictionsOperator`. |
-| `datarobot_gcp_storage_batch_scoring_dag.py`           | Use DataRobot GCP Credentials with `ScorePredictionsOperator`. |
-| `datarobot_bigquery_batch_scoring_dag.py`              | Use DataRobot GCP Credentials with `ScorePredictionsOperator`. |
-| `datarobot_azure_storage_batch_scoring_dag.py`         | Use DataRobot Azure Storage Credentials with `ScorePredictionsOperator`. |
-| `datarobot_jdbc_dataset_dag.py`                        | Upload a dataset to the AI Catalog through a JDBC connection.  |
-| `datarobot_batch_monitoring_job_dag.py`                | Run a batch monitoring job. |
-| `datarobot_create_project_from_ai_catalog_dag.py`      | Create a DataRobot project from a DataRobot AI Catalog dataset. |
+| Example DAG                                            | Description                                                                             |
+|--------------------------------------------------------|-----------------------------------------------------------------------------------------|
+| `datarobot_pipeline_dag.py`                            | Run the basic end-to-end workflow in DataRobot.                                         |
+| `datarobot_score_dag.py`                               | Perform DataRobot batch scoring.                                                        |
+| `datarobot_jdbc_batch_scoring_dag.py`                  | Perform DataRobot batch scoring with a JDBC data source.                                |
+| `datarobot_aws_s3_batch_scoring_dag.py`                | Use DataRobot AWS Credentials with `ScorePredictionsOperator`.                          |
+| `datarobot_gcp_storage_batch_scoring_dag.py`           | Use DataRobot GCP Credentials with `ScorePredictionsOperator`.                          |
+| `datarobot_bigquery_batch_scoring_dag.py`              | Use DataRobot GCP Credentials with `ScorePredictionsOperator`.                          |
+| `datarobot_azure_storage_batch_scoring_dag.py`         | Use DataRobot Azure Storage Credentials with `ScorePredictionsOperator`.                |
+| `datarobot_jdbc_dataset_dag.py`                        | Upload a dataset to the AI Catalog through a JDBC connection.                           |
+| `datarobot_batch_monitoring_job_dag.py`                | Run a batch monitoring job.                                                             |
+| `datarobot_create_project_from_ai_catalog_dag.py`      | Create a DataRobot project from a DataRobot AI Catalog dataset.                         |
 | `datarobot_create_project_from_dataset_version_dag.py` | Create a DataRobot project from a specific dataset version in the DataRobot AI Catalog. |
-| `datarobot_dataset_new_version_dag.py`                 | Create a new version of an existing dataset in the DataRobot AI Catalog. |
-| `datarobot_dataset_upload_dag.py`                      | Upload a local file to the DataRobot AI Catalog. |
-| `datarobot_get_datastore_dag.py`                       | Create a DataRobot DataStore with `GetOrCreateDataStoreOperator`. |
-| `datarobot_jdbc_dataset_dag.py`                        | Create a DataRobot project from a JDBC data source. |
-| `datarobot_jdbc_dynamic_dataset_dag.py`                | Create a DataRobot project from a JDBC dynamic data source. |
-| `datarobot_upload_actuals_catalog_dag.py`              | Upload actuals from the DataRobot AI Catalog. |
-| `deployment_service_stats_dag.py`                      | Get a deployment's service statistics with `GetServiceStatsOperator` |
-| `deployment_stat_and_accuracy_dag.py`                  | Get a deployment's service statistics and accuracy. |
-| `deployment_update_monitoring_settings_dag.py`         | Update a deployment's monitoring settings. |
-| `deployment_update_segment_analysis_settings_dag.py`   | Update a deployment's segment analysis settings. |
-| `download_scoring_code_from_deployment_dag.py`         | Download scoring code (JAR file) from a DataRobot deployment. |
-| `advanced_datarobot_pipeline_jdbc_dag.py`              | Run the advanced end-to-end workflow in DataRobot. |
+| `datarobot_dataset_new_version_dag.py`                 | Create a new version of an existing dataset in the DataRobot AI Catalog.                |
+| `datarobot_dataset_upload_dag.py`                      | Upload a local file to the DataRobot AI Catalog.                                        |
+| `datarobot_get_datastore_dag.py`                       | Create a DataRobot DataStore with `GetOrCreateDataStoreOperator`.                       |
+| `datarobot_jdbc_dataset_dag.py`                        | Create a DataRobot project from a JDBC data source.                                     |
+| `datarobot_jdbc_dynamic_dataset_dag.py`                | Create a DataRobot project from a JDBC dynamic data source.                             |
+| `datarobot_upload_actuals_catalog_dag.py`              | Upload actuals from the DataRobot AI Catalog.                                           |
+| `deployment_service_stats_dag.py`                      | Get a deployment's service statistics with `GetServiceStatsOperator`                    |
+| `deployment_stat_and_accuracy_dag.py`                  | Get a deployment's service statistics and accuracy.                                     |
+| `deployment_update_monitoring_settings_dag.py`         | Update a deployment's monitoring settings.                                              |
+| `deployment_update_segment_analysis_settings_dag.py`   | Update a deployment's segment analysis settings.                                        |
+| `download_scoring_code_from_deployment_dag.py`         | Download scoring code (JAR file) from a DataRobot deployment.                           |
+| `advanced_datarobot_pipeline_jdbc_dag.py`              | Run the advanced end-to-end workflow in DataRobot.                                      |
+| `datarobot_autopilot_options_pipeline_dag.py`          | Creates datarobot project and starts autopilot with advanced options.                   |
+| `datarobot_custom_model_pipeline_dag.py`               | Creating end-to-end workflow with custom models in DataRobot.                           |
+| `datarobot_custom_partitioning_pipeline_dag.py`        | Creating custom partitioned project, train models pipline                               |
+| `datarobot_datetime_partitioning_pipeline_dag.py`      | Creating datetime partitioned project, train models pipline.                            |
+| `datarobot_external_model_pipeline_dag.py`             | Creating end-to-end workflow with external models in DataRobot.                         |
+| `datarobot_feature_discovery_pipeline_dag.py`          | Creating feature-discovery DataRobot project, train models pipline.                     |
+| `datarobot_timeseries_pipeline_dag.py`                 | Creating timeseries DataRobot project, train models pipline.                            |
+| `deployment_activate_deactivate_dag.py`                | Example of Deployment activation/deactivaion and get Deployment status.                 |
+| `deployment_replace_model_dag.py`                      | Example of Deployment model replacement.                                                |
+| `model_compute_insights_dag.py`                        | Example of compute FeatureImpact and FeatureEffects job.                                |
+| `model_compute_prediction_explanations_dag.py`         | Example of compute prediction explanations job.                                         |
+| `model_compute_predictions_dag.py`                     | Example of compute predictions for model.                                               |
+| `model_compute_shap_dag.py`                            | Example of compute SHAP job.                                                            |
+| `model_retrain_dag.py`                                 | Example of model retraining job on specific sample size/featurelist.                    |
+| `model_train_dag.py`                                   | Example of model training job based on specific blueprint.                              |
 
 The advanced end-to-end workflow in DataRobot (`advanced_datarobot_pipeline_jdbc_dag.py`) contains the following steps:
 
