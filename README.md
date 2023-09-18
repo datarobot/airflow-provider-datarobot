@@ -720,10 +720,10 @@ Downloads scoring code artifact from a model.
 
 Parameters:
 
-| Parameter                   | Type | Description |
-|-----------------------------|------|-------------|
-| `project_id`                | str  | The DataRobot project ID. |
-| `model_id`                  | str  | The DataRobot model ID. |
+| Parameter                   | Type | Description                                            |
+|-----------------------------|------|--------------------------------------------------------|
+| `project_id`                | str  | The DataRobot project ID.                              |
+| `model_id`                  | str  | The DataRobot model ID.                                |
 | `base_path`                 | str  | The base path for storing a downloaded model artifact. |
 
 Sample config params: 
@@ -742,9 +742,9 @@ Downloads scoring code artifact from a deployment.
 
 Parameters:
 
-| Parameter                   | Type | Description |
-|-----------------------------|------|-------------|
-| `deployment_id`             | str  | The DataRobot deployment ID. |
+| Parameter                   | Type | Description                                            |
+|-----------------------------|------|--------------------------------------------------------|
+| `deployment_id`             | str  | The DataRobot deployment ID.                           |
 | `base_path`                 | str  | The base path for storing a downloaded model artifact. |
 
 Sample config params:
@@ -768,10 +768,10 @@ Returns an actuals upload job ID.
 
 Parameters:
 
-| Parameter                   | Type | Description |
-|-----------------------------|------|-------------|
-| `deployment_id`             | str  | The DataRobot deployment ID. |
-| `dataset_id`                | str  | The DataRobot AI Catalog dataset ID. |
+| Parameter                   | Type | Description                                  |
+|-----------------------------|------|----------------------------------------------|
+| `deployment_id`             | str  | The DataRobot deployment ID.                 |
+| `dataset_id`                | str  | The DataRobot AI Catalog dataset ID.         |
 | `dataset_version_id`        | str  | The DataRobot AI Catalog dataset version ID. |
 
 Sample config params:
@@ -790,12 +790,12 @@ Triggers DataRobot Autopilot to train set of models.
 
 Parameters:
 
-| Parameter                   | Type | Description |
-|-----------------------------|------|-------------|
-| `project_id`             | str  | The DataRobot project ID. |
-| `featurelist_id`                | str  | Specifies which feature list to use. |
-| `relationships_configuration_id`        | str  | ID of the relationships configuration to use. |
-| `segmentation_task_id`        | str  | ID of the relationships configuration to use. |
+| Parameter                        | Type | Description                                   |
+|----------------------------------|------|-----------------------------------------------|
+| `project_id`                     | str  | The DataRobot project ID.                     |
+| `featurelist_id`                 | str  | Specifies which feature list to use.          |
+| `relationships_configuration_id` | str  | ID of the relationships configuration to use. |
+| `segmentation_task_id`           | str  | ID of the relationships configuration to use. |
 
 Sample config params:
 
@@ -818,11 +818,11 @@ Returns an execution environment ID.
 
 Parameters:
 
-| Parameter                   | Type | Description                                   |
-|-----------------------------|------|-----------------------------------------------|
-| `name`             | str  | The execution environment name.               |
-| `description`                | str  | execution environment description.          |
-| `programming_language`        | str  | programming language of the environment to be created. |
+| Parameter              | Type | Description                                            |
+|------------------------|------|--------------------------------------------------------|
+| `name`                 | str  | The execution environment name.                        |
+| `description`          | str  | execution environment description.                     |
+| `programming_language` | str  | programming language of the environment to be created. |
 
 Sample config params:
 
@@ -844,12 +844,12 @@ Returns a created execution environment version ID
 
 Parameters:
 
-| Parameter                   | Type | Description                                            |
-|-----------------------------|------|--------------------------------------------------------|
-| `execution_environment_id`             | str  | The id of the execution environment.                   |
-| `docker_context_path`                | str  | The path to a docker context archive or folder.        |
+| Parameter                          | Type | Description                                       |
+|------------------------------------|------|---------------------------------------------------|
+| `execution_environment_id`         | str  | The id of the execution environment.              |
+| `docker_context_path`              | str  | The path to a docker context archive or folder.   |
 | `environment_version_label`        | str  | short human readable string to label the version. |
-| `environment_version_description`        | str  | execution environment version description. |
+| `environment_version_description`  | str  | execution environment version description.        |
 
 For more [execution environment version creation parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/mlops/custom_model.html?highlight=ExecutionEnvironmentVersion#create-execution-environment), see the DataRobot documentation.
 
@@ -863,10 +863,10 @@ Returns a created custom model ID
 
 Parameters:
 
-| Parameter                   | Type | Description                                            |
-|-----------------------------|------|--------------------------------------------------------|
-| `name`             | str  | Name of the custom model.                   |
-| `description`                | str  | Description of the custom model.        |
+| Parameter          | Type | Description                           |
+|--------------------|------|---------------------------------------|
+| `name`             | str  | Name of the custom model.             |
+| `description`      | str  | Description of the custom model.      |
 
 Sample DAG config params:
 
@@ -898,14 +898,14 @@ Returns a created custom model version ID
 
 Parameters:
 
-| Parameter                   | Type | Description                                            |
-|-----------------------------|------|--------------------------------------------------------|
-| `custom_model_id`             | str  | The ID of the custom model.                   |
-| `base_environment_id`                | str  | The ID of the base environment to use with the custom model version.        |
-| `training_dataset_id`                | str  | The ID of the training dataset to assign to the custom model.        |
-| `holdout_dataset_id`                | str  | The ID of the holdout dataset to assign to the custom model.        |
-| `custom_model_folder`                | str  | The ID of the holdout dataset to assign to the custom model.        |
-| `create_from_previous`                | bool | if set to True - creates a custom model version containing files from a previous version.|
+| Parameter                      | Type | Description                                                                               |
+|--------------------------------|------|-------------------------------------------------------------------------------------------|
+| `custom_model_id`              | str  | The ID of the custom model.                                                               |
+| `base_environment_id`          | str  | The ID of the base environment to use with the custom model version.                      |
+| `training_dataset_id`          | str  | The ID of the training dataset to assign to the custom model.                             |
+| `holdout_dataset_id`           | str  | The ID of the holdout dataset to assign to the custom model.                              |
+| `custom_model_folder`          | str  | The ID of the holdout dataset to assign to the custom model.                              |
+| `create_from_previous`         | bool | if set to True - creates a custom model version containing files from a previous version. |
 
 
 Sample DAG config params:
@@ -934,11 +934,11 @@ Returns a created custom model test ID
 
 Parameters:
 
-| Parameter                   | Type | Description                                                                                                         |
-|-----------------------------|------|---------------------------------------------------------------------------------------------------------------------|
-| `custom_model_id`             | str  | The ID of the custom model.                                                                                         |
-| `custom_model_version_id`                | str  | The ID of the custom model version.                                                                                 |
-| `dataset_id`                | str  | The id of the testing dataset for non-unstructured custom models. Ignored and not required for unstructured models. |
+| Parameter                 | Type | Description                                                                                                         |
+|---------------------------|------|---------------------------------------------------------------------------------------------------------------------|
+| `custom_model_id`         | str  | The ID of the custom model.                                                                                         |
+| `custom_model_version_id` | str  | The ID of the custom model version.                                                                                 |
+| `dataset_id`              | str  | The id of the testing dataset for non-unstructured custom models. Ignored and not required for unstructured models. |
 
 Sample DAG config params:
 
@@ -960,9 +960,9 @@ Returns a custom model test overall status
 
 Parameters:
 
-| Parameter                   | Type | Description                                                                                                         |
-|-----------------------------|------|---------------------------------------------------------------------------------------------------------------------|
-| `custom_model_test_id`             | str  | The ID of the custom model test.                                                                                         |
+| Parameter                     | Type | Description                            |
+|-------------------------------|------|----------------------------------------|
+| `custom_model_test_id`        | str  | The ID of the custom model test.       |
 
 For more [custom model test get status parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/mlops/custom_model.html?highlight=CustomModelTest#retrieve-custom-model-test), see the DataRobot documentation.
 
@@ -976,13 +976,13 @@ Returns the created deployment id
 
 Parameters:
 
-| Parameter                   | Type | Description                                                                                          |
-|-----------------------------|------|------------------------------------------------------------------------------------------------------|
-| `custom_model_version_id`             | str  | The id of the DataRobot custom model version to deploy                                     |
-| `deployment_name`             | str  | a human readable label (name) of the deployment                                                    |
-| `default_prediction_server_id`             | str  | an identifier of a prediction server to be used as the default prediction server      |
-| `description`             | str  | a human readable description of the deployment                                                         |
-| `importance`             | str  | deployment importance                                                         |
+| Parameter                      | Type | Description                                                                      |
+|--------------------------------|------|----------------------------------------------------------------------------------|
+| `custom_model_version_id`      | str  | The id of the DataRobot custom model version to deploy                           |
+| `deployment_name`              | str  | a human readable label (name) of the deployment                                  |
+| `default_prediction_server_id` | str  | an identifier of a prediction server to be used as the default prediction server |
+| `description`                  | str  | a human readable description of the deployment                                   |
+| `importance`                   | str  | deployment importance                                                            |
 
 For more [create_from_custom_model_version parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=create_from_custom_model_version#datarobot.models.Deployment.create_from_custom_model_version), see the DataRobot documentation.
 
@@ -996,9 +996,9 @@ Returns a model info from a Deployment
 
 Parameters:
 
-| Parameter                   | Type | Description                                                                                          |
-|-----------------------------|------|------------------------------------------------------------------------------------------------------|
-| `deployment_id`             | str  | DataRobot deployment ID                                     |
+| Parameter         | Type | Description                   |
+|-------------------|------|-------------------------------|
+| `deployment_id`   | str  | DataRobot deployment ID       |
 
 For more [get deployment parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=Deployment.get#datarobot.models.Deployment.get), see the DataRobot documentation.
 
@@ -1012,11 +1012,11 @@ Returns a model info from a Deployment
 
 Parameters:
 
-| Parameter                   | Type | Description                                                                                                                                                                                                                         |
-|-----------------------------|------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `deployment_id`             | str  | DataRobot deployment ID                                                                                                                                                                                                             |
-| `new_model_id`             | str  | The id of the new model to use. If replacing the deployment's model with a CustomInferenceModel, a specific CustomModelVersion ID must be used.                                                                                     |
-| `reason`             | str  | The reason for the model replacement. Must be one of 'ACCURACY', 'DATA_DRIFT', 'ERRORS', 'SCHEDULED_REFRESH', 'SCORING_SPEED', or 'OTHER'. This value will be stored in the model history to keep track of why a model was replaced |
+| Parameter       | Type | Description                                                                                                                                                                                                                         |
+|-----------------|------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `deployment_id` | str  | DataRobot deployment ID                                                                                                                                                                                                             |
+| `new_model_id`  | str  | The id of the new model to use. If replacing the deployment's model with a CustomInferenceModel, a specific CustomModelVersion ID must be used.                                                                                     |
+| `reason`        | str  | The reason for the model replacement. Must be one of 'ACCURACY', 'DATA_DRIFT', 'ERRORS', 'SCHEDULED_REFRESH', 'SCORING_SPEED', or 'OTHER'. This value will be stored in the model history to keep track of why a model was replaced |
 
 For more [replace_model parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=replace_model#datarobot.models.Deployment.replace_model), see the DataRobot documentation.
 
@@ -1030,10 +1030,10 @@ Returns the Deployment status (active/inactive)
 
 Parameters:
 
-| Parameter                   | Type | Description                                                                                                                                                                                                                         |
-|-----------------------------|------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `deployment_id`             | str  | DataRobot deployment ID                                                                                                                                                                                                             |
-| `activate`             | str  | if set to True - activate deployment, if set to False - deactivate deployment                                                                                     |
+| Parameter               | Type | Description                                                                   |
+|-------------------------|------|-------------------------------------------------------------------------------|
+| `deployment_id`         | str  | DataRobot deployment ID                                                       |
+| `activate`              | str  | if set to True - activate deployment, if set to False - deactivate deployment |
 
 For more [activate deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=replace_model#datarobot.models.Deployment.activate), see the DataRobot documentation.
 
@@ -1047,9 +1047,9 @@ Returns the Deployment status (active/inactive)
 
 Parameters:
 
-| Parameter                   | Type | Description                                                                                                                                                                                                                         |
-|-----------------------------|------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `deployment_id`             | str  | DataRobot deployment ID                                                                                                                                                                                                             |
+| Parameter       | Type | Description              |
+|-----------------|------|--------------------------|
+| `deployment_id` | str  | DataRobot deployment ID  |
 
 For more [deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=replace_model#datarobot.models.Deployment.activate), see the DataRobot documentation.
 
@@ -1063,11 +1063,11 @@ Returns Relationships Configuration ID
 
 Parameters:
 
-| Parameter                   | Type | Description                                                                                                                                                |
-|-----------------------------|------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `dataset_definitions`       | str  | list of dataset definitions. Each element is a dict retrieved from DatasetDefinitionOperator operator                                                      |
-| `relationships`             | str  | list of relationships. Each element is a dict retrieved from DatasetRelationshipOperator operator                                                          |
-| `feature_discovery_settings`| str  | list of feature discovery settings, optional. If not provided, it will be retrieved from DAG configuration params otherwise default settings will be used. |
+| Parameter                     | Type | Description                                                                                                                                                |
+|-------------------------------|------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `dataset_definitions`         | str  | list of dataset definitions. Each element is a dict retrieved from DatasetDefinitionOperator operator                                                      |
+| `relationships`               | str  | list of relationships. Each element is a dict retrieved from DatasetRelationshipOperator operator                                                          |
+| `feature_discovery_settings`  | str  | list of feature discovery settings, optional. If not provided, it will be retrieved from DAG configuration params otherwise default settings will be used. |
 
 
 For more [feature-discovery](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/data/feature_discovery.html?highlight=Featue%20Discovery#feature-discovery), see the DataRobot documentation.
@@ -1104,18 +1104,18 @@ Returns Dataset definition dict
 
 Parameters:
 
-| Parameter              | Type       | Description                                                                                                                                                                                                                                                                             |
-|------------------------|------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `dataset1_identifier`   | List[str]  | Identifier of the first dataset in this relationship. This is specified in the identifier field of dataset_definition structure. If None, then the relationship is with the primary dataset.                                                                                            |
-| `dataset2_identifier`    | List[str]  | Identifier of the second dataset in this relationship. This is specified in the identifier field of dataset_definition schema.                                                                                                                                                          |
-| `dataset1_keys`   | List[str]  | list of string (max length: 10 min length: 1). Column(s) from the first dataset which are used to join to the second dataset                                                                                                                                                            |
-| `dataset2_keys` | List[str]  | list of string (max length: 10 min length: 1). Column(s) from the second dataset that are used to join to the first dataset                                                                                                                                                             |
-| `feature_derivation_window_start`      | int        | How many time units of each dataset's primary temporal key into the past relative to the datetimePartitionColumn the feature derivation window should begin. Will be a negative integer, If present, the feature engineering Graph will perform time-aware joins.                       |
-| `feature_derivation_window_end`      | int        | How many time units of each dataset's record primary temporal key into the past relative to the datetimePartitionColumn the feature derivation window should end.  Will be a non-positive integer, if present. If present, the feature engineering Graph will perform time-aware joins. |
-| `feature_derivation_window_time_unit`      | str        | Time unit of the feature derivation window. One of ``datarobot.enums.AllowedTimeUnitsSAFER`` If present, time-aware joins will be used. Only applicable when dataset1_identifier is not provided.                                                                                       |
-| `feature_derivation_windows`      | List       | List of feature derivation windows settings. If present, time-aware joins will be used. Only allowed when feature_derivation_window_start, feature_derivation_window_end and feature_derivation_window_time_unit are not provided.                                                      |
-| `prediction_point_rounding`      | List[dict] | Closest value of prediction_point_rounding_time_unit to round the prediction point into the past when applying the feature deri if present.Only applicable when dataset1_identifier is not provided.                                                                                    |
-| `prediction_point_rounding_time_unit`      | str        | Time unit of the prediction point rounding. One of ``datarobot.enums.AllowedTimeUnitsSAFER`` Only applicable when dataset1_identifier is not provided.                                                                                                                                  |
+| Parameter                             | Type       | Description                                                                                                                                                                                                                                                                             |
+|---------------------------------------|------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `dataset1_identifier`                 | List[str]  | Identifier of the first dataset in this relationship. This is specified in the identifier field of dataset_definition structure. If None, then the relationship is with the primary dataset.                                                                                            |
+| `dataset2_identifier`                 | List[str]  | Identifier of the second dataset in this relationship. This is specified in the identifier field of dataset_definition schema.                                                                                                                                                          |
+| `dataset1_keys`                       | List[str]  | list of string (max length: 10 min length: 1). Column(s) from the first dataset which are used to join to the second dataset                                                                                                                                                            |
+| `dataset2_keys`                       | List[str]  | list of string (max length: 10 min length: 1). Column(s) from the second dataset that are used to join to the first dataset                                                                                                                                                             |
+| `feature_derivation_window_start`     | int        | How many time units of each dataset's primary temporal key into the past relative to the datetimePartitionColumn the feature derivation window should begin. Will be a negative integer, If present, the feature engineering Graph will perform time-aware joins.                       |
+| `feature_derivation_window_end`       | int        | How many time units of each dataset's record primary temporal key into the past relative to the datetimePartitionColumn the feature derivation window should end.  Will be a non-positive integer, if present. If present, the feature engineering Graph will perform time-aware joins. |
+| `feature_derivation_window_time_unit` | str        | Time unit of the feature derivation window. One of ``datarobot.enums.AllowedTimeUnitsSAFER`` If present, time-aware joins will be used. Only applicable when dataset1_identifier is not provided.                                                                                       |
+| `feature_derivation_windows`          | List       | List of feature derivation windows settings. If present, time-aware joins will be used. Only allowed when feature_derivation_window_start, feature_derivation_window_end and feature_derivation_window_time_unit are not provided.                                                      |
+| `prediction_point_rounding`           | List[dict] | Closest value of prediction_point_rounding_time_unit to round the prediction point into the past when applying the feature deri if present.Only applicable when dataset1_identifier is not provided.                                                                                    |
+| `prediction_point_rounding_time_unit` | str        | Time unit of the prediction point rounding. One of ``datarobot.enums.AllowedTimeUnitsSAFER`` Only applicable when dataset1_identifier is not provided.                                                                                                                                  |
 
 
 For more [create-dataset-definitions-and-relationships-using-helper-functions](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/data/feature_discovery.html?highlight=DatasetDefinition#create-dataset-definitions-and-relationships-using-helper-functions), see the DataRobot documentation.
@@ -1130,29 +1130,12 @@ Returns Feature Impact job ID
 
 Parameters:
 
-| Parameter              | Type | Description                                                                                                      |
-|------------------------|------|------------------------------------------------------------------------------------------------------------------|
-| `project_id`   | str  | DataRobot project ID  |
-| `model_id`           | str  | DataRobot model ID  |
+| Parameter       | Type | Description           |
+|-----------------|------|-----------------------|
+| `project_id`    | str  | DataRobot project ID  |
+| `model_id`      | str  | DataRobot model ID    |
 
 For more [request_feature_impact](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=request_feature_impact#datarobot.models.Model.request_feature_impact), see the DataRobot documentation.
-
----
-
-#### `CComputeFeatureEffectsOperator`
-
-Submit request to compute Feature Effects for the model.
-
-Returns Feature Effects job ID
-
-Parameters:
-
-| Parameter              | Type | Description                                                                                                      |
-|------------------------|------|------------------------------------------------------------------------------------------------------------------|
-| `project_id`   | str  | DataRobot project ID  |
-| `model_id`           | str  | DataRobot model ID  |
-
-For more [request_feature_impact](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=request_feature_effect#datarobot.models.DatetimeModel.request_feature_effect), see the DataRobot documentation.
 
 ---
 
@@ -1164,12 +1147,12 @@ Returns Feature Effects job ID
 
 Parameters:
 
-| Parameter      | Type | Description             |
-|----------------|------|-------------------------|
-| `project_id`   | str  | DataRobot project ID    |
-| `model_id`     | str  | DataRobot model ID      |
+| Parameter        | Type | Description          |
+|------------------|------|----------------------|
+| `project_id`     | str  | DataRobot project ID |
+| `model_id`       | str  | DataRobot model ID   |
 
-For more [request_feature_effect](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=request_feature_effect#datarobot.models.DatetimeModel.request_feature_effect), see the DataRobot documentation.
+For more [request_feature_impact](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=request_feature_effect#datarobot.models.DatetimeModel.request_feature_effect), see the DataRobot documentation.
 
 ---
 
