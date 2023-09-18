@@ -1260,11 +1260,29 @@ Example JSON for a multiclass classification model:
 
 ---
 
+#### `DeployModelPackageOperator`
+
+Create a deployment from a DataRobot model package.
+
+Returns The created deployment ID
+
+Parameters:
+
+| Parameter      | Type | Description                                                                                                                                                                      |
+|----------------|------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `deployment_name`   | str  | A human readable label of the deployment.                                                                                                                                        |
+| `model_package_id`  | str  | The ID of the DataRobot model package to deploy.                                                                                                                                 |
+| `default_prediction_server_id`  | str  | An identifier of a prediction server to be used as the default prediction server. When working with prediction environments, default prediction server Id should not be provided |
+| `prediction_environment_id`  | str  | An identifier of a prediction environment to be used for model deployment. |
+| `description`  | str  | A human readable description of the deployment. |
+| `importance`  | str  | Deployment importance level. |
+| `user_provided_id`  | str  | A user-provided unique ID associated with a deployment definition in a remote git repository. |
+| `additional_metadata`  | Dict[str, str]  | A Key/Value pair dict, with additional metadata. |
+
+---
 
 
 
-
-CreateExternalModelPackageOperator
 DeployModelPackageOperator
 AddExternalDatasetOperator
 RequestModelPredictionsOperator
