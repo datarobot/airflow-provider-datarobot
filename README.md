@@ -968,9 +968,28 @@ For more [custom model test get status parameters](https://datarobot-public-api-
 
 ---
 
+#### `CreateCustomModelDeploymentOperator`
+
+Create a deployment from a DataRobot custom model image.
+
+Returns the created deployment id
+
+Parameters:
+
+| Parameter                   | Type | Description                                                                                          |
+|-----------------------------|------|------------------------------------------------------------------------------------------------------|
+| `custom_model_version_id`             | str  | The id of the DataRobot custom model version to deploy                                     |
+| `deployment_name`             | str  | a human readable label (name) of the deployment                                                    |
+| `default_prediction_server_id`             | str  | an identifier of a prediction server to be used as the default prediction server      |
+| `description`             | str  | a human readable description of the deployment                                                         |
+| `importance`             | str  | deployment importance                                                         |
+| `description`             | str  | a human readable description of the deployment                                                         |
+For more [create_from_custom_model_version parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=create_from_custom_model_version#datarobot.models.Deployment.create_from_custom_model_version), see the DataRobot documentation.
+
+---
 
 
-CreateCustomModelDeploymentOperator
+
 GetDeploymentModelOperator
 ReplaceModelOperator
 ActivateDeploymentOperator

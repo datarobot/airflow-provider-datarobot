@@ -546,7 +546,7 @@ class CreateCustomModelDeploymentOperator(BaseOperator):
         has successfully finished
     :type max_wait_sec: int, optional
     :return: The created deployment id
-    :rtype: ste
+    :rtype: str
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
