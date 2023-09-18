@@ -1268,23 +1268,39 @@ Returns The created deployment ID
 
 Parameters:
 
-| Parameter      | Type | Description                                                                                                                                                                      |
-|----------------|------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `deployment_name`   | str  | A human readable label of the deployment.                                                                                                                                        |
-| `model_package_id`  | str  | The ID of the DataRobot model package to deploy.                                                                                                                                 |
-| `default_prediction_server_id`  | str  | An identifier of a prediction server to be used as the default prediction server. When working with prediction environments, default prediction server Id should not be provided |
-| `prediction_environment_id`  | str  | An identifier of a prediction environment to be used for model deployment. |
-| `description`  | str  | A human readable description of the deployment. |
-| `importance`  | str  | Deployment importance level. |
-| `user_provided_id`  | str  | A user-provided unique ID associated with a deployment definition in a remote git repository. |
-| `additional_metadata`  | Dict[str, str]  | A Key/Value pair dict, with additional metadata. |
+| Parameter                      | Type           | Description                                                                                                                                                                      |
+|--------------------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `deployment_name`              | str            | A human readable label of the deployment.                                                                                                                                        |
+| `model_package_id`             | str            | The ID of the DataRobot model package to deploy.                                                                                                                                 |
+| `default_prediction_server_id` | str            | An identifier of a prediction server to be used as the default prediction server. When working with prediction environments, default prediction server Id should not be provided |
+| `prediction_environment_id`    | str            | An identifier of a prediction environment to be used for model deployment.                                                                                                       |
+| `description`                  | str            | A human readable description of the deployment.                                                                                                                                  |
+| `importance`                   | str            | Deployment importance level.                                                                                                                                                     |
+| `user_provided_id`             | str            | A user-provided unique ID associated with a deployment definition in a remote git repository.                                                                                    |
+| `additional_metadata`          | Dict[str, str] | A Key/Value pair dict, with additional metadata.                                                                                                                                 |
+
+---
+
+#### `AddExternalDatasetOperator`
+
+Upload a new dataset from a catalog dataset to make predictions for a model
+
+Returns external dataset ID for the model
+
+Parameters:
+
+| Parameter            | Type | Description                              |
+|----------------------|------|------------------------------------------|
+| `project_id`         | str  | DataRobot project ID                     |
+| `dataset_id`         | str  | DataRobot AI Catalog dataset ID          |
+| `credential_id`      | str  | DataRobot Credentials ID                 |
+| `dataset_version_id` | str  | DataRobot AI Catalog dataset version ID  |
+
+For more [upload_dataset_from_catalog](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=upload_dataset_from_catalog#datarobot.models.Project.upload_dataset_from_catalog), see the DataRobot documentation.
 
 ---
 
 
-
-DeployModelPackageOperator
-AddExternalDatasetOperator
 RequestModelPredictionsOperator
 TrainModelOperator
 RetrainModelOperator
