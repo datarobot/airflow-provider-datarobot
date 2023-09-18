@@ -926,9 +926,34 @@ For more [custom inference model creation parameters](https://datarobot-public-a
 
 ---
 
+#### `CustomModelTestOperator`
+
+Create and start a custom model test.
+
+Returns a created custom model test ID
+
+Parameters:
+
+| Parameter                   | Type | Description                                                                                                         |
+|-----------------------------|------|---------------------------------------------------------------------------------------------------------------------|
+| `custom_model_id`             | str  | The ID of the custom model.                                                                                         |
+| `custom_model_version_id`                | str  | The ID of the custom model version.                                                                                 |
+| `dataset_id`                | str  | The id of the testing dataset for non-unstructured custom models. Ignored and not required for unstructured models. |
+
+Sample DAG config params:
+
+```
+"network_egress_policy": - Determines whether the given custom model is isolated, or can access the public network.
+"maximum_memory": - The maximum memory that might be allocated by the custom-model.
+"replicas": - A fixed number of replicas that will be deployed in the cluster.
+```
+
+For more [custom model test creation parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/mlops/custom_model.html?highlight=CustomModelTest#create-custom-model-test), see the DataRobot documentation.
+
+---
 
 
-CustomModelTestOperator
+
 GetCustomModelTestOverallStatusOperator
 CreateCustomModelDeploymentOperator
 GetDeploymentModelOperator
