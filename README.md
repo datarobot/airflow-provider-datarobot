@@ -1074,8 +1074,30 @@ For more [feature-discovery](https://datarobot-public-api-client.readthedocs-hos
 
 ---
 
+#### `DatasetDefinitionOperator`
 
-DatasetDefinitionOperator
+Dataset definition for the Feature Discovery.
+
+Returns Relationships Configuration ID
+
+Parameters:
+
+| Parameter              | Type | Description |
+|------------------------|------|-------------|
+| `dataset_identifier`   | str  |             |
+| `dataset_id`           | str  |             |
+| `dataset_version_id`   | str  |             |
+| `primary_temporal_key` | str  |             |
+| `feature_list_id`      | str  |             |
+| `snapshot_policy`      | str  |             |
+
+
+For more [feature-discovery](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/data/feature_discovery.html?highlight=Featue%20Discovery#feature-discovery), see the DataRobot documentation.
+
+---
+
+
+
 DatasetRelationshipOperator
 ComputeFeatureImpactOperator
 ComputeFeatureEffectsOperator

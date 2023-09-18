@@ -119,6 +119,8 @@ class DatasetDefinitionOperator(BaseOperator):
     :type snapshot_policy: str, optional
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
+    :return: Dataset definition
+    :rtype: dict
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
