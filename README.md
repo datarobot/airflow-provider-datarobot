@@ -916,7 +916,7 @@ Sample DAG config params:
             the path the file should be placed in the model.
 "files_to_delete" - The list of a file items IDs to be deleted.
 "network_egress_policy": - Determines whether the given custom model is isolated, or can access the public network.
-"maximum_memory": - The maximum memory that might be allocated by the custom-model.
+"maximum_memory": - The maximum memory that might be allocated by the custom model.
 "replicas": - A fixed number of replicas that will be deployed in the cluster.
 "required_metadata_values" - Additional parameters required by the execution environment.
 "keep_training_holdout_data" - If the version should inherit training and holdout data from the previous version.
