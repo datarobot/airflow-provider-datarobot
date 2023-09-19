@@ -1084,7 +1084,7 @@ Parameters:
 
 | Parameter              | Type | Description                                                                                                      |
 |------------------------|------|------------------------------------------------------------------------------------------------------------------|
-| `dataset_identifier`   | str  | Alias of the dataset (used directly as part of the generated feature names)                                      |
+| `dataset_identifier`   | str  | The alias of the dataset, used directly as part of the generated feature names.                                      |
 | `dataset_id`           | str  | Identifier of the dataset in DataRobot AI Catalog                                                                |
 | `dataset_version_id`   | str  | Identifier of the dataset version in DataRobot AI Catalog                                                        |
 | `primary_temporal_key` | str  | Name of the column indicating time of record creation                                                            |
