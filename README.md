@@ -1078,7 +1078,7 @@ For more [Feature Discovery parameters](https://datarobot-public-api-client.read
 
 Creates a dataset definition for Feature Discovery.
 
-Returns Dataset definition dict
+Returns a dataset definition dict.
 
 Parameters:
 
