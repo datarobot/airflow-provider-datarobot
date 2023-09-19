@@ -1470,7 +1470,7 @@ Parameters:
 | Parameter                   | Type | Description           |
 |-----------------------------|------|-----------------------|
 | `project_id`                | str  | DataRobot project ID. |
-| `job_id`                    | str  | DataRobot Job ID.     |
+| `job_id`                    | str  | DataRobot job ID.     |
 
 ----
 
