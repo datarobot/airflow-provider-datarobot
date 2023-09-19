@@ -1461,7 +1461,7 @@ Parameters:
 
 #### `ModelTrainingJobSensor`
 
-Checks whether DataRobot Model Training Job is complete.
+Checks whether a DataRobot model training job is complete.
 
 Returns False if job not yet completed, PokeReturnValue(True, trained_model.id) if model training completed
 
