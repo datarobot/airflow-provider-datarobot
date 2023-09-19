@@ -1057,9 +1057,9 @@ For more [deployment parameters](https://datarobot-public-api-client.readthedocs
 
 #### `RelationshipsConfigurationOperator`
 
-Create a Relationships Configuration.
+Creates a relationship configuration.
 
-Returns Relationships Configuration ID
+Returns the relationships configuration ID.
 
 Parameters:
 
