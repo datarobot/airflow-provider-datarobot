@@ -795,7 +795,7 @@ Parameters:
 | `project_id`                     | str  | The DataRobot project ID.                     |
 | `featurelist_id`                 | str  | Specifies which feature list to use.          |
 | `relationships_configuration_id` | str  | ID of the relationships configuration to use. |
-| `segmentation_task_id`           | str  | ID of the relationships configuration to use. |
+| `segmentation_task_id`           | str  | ID of the segementation task to use. |
 
 Sample config params:
 
