@@ -1532,7 +1532,7 @@ You can find the following examples using a preconfigured connection in the `dat
 | `model_compute_prediction_explanations_dag.py`         | Example of compute prediction explanations job.                                         |
 | `model_compute_predictions_dag.py`                     | Example of compute predictions for model.                                               |
 | `model_compute_shap_dag.py`                            | Example of compute SHAP job.                                                            |
-| `model_retrain_dag.py`                                 | Example of model retraining job on specific sample size/featurelist.                    |
+| `model_retrain_dag.py`                                 | Example of model retraining job on a specific sample size/featurelist.                    |
 | `model_train_dag.py`                                   | Example of model training job based on specific blueprint.                              |
 
 The advanced end-to-end workflow in DataRobot (`advanced_datarobot_pipeline_jdbc_dag.py`) contains the following steps:
