@@ -990,7 +990,7 @@ For more [create_from_custom_model_version parameters](https://datarobot-public-
 
 #### `GetDeploymentModelOperator`
 
-Gets current model info from a deployment.
+Gets information about the deployment's current model.
 
 Returns a model info from a Deployment
 
