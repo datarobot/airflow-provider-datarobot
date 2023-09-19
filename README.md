@@ -1152,7 +1152,7 @@ Parameters:
 | `project_id`     | str  | DataRobot project ID. |
 | `model_id`       | str  | DataRobot model ID.   |
 
-For more [request_feature_impact](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=request_feature_effect#datarobot.models.DatetimeModel.request_feature_effect), see the DataRobot documentation.
+For more [request_feature_impact parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=request_feature_effect#datarobot.models.DatetimeModel.request_feature_effect), see the DataRobot documentation.
 
 ---
 
