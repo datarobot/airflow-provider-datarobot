@@ -1070,7 +1070,7 @@ Parameters:
 | `feature_discovery_settings`  | str  | Optional. A list of Feature Discovery settings. If not provided, it will be retrieved from the DAG configuration parameters. Otherwise, default settings are used. |
 
 
-For more [feature-discovery](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/data/feature_discovery.html?highlight=Featue%20Discovery#feature-discovery), see the DataRobot documentation.
+For more [Feature Discovery parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/data/feature_discovery.html?highlight=Featue%20Discovery#feature-discovery), see the DataRobot documentation.
 
 ---
 
