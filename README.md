@@ -956,7 +956,7 @@ For more [custom model test creation parameters](https://datarobot-public-api-cl
 
 Get the overall status for custom model tests.
 
-Returns a custom model test overall status
+Returns the custom model test status.
 
 Parameters:
 
