@@ -1014,7 +1014,7 @@ Parameters:
 
 | Parameter       | Type | Description                                                                                                                                                                                                                         |
 |-----------------|------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `deployment_id` | str  | DataRobot deployment ID                                                                                                                                                                                                             |
+| `deployment_id` | str  | An identifier for the deployed model.                                                                                                                                                                                                             |
 | `new_model_id`  | str  | The id of the new model to use. If replacing the deployment's model with a CustomInferenceModel, a specific CustomModelVersion ID must be used.                                                                                     |
 | `reason`        | str  | The reason for the model replacement. Must be one of 'ACCURACY', 'DATA_DRIFT', 'ERRORS', 'SCHEDULED_REFRESH', 'SCORING_SPEED', or 'OTHER'. This value will be stored in the model history to keep track of why a model was replaced |
 
