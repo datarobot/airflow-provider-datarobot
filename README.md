@@ -905,7 +905,7 @@ Parameters:
 | `training_dataset_id`          | str  | The ID of the training dataset to assign to the custom model.                             |
 | `holdout_dataset_id`           | str  | The ID of the holdout dataset to assign to the custom model.                              |
 | `custom_model_folder`          | str  | The ID of the holdout dataset to assign to the custom model.                              |
-| `create_from_previous`         | bool | if set to True - creates a custom model version containing files from a previous version. |
+| `create_from_previous`         | bool | If set to True, this parameter creates a custom model version containing files from a previous version. |
 
 
 Sample DAG config params:
