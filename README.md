@@ -1520,18 +1520,18 @@ You can find the following examples using a preconfigured connection in the `dat
 | `download_scoring_code_from_deployment_dag.py`         | Download a Scoring Code JAR file from a DataRobot deployment.                           |
 | `advanced_datarobot_pipeline_jdbc_dag.py`              | Run the advanced end-to-end workflow in DataRobot.                                      |
 | `datarobot_autopilot_options_pipeline_dag.py`          | Creates a DataRobot project and starts Autopilot with advanced options.                   |
-| `datarobot_custom_model_pipeline_dag.py`               | Creating end-to-end workflow with custom models in DataRobot.                           |
-| `datarobot_custom_partitioning_pipeline_dag.py`        | Creating custom partitioned project, train models pipline                               |
-| `datarobot_datetime_partitioning_pipeline_dag.py`      | Creating datetime partitioned project, train models pipline.                            |
-| `datarobot_external_model_pipeline_dag.py`             | Creating end-to-end workflow with external models in DataRobot.                         |
-| `datarobot_feature_discovery_pipeline_dag.py`          | Creating feature-discovery DataRobot project, train models pipline.                     |
-| `datarobot_timeseries_pipeline_dag.py`                 | Creating timeseries DataRobot project, train models pipline.                            |
-| `deployment_activate_deactivate_dag.py`                | Example of Deployment activation/deactivaion and get Deployment status.                 |
-| `deployment_replace_model_dag.py`                      | Example of Deployment model replacement.                                                |
-| `model_compute_insights_dag.py`                        | Example of compute FeatureImpact and FeatureEffects job.                                |
-| `model_compute_prediction_explanations_dag.py`         | Example of compute prediction explanations job.                                         |
-| `model_compute_predictions_dag.py`                     | Example of compute predictions for model.                                               |
-| `model_compute_shap_dag.py`                            | Example of compute SHAP job.                                                            |
+| `datarobot_custom_model_pipeline_dag.py`               | Create an end-to-end workflow with custom models in DataRobot.                           |
+| `datarobot_custom_partitioning_pipeline_dag.py`        | Create a custom partitioned project and train models.                              |
+| `datarobot_datetime_partitioning_pipeline_dag.py`      | Create a datetime partitioned project.                            |
+| `datarobot_external_model_pipeline_dag.py`             | An end-to-end workflow with external models in DataRobot.                         |
+| `datarobot_feature_discovery_pipeline_dag.py`          | Create a Feature Discovery project and train models.                     |
+| `datarobot_timeseries_pipeline_dag.py`                 | Create a time series DataRobot project.                            |
+| `deployment_activate_deactivate_dag.py`                | An example of deployment activation/deactivation and getting deployment status.                 |
+| `deployment_replace_model_dag.py`                      | An example of model replacement for deployments.                                                |
+| `model_compute_insights_dag.py`                        | An example of computing Feature Impact and Feature Effects.                                |
+| `model_compute_prediction_explanations_dag.py`         | An example of a compute prediction explanations job.                                         |
+| `model_compute_predictions_dag.py`                     | An example of computing predictions for model.                                               |
+| `model_compute_shap_dag.py`                            | An example of computing SHAP.                                                            |
 | `model_retrain_dag.py`                                 | Example of model retraining job on a specific sample size/featurelist.                    |
 | `model_train_dag.py`                                   | Example of model training job based on specific blueprint.                              |
 
