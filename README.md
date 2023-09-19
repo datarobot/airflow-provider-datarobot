@@ -1287,7 +1287,7 @@ For more [upload_dataset_from_catalog](https://datarobot-public-api-client.readt
 
 Requests predictions against a previously uploaded dataset.
 
-Returns model predictions job ID
+Returns a model predictions job ID.
 
 Parameters:
 
