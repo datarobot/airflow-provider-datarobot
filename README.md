@@ -848,7 +848,7 @@ Parameters:
 |------------------------------------|------|---------------------------------------------------|
 | `execution_environment_id`         | str  | The ID of the execution environment.              |
 | `docker_context_path`              | str  | The file path to a Docker context archive or folder.   |
-| `environment_version_label`        | str  | short human readable string to label the version. |
+| `environment_version_label`        | str  | A short, human-readable string to label the environment version. |
 | `environment_version_description`  | str  | execution environment version description.        |
 
 For more [execution environment version creation parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/mlops/custom_model.html?highlight=ExecutionEnvironmentVersion#create-execution-environment), see the DataRobot documentation.
