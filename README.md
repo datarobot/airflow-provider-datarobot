@@ -1008,7 +1008,7 @@ For more [get deployment parameters](https://datarobot-public-api-client.readthe
 
 Replaces the current model for a deployment.
 
-Returns a model info from a Deployment
+Returns model information for the mode replacing the deployed model.
 
 Parameters:
 
