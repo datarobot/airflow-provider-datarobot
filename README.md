@@ -1143,7 +1143,7 @@ For more [request_feature_impact](https://datarobot-public-api-client.readthedoc
 
 Submit a request to compute Feature Effects for the model.
 
-Returns Feature Effects job ID
+Returns the Feature Effects job ID.
 
 Parameters:
 
