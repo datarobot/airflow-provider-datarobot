@@ -1132,8 +1132,8 @@ Parameters:
 
 | Parameter       | Type | Description           |
 |-----------------|------|-----------------------|
-| `project_id`    | str  | DataRobot project ID  |
-| `model_id`      | str  | DataRobot model ID    |
+| `project_id`    | str  | DataRobot project ID.  |
+| `model_id`      | str  | DataRobot model ID.    |
 
 For more [request_feature_impact](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=request_feature_impact#datarobot.models.Model.request_feature_impact), see the DataRobot documentation.
 
