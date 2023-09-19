@@ -1374,7 +1374,7 @@ For more [prediction-explanations](https://datarobot-public-api-client.readthedo
 
 Create prediction explanations for the specified dataset.
 
-Returns a Triggered prediction explanations for the specified dataset job ID
+Returns a job ID for the prediction explanations for the specified dataset.
 
 Parameters:
 
