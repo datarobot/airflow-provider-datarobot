@@ -914,7 +914,7 @@ Sample DAG config params:
 "is_major_update" - The flag defining if a custom model version will be a minor or a major version.
 "files" - The list of tuples, where values in each tuple are the local filesystem path and
             the path the file should be placed in the model.
-"files_to_delete" - The list of a file items ids to be deleted.
+"files_to_delete" - The list of a file items IDs to be deleted.
 "network_egress_policy": - Determines whether the given custom model is isolated, or can access the public network.
 "maximum_memory": - The maximum memory that might be allocated by the custom-model.
 "replicas": - A fixed number of replicas that will be deployed in the cluster.
