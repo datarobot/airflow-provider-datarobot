@@ -840,7 +840,7 @@ For more [execution environment creation parameters](https://datarobot-public-ap
 
 Create an execution environment version.
 
-Returns a created execution environment version ID
+Returns a version ID for the newly created execution environment .
 
 Parameters:
 
