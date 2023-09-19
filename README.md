@@ -821,7 +821,7 @@ Parameters:
 | Parameter              | Type | Description                                            |
 |------------------------|------|--------------------------------------------------------|
 | `name`                 | str  | The execution environment name.                        |
-| `description`          | str  | execution environment description.                     |
+| `description`          | str  | The execution environment description.                     |
 | `programming_language` | str  | programming language of the environment to be created. |
 
 Sample config params:
