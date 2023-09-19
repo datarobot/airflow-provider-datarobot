@@ -1448,7 +1448,7 @@ Parameters:
 
 #### `DataRobotJobSensor`
 
-Checks whether DataRobot Job is complete.
+Checks whether a DataRobot job is complete.
 
 Parameters:
 
