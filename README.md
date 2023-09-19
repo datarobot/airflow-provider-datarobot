@@ -1098,7 +1098,7 @@ For more [create-dataset-definitions-and-relationships-using-helper-functions](h
 
 #### `DatasetRelationshipOperator`
 
-Create a Relationship between dataset defined in DatasetDefinition.
+Create a relationship between datasets defined in DatasetDefinition.
 
 Returns a dataset definition dict.
 
