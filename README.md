@@ -1051,7 +1051,7 @@ Parameters:
 |-----------------|------|--------------------------|
 | `deployment_id` | str  | DataRobot deployment ID  |
 
-For more [deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=replace_model#datarobot.models.Deployment.activate), see the DataRobot documentation.
+For more [deployment parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=replace_model#datarobot.models.Deployment.activate), see the DataRobot documentation.
 
 ---
 
