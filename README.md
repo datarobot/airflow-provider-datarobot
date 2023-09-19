@@ -1124,7 +1124,7 @@ For more [create-dataset-definitions-and-relationships-using-helper-functions](h
 
 #### `ComputeFeatureImpactOperator`
 
-Creates Feature Impact job in DataRobot.
+Creates a Feature Impact job in DataRobot.
 
 Returns Feature Impact job ID
 
