@@ -1311,10 +1311,10 @@ Parameters:
 
 | Parameter              | Type | Description                                                                                                                                             |
 |------------------------|------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `project_id`           | str  | DataRobot project ID                                                                                                                                    |
-| `blueprint_id`         | str  | DataRobot blueprint ID                                                                                                                                  |
-| `featurelist_id`       | str  | The identifier of the featurelist to use. If not defined, the default for this project is used.                                                         |
-| `source_project_id`    | str  | Which project created this blueprint_id. If ``None``, it defaults to looking in this project. Note that you must have read permissions in this project. |
+| `project_id`           | str  | DataRobot project ID.                                                                                                                                    |
+| `blueprint_id`         | str  | DataRobot blueprint ID.                                                                                                                                  |
+| `featurelist_id`       | str  | The identifier of the feature list to use. If not defined, the default feature list for this project is used.                                                         |
+| `source_project_id`    | str  | The source project that created the `blueprint_id`. If ``None``, it defaults to looking in this project. Note that you must have read permissions in this project. |
 
 Example of DAG config params:
 {
