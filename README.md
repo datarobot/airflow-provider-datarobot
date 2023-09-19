@@ -930,7 +930,7 @@ For more [custom inference model creation parameters](https://datarobot-public-a
 
 Create and start a custom model test.
 
-Returns a created custom model test ID
+Returns an ID for the custom model test.
 
 Parameters:
 
