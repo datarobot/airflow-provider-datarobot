@@ -1303,7 +1303,7 @@ For more [request_predictions](https://datarobot-public-api-client.readthedocs-h
 
 #### `TrainModelOperator`
 
-Submit a job to the queue to train a model from specific blueprint.
+Submit a job to the queue to train a model from a specific blueprint.
 
 Returns model training job ID
 
