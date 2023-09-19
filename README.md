@@ -998,7 +998,7 @@ Parameters:
 
 | Parameter         | Type | Description                   |
 |-------------------|------|-------------------------------|
-| `deployment_id`   | str  | DataRobot deployment ID       |
+| `deployment_id`   | str  | An identifier for the deployed model.       |
 
 For more [get deployment parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=Deployment.get#datarobot.models.Deployment.get), see the DataRobot documentation.
 
