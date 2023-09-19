@@ -894,7 +894,7 @@ For more [custom inference model creation parameters](https://datarobot-public-a
 
 Create a custom model version.
 
-Returns a created custom model version ID
+Returns the version ID for the created custom model.
 
 Parameters:
 
