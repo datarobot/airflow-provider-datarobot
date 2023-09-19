@@ -1141,7 +1141,7 @@ For more [request_feature_impact](https://datarobot-public-api-client.readthedoc
 
 #### `ComputeFeatureEffectsOperator`
 
-Submit request to compute Feature Effects for the model.
+Submit a request to compute Feature Effects for the model.
 
 Returns Feature Effects job ID
 
