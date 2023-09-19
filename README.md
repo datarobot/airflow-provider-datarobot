@@ -786,7 +786,7 @@ Sample config params:
 
 #### `StartAutopilotOperator`
 
-Triggers DataRobot Autopilot to train set of models.
+Triggers DataRobot Autopilot to train a set of models.
 
 Parameters:
 
