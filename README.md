@@ -1279,7 +1279,7 @@ Parameters:
 | `credential_id`      | str  | DataRobot credentials ID.                 |
 | `dataset_version_id` | str  | DataRobot AI Catalog dataset version ID.  |
 
-For more [upload_dataset_from_catalog](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=upload_dataset_from_catalog#datarobot.models.Project.upload_dataset_from_catalog), see the DataRobot documentation.
+For more [upload_dataset_from_catalog parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=upload_dataset_from_catalog#datarobot.models.Project.upload_dataset_from_catalog), see the DataRobot documentation.
 
 ---
 
