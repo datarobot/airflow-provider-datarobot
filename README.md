@@ -898,14 +898,14 @@ Returns the version ID for the created custom model.
 
 Parameters:
 
-| Parameter                      | Type | Description                                                                               |
-|--------------------------------|------|-------------------------------------------------------------------------------------------|
-| `custom_model_id`              | str  | The ID of the custom model.                                                               |
-| `base_environment_id`          | str  | The ID of the base environment to use with the custom model version.                      |
-| `training_dataset_id`          | str  | The ID of the training dataset to assign to the custom model.                             |
-| `holdout_dataset_id`           | str  | The ID of the holdout dataset to assign to the custom model.                              |
-| `custom_model_folder`          | str  | The ID of the holdout dataset to assign to the custom model.                              |
-| `create_from_previous`         | bool | If set to True, this parameter creates a custom model version containing files from a previous version. |
+| Parameter                      | Type | Description                                                                                                                     |
+|--------------------------------|------|---------------------------------------------------------------------------------------------------------------------------------|
+| `custom_model_id`              | str  | The ID of the custom model.                                                                                                     |
+| `base_environment_id`          | str  | The ID of the base environment to use with the custom model version.                                                            |
+| `training_dataset_id`          | str  | The ID of the training dataset to assign to the custom model.                                                                   |
+| `holdout_dataset_id`           | str  | The ID of the holdout dataset to assign to the custom model.                                                                    |
+| `custom_model_folder`          | str  | The path to a folder containing files to be uploaded. Each file in the folder is uploaded under path relative to a folder path. |
+| `create_from_previous`         | bool | If set to True, this parameter creates a custom model version containing files from a previous version.                         |
 
 
 Sample DAG config params:
