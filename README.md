@@ -1169,7 +1169,7 @@ Parameters:
 | `project_id`   | str  | DataRobot project ID.    |
 | `model_id`     | str  | DataRobot model ID.      |
 
-For more [shap-impact](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/modeling/model.html?highlight=ShapImpact#shap-impact), see the DataRobot documentation.
+For more [shap-impact parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/modeling/model.html?highlight=ShapImpact#shap-impact), see the DataRobot documentation.
 
 ---
 
