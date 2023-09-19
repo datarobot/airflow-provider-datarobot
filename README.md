@@ -875,7 +875,7 @@ Sample DAG config params:
     Values: [`datarobot.TARGET_TYPE.BINARY`, `datarobot.TARGET_TYPE.REGRESSION`,
     `datarobot.TARGET_TYPE.MULTICLASS`, `datarobot.TARGET_TYPE.UNSTRUCTURED`]
 "target_name": - Target feature name.
-    It is optional(ignored if provided) for `datarobot.TARGET_TYPE.UNSTRUCTURED` target type.
+    It is optional (ignored if provided) for `datarobot.TARGET_TYPE.UNSTRUCTURED` target type.
 "programming_language": - Programming language of the custom learning model.
 "positive_class_label": - Custom inference model positive class label for binary classification.
 "negative_class_label": - Custom inference model negative class label for binary classification.
