@@ -1126,7 +1126,7 @@ For more [create-dataset-definitions-and-relationships-using-helper-functions](h
 
 Creates a Feature Impact job in DataRobot.
 
-Returns Feature Impact job ID
+Returns a Feature Impact job ID.
 
 Parameters:
 
