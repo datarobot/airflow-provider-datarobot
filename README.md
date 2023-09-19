@@ -1100,7 +1100,7 @@ For more [create-dataset-definitions-and-relationships-using-helper-functions](h
 
 Create a Relationship between dataset defined in DatasetDefinition.
 
-Returns Dataset definition dict
+Returns a dataset definition dict.
 
 Parameters:
 
