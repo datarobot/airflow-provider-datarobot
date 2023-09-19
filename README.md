@@ -882,7 +882,7 @@ Sample DAG config params:
 "prediction_threshold": - Custom inference model prediction threshold.
 "class_labels": - Custom inference model class labels for multiclass classification.
 "network_egress_policy": - Determines whether the given custom model is isolated, or can access the public network.
-"maximum_memory": - The maximum memory that might be allocated by the custom-model.
+"maximum_memory": - The maximum memory that might be allocated by the custom model.
 "replicas": - A fixed number of replicas that will be deployed in the cluster.
 ```
 
