@@ -1041,9 +1041,9 @@ For more [activate deployment parameters](https://datarobot-public-api-client.re
 
 #### `GetDeploymentStatusOperator`
 
-Get a Deployment status (active/inactive).
+Get the deployment status (active or inactive).
 
-Returns the Deployment status (active/inactive)
+Returns the deployment status.
 
 Parameters:
 
