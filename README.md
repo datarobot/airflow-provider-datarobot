@@ -938,7 +938,7 @@ Parameters:
 |---------------------------|------|---------------------------------------------------------------------------------------------------------------------|
 | `custom_model_id`         | str  | The ID of the custom model.                                                                                         |
 | `custom_model_version_id` | str  | The ID of the custom model version.                                                                                 |
-| `dataset_id`              | str  | The id of the testing dataset for non-unstructured custom models. Ignored and not required for unstructured models. |
+| `dataset_id`              | str  | The ID of the testing dataset for [structured custom models](https://docs.datarobot.com/en/docs/mlops/deployment/custom-models/custom-model-assembly/structured-custom-models.html). Ignored and not required for [unstructured models](https://docs.datarobot.com/en/docs/mlops/deployment/custom-models/custom-model-assembly/unstructured-custom-models.html). |
 
 Sample DAG config params:
 
