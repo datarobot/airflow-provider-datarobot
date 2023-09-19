@@ -1035,7 +1035,7 @@ Parameters:
 | `deployment_id`         | str  | DataRobot deployment ID                                                       |
 | `activate`              | str  | If set to True, this parameter activates the deployment. Set to False to deactivate the deployment. |
 
-For more [activate deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=replace_model#datarobot.models.Deployment.activate), see the DataRobot documentation.
+For more [activate deployment parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=replace_model#datarobot.models.Deployment.activate), see the DataRobot documentation.
 
 ---
 
