@@ -979,7 +979,7 @@ Parameters:
 | Parameter                      | Type | Description                                                                      |
 |--------------------------------|------|----------------------------------------------------------------------------------|
 | `custom_model_version_id`      | str  | The ID of the deployed custom model.                           |
-| `deployment_name`              | str  | a human readable label (name) of the deployment                                  |
+| `deployment_name`              | str  | A human-readable label for the deployment.                                  |
 | `default_prediction_server_id` | str  | an identifier of a prediction server to be used as the default prediction server |
 | `description`                  | str  | a human readable description of the deployment                                   |
 | `importance`                   | str  | deployment importance                                                            |
