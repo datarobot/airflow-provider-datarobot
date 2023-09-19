@@ -992,7 +992,7 @@ For more [create_from_custom_model_version parameters](https://datarobot-public-
 
 Gets information about the deployment's current model.
 
-Returns a model info from a Deployment
+Returns a model information from a deployment.
 
 Parameters:
 
