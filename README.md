@@ -972,7 +972,7 @@ For more [custom model test get status parameters](https://datarobot-public-api-
 
 Create a deployment from a DataRobot custom model image.
 
-Returns the created deployment id
+Returns the deployment ID.
 
 Parameters:
 
