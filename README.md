@@ -1380,9 +1380,9 @@ Parameters:
 
 | Parameter             | Type | Description                    |
 |-----------------------|------|--------------------------------|
-| `project_id`          | str  | DataRobot project ID           |
-| `model_id`            | str  | DataRobot model ID             |
-| `external_dataset_id` | str  | DataRobot external dataset ID  |
+| `project_id`          | str  | DataRobot project ID.           |
+| `model_id`            | str  | DataRobot model ID.             |
+| `external_dataset_id` | str  | DataRobot external dataset ID.  |
 
 Example of DAG config params:
 
