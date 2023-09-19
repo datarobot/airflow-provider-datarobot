@@ -1274,10 +1274,10 @@ Parameters:
 
 | Parameter            | Type | Description                              |
 |----------------------|------|------------------------------------------|
-| `project_id`         | str  | DataRobot project ID                     |
-| `dataset_id`         | str  | DataRobot AI Catalog dataset ID          |
-| `credential_id`      | str  | DataRobot Credentials ID                 |
-| `dataset_version_id` | str  | DataRobot AI Catalog dataset version ID  |
+| `project_id`         | str  | DataRobot project ID.                     |
+| `dataset_id`         | str  | DataRobot AI Catalog dataset ID.          |
+| `credential_id`      | str  | DataRobot credentials ID.                 |
+| `dataset_version_id` | str  | DataRobot AI Catalog dataset version ID.  |
 
 For more [upload_dataset_from_catalog](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=upload_dataset_from_catalog#datarobot.models.Project.upload_dataset_from_catalog), see the DataRobot documentation.
 
