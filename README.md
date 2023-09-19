@@ -1268,7 +1268,7 @@ Parameters:
 
 Upload a new dataset from the AI Catalog to make predictions for a model.
 
-Returns external dataset ID for the model
+Returns an external dataset ID for the model,
 
 Parameters:
 
