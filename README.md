@@ -1085,11 +1085,11 @@ Parameters:
 | Parameter              | Type | Description                                                                                                      |
 |------------------------|------|------------------------------------------------------------------------------------------------------------------|
 | `dataset_identifier`   | str  | The alias of the dataset, used directly as part of the generated feature names.                                      |
-| `dataset_id`           | str  | Identifier of the dataset in DataRobot AI Catalog                                                                |
-| `dataset_version_id`   | str  | Identifier of the dataset version in DataRobot AI Catalog                                                        |
-| `primary_temporal_key` | str  | Name of the column indicating time of record creation                                                            |
-| `feature_list_id`      | str  | Specifies which feature list to use.                                                                             |
-| `snapshot_policy`      | str  | Policy to use  when creating a project or making predictions. If omitted, by default endpoint will use 'latest'. |
+| `dataset_id`           | str  | The identifier of the dataset in the AI Catalog.                                                                |
+| `dataset_version_id`   | str  | The identifier of the dataset version in the AI Catalog.                                                        |
+| `primary_temporal_key` | str  | The name of the column indicating the time of record creation.                                                            |
+| `feature_list_id`      | str  | Specifies the feature list to use.                                                                             |
+| `snapshot_policy`      | str  | The policy to use when creating a project or making predictions. If omitted, the endpoint will use 'latest' by default. |
 
 
 For more [create-dataset-definitions-and-relationships-using-helper-functions](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/data/feature_discovery.html?highlight=DatasetDefinition#create-dataset-definitions-and-relationships-using-helper-functions), see the DataRobot documentation.
