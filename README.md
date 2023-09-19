@@ -1026,7 +1026,7 @@ For more [replace_model parameters](https://datarobot-public-api-client.readthed
 
 Activate or deactivate a Deployment.
 
-Returns the Deployment status (active/inactive)
+Returns the Deployment status (active or inactive).
 
 Parameters:
 
