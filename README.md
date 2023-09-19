@@ -980,9 +980,9 @@ Parameters:
 |--------------------------------|------|----------------------------------------------------------------------------------|
 | `custom_model_version_id`      | str  | The ID of the deployed custom model.                           |
 | `deployment_name`              | str  | A human-readable label for the deployment.                                  |
-| `default_prediction_server_id` | str  | an identifier of a prediction server to be used as the default prediction server |
-| `description`                  | str  | a human readable description of the deployment                                   |
-| `importance`                   | str  | deployment importance                                                            |
+| `default_prediction_server_id` | str  | An identifier for the default prediction server. |
+| `description`                  | str  | A human-readable description of the deployment.                                   |
+| `importance`                   | str  | The deployment importance level.                                                          |
 
 For more [create_from_custom_model_version parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=create_from_custom_model_version#datarobot.models.Deployment.create_from_custom_model_version), see the DataRobot documentation.
 
