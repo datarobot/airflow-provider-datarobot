@@ -1508,7 +1508,7 @@ You can find the following examples using a preconfigured connection in the `dat
 | `datarobot_create_project_from_ai_catalog_dag.py`      | Create a DataRobot project from a DataRobot AI Catalog dataset.                         |
 | `datarobot_create_project_from_dataset_version_dag.py` | Create a DataRobot project from a specific dataset version in the DataRobot AI Catalog. |
 | `datarobot_dataset_new_version_dag.py`                 | Create a new version of an existing dataset in the AI Catalog.                |
-| `datarobot_dataset_upload_dag.py`                      | Upload a local file to the DataRobot AI Catalog.                                        |
+| `datarobot_dataset_upload_dag.py`                      | Upload a local file to the AI Catalog.                                        |
 | `datarobot_get_datastore_dag.py`                       | Create a DataRobot data store with `GetOrCreateDataStoreOperator`.                       |
 | `datarobot_jdbc_dataset_dag.py`                        | Create a DataRobot project from a JDBC data source.                                     |
 | `datarobot_jdbc_dynamic_dataset_dag.py`                | Create a DataRobot project from a JDBC dynamic data source.                             |
