@@ -1330,7 +1330,7 @@ For more [start-training-a-model](https://datarobot-public-api-client.readthedoc
 
 #### `RetrainModelOperator`
 
-Submit a job to the queue to retrain a model on a specific sample size and/or custom featurelist.
+Submit a job to the queue to retrain a model on a specific sample size and/or custom feature list.
 
 Returns a model retraining job ID
 
