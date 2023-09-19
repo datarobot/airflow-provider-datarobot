@@ -846,7 +846,7 @@ Parameters:
 
 | Parameter                          | Type | Description                                       |
 |------------------------------------|------|---------------------------------------------------|
-| `execution_environment_id`         | str  | The id of the execution environment.              |
+| `execution_environment_id`         | str  | The ID of the execution environment.              |
 | `docker_context_path`              | str  | The path to a docker context archive or folder.   |
 | `environment_version_label`        | str  | short human readable string to label the version. |
 | `environment_version_description`  | str  | execution environment version description.        |
