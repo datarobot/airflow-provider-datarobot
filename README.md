@@ -1513,7 +1513,7 @@ You can find the following examples using a preconfigured connection in the `dat
 | `datarobot_jdbc_dataset_dag.py`                        | Create a DataRobot project from a JDBC data source.                                     |
 | `datarobot_jdbc_dynamic_dataset_dag.py`                | Create a DataRobot project from a JDBC dynamic data source.                             |
 | `datarobot_upload_actuals_catalog_dag.py`              | Upload actuals from the DataRobot AI Catalog.                                           |
-| `deployment_service_stats_dag.py`                      | Get a deployment's service statistics with `GetServiceStatsOperator`                    |
+| `deployment_service_stats_dag.py`                      | Get a deployment's service statistics with `GetServiceStatsOperator`.                    |
 | `deployment_stat_and_accuracy_dag.py`                  | Get a deployment's service statistics and accuracy.                                     |
 | `deployment_update_monitoring_settings_dag.py`         | Update a deployment's monitoring settings.                                              |
 | `deployment_update_segment_analysis_settings_dag.py`   | Update a deployment's segment analysis settings.                                        |
