@@ -1338,9 +1338,9 @@ Parameters:
 
 | Parameter            | Type | Description                                                                                     |
 |----------------------|------|-------------------------------------------------------------------------------------------------|
-| `project_id`         | str  | DataRobot project ID                                                                            |
-| `model_id`           | str  | DataRobot model ID                                                                              |
-| `featurelist_id`     | str  | The identifier of the featurelist to use. If not defined, the default for this project is used. |
+| `project_id`         | str  | DataRobot project ID.                                                                            |
+| `model_id`           | str  | DataRobot model ID.                                                                              |
+| `featurelist_id`     | str  | The identifier of the feature list to use. If not defined, the default for this project is used. |
 
 Example of DAG config params:
 {
