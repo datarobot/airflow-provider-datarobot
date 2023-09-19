@@ -1517,7 +1517,7 @@ You can find the following examples using a preconfigured connection in the `dat
 | `deployment_stat_and_accuracy_dag.py`                  | Get a deployment's service statistics and accuracy.                                     |
 | `deployment_update_monitoring_settings_dag.py`         | Update a deployment's monitoring settings.                                              |
 | `deployment_update_segment_analysis_settings_dag.py`   | Update a deployment's segment analysis settings.                                        |
-| `download_scoring_code_from_deployment_dag.py`         | Download scoring code (JAR file) from a DataRobot deployment.                           |
+| `download_scoring_code_from_deployment_dag.py`         | Download a Scoring Code JAR file from a DataRobot deployment.                           |
 | `advanced_datarobot_pipeline_jdbc_dag.py`              | Run the advanced end-to-end workflow in DataRobot.                                      |
 | `datarobot_autopilot_options_pipeline_dag.py`          | Creates datarobot project and starts autopilot with advanced options.                   |
 | `datarobot_custom_model_pipeline_dag.py`               | Creating end-to-end workflow with custom models in DataRobot.                           |
