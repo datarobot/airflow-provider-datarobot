@@ -1247,7 +1247,7 @@ Example JSON for a multiclass classification model:
 
 Create a deployment from a DataRobot model package.
 
-Returns The created deployment ID
+Returns the created deployment ID.
 
 Parameters:
 
