@@ -954,7 +954,7 @@ For more [custom model test creation parameters](https://datarobot-public-api-cl
 
 #### `GetCustomModelTestOverallStatusOperator`
 
-Get a custom model testing overall status.
+Get the overall status for custom model tests.
 
 Returns a custom model test overall status
 
