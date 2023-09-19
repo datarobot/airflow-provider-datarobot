@@ -859,7 +859,7 @@ For more [execution environment version creation parameters](https://datarobot-p
 
 Create a custom inference model.
 
-Returns a created custom model ID
+Returns the ID for the created custom model.
 
 Parameters:
 
