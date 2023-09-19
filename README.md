@@ -1463,7 +1463,7 @@ Parameters:
 
 Checks whether a DataRobot model training job is complete.
 
-Returns False if job not yet completed, PokeReturnValue(True, trained_model.id) if model training completed
+Returns False if the job is not yet completed, and returns PokeReturnValue(True, trained_model.id) if model training has completed.
 
 Parameters:
 
