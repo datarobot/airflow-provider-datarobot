@@ -1357,7 +1357,7 @@ For more [train-a-model-on-a-different-sample-size](https://datarobot-public-api
 
 Initialize prediction explanations for a model.
 
-Returns a Prediction Explanations Initialization job ID
+Returns a prediction explanations initialization job ID.
 
 Parameters:
 
