@@ -1076,7 +1076,7 @@ For more [Feature Discovery parameters](https://datarobot-public-api-client.read
 
 #### `DatasetDefinitionOperator`
 
-Create a Dataset definition for the Feature Discovery.
+Creates a dataset definition for Feature Discovery.
 
 Returns Dataset definition dict
 
