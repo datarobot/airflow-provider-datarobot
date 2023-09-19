@@ -1355,7 +1355,7 @@ For more [train-a-model-on-a-different-sample-size](https://datarobot-public-api
 
 #### `PredictionExplanationsInitializationOperator`
 
-Triggering a prediction explanations initialization of a model.
+Initialize prediction explanations for a model.
 
 Returns a Prediction Explanations Initialization job ID
 
