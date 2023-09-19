@@ -1177,7 +1177,7 @@ For more [shap-impact](https://datarobot-public-api-client.readthedocs-hosted.co
 
 Create an external model package in DataRobot MLOps from JSON configuration.
 
-Returns a model package ID of newly created ModelPackage.
+Returns a model package ID of the newly created model package.
 
 Parameters:
 
