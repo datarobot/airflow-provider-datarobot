@@ -720,10 +720,10 @@ Downloads scoring code artifact from a model.
 
 Parameters:
 
-| Parameter                   | Type | Description |
-|-----------------------------|------|-------------|
-| `project_id`                | str  | The DataRobot project ID. |
-| `model_id`                  | str  | The DataRobot model ID. |
+| Parameter                   | Type | Description                                            |
+|-----------------------------|------|--------------------------------------------------------|
+| `project_id`                | str  | The DataRobot project ID.                              |
+| `model_id`                  | str  | The DataRobot model ID.                                |
 | `base_path`                 | str  | The base path for storing a downloaded model artifact. |
 
 Sample config params: 
@@ -742,9 +742,9 @@ Downloads scoring code artifact from a deployment.
 
 Parameters:
 
-| Parameter                   | Type | Description |
-|-----------------------------|------|-------------|
-| `deployment_id`             | str  | The DataRobot deployment ID. |
+| Parameter                   | Type | Description                                            |
+|-----------------------------|------|--------------------------------------------------------|
+| `deployment_id`             | str  | The DataRobot deployment ID.                           |
 | `base_path`                 | str  | The base path for storing a downloaded model artifact. |
 
 Sample config params:
@@ -768,10 +768,10 @@ Returns an actuals upload job ID.
 
 Parameters:
 
-| Parameter                   | Type | Description |
-|-----------------------------|------|-------------|
-| `deployment_id`             | str  | The DataRobot deployment ID. |
-| `dataset_id`                | str  | The DataRobot AI Catalog dataset ID. |
+| Parameter                   | Type | Description                                  |
+|-----------------------------|------|----------------------------------------------|
+| `deployment_id`             | str  | The DataRobot deployment ID.                 |
+| `dataset_id`                | str  | The DataRobot AI Catalog dataset ID.         |
 | `dataset_version_id`        | str  | The DataRobot AI Catalog dataset version ID. |
 
 Sample config params:
@@ -781,6 +781,618 @@ Sample config params:
 "actual_value_column": "ACTUAL",
 "timestamp_column": "timestamp",
 ```
+
+---
+
+#### `StartAutopilotOperator`
+
+Triggers DataRobot Autopilot to train a set of models.
+
+Parameters:
+
+| Parameter                        | Type | Description                                   |
+|----------------------------------|------|-----------------------------------------------|
+| `project_id`                     | str  | The DataRobot project ID.                     |
+| `featurelist_id`                 | str  | Specifies which feature list to use.          |
+| `relationships_configuration_id` | str  | ID of the relationships configuration to use. |
+| `segmentation_task_id`           | str  | ID of the segementation task to use. |
+
+Sample config params:
+
+```
+"autopilot_settings": {
+    "target": "column_name",
+    "mode": AUTOPILOT_MODE.QUICK,
+}
+```
+
+For more [analyze_and_model parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Project.analyze_and_model), see the DataRobot documentation.
+
+---
+
+#### `CreateExecutionEnvironmentOperator`
+
+Create an execution environment.
+
+Returns an execution environment ID.
+
+Parameters:
+
+| Parameter              | Type | Description                                            |
+|------------------------|------|--------------------------------------------------------|
+| `name`                 | str  | The execution environment name.                        |
+| `description`          | str  | The execution environment description.                     |
+| `programming_language` | str  | The programming language of the environment to be created. |
+
+Sample config params:
+
+```
+"execution_environment_name": "My Demo Env",
+"custom_model_description": "This is a custom model created by Airflow",
+"programming_language": "python",
+```
+
+For more [execution environment creation parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=executionenvironmentversion%20create#datarobot.ExecutionEnvironment.create), see the DataRobot documentation.
+
+---
+
+#### `CreateExecutionEnvironmentVersionOperator`
+
+Create an execution environment version.
+
+Returns a version ID for the newly created execution environment .
+
+Parameters:
+
+| Parameter                          | Type | Description                                       |
+|------------------------------------|------|---------------------------------------------------|
+| `execution_environment_id`         | str  | The ID of the execution environment.              |
+| `docker_context_path`              | str  | The file path to a Docker context archive or folder.   |
+| `environment_version_label`        | str  | A short, human-readable string to label the environment version. |
+| `environment_version_description`  | str  | The execution environment version description.        |
+
+For more [execution environment version creation parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/mlops/custom_model.html?highlight=ExecutionEnvironmentVersion#create-execution-environment), see the DataRobot documentation.
+
+---
+
+#### `CreateCustomInferenceModelOperator`
+
+Create a custom inference model.
+
+Returns the ID for the created custom model.
+
+Parameters:
+
+| Parameter          | Type | Description                           |
+|--------------------|------|---------------------------------------|
+| `name`             | str  | Name of the custom model.             |
+| `description`      | str  | Description of the custom model.      |
+
+Sample DAG config params:
+
+```
+"target_type": - Target type of the custom inference model.
+    Values: [`datarobot.TARGET_TYPE.BINARY`, `datarobot.TARGET_TYPE.REGRESSION`,
+    `datarobot.TARGET_TYPE.MULTICLASS`, `datarobot.TARGET_TYPE.UNSTRUCTURED`]
+"target_name": - Target feature name.
+    It is optional (ignored if provided) for `datarobot.TARGET_TYPE.UNSTRUCTURED` target type.
+"programming_language": - Programming language of the custom learning model.
+"positive_class_label": - Custom inference model positive class label for binary classification.
+"negative_class_label": - Custom inference model negative class label for binary classification.
+"prediction_threshold": - Custom inference model prediction threshold.
+"class_labels": - Custom inference model class labels for multiclass classification.
+"network_egress_policy": - Determines whether the given custom model is isolated, or can access the public network.
+"maximum_memory": - The maximum memory that might be allocated by the custom model.
+"replicas": - A fixed number of replicas that will be deployed in the cluster.
+```
+
+For more [custom inference model creation parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/mlops/custom_model.html?highlight=CustomInferenceModel#create-custom-inference-model), see the DataRobot documentation.
+
+---
+
+#### `CreateCustomModelVersionOperator`
+
+Create a custom model version.
+
+Returns the version ID for the created custom model.
+
+Parameters:
+
+| Parameter                      | Type | Description                                                                                                                     |
+|--------------------------------|------|---------------------------------------------------------------------------------------------------------------------------------|
+| `custom_model_id`              | str  | The ID of the custom model.                                                                                                     |
+| `base_environment_id`          | str  | The ID of the base environment to use with the custom model version.                                                            |
+| `training_dataset_id`          | str  | The ID of the training dataset to assign to the custom model.                                                                   |
+| `holdout_dataset_id`           | str  | The ID of the holdout dataset to assign to the custom model.                                                                    |
+| `custom_model_folder`          | str  | The path to a folder containing files to be uploaded. Each file in the folder is uploaded under path relative to a folder path. |
+| `create_from_previous`         | bool | If set to True, this parameter creates a custom model version containing files from a previous version.                         |
+
+
+Sample DAG config params:
+
+```
+"is_major_update" - The flag defining if a custom model version will be a minor or a major version.
+"files" - The list of tuples, where values in each tuple are the local filesystem path and
+            the path the file should be placed in the model.
+"files_to_delete" - The list of a file items IDs to be deleted.
+"network_egress_policy": - Determines whether the given custom model is isolated, or can access the public network.
+"maximum_memory": - The maximum memory that might be allocated by the custom model.
+"replicas": - A fixed number of replicas that will be deployed in the cluster.
+"required_metadata_values" - Additional parameters required by the execution environment.
+"keep_training_holdout_data" - If the version should inherit training and holdout data from the previous version.
+```
+
+For more [custom inference model creation parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/mlops/custom_model.html?highlight=CustomInferenceModel#create-custom-inference-model), see the DataRobot documentation.
+
+---
+
+#### `CustomModelTestOperator`
+
+Create and start a custom model test.
+
+Returns an ID for the custom model test.
+
+Parameters:
+
+| Parameter                 | Type | Description                                                                                                         |
+|---------------------------|------|---------------------------------------------------------------------------------------------------------------------|
+| `custom_model_id`         | str  | The ID of the custom model.                                                                                         |
+| `custom_model_version_id` | str  | The ID of the custom model version.                                                                                 |
+| `dataset_id`              | str  | The ID of the testing dataset for [structured custom models](https://docs.datarobot.com/en/docs/mlops/deployment/custom-models/custom-model-assembly/structured-custom-models.html). Ignored and not required for [unstructured models](https://docs.datarobot.com/en/docs/mlops/deployment/custom-models/custom-model-assembly/unstructured-custom-models.html). |
+
+Sample DAG config params:
+
+```
+"network_egress_policy": - Determines whether the given custom model is isolated, or can access the public network.
+"maximum_memory": - The maximum memory that might be allocated by the custom model.
+"replicas": - A fixed number of replicas that will be deployed in the cluster.
+```
+
+For more [custom model test creation parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/mlops/custom_model.html?highlight=CustomModelTest#create-custom-model-test), see the DataRobot documentation.
+
+---
+
+#### `GetCustomModelTestOverallStatusOperator`
+
+Get the overall status for custom model tests.
+
+Returns the custom model test status.
+
+Parameters:
+
+| Parameter                     | Type | Description                            |
+|-------------------------------|------|----------------------------------------|
+| `custom_model_test_id`        | str  | The ID of the custom model test.       |
+
+For more [custom model test get status parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/mlops/custom_model.html?highlight=CustomModelTest#retrieve-custom-model-test), see the DataRobot documentation.
+
+---
+
+#### `CreateCustomModelDeploymentOperator`
+
+Create a deployment from a DataRobot custom model image.
+
+Returns the deployment ID.
+
+Parameters:
+
+| Parameter                      | Type | Description                                                                      |
+|--------------------------------|------|----------------------------------------------------------------------------------|
+| `custom_model_version_id`      | str  | The ID of the deployed custom model.                           |
+| `deployment_name`              | str  | A human-readable label for the deployment.                                  |
+| `default_prediction_server_id` | str  | An identifier for the default prediction server. |
+| `description`                  | str  | A human-readable description of the deployment.                                   |
+| `importance`                   | str  | The deployment importance level.                                                          |
+
+For more [create_from_custom_model_version parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=create_from_custom_model_version#datarobot.models.Deployment.create_from_custom_model_version), see the DataRobot documentation.
+
+---
+
+#### `GetDeploymentModelOperator`
+
+Gets information about the deployment's current model.
+
+Returns a model information from a deployment.
+
+Parameters:
+
+| Parameter         | Type | Description                   |
+|-------------------|------|-------------------------------|
+| `deployment_id`   | str  | An identifier for the deployed model.       |
+
+For more [get deployment parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=Deployment.get#datarobot.models.Deployment.get), see the DataRobot documentation.
+
+---
+
+#### `ReplaceModelOperator`
+
+Replaces the current model for a deployment.
+
+Returns model information for the mode replacing the deployed model.
+
+Parameters:
+
+| Parameter       | Type | Description                                                                                                                                                                                                                         |
+|-----------------|------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `deployment_id` | str  | An identifier for the deployed model.                                                                                                                                                                                                             |
+| `new_model_id`  | str  | The ID of the replacement model. If you are replacing the deployment's model with a custom inference model, you must use a specific custom model version ID.                                                                                     |
+| `reason`        | str  | The reason for the model replacement. Must be one of 'ACCURACY', 'DATA_DRIFT', 'ERRORS', 'SCHEDULED_REFRESH', 'SCORING_SPEED', or 'OTHER'. This value will be stored in the model history to keep track of why a model was replaced. |
+
+For more [replace_model parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=replace_model#datarobot.models.Deployment.replace_model), see the DataRobot documentation.
+
+---
+
+#### `ActivateDeploymentOperator`
+
+Activate or deactivate a Deployment.
+
+Returns the Deployment status (active or inactive).
+
+Parameters:
+
+| Parameter               | Type | Description                                                                   |
+|-------------------------|------|-------------------------------------------------------------------------------|
+| `deployment_id`         | str  | An identifier for the deployed model.                                                      |
+| `activate`              | str  | If set to True, this parameter activates the deployment. Set to False to deactivate the deployment. |
+
+For more [activate deployment parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=replace_model#datarobot.models.Deployment.activate), see the DataRobot documentation.
+
+---
+
+#### `GetDeploymentStatusOperator`
+
+Get the deployment status (active or inactive).
+
+Returns the deployment status.
+
+Parameters:
+
+| Parameter       | Type | Description              |
+|-----------------|------|--------------------------|
+| `deployment_id` | str  | An identifier for the deployed model.  |
+
+For more [deployment parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=replace_model#datarobot.models.Deployment.activate), see the DataRobot documentation.
+
+---
+
+#### `RelationshipsConfigurationOperator`
+
+Creates a relationship configuration.
+
+Returns the relationships configuration ID.
+
+Parameters:
+
+| Parameter                     | Type | Description                                                                                                                                                |
+|-------------------------------|------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `dataset_definitions`         | str  | A list of dataset definitions. Each element is a dict retrieved from the `DatasetDefinitionOperator` operator.                                                      |
+| `relationships`               | str  | A list of relationships. Each element is a dict retrieved from DatasetRelationshipOperator operator.                                                          |
+| `feature_discovery_settings`  | str  | Optional. A list of Feature Discovery settings. If not provided, it will be retrieved from the DAG configuration parameters. Otherwise, default settings are used. |
+
+
+For more [Feature Discovery parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/data/feature_discovery.html?highlight=Featue%20Discovery#feature-discovery), see the DataRobot documentation.
+
+---
+
+#### `DatasetDefinitionOperator`
+
+Creates a dataset definition for Feature Discovery.
+
+Returns a dataset definition dict.
+
+Parameters:
+
+| Parameter              | Type | Description                                                                                                      |
+|------------------------|------|------------------------------------------------------------------------------------------------------------------|
+| `dataset_identifier`   | str  | The alias of the dataset, used directly as part of the generated feature names.                                      |
+| `dataset_id`           | str  | The identifier of the dataset in the AI Catalog.                                                                |
+| `dataset_version_id`   | str  | The identifier of the dataset version in the AI Catalog.                                                        |
+| `primary_temporal_key` | str  | The name of the column indicating the time of record creation.                                                            |
+| `feature_list_id`      | str  | Specifies the feature list to use.                                                                             |
+| `snapshot_policy`      | str  | The policy to use when creating a project or making predictions. If omitted, the endpoint will use 'latest' by default. |
+
+
+For more [create-dataset-definitions-and-relationships-using-helper-functions](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/data/feature_discovery.html?highlight=DatasetDefinition#create-dataset-definitions-and-relationships-using-helper-functions), see the DataRobot documentation.
+
+---
+
+#### `DatasetRelationshipOperator`
+
+Create a relationship between datasets defined in DatasetDefinition.
+
+Returns a dataset definition dict.
+
+Parameters:
+
+| Parameter                             | Type       | Description                                                                                                                                                                                                                                                                             |
+|---------------------------------------|------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `dataset1_identifier`                 | List[str]  | Identifier of the first dataset in this relationship. This is specified in the identifier field of the `dataset_definition` structure. If set to None, then the relationship is with the primary dataset.                                                                                            |
+| `dataset2_identifier`                 | List[str]  | Identifier of the second dataset in this relationship. This is specified in the identifier field of the `dataset_definition` schema.                                                                                                                                                          |
+| `dataset1_keys`                       | List[str]  | A list of strings (max length: 10 min length: 1). The column(s) from the first dataset which are used to join to the second dataset.                                                                                                                                                            |
+| `dataset2_keys`                       | List[str]  | A list of strings (max length: 10 min length: 1). The column(s) from the second dataset that are used to join to the first dataset.                                                                                                                                                             |
+| `feature_derivation_window_start`     | int        | How many time units of each dataset's primary temporal key into the past relative to the datetimePartitionColumn the feature derivation window should begin. Will be a negative integer, If present, the feature engineering graph performs time-aware joins.                       |
+| `feature_derivation_window_end`       | int        | Determines how many units of time of each dataset's record primary temporal key into the past relative to the datetimePartitionColumn the feature derivation window should end.  It is a non-positive integer if present. If present, the feature engineering graph performs time-aware joins. |
+| `feature_derivation_window_time_unit` | str        | The unit of time the feature derivation window. One of ``datarobot.enums.AllowedTimeUnitsSAFER`` If present, time-aware joins will be used. Only applicable when dataset1_identifier is not provided.                                                                                       |
+| `feature_derivation_windows`          | List       | A list of feature derivation windows settings. If present, time-aware joins will be used. Only allowed when `feature_derivation_window_start`, `feature_derivation_window_end `, and `feature_derivation_window_time_unit` are not provided.                                                      |
+| `prediction_point_rounding`           | List[dict] | Closest value of `prediction_point_rounding_time_unit` to round the prediction point into the past when applying the feature derivation if present. Only applicable when `dataset1_identifier` is not provided.                                                                                    |
+| `prediction_point_rounding_time_unit` | str        | Time unit of the prediction point rounding. One of ``datarobot.enums.AllowedTimeUnitsSAFER``. Only applicable when `dataset1_identifier` is not provided.                                                                                                                                  |
+
+
+For more [create-dataset-definitions-and-relationships-using-helper-functions](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/data/feature_discovery.html?highlight=DatasetDefinition#create-dataset-definitions-and-relationships-using-helper-functions), see the DataRobot documentation.
+
+---
+
+#### `ComputeFeatureImpactOperator`
+
+Creates a Feature Impact job in DataRobot.
+
+Returns a Feature Impact job ID.
+
+Parameters:
+
+| Parameter       | Type | Description           |
+|-----------------|------|-----------------------|
+| `project_id`    | str  | DataRobot project ID.  |
+| `model_id`      | str  | DataRobot model ID.    |
+
+For more [request_feature_impact](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=request_feature_impact#datarobot.models.Model.request_feature_impact), see the DataRobot documentation.
+
+---
+
+#### `ComputeFeatureEffectsOperator`
+
+Submit a request to compute Feature Effects for the model.
+
+Returns the Feature Effects job ID.
+
+Parameters:
+
+| Parameter        | Type | Description          |
+|------------------|------|----------------------|
+| `project_id`     | str  | DataRobot project ID. |
+| `model_id`       | str  | DataRobot model ID.   |
+
+For more [request_feature_impact parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=request_feature_effect#datarobot.models.DatetimeModel.request_feature_effect), see the DataRobot documentation.
+
+---
+
+#### `ComputeShapOperator`
+
+Submit a request to compute a SHAP impact job for the model.
+
+Returns a SHAP impact job ID.
+
+Parameters:
+
+| Parameter      | Type | Description             |
+|----------------|------|-------------------------|
+| `project_id`   | str  | DataRobot project ID.    |
+| `model_id`     | str  | DataRobot model ID.      |
+
+For more [shap-impact parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/modeling/model.html?highlight=ShapImpact#shap-impact), see the DataRobot documentation.
+
+---
+
+#### `CreateExternalModelPackageOperator`
+
+Create an external model package in DataRobot MLOps from JSON configuration.
+
+Returns a model package ID of the newly created model package.
+
+Parameters:
+
+| Parameter      | Type | Description                                 |
+|----------------|------|---------------------------------------------|
+| `model_info`   | str  | A JSON object of external model parameters. |
+
+Example of JSON configuration for a regression model:
+
+.. code-block:: python
+
+    {
+         "name": "Lending club regression",
+         "modelDescription": {
+                 "description": "Regression on lending club dataset"
+             }
+         "target": {
+             "type": "Regression",
+             "name": "loan_amnt"
+         }
+    }
+
+
+Example JSON for a binary classification model:
+
+.. code-block:: python
+
+    {
+        "name": "Surgical Model",
+        "modelDescription": {
+            "description": "Binary classification on surgical dataset",
+            "location": "/tmp/myModel"
+            },
+            "target": {
+                "type": "Binary",
+                "name": "complication",
+                "classNames": ["Yes","No"],  # minority/positive class should be listed first
+                "predictionThreshold": 0.5
+            }
+        }
+    }
+
+Example JSON for a multiclass classification model:
+
+.. code-block:: python
+
+    {
+        "name": "Iris classifier",
+        "modelDescription": {
+        "description": "Classification on iris dataset",
+        "location": "/tmp/myModel"
+    },
+        "target": {
+            "type": "Multiclass",
+            "name": "Species",
+            "classNames": [
+                "Iris-versicolor",
+                "Iris-virginica",
+                "Iris-setosa"
+            ]
+        }
+    }
+
+---
+
+#### `DeployModelPackageOperator`
+
+Create a deployment from a DataRobot model package.
+
+Returns the created deployment ID.
+
+Parameters:
+
+| Parameter                      | Type           | Description                                                                                                                                                                      |
+|--------------------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `deployment_name`              | str            | A human readable label of the deployment.                                                                                                                                        |
+| `model_package_id`             | str            | The ID of the DataRobot model package to deploy.                                                                                                                                 |
+| `default_prediction_server_id` | str            | An identifier of a prediction server to be used as the default prediction server. When working with prediction environments, the default prediction server ID should not be provided. |
+| `prediction_environment_id`    | str            | An identifier of a prediction environment to be used for model deployment.                                                                                                       |
+| `description`                  | str            | A human readable description of the deployment.                                                                                                                                  |
+| `importance`                   | str            | Deployment importance level.                                                                                                                                                     |
+| `user_provided_id`             | str            | A user-provided unique ID associated with a deployment definition in a remote git repository.                                                                                    |
+| `additional_metadata`          | Dict[str, str] | A Key/Value pair dict, with additional metadata.                                                                                                                                 |
+
+---
+
+#### `AddExternalDatasetOperator`
+
+Upload a new dataset from the AI Catalog to make predictions for a model.
+
+Returns an external dataset ID for the model,
+
+Parameters:
+
+| Parameter            | Type | Description                              |
+|----------------------|------|------------------------------------------|
+| `project_id`         | str  | DataRobot project ID.                     |
+| `dataset_id`         | str  | DataRobot AI Catalog dataset ID.          |
+| `credential_id`      | str  | DataRobot credentials ID.                 |
+| `dataset_version_id` | str  | DataRobot AI Catalog dataset version ID.  |
+
+For more [upload_dataset_from_catalog parameters](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=upload_dataset_from_catalog#datarobot.models.Project.upload_dataset_from_catalog), see the DataRobot documentation.
+
+---
+
+#### `RequestModelPredictionsOperator`
+
+Requests predictions against a previously uploaded dataset.
+
+Returns a model predictions job ID.
+
+Parameters:
+
+| Parameter             | Type | Description                   |
+|-----------------------|------|-------------------------------|
+| `project_id`          | str  | DataRobot project ID.          |
+| `model_id`            | str  | DataRobot model ID.            |
+| `external_dataset_id` | str  | DataRobot external dataset ID. |
+
+For more [request_predictions](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=request_predictions#datarobot.models.Model.request_predictions), see the DataRobot documentation.
+
+---
+
+#### `TrainModelOperator`
+
+Submit a job to the queue to train a model from a specific blueprint.
+
+Returns a model training job ID.
+
+Parameters:
+
+| Parameter              | Type | Description                                                                                                                                             |
+|------------------------|------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `project_id`           | str  | DataRobot project ID.                                                                                                                                    |
+| `blueprint_id`         | str  | DataRobot blueprint ID.                                                                                                                                  |
+| `featurelist_id`       | str  | The identifier of the feature list to use. If not defined, the default feature list for this project is used.                                                         |
+| `source_project_id`    | str  | The source project that created the `blueprint_id`. If ``None``, it defaults to looking in this project. Note that you must have read permissions in this project. |
+
+Example of DAG config params:
+{
+    "sample_pct":
+    "scoring_type":
+    "training_row_count":
+    "n_clusters":
+}
+
+For more [start-training-a-model](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/modeling/model.html?highlight=project.train#start-training-a-model), see the DataRobot documentation.
+
+---
+
+#### `RetrainModelOperator`
+
+Submit a job to the queue to retrain a model on a specific sample size and/or custom feature list.
+
+Returns a model retraining job ID.
+
+Parameters:
+
+| Parameter            | Type | Description                                                                                     |
+|----------------------|------|-------------------------------------------------------------------------------------------------|
+| `project_id`         | str  | DataRobot project ID.                                                                            |
+| `model_id`           | str  | DataRobot model ID.                                                                              |
+| `featurelist_id`     | str  | The identifier of the feature list to use. If not defined, the default for this project is used. |
+
+Example of DAG config params:
+{
+    "sample_pct":
+    "scoring_type":
+    "training_row_count":
+}
+
+For more [train-a-model-on-a-different-sample-size](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/modeling/model.html?highlight=model.train#train-a-model-on-a-different-sample-size), see the DataRobot documentation.
+
+---
+
+#### `PredictionExplanationsInitializationOperator`
+
+Initialize prediction explanations for a model.
+
+Returns a prediction explanations initialization job ID.
+
+Parameters:
+
+| Parameter            | Type | Description          |
+|----------------------|------|----------------------|
+| `project_id`         | str  | DataRobot project ID. |
+| `model_id`           | str  | DataRobot model ID.   |
+
+For more [prediction-explanations](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=PredictionExplanationsInitialization#prediction-explanations), see the DataRobot documentation.
+
+---
+
+#### `ComputePredictionExplanationsOperator`
+
+Create prediction explanations for the specified dataset.
+
+Returns a job ID for the prediction explanations for the specified dataset.
+
+Parameters:
+
+| Parameter             | Type | Description                    |
+|-----------------------|------|--------------------------------|
+| `project_id`          | str  | DataRobot project ID.           |
+| `model_id`            | str  | DataRobot model ID.             |
+| `external_dataset_id` | str  | DataRobot external dataset ID.  |
+
+Example of DAG config params:
+
+{
+    "max_explanations"
+    "threshold_low"
+    "threshold_high"
+}
+
+For more [prediction-explanations](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=PredictionExplanationsInitialization#prediction-explanations), see the DataRobot documentation.
 
 ---
 
@@ -832,6 +1444,34 @@ Parameters:
 |-----------------------------|------|-------------|
 | `job_id`                    | str  | The DataRobot async API call status check ID. |
 
+---
+
+#### `DataRobotJobSensor`
+
+Checks whether a DataRobot job is complete.
+
+Parameters:
+
+| Parameter                   | Type | Description           |
+|-----------------------------|------|-----------------------|
+| `project_id`                | str  | DataRobot project ID. |
+| `job_id`                    | str  | DataRobot job ID.     |
+
+---
+
+#### `ModelTrainingJobSensor`
+
+Checks whether a DataRobot model training job is complete.
+
+Returns False if the job is not yet completed, and returns PokeReturnValue(True, trained_model.id) if model training has completed.
+
+Parameters:
+
+| Parameter                   | Type | Description           |
+|-----------------------------|------|-----------------------|
+| `project_id`                | str  | DataRobot project ID. |
+| `job_id`                    | str  | DataRobot job ID.     |
+
 ----
 
 ### [Hooks](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/hooks/datarobot.py)
@@ -854,31 +1494,46 @@ See the the [`datarobot_provider/example_dags`](https://github.com/datarobot/air
 
 You can find the following examples using a preconfigured connection in the `datarobot_provider/example_dags` directory:
 
-| Example DAG                                            | Description |
-|--------------------------------------------------------|-------------|
-| `datarobot_pipeline_dag.py`                            | Run the basic end-to-end workflow in DataRobot. |
-| `datarobot_score_dag.py`                               | Perform DataRobot batch scoring. |
-| `datarobot_jdbc_batch_scoring_dag.py`                  | Perform DataRobot batch scoring with a JDBC data source. |
-| `datarobot_aws_s3_batch_scoring_dag.py`                | Use DataRobot AWS Credentials with `ScorePredictionsOperator`. |
-| `datarobot_gcp_storage_batch_scoring_dag.py`           | Use DataRobot GCP Credentials with `ScorePredictionsOperator`. |
-| `datarobot_bigquery_batch_scoring_dag.py`              | Use DataRobot GCP Credentials with `ScorePredictionsOperator`. |
-| `datarobot_azure_storage_batch_scoring_dag.py`         | Use DataRobot Azure Storage Credentials with `ScorePredictionsOperator`. |
-| `datarobot_jdbc_dataset_dag.py`                        | Upload a dataset to the AI Catalog through a JDBC connection.  |
-| `datarobot_batch_monitoring_job_dag.py`                | Run a batch monitoring job. |
-| `datarobot_create_project_from_ai_catalog_dag.py`      | Create a DataRobot project from a DataRobot AI Catalog dataset. |
+| Example DAG                                            | Description                                                                             |
+|--------------------------------------------------------|-----------------------------------------------------------------------------------------|
+| `datarobot_pipeline_dag.py`                            | Run the basic end-to-end workflow in DataRobot.                                         |
+| `datarobot_score_dag.py`                               | Perform DataRobot batch scoring.                                                        |
+| `datarobot_jdbc_batch_scoring_dag.py`                  | Perform DataRobot batch scoring with a JDBC data source.                                |
+| `datarobot_aws_s3_batch_scoring_dag.py`                | Use DataRobot AWS Credentials with `ScorePredictionsOperator`.                          |
+| `datarobot_gcp_storage_batch_scoring_dag.py`           | Use DataRobot GCP Credentials with `ScorePredictionsOperator`.                          |
+| `datarobot_bigquery_batch_scoring_dag.py`              | Use DataRobot GCP Credentials with `ScorePredictionsOperator`.                          |
+| `datarobot_azure_storage_batch_scoring_dag.py`         | Use DataRobot Azure Storage Credentials with `ScorePredictionsOperator`.                |
+| `datarobot_jdbc_dataset_dag.py`                        | Upload a dataset to the AI Catalog through a JDBC connection.                           |
+| `datarobot_batch_monitoring_job_dag.py`                | Run a batch monitoring job.                                                             |
+| `datarobot_create_project_from_ai_catalog_dag.py`      | Create a DataRobot project from a DataRobot AI Catalog dataset.                         |
 | `datarobot_create_project_from_dataset_version_dag.py` | Create a DataRobot project from a specific dataset version in the DataRobot AI Catalog. |
-| `datarobot_dataset_new_version_dag.py`                 | Create a new version of an existing dataset in the DataRobot AI Catalog. |
-| `datarobot_dataset_upload_dag.py`                      | Upload a local file to the DataRobot AI Catalog. |
-| `datarobot_get_datastore_dag.py`                       | Create a DataRobot DataStore with `GetOrCreateDataStoreOperator`. |
-| `datarobot_jdbc_dataset_dag.py`                        | Create a DataRobot project from a JDBC data source. |
-| `datarobot_jdbc_dynamic_dataset_dag.py`                | Create a DataRobot project from a JDBC dynamic data source. |
-| `datarobot_upload_actuals_catalog_dag.py`              | Upload actuals from the DataRobot AI Catalog. |
-| `deployment_service_stats_dag.py`                      | Get a deployment's service statistics with `GetServiceStatsOperator` |
-| `deployment_stat_and_accuracy_dag.py`                  | Get a deployment's service statistics and accuracy. |
-| `deployment_update_monitoring_settings_dag.py`         | Update a deployment's monitoring settings. |
-| `deployment_update_segment_analysis_settings_dag.py`   | Update a deployment's segment analysis settings. |
-| `download_scoring_code_from_deployment_dag.py`         | Download scoring code (JAR file) from a DataRobot deployment. |
-| `advanced_datarobot_pipeline_jdbc_dag.py`              | Run the advanced end-to-end workflow in DataRobot. |
+| `datarobot_dataset_new_version_dag.py`                 | Create a new version of an existing dataset in the AI Catalog.                |
+| `datarobot_dataset_upload_dag.py`                      | Upload a local file to the AI Catalog.                                        |
+| `datarobot_get_datastore_dag.py`                       | Create a DataRobot data store with `GetOrCreateDataStoreOperator`.                       |
+| `datarobot_jdbc_dataset_dag.py`                        | Create a DataRobot project from a JDBC data source.                                     |
+| `datarobot_jdbc_dynamic_dataset_dag.py`                | Create a DataRobot project from a JDBC dynamic data source.                             |
+| `datarobot_upload_actuals_catalog_dag.py`              | Upload actuals from the DataRobot AI Catalog.                                           |
+| `deployment_service_stats_dag.py`                      | Get a deployment's service statistics with `GetServiceStatsOperator`.                    |
+| `deployment_stat_and_accuracy_dag.py`                  | Get a deployment's service statistics and accuracy.                                     |
+| `deployment_update_monitoring_settings_dag.py`         | Update a deployment's monitoring settings.                                              |
+| `deployment_update_segment_analysis_settings_dag.py`   | Update a deployment's segment analysis settings.                                        |
+| `download_scoring_code_from_deployment_dag.py`         | Download a Scoring Code JAR file from a DataRobot deployment.                           |
+| `advanced_datarobot_pipeline_jdbc_dag.py`              | Run the advanced end-to-end workflow in DataRobot.                                      |
+| `datarobot_autopilot_options_pipeline_dag.py`          | Creates a DataRobot project and starts Autopilot with advanced options.                   |
+| `datarobot_custom_model_pipeline_dag.py`               | Create an end-to-end workflow with custom models in DataRobot.                           |
+| `datarobot_custom_partitioning_pipeline_dag.py`        | Create a custom partitioned project and train models.                              |
+| `datarobot_datetime_partitioning_pipeline_dag.py`      | Create a datetime partitioned project.                            |
+| `datarobot_external_model_pipeline_dag.py`             | An end-to-end workflow with external models in DataRobot.                         |
+| `datarobot_feature_discovery_pipeline_dag.py`          | Create a Feature Discovery project and train models.                     |
+| `datarobot_timeseries_pipeline_dag.py`                 | Create a time series DataRobot project.                            |
+| `deployment_activate_deactivate_dag.py`                | An example of deployment activation/deactivation and getting deployment status.                 |
+| `deployment_replace_model_dag.py`                      | An example of model replacement for deployments.                                                |
+| `model_compute_insights_dag.py`                        | An example of computing Feature Impact and Feature Effects.                                |
+| `model_compute_prediction_explanations_dag.py`         | An example of a compute prediction explanations job.                                         |
+| `model_compute_predictions_dag.py`                     | An example of computing predictions for model.                                               |
+| `model_compute_shap_dag.py`                            | An example of computing SHAP.                                                            |
+| `model_retrain_dag.py`                                 | Example of model retraining job on a specific sample size/featurelist.                    |
+| `model_train_dag.py`                                   | Example of model training job based on specific blueprint.                              |
 
 The advanced end-to-end workflow in DataRobot (`advanced_datarobot_pipeline_jdbc_dag.py`) contains the following steps:
 

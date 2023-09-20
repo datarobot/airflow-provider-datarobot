@@ -31,7 +31,7 @@ class AddExternalDatasetOperator(BaseOperator):
     :type dataset_version_id: str
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
-    :return: Feature Impact job ID
+    :return: External dataset ID for the model
     :rtype: str
     """
 
@@ -49,8 +49,8 @@ class AddExternalDatasetOperator(BaseOperator):
     def __init__(
         self,
         *,
-        project_id: str = None,
-        dataset_id: str = None,
+        project_id: str,
+        dataset_id: str,
         credential_id: str = None,
         dataset_version_id: str = None,
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
@@ -106,7 +106,7 @@ class RequestModelPredictionsOperator(BaseOperator):
     :type external_dataset_id: str
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
-    :return: Feature Effects job ID
+    :return: Model predictions job ID
     :rtype: str
     """
 

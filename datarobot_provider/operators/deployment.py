@@ -149,7 +149,7 @@ class ActivateDeploymentOperator(BaseOperator):
 
     :param deployment_id: DataRobot deployment ID
     :type deployment_id: str
-    :param activate:
+    :param activate: if set to True - activate deployment, if set to False - deactivate deployment
     :type activate: boolean
     :param max_wait_sec: The maximum time in seconds to wait for deployment activation/deactivation to complete
     :type max_wait_sec: int

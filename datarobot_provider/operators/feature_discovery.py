@@ -30,9 +30,10 @@ class RelationshipsConfigurationOperator(BaseOperator):
     :type dataset_definitions: Iterable[dict]
     :param relationships: list of relationships
         Each element is a dict retrieved from DatasetRelationshipOperator operator
-    :type dataset_definitions: Iterable[dict]
+    :type relationships: Iterable[dict]
     :param feature_discovery_settings: list of feature discovery settings, optional
         If not provided, it will be retrieved from DAG configuration params otherwise default settings will be used.
+    :type feature_discovery_settings: dict
     :param max_wait_sec: For some settings, an asynchronous task must be run to analyze the dataset.  max_wait
             governs the maximum time (in seconds) to wait before giving up.
     :type max_wait_sec: int, optional
@@ -103,7 +104,7 @@ class DatasetDefinitionOperator(BaseOperator):
     :type dataset_identifier: str
     :param dataset_id: Identifier of the dataset in DataRobot AI Catalog
     :type dataset_id: str
-    :param dataset_version_id: str,
+    :param dataset_version_id: Identifier of the dataset version in DataRobot AI Catalog
     :type dataset_version_id: str, optional
     :param primary_temporal_key: Name of the column indicating time of record creation
     :type primary_temporal_key: str, optional
@@ -118,6 +119,8 @@ class DatasetDefinitionOperator(BaseOperator):
     :type snapshot_policy: str, optional
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
+    :return: Dataset definition
+    :rtype: dict
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
@@ -201,8 +204,7 @@ class DatasetRelationshipOperator(BaseOperator):
         feature derivation window should end.  Will be a non-positive integer, if present.
         If present, the feature engineering Graph will perform time-aware joins.
     :type feature_derivation_window_end: int, optional
-    :param feature_derivation_window_time_unit: int, optional
-        Time unit of the feature derivation window.
+    :param feature_derivation_window_time_unit: Time unit of the feature derivation window.
         One of ``datarobot.enums.AllowedTimeUnitsSAFER``
         If present, time-aware joins will be used.
         Only applicable when dataset1_identifier is not provided.
@@ -211,17 +213,19 @@ class DatasetRelationshipOperator(BaseOperator):
         If present, time-aware joins will be used.
         Only allowed when feature_derivation_window_start,
         feature_derivation_window_end and feature_derivation_window_time_unit are not provided.
-    :type feature_derivation_window_time_unit: int, optional
-    :param feature_derivation_windows: list of dict, or None
+    :type feature_derivation_windows: int, optional
+    :param prediction_point_rounding: list of dict, or None
         Closest value of prediction_point_rounding_time_unit to round the prediction point
         into the past when applying the feature derivation window. Will be a positive integer,
         if present.Only applicable when dataset1_identifier is not provided.
-    :type feature_derivation_windows: list[dict], optional
+    :type prediction_point_rounding: list[dict], optional
     :param prediction_point_rounding_time_unit: Time unit of the prediction point rounding.
         One of ``datarobot.enums.AllowedTimeUnitsSAFER`` Only applicable when dataset1_identifier is not provided.
-    :type feature_derivation_windows:  str, optional
+    :type prediction_point_rounding_time_unit:  str, optional
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
+    :return: Relationship definition
+    :rtype: dict
     """
 
     # Specify the arguments that are allowed to parse with jinja templating

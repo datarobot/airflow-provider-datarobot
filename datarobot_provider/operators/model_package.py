@@ -24,8 +24,8 @@ class CreateExternalModelPackageOperator(BaseOperator):
     """
     Create an external model package in DataRobot MLOps from JSON configuration
 
-    :param model_info: A JSON object of external model parameters.
-    :type model_info: dict
+    :param model_package_json: A JSON object of external model parameters.
+    :type model_package_json: dict
     :return: A model package ID of newly created ModelPackage.
     :rtype: str
     """
@@ -102,8 +102,8 @@ class DeployModelPackageOperator(BaseOperator):
     :importance: str, optional
     :user_provided_id: A user-provided unique ID associated with a deployment definition in a remote git repository.
     :user_provided_id: str, optional
-    :user_provided_id: A Key/Value pair dict, with additional metadata
-    :user_provided_id: dict, optional
+    :additional_metadata: A Key/Value pair dict, with additional metadata
+    :additional_metadata: Dict[str, str], optional
     :max_wait: The amount of seconds to wait for successful resolution of a deployment creation job.
         Deployment supports making predictions only after a deployment creating job has successfully finished.
     :max_wait: int, optional
