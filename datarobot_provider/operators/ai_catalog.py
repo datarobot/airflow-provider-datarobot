@@ -83,6 +83,12 @@ class UpdateDatasetFromFileOperator(BaseOperator):
 
     :param dataset_id: DataRobot AI Catalog dataset ID
     :type dataset_id: str, optional
+    :param dataset_id_param: Name of the parameter in the configuration to use as dataset_id, defaults to `training_dataset_id`
+    :type dataset_id_param: str, optional
+    :param file_path: The path to the file to upload
+    :type file_path: str, optional
+    :param file_path_param: Name of the parameter in the configuration to use as file_path, defaults to `dataset_file_path`
+    :type file_path_param: str, optional
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
     :return: DataRobot AI Catalog dataset version ID
@@ -90,7 +96,12 @@ class UpdateDatasetFromFileOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["dataset_id"]
+    template_fields: Iterable[str] = [
+        "dataset_id",
+        "dataset_id_param",
+        "file_path",
+        "file_path_param",
+    ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
     ui_color = '#f4a460'
