@@ -23,7 +23,10 @@ DATAROBOT_MAX_WAIT_SEC = 3600
 class UploadDatasetOperator(BaseOperator):
     """
     Uploading local file to DataRobot AI Catalog and return Dataset ID.
-
+    :param file_path: The path to the file.
+    :type file_path: str, optional
+    :param file_path_param: Name of the parameter in the configuration to use as file_path, defaults to `dataset_file_path`
+    :type file_path_param: str, optional
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
     :return: DataRobot AI Catalog dataset ID
@@ -31,7 +34,10 @@ class UploadDatasetOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = []
+    template_fields: Iterable[str] = [
+        "file_path",
+        "file_path_param",
+    ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
     ui_color = '#f4a460'
@@ -39,10 +45,14 @@ class UploadDatasetOperator(BaseOperator):
     def __init__(
         self,
         *,
+        file_path: str = None,
+        file_path_param: str = "dataset_file_path",
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
+        self.file_path = file_path
+        self.file_path_param = file_path_param
         self.datarobot_conn_id = datarobot_conn_id
         if kwargs.get('xcom_push') is not None:
             raise AirflowException(
@@ -55,11 +65,14 @@ class UploadDatasetOperator(BaseOperator):
 
         # Upload Dataset to AI Catalog
         self.log.info("Upload Dataset to AI Catalog")
-        # dataset_file_path a path to a local file
+        if self.file_path is None:
+            self.file_path = context["params"][self.file_path_param]
+
         ai_catalog_dataset = dr.Dataset.create_from_file(
-            file_path=context["params"]["dataset_file_path"],
+            file_path=self.file_path,
             max_wait=DATAROBOT_MAX_WAIT_SEC,
         )
+
         self.log.info(f"Dataset created: dataset_id={ai_catalog_dataset.id}")
         return ai_catalog_dataset.id
 
@@ -71,6 +84,12 @@ class UpdateDatasetFromFileOperator(BaseOperator):
 
     :param dataset_id: DataRobot AI Catalog dataset ID
     :type dataset_id: str, optional
+    :param dataset_id_param: Name of the parameter in the configuration to use as dataset_id, defaults to `training_dataset_id`
+    :type dataset_id_param: str, optional
+    :param file_path: The path to the file to upload
+    :type file_path: str, optional
+    :param file_path_param: Name of the parameter in the configuration to use as file_path, defaults to `dataset_file_path`
+    :type file_path_param: str, optional
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
     :return: DataRobot AI Catalog dataset version ID
@@ -78,7 +97,12 @@ class UpdateDatasetFromFileOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["dataset_id"]
+    template_fields: Iterable[str] = [
+        "dataset_id",
+        "dataset_id_param",
+        "file_path",
+        "file_path_param",
+    ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
     ui_color = '#f4a460'
@@ -87,11 +111,17 @@ class UpdateDatasetFromFileOperator(BaseOperator):
         self,
         *,
         dataset_id: str = None,
+        dataset_id_param: str = 'training_dataset_id',
+        file_path: str = None,
+        file_path_param: str = "dataset_file_path",
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.dataset_id = dataset_id
+        self.dataset_id_param = dataset_id_param
+        self.file_path = file_path
+        self.file_path_param = file_path_param
         self.datarobot_conn_id = datarobot_conn_id
         if kwargs.get('xcom_push') is not None:
             raise AirflowException(
@@ -102,15 +132,20 @@ class UpdateDatasetFromFileOperator(BaseOperator):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
-        # If dataset_id not provided in constructor, then using training_dataset_id from json config
+        # If dataset_id not provided in constructor, then using dataset_id_param from json config
         dataset_id = (
             self.dataset_id
             if self.dataset_id is not None
-            else context['params']['training_dataset_id']
+            else context['params'][self.dataset_id_param]
         )
 
         # The path to the file.
-        file_path = context["params"]["dataset_file_path"]
+        file_path = (
+            self.file_path
+            if self.file_path is not None
+            else context['params'][self.file_path_param]
+        )
+
         self.log.info(f"Update Dataset {dataset_id} in AI Catalog from the local file: {file_path}")
         ai_catalog_dataset = dr.Dataset.create_version_from_file(
             dataset_id=dataset_id,
