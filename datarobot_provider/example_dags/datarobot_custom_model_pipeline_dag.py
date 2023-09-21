@@ -29,8 +29,8 @@ from datarobot_provider.operators.custom_models import GetCustomModelTestOverall
     start_date=datetime(2023, 1, 1),
     tags=['example', 'custom model'],
     params={
-        "execution_environment_name": "Demo Execution Environment",
-        "execution_environment_description": "Demo Execution Environment for Airflow provider",
+        "execution_environment_name": "Execution Env Airflow",
+        "execution_environment_description": "Demo Execution Environment created by Airflow provider",
         "programming_language": "python",
         "required_metadata_keys": [],  # example: [{"field_name": "test_key", "display_name": "test_display_name"}],
         "custom_model_description": 'This is a custom model created by Airflow',
@@ -39,13 +39,14 @@ from datarobot_provider.operators.custom_models import GetCustomModelTestOverall
         "target_type": TARGET_TYPE.REGRESSION,
         "target_name": 'Grade 2014',
         "is_major_update": True,
-        "docker_context_path": "/datarobot-user-models/public_dropin_environments/python3_pytorch/",
-        "custom_model_folder": "/datarobot-user-models/model_templates/python3_pytorch/",
-        "dataset_file_path": "/datarobot-user-models/tests/testdata/juniors_3_year_stats_regression.csv",
+        "docker_context_path": "/usr/local/airflow/dags/datarobot-user-models/public_dropin_environments/python3_pytorch/",
+        "custom_model_folder": "/usr/local/airflow/dags/datarobot-user-models/model_templates/python3_pytorch/",
+        "test_dataset_file_path": "/usr/local/airflow/dags/datarobot-user-models/tests/testdata/juniors_3_year_stats_regression.csv",
+        "train_dataset_file_path": "/usr/local/airflow/dags/datarobot-user-models/tests/testdata/juniors_3_year_stats_regression.csv",
     },
 )
 def create_custom_model_pipeline(
-    prediction_server_id="5fbc1924ccfc5a0025c424bf", deployment_name="Demo Deployment"
+    prediction_server_id="5fbc1924ccfc5a0025c424bf", deployment_name="Demo Deployment Airflow"
 ):
     create_execution_environment_op = CreateExecutionEnvironmentOperator(
         task_id='create_execution_environment',
@@ -60,21 +61,26 @@ def create_custom_model_pipeline(
         task_id='create_custom_inference_model',
     )
 
+    train_dataset_uploading_op = UploadDatasetOperator(
+        task_id="train_dataset_uploading", file_path_param="train_dataset_file_path"
+    )
+
     create_custom_model_version_op = CreateCustomModelVersionOperator(
         task_id='create_custom_model_version',
         custom_model_id=create_custom_inference_model_op.output,
         base_environment_id=create_execution_environment_op.output,
+        training_dataset_id=train_dataset_uploading_op.output,
     )
 
-    dataset_uploading_op = UploadDatasetOperator(
-        task_id="dataset_uploading",
+    test_dataset_uploading_op = UploadDatasetOperator(
+        task_id="test_dataset_uploading", file_path_param="test_dataset_file_path"
     )
 
     custom_model_test_op = CustomModelTestOperator(
         task_id='custom_model_test',
         custom_model_id=create_custom_inference_model_op.output,
         custom_model_version_id=create_custom_model_version_op.output,
-        dataset_id=dataset_uploading_op.output,
+        dataset_id=test_dataset_uploading_op.output,
     )
 
     custom_model_test_overall_status_op = GetCustomModelTestOverallStatusOperator(
@@ -109,8 +115,9 @@ def create_custom_model_pipeline(
         create_execution_environment_op
         >> create_execution_environment_version_op
         >> create_custom_inference_model_op
+        >> train_dataset_uploading_op
         >> create_custom_model_version_op
-        >> dataset_uploading_op
+        >> test_dataset_uploading_op
         >> custom_model_test_op
         >> custom_model_test_overall_status_op
         >> branching
