@@ -35,7 +35,7 @@ class UploadDatasetOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Iterable[str] = [
-        "file_path" "file_path_param",
+        "file_path", "file_path_param",
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
