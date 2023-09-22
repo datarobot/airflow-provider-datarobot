@@ -86,7 +86,7 @@ class DataRobotHook(BaseHook):
             provider_package_name, provider_versions, AIRFLOW_VERSION
         )
         self.log.info("Initialize DataRobot Client, user_agent_suffix:{}".format(user_agent_suffix))
-        return Client(token=api_key, endpoint=endpoint, user_agent_suffix=user_agent_suffix)
+        return Client(token=api_key, endpoint=endpoint, trace_context=user_agent_suffix)
 
     def run(self) -> Any:
         # Initialize DataRobot client
