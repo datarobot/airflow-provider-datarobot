@@ -39,6 +39,7 @@ from datarobot_provider.operators.custom_models import GetCustomModelTestOverall
         "target_type": TARGET_TYPE.REGRESSION,
         "target_name": 'Grade 2014',
         "is_major_update": True,
+        "is_training_data_for_versions_permanently_enabled": True,
         "docker_context_path": "/usr/local/airflow/dags/datarobot-user-models/public_dropin_environments/python3_pytorch/",
         "custom_model_folder": "/usr/local/airflow/dags/datarobot-user-models/model_templates/python3_pytorch/",
         "test_dataset_file_path": "/usr/local/airflow/dags/datarobot-user-models/tests/testdata/juniors_3_year_stats_regression.csv",
