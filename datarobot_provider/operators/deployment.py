@@ -129,8 +129,8 @@ class ReplaceModelOperator(BaseOperator):
             new_model_id=self.new_model_id
         )
         self.log.info(f"Validation result: {check_result}, message: {check_message}")
-        self.log.debug(f"Validation result details: {status_list}")
-        if check_result != 'passing':
+        self.log.info(f"Validation result details: {status_list}")
+        if check_result == 'failing':
             raise AirflowFailException(check_message)
         self.log.info(
             f"Trying to replace a model for deployment_id={self.deployment_id} to new_model_id={self.new_model_id}"
@@ -139,7 +139,7 @@ class ReplaceModelOperator(BaseOperator):
             new_model_id=self.new_model_id, reason=self.reason, max_wait=self.max_wait_sec
         )
         self.log.info(
-            f"Trying to replace a model for deployment_id={self.deployment_id} to new_model_id={self.new_model_id}"
+            f"Model for deployment_id={self.deployment_id} replaced to new_model_id={self.new_model_id}"
         )
 
 
