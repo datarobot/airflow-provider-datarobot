@@ -34,7 +34,7 @@ from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
     start_date=datetime(2022, 1, 1),
     tags=['example', 'scoring'],
 )
-def datarobot_score():
+def datarobot_batch_scoring_templated():
 
     score_predictions_op = ScorePredictionsOperator(
         task_id="score_predictions",
@@ -65,7 +65,7 @@ def datarobot_score():
     score_predictions_op >> scoring_complete_sensor
 
 
-datarobot_pipeline_dag = datarobot_score()
+datarobot_batch_scoring_templated_dag = datarobot_batch_scoring_templated()
 
 if __name__ == "__main__":
-    datarobot_pipeline_dag.test()
+    datarobot_batch_scoring_templated_dag.test()
