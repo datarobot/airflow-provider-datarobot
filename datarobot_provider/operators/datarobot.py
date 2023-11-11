@@ -294,6 +294,7 @@ class ScorePredictionsOperator(BaseOperator):
         "intake_credential_id",
         "output_datastore_id",
         "output_credential_id",
+        "score_settings",
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
@@ -307,6 +308,7 @@ class ScorePredictionsOperator(BaseOperator):
         intake_credential_id: str = None,
         output_datastore_id: str = None,
         output_credential_id: str = None,
+        score_settings: dict = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
@@ -316,6 +318,7 @@ class ScorePredictionsOperator(BaseOperator):
         self.intake_credential_id = intake_credential_id
         self.output_datastore_id = output_datastore_id
         self.output_credential_id = output_credential_id
+        self.score_settings = score_settings
         self.datarobot_conn_id = datarobot_conn_id
         if kwargs.get('xcom_push') is not None:
             raise AirflowException(
@@ -326,35 +329,36 @@ class ScorePredictionsOperator(BaseOperator):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
-        score_settings = context["params"]["score_settings"]
+        if self.score_settings is None:
+            self.score_settings = context["params"]["score_settings"]
 
         # in case of deployment_id was not set from operator argument:
         if self.deployment_id is None:
-            self.deployment_id = context["params"]["deployment_id"]
+            self.deployment_id = self.score_settings["deployment_id"]
 
         if self.intake_credential_id is not None:
-            score_settings["intake_settings"]["credential_id"] = self.intake_credential_id
+            self.score_settings["intake_settings"]["credential_id"] = self.intake_credential_id
         if self.output_credential_id is not None:
-            score_settings["output_settings"]["credential_id"] = self.output_credential_id
+            self.score_settings["output_settings"]["credential_id"] = self.output_credential_id
 
-        intake_settings = score_settings.get("intake_settings", dict())
-        output_settings = score_settings.get("output_settings", dict())
+        intake_settings = self.score_settings.get("intake_settings", dict())
+        output_settings = self.score_settings.get("output_settings", dict())
 
         intake_type = intake_settings.get("type")
         output_type = output_settings.get("type")
 
         # in case of JDBC intake from operator argument:
         if intake_type == "jdbc" and self.intake_datastore_id is not None:
-            score_settings["intake_settings"]["data_store_id"] = self.intake_datastore_id
+            self.score_settings["intake_settings"]["data_store_id"] = self.intake_datastore_id
 
         # in case of JDBC output from operator argument:
         if output_type == "jdbc" and self.output_datastore_id is not None:
-            score_settings["output_settings"]["data_store_id"] = self.output_datastore_id
+            self.score_settings["output_settings"]["data_store_id"] = self.output_datastore_id
 
         # Score data
         self.log.info(
             f"Scoring predictions against deployment_id={self.deployment_id} "
-            f"with settings: {score_settings}"
+            f"with settings: {self.score_settings}"
         )
 
         # BatchPredictionJob.score() method in the Python SDK expects a DataRobot dataset instance
@@ -370,7 +374,10 @@ class ScorePredictionsOperator(BaseOperator):
             # We no longer need the ID
             del intake_settings["dataset_id"]
 
-        job = dr.BatchPredictionJob.score(self.deployment_id, **score_settings)
+        job = dr.BatchPredictionJob.score(self.deployment_id, **self.score_settings)
+        self.log.info(
+            f"Batch Prediction submitted, job.id={job.id}"
+        )
         return job.id
 
 
