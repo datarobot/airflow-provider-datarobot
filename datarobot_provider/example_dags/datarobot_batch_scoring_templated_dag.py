@@ -35,26 +35,20 @@ from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
     tags=['example', 'scoring'],
 )
 def datarobot_batch_scoring_templated():
-
     score_predictions_op = ScorePredictionsOperator(
         task_id="score_predictions",
         score_settings={
             "deployment_id": "62cc0a6383d7a13d34f83344",
             "score_settings": {
-                "intake_settings": {
-                    "type": "dataset",
-                    "dataset_id": "623d8ae79b186124a926c3cd"
-                },
+                "intake_settings": {"type": "dataset", "dataset_id": "623d8ae79b186124a926c3cd"},
                 "output_settings": {
                     "type": "localFile",
-                    "path": "include/{{ ds_nodash }}/{{ params.myparam }}/Diabetes_predictions.csv"
-                }
-            }
+                    "path": "include/{{ ds_nodash }}/{{ params.myparam }}/Diabetes_predictions.csv",
+                },
+            },
         },
         # custom parameter example
-        params={
-            'myparam': 'test_param_value'
-        }
+        params={'myparam': 'test_param_value'},
     )
 
     scoring_complete_sensor = ScoringCompleteSensor(
