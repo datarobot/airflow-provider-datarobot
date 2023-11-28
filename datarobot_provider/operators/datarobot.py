@@ -375,9 +375,7 @@ class ScorePredictionsOperator(BaseOperator):
             del intake_settings["dataset_id"]
 
         job = dr.BatchPredictionJob.score(self.deployment_id, **self.score_settings)
-        self.log.info(
-            f"Batch Prediction submitted, job.id={job.id}"
-        )
+        self.log.info(f"Batch Prediction submitted, job.id={job.id}")
         return job.id
 
 
