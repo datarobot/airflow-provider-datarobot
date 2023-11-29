@@ -39,10 +39,10 @@ def datarobot_batch_scoring_templated():
         task_id="score_predictions",
         deployment_id="testdeploymentid",
         score_settings={
-                "intake_settings": {"type": "dataset", "dataset_id": "testdatasetid"},
-                "output_settings": {
-                    "type": "localFile",
-                    "path": "include/{{ ds_nodash }}/{{ params.myparam }}/Diabetes_predictions.csv",
+            "intake_settings": {"type": "dataset", "dataset_id": "testdatasetid"},
+            "output_settings": {
+                "type": "localFile",
+                "path": "include/{{ ds_nodash }}/{{ params.myparam }}/Diabetes_predictions.csv",
             },
         },
         # custom parameter example
