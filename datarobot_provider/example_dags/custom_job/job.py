@@ -1,5 +1,4 @@
 import os
-import datarobot as dr
 from datarobot import Deployment
 
 
