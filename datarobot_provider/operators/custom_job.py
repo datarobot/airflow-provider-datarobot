@@ -40,12 +40,12 @@ class CreateCustomJobOperator(BaseOperator):
     ui_color = '#f4a460'
 
     def __init__(
-            self,
-            *,
-            name: str,
-            description: str = None,
-            datarobot_conn_id: str = "datarobot_default",
-            **kwargs: Any,
+        self,
+        *,
+        name: str,
+        description: str = None,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.name = name
@@ -64,17 +64,16 @@ class CreateCustomJobOperator(BaseOperator):
             raise ValueError("Invalid or missing custom job name")
 
         response = dr.client.get_client().post(
-            "customJobs/", data={
+            "customJobs/",
+            data={
                 "name": self.name,
                 "description": self.description,
-            }
+            },
         )
 
         if response.status_code == 201:
             custom_job_id = response.json()["id"]
-            self.log.info(
-                f"Custom job created, custom_job_id={custom_job_id}"
-            )
+            self.log.info(f"Custom job created, custom_job_id={custom_job_id}")
             return custom_job_id
         else:
             e_msg = "Server unexpectedly returned status code {}"
@@ -102,12 +101,12 @@ class AddFilesToCustomJobOperator(BaseOperator):
     ui_color = '#f4a460'
 
     def __init__(
-            self,
-            *,
-            custom_job_id: str = None,
-            files_path: str = None,
-            datarobot_conn_id: str = "datarobot_default",
-            **kwargs: Any,
+        self,
+        *,
+        custom_job_id: str = None,
+        files_path: str = None,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.custom_job_id = custom_job_id
@@ -119,7 +118,6 @@ class AddFilesToCustomJobOperator(BaseOperator):
             )
 
     def upload_custom_job_file(self, file_path, filename):
-
         with open(file_path, "rb") as file_payload:
             files = {
                 'file': file_payload,
@@ -179,13 +177,13 @@ class SetCustomJobExecutionEnvironmentOperator(BaseOperator):
     ui_color = '#f4a460'
 
     def __init__(
-            self,
-            *,
-            custom_job_id: str,
-            environment_id: str,
-            environment_version_id: str,
-            datarobot_conn_id: str = "datarobot_default",
-            **kwargs: Any,
+        self,
+        *,
+        custom_job_id: str,
+        environment_id: str,
+        environment_version_id: str,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.custom_job_id = custom_job_id
@@ -251,21 +249,18 @@ class SetCustomJobRuntimeParametersOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
-        "custom_job_id",
-        "runtime_parameter_values"
-    ]
+    template_fields: Iterable[str] = ["custom_job_id", "runtime_parameter_values"]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
     ui_color = '#f4a460'
 
     def __init__(
-            self,
-            *,
-            custom_job_id: str,
-            runtime_parameter_values: str = None,
-            datarobot_conn_id: str = "datarobot_default",
-            **kwargs: Any,
+        self,
+        *,
+        custom_job_id: str,
+        runtime_parameter_values: str = None,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.custom_job_id = custom_job_id
@@ -298,9 +293,7 @@ class SetCustomJobRuntimeParametersOperator(BaseOperator):
         if response.status_code == 201:
             response_json = response.json()
             custom_job_id = response_json["id"]
-            self.log.info(
-                f"Custom job_id={custom_job_id} environment updated"
-            )
+            self.log.info(f"Custom job_id={custom_job_id} environment updated")
             return response_json
         else:
             e_msg = "Server unexpectedly returned status code {}"
@@ -327,12 +320,12 @@ class RunCustomJobOperator(BaseOperator):
     ui_color = '#f4a460'
 
     def __init__(
-            self,
-            *,
-            custom_job_id: str = None,
-            setup_dependencies: bool = False,
-            datarobot_conn_id: str = "datarobot_default",
-            **kwargs: Any,
+        self,
+        *,
+        custom_job_id: str = None,
+        setup_dependencies: bool = False,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.custom_job_id = custom_job_id
@@ -352,18 +345,14 @@ class RunCustomJobOperator(BaseOperator):
 
         response = dr.client.get_client().post(
             f"customJobs/{self.custom_job_id}/runs/",
-            data={
-                "setupDependencies": self.setup_dependencies
-            }
+            data={"setupDependencies": self.setup_dependencies},
         )
 
         if response.status_code == 201:
             response_json = response.json()
             job_status_id = response_json["jobStatusId"]
             custom_job_id = response.json()["id"]
-            self.log.info(
-                f"Custom job created, custom_job_id={custom_job_id}"
-            )
+            self.log.info(f"Custom job created, custom_job_id={custom_job_id}")
             return job_status_id
         else:
             e_msg = "Server unexpectedly returned status code {}"
@@ -390,11 +379,11 @@ class ListExecutionEnvironmentOperator(BaseOperator):
     ui_color = '#f4a460'
 
     def __init__(
-            self,
-            *,
-            search_for: str = None,
-            datarobot_conn_id: str = "datarobot_default",
-            **kwargs: Any,
+        self,
+        *,
+        search_for: str = None,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.search_for = search_for
@@ -408,15 +397,11 @@ class ListExecutionEnvironmentOperator(BaseOperator):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
-        execution_environments = dr.ExecutionEnvironment.list(
-            search_for=self.search_for
-        )
+        execution_environments = dr.ExecutionEnvironment.list(search_for=self.search_for)
         execution_environment_ids = [
             execution_environment.id for execution_environment in execution_environments
         ]
-        self.log.info(
-            f"List of execution environments ids = {execution_environment_ids}"
-        )
+        self.log.info(f"List of execution environments ids = {execution_environment_ids}")
 
         return execution_environment_ids
 
@@ -442,12 +427,12 @@ class ListExecutionEnvironmentVersionsOperator(BaseOperator):
     ui_color = '#f4a460'
 
     def __init__(
-            self,
-            *,
-            environment_id: str,
-            search_for: str = None,
-            datarobot_conn_id: str = "datarobot_default",
-            **kwargs: Any,
+        self,
+        *,
+        environment_id: str,
+        search_for: str = None,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.environment_id = environment_id
@@ -472,8 +457,6 @@ class ListExecutionEnvironmentVersionsOperator(BaseOperator):
         execution_environment_ids = [
             execution_environment.id for execution_environment in execution_environments
         ]
-        self.log.info(
-            f"List of execution environments ids = {execution_environment_ids}"
-        )
+        self.log.info(f"List of execution environments ids = {execution_environment_ids}")
 
         return execution_environment_ids

@@ -2,6 +2,7 @@ import os
 import datarobot as dr
 from datarobot import Deployment
 
+
 def main():
     print(f"Running python code: {__file__}")
 
@@ -25,6 +26,7 @@ def main():
     print("-----------------------")
     for deployment in deployments:
         print(deployment)
+
 
 if __name__ == "__main__":
     main()

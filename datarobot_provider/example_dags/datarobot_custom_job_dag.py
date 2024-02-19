@@ -17,18 +17,18 @@ from datarobot_provider.operators.custom_job import SetCustomJobRuntimeParameter
 from datarobot_provider.operators.custom_job import RunCustomJobOperator
 from datarobot_provider.sensors.client import BaseAsyncResolutionSensor
 
+
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
     tags=['example', 'custom job'],
     params={},
 )
-def create_custom_custom_job(
-):
+def create_custom_custom_job():
     create_custom_job_op = CreateCustomJobOperator(
         task_id='create_custom_job',
         name="airflow-test-create-custom-job-v556",
-        description="demo-test-demonstration"
+        description="demo-test-demonstration",
     )
 
     add_files_to_custom_job_op = AddFilesToCustomJobOperator(
@@ -53,22 +53,14 @@ def create_custom_custom_job(
         task_id='set_runtime_parameters',
         custom_job_id=create_custom_job_op.output,
         runtime_parameter_values=[
-            {
-                "fieldName": "DEPLOYMENT",
-                "type": "deployment",
-                "value": "650ef15944f21ea1a3c91a25"
-            },
+            {"fieldName": "DEPLOYMENT", "type": "deployment", "value": "650ef15944f21ea1a3c91a25"},
             {
                 "fieldName": "MODEL_PACKAGE",
                 "type": "modelPackage",
-                "value": "654b9b228404a39b5c8da5b2"
+                "value": "654b9b228404a39b5c8da5b2",
             },
-            {
-                "fieldName": "STRING_PARAMETER",
-                "type": "string",
-                "value": 'my test string'
-            },
-        ]
+            {"fieldName": "STRING_PARAMETER", "type": "string", "value": 'my test string'},
+        ],
     )
 
     run_custom_job_op = RunCustomJobOperator(
@@ -84,9 +76,15 @@ def create_custom_custom_job(
         timeout=3600,
     )
 
-    (create_custom_job_op >> add_files_to_custom_job_op
-     >> set_env_to_custom_job_op >> set_runtime_parameters_op
-     >> run_custom_job_op >> custom_job_complete_sensor)
+    (
+        create_custom_job_op
+        >> add_files_to_custom_job_op
+        >> set_env_to_custom_job_op
+        >> set_runtime_parameters_op
+        >> run_custom_job_op
+        >> custom_job_complete_sensor
+    )
+
 
 create_custom_job_dag = create_custom_custom_job()
 
