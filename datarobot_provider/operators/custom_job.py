@@ -120,9 +120,7 @@ class AddFilesToCustomJobOperator(BaseOperator):
 
     def upload_custom_job_file(self, file_path, filename):
 
-        current_path = Path(os.getcwd())
-
-        with open(current_path / file_path, "rb") as file_payload:
+        with open(file_path, "rb") as file_payload:
             files = {
                 'file': file_payload,
                 'filePath': filename,
@@ -142,6 +140,8 @@ class AddFilesToCustomJobOperator(BaseOperator):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
+        airflow_home = os.environ.get('AIRFLOW_HOME')
+        self.files_path = Path(f'{airflow_home}/dags/{self.files_path}')
         if self.custom_job_id is None:
             raise ValueError("Invalid or missing custom_job_id")
 
@@ -150,7 +150,7 @@ class AddFilesToCustomJobOperator(BaseOperator):
         uploaded_files = []
         if os.path.isdir(self.files_path):
             for file_name in os.listdir(self.files_path):
-                self.upload_custom_job_file(self.files_path + '/' + file_name, file_name)
+                self.upload_custom_job_file(self.files_path / file_name, file_name)
                 uploaded_files.append(file_name)
         return uploaded_files
 
