@@ -309,15 +309,12 @@ class SetCustomJobRuntimeParametersOperator(BaseOperator):
 
 class RunCustomJobOperator(BaseOperator):
     """
-    Create an execution environment.
-    :param name: execution environment name
-    :type name: str
-    :param description: execution environment description
-    :type description: str, optional
-    :param programming_language: programming language of the environment to be created.
-        Can be "python", "r", "java" or "other". Default value - "other"
-    :type programming_language: str, optional
-    :return: execution environment ID
+    Run custom job and return ID for job status check.
+    :param custom_job_id: custom job ID
+    :type custom_job_id: str
+    :param setup_dependencies: setup dependencies flag
+    :type bool, optional
+    :return: status check ID
     :rtype: str
     """
 
