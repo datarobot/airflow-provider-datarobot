@@ -8,7 +8,7 @@
 import json
 import os
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 from typing import Dict
 from typing import Iterable
 
