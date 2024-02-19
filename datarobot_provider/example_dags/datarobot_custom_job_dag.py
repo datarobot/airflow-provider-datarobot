@@ -10,8 +10,11 @@ from datetime import datetime
 
 from airflow.decorators import dag
 
-from datarobot_provider.operators.custom_job import CreateCustomJobOperator, AddFilesToCustomJobOperator, \
-    SetCustomJobExecutionEnvironmentOperator, SetCustomJobRuntimeParametersOperator, RunCustomJobOperator, \
+from datarobot_provider.operators.custom_job import CreateCustomJobOperator
+from datarobot_provider.operators.custom_job import AddFilesToCustomJobOperator
+from datarobot_provider.operators.custom_job import SetCustomJobExecutionEnvironmentOperator
+from datarobot_provider.operators.custom_job import SetCustomJobRuntimeParametersOperator
+from datarobot_provider.operators.custom_job import RunCustomJobOperator
 from datarobot_provider.sensors.client import BaseAsyncResolutionSensor
 
 @dag(
