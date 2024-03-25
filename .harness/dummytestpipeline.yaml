@@ -1,0 +1,37 @@
+pipeline:
+  name: dummy-test-pipeline
+  identifier: dummytestpipeline
+  tags: {}
+  template:
+    templateRef: account.Build_and_Upload_Python_Package
+    versionLabel: 0.0.1
+    gitBranch: main
+    templateInputs:
+      properties:
+        ci:
+          codebase:
+            repoName: <+input>
+            build: <+input>
+      variables:
+        - name: POETRY_VERSION
+          type: String
+          default: 1.5.1
+          value: <+input>
+        - name: RUNTIME_IMAGE
+          type: String
+          default: python:3.10.11-slim-bullseye
+          value: <+input>
+        - name: ARTIFACTORY_REPO
+          type: String
+          default: datarobot-python-dev
+          value: <+input>
+        - name: PACKAGE_VERSION
+          type: String
+          default: <+trigger.tag>
+          value: <+input>
+        - name: COMMAND
+          type: String
+          default: poetry version -s
+          value: <+input>
+  projectIdentifier: dummy
+  orgIdentifier: AGENTS
