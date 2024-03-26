@@ -4,34 +4,44 @@ pipeline:
   projectIdentifier: dummy
   orgIdentifier: AGENTS
   tags: {}
-  template:
-    templateRef: account.Build_and_Upload_Python_Package
-    versionLabel: 0.0.1
-    gitBranch: main
-    templateInputs:
-      properties:
-        ci:
-          codebase:
-            repoName: airflow-provider-datarobot
-            build: <+input>
-      variables:
-        - name: POETRY_VERSION
-          type: String
-          default: 1.5.1
-          value: <+input>
-        - name: RUNTIME_IMAGE
-          type: String
-          default: python:3.10.11-slim-bullseye
-          value: <+input>
-        - name: ARTIFACTORY_REPO
-          type: String
-          default: datarobot-python-dev
-          value: <+input>
-        - name: PACKAGE_VERSION
-          type: String
-          default: <+trigger.tag>
-          value: <+input>
-        - name: COMMAND
-          type: String
-          default: poetry version -s
-          value: <+input>
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.svc_harness_git1
+        repoName: airflow-provider-datarobot
+        build: <+input>
+  stages:
+    - parallel:
+        - stage:
+            name: test_unit
+            identifier: test_unit
+            description: ""
+            type: CI
+            spec:
+              cloneCodebase: true
+              infrastructure:
+                type: KubernetesDirect
+                spec:
+                  connectorRef: account.cigeneral
+                  namespace: harness-delegate-ng
+                  automountServiceAccountToken: true
+                  nodeSelector: {}
+                  os: Linux
+              execution:
+                steps:
+                  - step:
+                      type: Run
+                      name: run unit tests
+                      identifier: run_unit_tests
+                      spec:
+                        connectorRef: account.dockerhub_datarobot_read
+                        image: python:3.9
+                        shell: Bash
+                        command: |2-
+                                          set -exuo pipefail
+                                          pip install apache-airflow==2.5.1
+                                          pip install -r requirements.txt
+                                          pip install airflow-provider-datarobot
+                                          airflow db init
+                                          airflow db check
+                                          pytest tests/unit
