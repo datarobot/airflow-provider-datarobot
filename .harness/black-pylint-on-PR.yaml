@@ -33,6 +33,7 @@ pipeline:
                           set -exuo pipefail
                           pip install -U pip
                           pip install -r requirements.txt
+                          pip install pylint
                           make lint check-licenses
               infrastructure:
                 type: KubernetesDirect
