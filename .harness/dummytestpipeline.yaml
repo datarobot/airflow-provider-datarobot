@@ -49,4 +49,4 @@ pipeline:
                           type: JUnit
                           spec:
                             paths:
-                              - tests/unit/unit_test_report.xml
+                              - /harness/unit_test_report.xml
