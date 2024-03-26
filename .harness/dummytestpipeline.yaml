@@ -25,7 +25,7 @@ pipeline:
           value: <+input>
         - name: ARTIFACTORY_REPO
           type: String
-          default: airflow-provider-datarobot-dev
+          default: datarobot-python-dev
           value: <+input>
         - name: PACKAGE_VERSION
           type: String
