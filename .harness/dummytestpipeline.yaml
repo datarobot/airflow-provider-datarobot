@@ -35,7 +35,7 @@ pipeline:
                       identifier: run_unit_tests
                       spec:
                         connectorRef: account.dockerhub_datarobot_read
-                        image: python:3.8
+                        image: python:3.9
                         shell: Bash
                         command: |2-
                                           set -exuo pipefail
