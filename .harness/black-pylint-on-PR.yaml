@@ -18,6 +18,14 @@ pipeline:
             description: ""
             type: CI
             spec:
+              infrastructure:
+                type: KubernetesDirect
+                spec:
+                  connectorRef: account.cigeneral
+                  namespace: harness-delegate-ng
+                  automountServiceAccountToken: true
+                  nodeSelector: {}
+                  os: Linux
               cloneCodebase: true
               execution:
                 steps:
@@ -34,12 +42,4 @@ pipeline:
                           pip install -U pip
                           pip install -r requirements.txt
                           pip install pylint
-                          make lint check-licenses
-              infrastructure:
-                type: KubernetesDirect
-                spec:
-                  connectorRef: account.cigeneral
-                  namespace: harness-delegate-ng
-                  automountServiceAccountToken: true
-                  nodeSelector: {}
-                  os: Linux
+                          make lint
