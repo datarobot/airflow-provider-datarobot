@@ -1,6 +1,8 @@
 pipeline:
   name: dummy-test-pipeline
   identifier: dummytestpipeline
+  projectIdentifier: dummy
+  orgIdentifier: AGENTS
   tags: {}
   template:
     templateRef: account.Build_and_Upload_Python_Package
@@ -10,7 +12,7 @@ pipeline:
       properties:
         ci:
           codebase:
-            repoName: <+input>
+            repoName: airflow-provider-datarobot
             build: <+input>
       variables:
         - name: POETRY_VERSION
@@ -23,7 +25,7 @@ pipeline:
           value: <+input>
         - name: ARTIFACTORY_REPO
           type: String
-          default: datarobot-python-dev
+          default: airflow-provider-datarobot-dev
           value: <+input>
         - name: PACKAGE_VERSION
           type: String
@@ -33,5 +35,3 @@ pipeline:
           type: String
           default: poetry version -s
           value: <+input>
-  projectIdentifier: dummy
-  orgIdentifier: AGENTS
