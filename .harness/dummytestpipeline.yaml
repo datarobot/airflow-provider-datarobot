@@ -39,6 +39,7 @@ pipeline:
                         shell: Bash
                         command: |2-
                                           set -exuo pipefail
+                                          pip install virtualenv
                                           virtualenv .venv -p python3.8
                                           source .venv/bin/activate
                                           pip install apache-airflow==2.5.1
