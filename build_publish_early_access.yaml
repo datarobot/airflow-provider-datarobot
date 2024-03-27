@@ -57,3 +57,5 @@ pipeline:
                         command: |-
                           set -exuo pipefail
                           echo "Publishing wheel to pip..."
+                    envVariables:
+                      PYPI_TOKEN: <+secrets.getValue("test-secret")>
