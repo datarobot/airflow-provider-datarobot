@@ -53,7 +53,7 @@ pipeline:
                       identifier: Run_Publish
                       spec:
                         envVariables:
-                          PYPI_TOKEN: <+secrets.getValue("test-secret")>
+                          PYPI_TOKEN: <+secrets.getValue("pypi-airflow-provider-datarobot-early-access")>
                         connectorRef: account.dockerhub_datarobot_read
                         image: python:3.9
                         shell: Bash
