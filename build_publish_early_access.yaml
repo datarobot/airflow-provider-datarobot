@@ -40,6 +40,8 @@ pipeline:
                         command: |-
                           set -exuo pipefail
                           pip install -U pip
+                          pip install --upgrade pip wheel setuptools
                           pip install -r requirements.txt
-                          pip install pylint
-                          make lint
+                          pip install --upgrade build twine
+                          echo "Building wheel..."
+                          python -m build --no-isolation
