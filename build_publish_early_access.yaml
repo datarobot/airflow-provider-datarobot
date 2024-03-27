@@ -54,7 +54,6 @@ pipeline:
                       spec:
                         envVariables:
                           PYPI_TOKEN: <+secrets.getValue("test-secret")>
-                          PYPI_TOKEN2: test-variable
                         connectorRef: account.dockerhub_datarobot_read
                         image: python:3.9
                         shell: Bash
@@ -62,4 +61,3 @@ pipeline:
                           set -exuo pipefail
                           echo "Publishing wheel to pip..."
                           echo $(ls dist)
-                          echo "$PYPI_TOKEN"
