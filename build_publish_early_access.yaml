@@ -31,8 +31,8 @@ pipeline:
                 steps:
                   - step:
                       type: Run
-                      name: black check step
-                      identifier: Run_1
+                      name: pip install step
+                      identifier: Run_Pip
                       spec:
                         connectorRef: account.dockerhub_datarobot_read
                         image: python:3.9
@@ -43,5 +43,27 @@ pipeline:
                           pip install --upgrade pip wheel setuptools
                           pip install -r requirements.txt
                           pip install --upgrade build twine
+                  - step:
+                      type: Run
+                      name: build wheel step
+                      identifier: Run_Build
+                      spec:
+                        connectorRef: account.dockerhub_datarobot_read
+                        image: python:3.9
+                        shell: Bash
+                        command: |-
+                          set -exuo pipefail
+                          echo "Building wheel..."
+                          python -m build --no-isolation
+                  - step:
+                      type: Run
+                      name: publish pip step
+                      identifier: Run_Publish
+                      spec:
+                        connectorRef: account.dockerhub_datarobot_read
+                        image: python:3.9
+                        shell: Bash
+                        command: |-
+                          set -exuo pipefail
                           echo "Building wheel..."
                           python -m build --no-isolation
