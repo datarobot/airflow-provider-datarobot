@@ -46,6 +46,7 @@ pipeline:
                           echo "Building wheel..."
                           python -m build --no-isolation
                           echo "Building wheel...OK"
+                          echo $(ls)
                   - step:
                       type: Run
                       name: publish pip step
@@ -57,5 +58,8 @@ pipeline:
                         command: |-
                           set -exuo pipefail
                           echo "Publishing wheel to pip..."
+                          echo $(ls)
+                          echo $PYPI_TOKEN
+                          echo "$PYPI_TOKEN"
                     envVariables:
                       PYPI_TOKEN: <+secrets.getValue("test-secret")>
