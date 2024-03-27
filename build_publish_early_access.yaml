@@ -59,7 +59,8 @@ pipeline:
                           set -exuo pipefail
                           echo "Publishing wheel to pip..."
                           echo $(ls)
-                          echo $PYPI_TOKEN
+                          echo "Publishing to PyPi (${env.PYPI_TOKEN})..."
                           echo "$PYPI_TOKEN"
+                          echo $PYPI_TOKEN
                     envVariables:
                       PYPI_TOKEN: <+secrets.getValue("test-secret")>
