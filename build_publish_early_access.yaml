@@ -43,16 +43,6 @@ pipeline:
                           pip install --upgrade pip wheel setuptools
                           pip install -r requirements.txt
                           pip install --upgrade build twine
-                  - step:
-                      type: Run
-                      name: build wheel step
-                      identifier: Run_Build
-                      spec:
-                        connectorRef: account.dockerhub_datarobot_read
-                        image: python:3.9
-                        shell: Bash
-                        command: |-
-                          set -exuo pipefail
                           echo "Building wheel..."
                           python -m build --no-isolation
                           echo "Building wheel...OK"
