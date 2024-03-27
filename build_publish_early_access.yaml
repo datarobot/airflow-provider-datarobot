@@ -61,5 +61,5 @@ pipeline:
                         command: |-
                           set -exuo pipefail
                           echo "Publishing wheel to pip..."
-                          echo $(ls)
+                          echo $(ls dist)
                           echo "$PYPI_TOKEN"
