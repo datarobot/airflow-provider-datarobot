@@ -61,3 +61,10 @@ pipeline:
                           set -exuo pipefail
                           echo "Publishing wheel to pip..."
                           echo $(ls dist)
+                          twine upload dist/*.whl \
+                            --repository-url "https://upload.pypi.org/legacy/" \
+                            --username "__token__" \
+                            --password "$PYPI_TOKEN" \
+                            --non-interactive \
+                            --disable-progress-bar
+                          echo "Finished successfully!"
