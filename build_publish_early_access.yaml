@@ -59,6 +59,7 @@ pipeline:
                         shell: Bash
                         command: |-
                           set -exuo pipefail
+                          pip install --upgrade twine
                           echo "Publishing wheel to pip..."
                           echo $(ls dist)
                           twine upload dist/*.whl \
