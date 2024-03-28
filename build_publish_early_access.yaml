@@ -63,7 +63,6 @@ pipeline:
                           echo "Publishing wheel to pip..."
                           echo $(ls dist)
                           twine upload dist/*.whl \
-                            --repository-url "https://upload.pypi.org/legacy/" \
                             --username "__token__" \
                             --password "$PYPI_TOKEN" \
                             --non-interactive \
