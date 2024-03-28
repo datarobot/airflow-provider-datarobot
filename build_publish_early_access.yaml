@@ -66,5 +66,6 @@ pipeline:
                             --username "__token__" \
                             --password "$PYPI_TOKEN" \
                             --non-interactive \
+                            --verbose \
                             --disable-progress-bar
                           echo "Finished successfully!"
