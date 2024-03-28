@@ -1,0 +1,12 @@
+name: runtime-params
+
+runtimeParameterDefinitions:
+  - fieldName: MODEL_PACKAGE
+    type: modelPackage
+    description: Model package that will be used to store key values
+  - fieldName: DEPLOYMENT
+    type: deployment
+    description: Deployment that will be used to make predictions
+  - fieldName: STRING_PARAMETER
+    type: string
+    description: An example of a string parameter

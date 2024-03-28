@@ -7,10 +7,10 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 def get_provider_info():
     return {
-        "package-name": "airflow-provider-datarobot",
+        "package-name": "airflow-provider-datarobot-early-access",
         "name": "DataRobot Airflow Provider",
         "description": "DataRobot Airflow provider.",
-        "versions": ["0.0.8"],
+        "versions": ["0.0.8.1"],
         "connection-types": [
             {
                 "hook-class-name": "datarobot_provider.hooks.datarobot.DataRobotHook",
