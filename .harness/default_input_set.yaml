@@ -1,0 +1,14 @@
+inputSet:
+  name: default_input_set
+  identifier: default_input_set
+  orgIdentifier: AGENTS
+  projectIdentifier: dummy
+  pipeline:
+    identifier: black_check
+    properties:
+      ci:
+        codebase:
+          build:
+            type: PR
+            spec:
+              number: <+trigger.prNumber>
