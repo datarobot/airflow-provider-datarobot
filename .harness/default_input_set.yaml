@@ -1,0 +1,14 @@
+inputSet:
+  name: default_input_set
+  identifier: default_input_set
+  orgIdentifier: AGENTS
+  projectIdentifier: airflowproviderdatarobot
+  pipeline:
+    identifier: lint_check
+    properties:
+      ci:
+        codebase:
+          build:
+            type: PR
+            spec:
+              number: <+trigger.prNumber>

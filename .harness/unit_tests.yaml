@@ -1,0 +1,83 @@
+pipeline:
+  projectIdentifier: airflowproviderdatarobot
+  orgIdentifier: AGENTS
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.svc_harness_git1
+        repoName: airflow-provider-datarobot
+        build: <+input>
+  stages:
+    - parallel:
+        - stage:
+            name: lint
+            identifier: lint
+            description: ""
+            type: CI
+            spec:
+              infrastructure:
+                type: KubernetesDirect
+                spec:
+                  connectorRef: account.cigeneral
+                  namespace: harness-delegate-ng
+                  automountServiceAccountToken: true
+                  nodeSelector: {}
+                  os: Linux
+              cloneCodebase: true
+              execution:
+                steps:
+                  - step:
+                      type: Run
+                      name: lint check step
+                      identifier: run_lint
+                      spec:
+                        connectorRef: account.dockerhub_datarobot_read
+                        image: python:3.9
+                        shell: Bash
+                        command: |-
+                          set -exuo pipefail
+                          pip install -U pip
+                          pip install -r requirements.txt
+                          pip install pylint
+                          make lint
+        - stage:
+            name: test_unit
+            identifier: test_unit
+            description: ""
+            type: CI
+            spec:
+              cloneCodebase: true
+              infrastructure:
+                type: KubernetesDirect
+                spec:
+                  connectorRef: account.cigeneral
+                  namespace: harness-delegate-ng
+                  automountServiceAccountToken: true
+                  nodeSelector: {}
+                  os: Linux
+              execution:
+                steps:
+                  - step:
+                      type: Run
+                      name: run unit tests
+                      identifier: run_unit_tests
+                      spec:
+                        connectorRef: account.dockerhub_datarobot_read
+                        image: python:3.9
+                        shell: Bash
+                        command: |2-
+                                          set -exuo pipefail
+                                          pip install apache-airflow
+                                          pip install -r requirements.txt
+                                          pip install airflow-provider-datarobot
+                                          airflow db init
+                                          airflow db check
+                                          pytest -vv tests/unit/ --junit-xml=unit_test_report.xml
+                        reports:
+                          type: JUnit
+                          spec:
+                            paths:
+                              - /harness/unit_test_report.xml
+  identifier: unit_tests
+  name: unit_tests
