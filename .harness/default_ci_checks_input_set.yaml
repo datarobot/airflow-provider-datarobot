@@ -1,10 +1,10 @@
 inputSet:
-  name: default_input_set
-  identifier: default_input_set
+  name: default_ci_checks_input_set
+  identifier: default_ci_checks_input_set
   orgIdentifier: AGENTS
   projectIdentifier: airflowproviderdatarobot
   pipeline:
-    identifier: lint_check
+    identifier: cichecks
     properties:
       ci:
         codebase:

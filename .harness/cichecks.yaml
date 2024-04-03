@@ -1,4 +1,6 @@
 pipeline:
+  name: ci-checks
+  identifier: cichecks
   projectIdentifier: airflowproviderdatarobot
   orgIdentifier: AGENTS
   tags: {}
@@ -66,18 +68,16 @@ pipeline:
                         connectorRef: account.dockerhub_datarobot_read
                         image: python:3.9
                         shell: Bash
-                        command: |2-
-                                          set -exuo pipefail
-                                          pip install apache-airflow
-                                          pip install -r requirements.txt
-                                          pip install airflow-provider-datarobot
-                                          airflow db init
-                                          airflow db check
-                                          pytest -vv tests/unit/ --junit-xml=unit_test_report.xml
+                        command: |-
+                          set -exuo pipefail
+                          pip install apache-airflow
+                          pip install -r requirements.txt
+                          pip install airflow-provider-datarobot
+                          airflow db init
+                          airflow db check
+                          pytest -vv tests/unit/ --junit-xml=unit_test_report.xml
                         reports:
                           type: JUnit
                           spec:
                             paths:
                               - /harness/unit_test_report.xml
-  identifier: unit_tests
-  name: unit_tests
