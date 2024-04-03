@@ -1,0 +1,14 @@
+inputSet:
+  name: default_ci_checks_input_set
+  identifier: default_ci_checks_input_set
+  orgIdentifier: AGENTS
+  projectIdentifier: airflowproviderdatarobot
+  pipeline:
+    identifier: cichecks
+    properties:
+      ci:
+        codebase:
+          build:
+            type: PR
+            spec:
+              number: <+trigger.prNumber>
