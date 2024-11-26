@@ -59,10 +59,6 @@ def datarobot_s3_batch_scoring(deployment_id=None):
     if not deployment_id:
         raise ValueError("Invalid or missing `deployment_id` value")
 
-    # will make some changes here to demonstrate git sync
-
-    # here's another comment to check the sync
-
     get_credentials_op = GetOrCreateCredentialOperator(
         task_id="get_aws_credentials",
         credentials_param_name="datarobot_aws_credentials",
