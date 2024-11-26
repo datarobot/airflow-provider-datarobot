@@ -61,6 +61,8 @@ def datarobot_s3_batch_scoring(deployment_id=None):
 
     # will make some changes here to demonstrate git sync
 
+    # here's another comment to check the sync
+
     get_credentials_op = GetOrCreateCredentialOperator(
         task_id="get_aws_credentials",
         credentials_param_name="datarobot_aws_credentials",
