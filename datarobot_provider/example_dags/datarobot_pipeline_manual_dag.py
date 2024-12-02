@@ -62,4 +62,4 @@ def datarobot_pipeline_manual():
     )
 
 
-datarobot_pipeline_dag = datarobot_pipeline()
+datarobot_pipeline_dag = datarobot_pipeline_manual()
