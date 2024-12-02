@@ -83,6 +83,12 @@ class StartAutopilotOperator(BaseOperator):
 
         autopilot_settings = context['params']['autopilot_settings']
 
+        if autopilot_settings["mode"] == dr.AUTOPILOT_MODE.MANUAL:
+            project.analyze_and_model(**autopilot_settings)
+            bp = project.get_blueprints()[0]
+            project.train(bp)
+            return
+
         self.log.info(
             f"Starting DataRobot Autopilot for project_id={project.id} "
             f"with settings={autopilot_settings}"
