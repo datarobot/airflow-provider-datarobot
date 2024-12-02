@@ -11,8 +11,6 @@ from airflow.decorators import dag
 
 from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.operators.datarobot import DeployRecommendedModelOperator
-from datarobot_provider.operators.datarobot import GetFeatureDriftOperator
-from datarobot_provider.operators.datarobot import GetTargetDriftOperator
 from datarobot_provider.operators.datarobot import ScorePredictionsOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
 from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
@@ -52,16 +50,6 @@ def datarobot_pipeline():
         job_id=score_predictions_op.output,
     )
 
-    target_drift_op = GetTargetDriftOperator(
-        task_id="target_drift",
-        deployment_id=deploy_model_op.output,
-    )
-
-    feature_drift_op = GetFeatureDriftOperator(
-        task_id="feature_drift",
-        deployment_id=deploy_model_op.output,
-    )
-
     (
         create_project_op
         >> train_models_op
@@ -70,9 +58,6 @@ def datarobot_pipeline():
         >> score_predictions_op
         >> scoring_complete_sensor
     )
-
-    scoring_complete_sensor >> target_drift_op
-    scoring_complete_sensor >> feature_drift_op
 
 
 datarobot_pipeline_dag = datarobot_pipeline()
