@@ -22,7 +22,7 @@ from sensors.datarobot import ModelTrainingCompleteSensor
     start_date=datetime(2022, 1, 1),
     tags=['example'],
 )
-def datarobot_pipeline():
+def datarobot_pipeline_manual():
     create_project_op = CreateProjectOperator(
         task_id='create_project',
     )
