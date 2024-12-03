@@ -9,12 +9,12 @@ from datetime import datetime
 
 from airflow.decorators import dag
 
+from datarobot_provider.operators.autopilot import StartAutopilotOperator
 from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.operators.datarobot import DeployRecommendedModelOperator
 from datarobot_provider.operators.datarobot import ScorePredictionsOperator
 from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
-from operators.autopilot import StartAutopilotOperator
-from sensors.datarobot import ModelTrainingCompleteSensor
+from datarobot_provider.sensors.datarobot import ModelTrainingCompleteSensor
 
 
 @dag(
