@@ -188,12 +188,14 @@ class DeployModelOperator(BaseOperator, DeployModelMixin):
     def __init__(
         self,
         *,
-        model_id: str,
+        model_id: str = None,
+        project_id: str = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.model_id = model_id
+        self.project_id = project_id
         self.datarobot_conn_id = datarobot_conn_id
         if kwargs.get('xcom_push') is not None:
             raise AirflowException(
@@ -204,9 +206,15 @@ class DeployModelOperator(BaseOperator, DeployModelMixin):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
+        if self.project_id:
+            models = dr.Project.get(self.project_id).get_models()
+            model_id = models[0].id
+        else:
+            model_id = self.model_id
+
         # Deploy the model
         deployment = self.deploy_model(
-            self.model_id,
+            model_id,
             context['params']['deployment_label'],
             context['params'].get('deployment_description'),
         )

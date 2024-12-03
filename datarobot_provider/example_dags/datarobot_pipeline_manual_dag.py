@@ -11,7 +11,7 @@ from airflow.decorators import dag
 
 from datarobot_provider.operators.autopilot import StartAutopilotOperator
 from datarobot_provider.operators.datarobot import CreateProjectOperator
-from datarobot_provider.operators.datarobot import DeployRecommendedModelOperator
+from datarobot_provider.operators.datarobot import DeployModelOperator
 from datarobot_provider.operators.datarobot import ScorePredictionsOperator
 from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
 from datarobot_provider.sensors.datarobot import ModelTrainingCompleteSensor
@@ -37,8 +37,8 @@ def datarobot_pipeline_manual():
         project_id=create_project_op.output,
     )
 
-    deploy_model_op = DeployRecommendedModelOperator(
-        task_id="deploy_recommended_model",
+    deploy_model_op = DeployModelOperator(
+        task_id="deploy_model",
         project_id=create_project_op.output,
     )
 
