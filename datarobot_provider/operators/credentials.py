@@ -67,10 +67,12 @@ class GetOrCreateCredentialOperator(BaseOperator):
             # Trying to find an Airflow preconfigured credentials for provided credential name
             # to replicate credentials on DataRobot side:
             self.log.info(
-                f'Credentials :{credential.name} not found, id={credential.credential_id} '
-                f'for param {self.credentials_param_name}'
+                f'Credentials with name {credential_name} not found in DataRobot, trying to find '
+                'Airflow connection with the same name'
             )
-            credentials, credentials_data = CredentialsBaseHook.get_hook(
-                conn_id=credential_name
-            ).run()
+            hook = CredentialsBaseHook.get_hook(conn_id=credential_name)
+            if hook.conn_type == 'datarobot.datasource.jdbc':
+                credentials, _, _ = hook.run()
+            else:
+                credentials, _ = hook.run()
             return credentials.credential_id
