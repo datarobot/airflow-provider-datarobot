@@ -32,6 +32,18 @@ def test_operator_get_credential_not_found(mocker):
         )
 
 
+def test_operator_get_credential_not_found_in_datarobot(mock_airflow_connection_datarobot_jdbc):
+    operator = GetOrCreateCredentialOperator(task_id='get_credentials')
+    credential_id = operator.execute(
+        context={
+            "params": {
+                "datarobot_credentials_name": "datarobot_test_connection_jdbc_test",
+            },
+        }
+    )
+    assert credential_id == 'test-credentials-id'
+
+
 def test_operator_get_basic_credential_id(
     mocker, mock_airflow_connection_datarobot_basic_credentials
 ):
