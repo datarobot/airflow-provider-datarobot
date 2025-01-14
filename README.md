@@ -1546,6 +1546,58 @@ The advanced end-to-end workflow in DataRobot (`advanced_datarobot_pipeline_jdbc
 - Upload actuals from a JDBC datasource
 - Collect deployment metrics: service statistics, features drift, target drift, accuracy and process it with custom python operator.
 
+## Development
+### Pre-requisites
+- [Docker Desktop 1.13.1 or later](https://docs.docker.com/desktop/)
+- [Astronomer CLI 1.30.0 or later](https://github.com/astronomer/astro-cli?tab=readme-ov-file#install-the-astro-cli)
+- [Pyenv](https://github.com/pyenv/pyenv?tab=readme-ov-file#installation) or [virtualenv](https://virtualenv.pypa.io/en/latest/)
+
+### Environment Setup
+It is useful to have a simple airflow testing environment and a local development environment for the
+operators and DAGs. The following steps will construct the two environments needed for development.
+1. Clone the `airflow-provider-datarobot` repository
+    ```bash
+        cd ~/workspace
+        git clone git@github.com:datarobot/airflow-provider-datarobot.git
+        cd airflow-provider-datarobot
+    ```
+2. Create a virtual environment and install the dependencies
+    ```bash
+        pyenv virtualenv 3.12 airflow-provider-datarobot
+        pyenv local airflow-provider-datarobot
+        pip install -r requirements.txt
+    ```
+3. Create a new astro project
+    ```bash
+        cd ~/workspace
+        mkdir airflow-dev
+        cd airflow-dev/
+        astro dev init
+    ```
+
+_Note: The default username and password will both be `admin` in the astro project._
+
+### Updating Operators in the Dev Environment
+1. Build the python package in the `airflow-provider-datarobot` repo.
+    ```bash
+        pip install --upgrade build
+        python -m build
+    ```
+2. The resulting wheel will be present in the `airflow-provider-datarobot/dist/` folder.
+3. Copy the wheel to the `airflow-dev` project.
+    ```bash
+        cp ~/workspace/airflow-provider-datarobot/dist/*.whl ~/workspace/airflow-dev/
+    ```
+4. Add the new wheel to the `requirements.txt` file in the `airflow-dev` project. You
+may want to update this version when testing.
+    ```bash
+        echo "airflow-provider-datarobot>=0.0.4" >> requirements.txt
+    ```
+5. Start the new environment and wait for the packages to be resolved and the environment to be built.
+    ```bash
+        astro dev start
+    ```
+
 ## Issues
 
 Please submit [issues](https://github.com/datarobot/airflow-provider-datarobot/issues) and [pull requests](https://github.com/datarobot/airflow-provider-datarobot/pulls) in our official repo:
