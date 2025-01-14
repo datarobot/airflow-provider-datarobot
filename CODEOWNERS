@@ -1,1 +1,14 @@
-*       @elatt @alexromanyuk @andrius-senulis
+/                                                        @datarobot/core-backend
+/.harness                                                @datarobot/continuous-integration
+/datarobot_provider                                      @datarobot/machine-learning-development
+/datarobot_provider/operators/ai_catalog.py              @datarobot/mldata
+/datarobot_provider/operators/connections.py             @datarobot/mldata
+/datarobot_provider/operators/feature_discovery.py       @datarobot/trust-explainable-ai
+/datarobot_provider/operators/mlops.py                   @datarobot/model-management
+/datarobot_provider/operators/model_insights.py          @datarobot/trust-explainable-ai
+/datarobot_provider/operators/model_package.py           @datarobot/model-management
+/datarobot_provider/operators/model_predictions.py       @datarobot/predictions
+/datarobot_provider/operators/monitoring.py              @datarobot/model-management
+/datarobot_provider/operators/monitoring_job.py          @datarobot/model-management
+/datarobot_provider/operators/prediction_explanations.py @datarobot/trust-explainable-ai
+/tests/                                                  @datarobot/machine-learning-development
