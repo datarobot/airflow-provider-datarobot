@@ -1,6 +1,4 @@
 *                                                        @datarobot/machine-learning-development
-/.harness                                                @datarobot/continuous-integration
-/datarobot_provider                                      @datarobot/machine-learning-development
 /datarobot_provider/operators/ai_catalog.py              @datarobot/mldata
 /datarobot_provider/operators/connections.py             @datarobot/mldata
 /datarobot_provider/operators/feature_discovery.py       @datarobot/trust-explainable-ai
