@@ -1589,11 +1589,12 @@ _Note: The default username and password will both be `admin` in the astro proje
         cp ~/workspace/airflow-provider-datarobot/dist/*.whl ~/workspace/airflow-dev/
     ```
 4. Add the new wheel to the `requirements.txt` file in the `airflow-dev` project. You
-may want to update this version when testing.
+may want to update this version when testing. Make sure `X.Y.Z` is the version built in
+step 1.
     ```bash
-        echo "airflow-provider-datarobot>=0.0.4" >> requirements.txt
+        echo "airflow-provider-datarobot==X.Y.Z" >> requirements.txt
     ```
-5. Start the new environment and wait for the packages to be resolved and the environment to be built.
+6. Start the new environment and wait for the packages to be resolved and the environment to be built.
     ```bash
         astro dev start
     ```
