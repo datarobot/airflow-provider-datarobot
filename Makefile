@@ -56,7 +56,6 @@ stop-astro-dev:
 	cd astro-dev && astro dev stop
 
 build-astro-dev:
-	echo "For testing remember to bump datarobot_provider/__init__.py and setup.py versions"
 	$(MAKE) stop-astro-dev
 	cd astro-dev && astro dev stop
 	rm -rf ./dist
