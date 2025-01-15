@@ -47,7 +47,6 @@ create-astro-dev:
 
 reset-astro-dev:
 	rm -rf astro-dev
-	$(MAKE) install-astro
 	$(MAKE) create-astro-dev
 
 start-astro-dev:

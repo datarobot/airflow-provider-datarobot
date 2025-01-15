@@ -1567,12 +1567,20 @@ operators and DAGs. The following steps will construct the two environments need
         pyenv local airflow-provider-datarobot
         pip install -r requirements.txt
     ```
-3. Create a new astro project
+
+### Astro Setup
+1. (OPTIONAL) Install astro with the following command or manually from the links above:
     ```bash
-        cd ~/workspace
-        mkdir airflow-dev
-        cd airflow-dev/
-        astro dev init
+        make install-astro
+    ```
+2. Build an astro development environment with the following command:
+    ```bash
+        make reset-astro-dev
+    ```
+3. A new `./astro-dev` folder will be constructed for you to use as a development and test environment.
+4. Compile and run airflow on the development package with:
+    ```bash
+        make build-astro-dev
     ```
 
 _Note: The default username and password will both be `admin` in the astro project._
