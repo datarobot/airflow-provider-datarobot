@@ -47,6 +47,7 @@ create-astro-dev:
 	echo "RUN pip install -r \"/usr/local/airflow/requirements_dev.txt\"" >> ./astro-dev/Dockerfile
 
 clean-astro-dev:
+	$(MAKE) stop-astro-dev
 	rm -rf astro-dev
 	$(MAKE) create-astro-dev
 
@@ -58,7 +59,6 @@ stop-astro-dev:
 
 build-astro-dev:
 	$(MAKE) stop-astro-dev
-	cd astro-dev && astro dev stop
 	rm -rf ./dist
 	pip install --upgrade build
 	python -m build
