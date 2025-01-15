@@ -57,6 +57,7 @@ stop-astro-dev:
 
 build-astro-dev:
 	echo "For testing remember to bump datarobot_provider/__init__.py and setup.py versions"
+	$(MAKE) stop-astro-dev
 	cd astro-dev && astro dev stop
 	rm -rf ./dist
 	pip install --upgrade build
@@ -65,5 +66,4 @@ build-astro-dev:
 	cp -p "`ls -dtr1 ./dist/*.whl | sort -n | tail -1`" "./astro-dev/"
 	echo "/usr/local/airflow/`find ./dist/*.whl -exec basename {} \; | sort -n | tail -1`" > \
  		./astro-dev/requirements_dev.txt
-	cd astro-dev && astro dev start
-
+	$(MAKE) start-astro-dev
