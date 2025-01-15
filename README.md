@@ -1567,36 +1567,41 @@ operators and DAGs. The following steps will construct the two environments need
         pyenv local airflow-provider-datarobot
         pip install -r requirements.txt
     ```
-3. Create a new astro project
+
+### Astro Setup
+1. (OPTIONAL) Install astro with the following command or manually from the links above:
     ```bash
-        cd ~/workspace
-        mkdir airflow-dev
-        cd airflow-dev/
-        astro dev init
+        make install-astro
+    ```
+2. Build an astro development environment with the following command:
+    ```bash
+        make create-astro-dev
+    ```
+3. A new `./astro-dev` folder will be constructed for you to use as a development and test environment.
+4. Compile and run airflow on the development package with:
+    ```bash
+        make build-astro-dev
     ```
 
-_Note: The default username and password will both be `admin` in the astro project._
+_Note: All credentials and logins will be printed in the terminal after running
+the `build-astro-dev` command._
 
 ### Updating Operators in the Dev Environment
-1. Build the python package in the `airflow-provider-datarobot` repo.
+- Test, compile, and run new or updated operators on the development package with:
     ```bash
-        pip install --upgrade build
-        python -m build
+        make build-astro-dev
     ```
-2. The resulting wheel will be present in the `airflow-provider-datarobot/dist/` folder.
-3. Copy the wheel to the `airflow-dev` project.
+- Manually start the airflow dev environment without rebuilding the package with:
     ```bash
-        cp ~/workspace/airflow-provider-datarobot/dist/*.whl ~/workspace/airflow-dev/
+        make start-astro-dev
     ```
-4. Add the new wheel to the `requirements.txt` file in the `airflow-dev` project. You
-may want to update this version when testing. Make sure `X.Y.Z` is the version built in
-step 1.
+- Manually stop the airflow dev environment without rebuilding the package with:
     ```bash
-        echo "airflow-provider-datarobot==X.Y.Z" >> requirements.txt
+        make stop-astro-dev
     ```
-6. Start the new environment and wait for the packages to be resolved and the environment to be built.
+- If there are problems with the airflow environment you can reset it to a clean state with:
     ```bash
-        astro dev start
+        make clean-astro-dev
     ```
 
 ## Issues
