@@ -1583,7 +1583,8 @@ operators and DAGs. The following steps will construct the two environments need
         make build-astro-dev
     ```
 
-_Note: The default username and password will both be `admin` in the astro project._
+_Note: All credentials and logins will be printed in the terminal after running
+the `build-astro-dev` command._
 
 ### Updating Operators in the Dev Environment
 - Test, compile, and run new or updated operators on the development package with:
