@@ -43,6 +43,7 @@ install-astro:
 create-astro-dev:
 	mkdir astro-dev
 	cd astro-dev && astro dev init
+	grep -qF -- 'RUN pip install -r \"/usr/local/airflow/requirements_dev.txt\"' ./astro-dev/Dockerfile || \
 	echo "RUN pip install -r \"/usr/local/airflow/requirements_dev.txt\"" >> ./astro-dev/Dockerfile
 
 reset-astro-dev:
