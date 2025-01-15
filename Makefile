@@ -58,6 +58,7 @@ stop-astro-dev:
 build-astro-dev:
 	echo "For testing remember to bump datarobot_provider/__init__.py and setup.py versions"
 	cd astro-dev && astro dev stop
+	rm -rf ./dist
 	pip install --upgrade build
 	python -m build
 	cp -r ./datarobot_provider/example_dags/* ./astro-dev/dags/

@@ -1586,25 +1586,17 @@ operators and DAGs. The following steps will construct the two environments need
 _Note: The default username and password will both be `admin` in the astro project._
 
 ### Updating Operators in the Dev Environment
-1. Build the python package in the `airflow-provider-datarobot` repo.
+- Test, compile, and run new or updated operators on the development package with:
     ```bash
-        pip install --upgrade build
-        python -m build
+        make build-astro-dev
     ```
-2. The resulting wheel will be present in the `airflow-provider-datarobot/dist/` folder.
-3. Copy the wheel to the `airflow-dev` project.
+- Manually start the airflow dev environment without rebuilding the package with:
     ```bash
-        cp ~/workspace/airflow-provider-datarobot/dist/*.whl ~/workspace/airflow-dev/
+        make start-astro-dev
     ```
-4. Add the new wheel to the `requirements.txt` file in the `airflow-dev` project. You
-may want to update this version when testing. Make sure `X.Y.Z` is the version built in
-step 1.
+- Manually stop the airflow dev environment without rebuilding the package with:
     ```bash
-        echo "airflow-provider-datarobot==X.Y.Z" >> requirements.txt
-    ```
-6. Start the new environment and wait for the packages to be resolved and the environment to be built.
-    ```bash
-        astro dev start
+        make stop-astro-dev
     ```
 
 ## Issues
