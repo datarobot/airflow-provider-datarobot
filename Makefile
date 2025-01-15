@@ -46,7 +46,7 @@ create-astro-dev:
 	grep -qF -- 'RUN pip install -r \"/usr/local/airflow/requirements_dev.txt\"' ./astro-dev/Dockerfile || \
 	echo "RUN pip install -r \"/usr/local/airflow/requirements_dev.txt\"" >> ./astro-dev/Dockerfile
 
-reset-astro-dev:
+clean-astro-dev:
 	rm -rf astro-dev
 	$(MAKE) create-astro-dev
 

@@ -1575,7 +1575,7 @@ operators and DAGs. The following steps will construct the two environments need
     ```
 2. Build an astro development environment with the following command:
     ```bash
-        make reset-astro-dev
+        make create-astro-dev
     ```
 3. A new `./astro-dev` folder will be constructed for you to use as a development and test environment.
 4. Compile and run airflow on the development package with:
@@ -1597,6 +1597,10 @@ _Note: The default username and password will both be `admin` in the astro proje
 - Manually stop the airflow dev environment without rebuilding the package with:
     ```bash
         make stop-astro-dev
+    ```
+- If there are problems with the airflow environment you can reset it to a clean state with:
+    ```bash
+        make clean-astro-dev
     ```
 
 ## Issues
