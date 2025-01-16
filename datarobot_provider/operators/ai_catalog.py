@@ -5,6 +5,8 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+import logging
+
 from typing import Any
 from typing import Dict
 from typing import Iterable, Optional
@@ -258,10 +260,8 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
     :rtype: str
     """
 
-    # The arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
-        'recipe_id', 'materialization_catalog', 'materialization_schema', 'materialization_table'
-    ]
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Iterable[str] = []
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
     ui_color = '#f4a460'
@@ -280,12 +280,18 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
         self.datarobot_conn_id = datarobot_conn_id
         self.recipe_id = recipe_id
 
-        _materialization_destination = dr.models.dataset.MaterializationDestination(
-            materialization_catalog, materialization_schema, materialization_table
-        )
-        self._in_source_materialization = bool(_materialization_destination.table)
+        self.materialization_catalog = materialization_catalog
+        self.materialization_schema = materialization_schema
+        self.materialization_table = materialization_table
+
+        self._in_source_materialization = bool(self.materialization_table)
+
         if self._in_source_materialization:
-            self.materialization_destination = _materialization_destination
+            self.materialization_destination = dr.models.dataset.MaterializationDestination(
+            catalog=materialization_catalog,
+            schema=materialization_schema,
+            table=materialization_table,
+        )
 
         else:
             self.materialization_destination = None
@@ -301,10 +307,25 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
 
         dataset = dr.Dataset.create_from_recipe(
             dr.models.Recipe.get(self.recipe_id),
+            name=context["params"].get("dataset_name"),
             do_snapshot=not self._in_source_materialization,
             persist_data_after_ingestion=not self._in_source_materialization,
             materialization_destination=self.materialization_destination,
         )
+
+        logging.info('Dataset created.')
+
+        if context['params'].get('experiment_container_id'):
+            dr.UseCase.get(use_case_id=context['params']['experiment_container_id']).add(dataset)
+
+            logging.info(
+                'The dataset is added into experiment container %s.',
+                context['params']['experiment_container_id'],
+            )
+
+        else:
+            logging.info("New Dataset won't belong to any experiment container.")
+
 
         return dataset.id
 
