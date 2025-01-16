@@ -7,9 +7,10 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from typing import Any
 from typing import Dict
-from typing import Iterable
+from typing import Iterable, Optional
 
 import datarobot as dr
+from datarobot.models.recipe import Recipe
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 
@@ -244,6 +245,68 @@ class CreateDatasetFromDataStoreOperator(BaseOperator):
         )
         self.log.info(f"Dataset created: dataset_id={ai_catalog_dataset.id}")
         return ai_catalog_dataset.id
+
+
+class CreateDatasetFromRecipeOperator(BaseOperator):
+    """
+
+    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
+    :type datarobot_conn_id: str, optional
+    :param recipe_id: Wrangling or Feature Discovery Recipe Id
+    :type recipe_id: str
+    :return: DataRobot AI Catalog dataset ID
+    :rtype: str
+    """
+
+    # The arguments that are allowed to parse with jinja templating
+    template_fields: Iterable[str] = [
+        'recipe_id', 'materialization_catalog', 'materialization_schema', 'materialization_table'
+    ]
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Iterable[str] = ()
+    ui_color = '#f4a460'
+
+    def __init__(
+        self,
+        *,
+        datarobot_conn_id: str = "datarobot_default",
+        recipe_id: str,
+        materialization_catalog: Optional[str] = None,
+        materialization_schema: Optional[str] = None,
+        materialization_table: Optional[str] = None,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.datarobot_conn_id = datarobot_conn_id
+        self.recipe_id = recipe_id
+
+        _materialization_destination = dr.models.dataset.MaterializationDestination(
+            materialization_catalog, materialization_schema, materialization_table
+        )
+        self._in_source_materialization = bool(_materialization_destination.table)
+        if self._in_source_materialization:
+            self.materialization_destination = _materialization_destination
+
+        else:
+            self.materialization_destination = None
+
+        if kwargs.get('xcom_push') is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Dict[str, Any]) -> str:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        dataset = dr.Dataset.create_from_recipe(
+            dr.models.Recipe.get(self.recipe_id),
+            do_snapshot=not self._in_source_materialization,
+            persist_data_after_ingestion=not self._in_source_materialization,
+            materialization_destination=self.materialization_destination,
+        )
+
+        return dataset.id
 
 
 class CreateDatasetVersionOperator(BaseOperator):
