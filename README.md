@@ -22,7 +22,7 @@ pip install airflow-provider-datarobot
 
 The next step is to create a connection from Airflow to DataRobot:
 
-1. In the Airflow user interface, click **Admin > Connections** to 
+1. In the Airflow user interface, click **Admin > Connections** to
    [add an Airflow connection](https://airflow.apache.org/docs/apache-airflow/stable/howto/connection.html#creating-a-connection-with-the-ui).
 
 2. On the **List Connection** page, click **+ Add a new record**.
@@ -42,7 +42,7 @@ The next step is to create a connection from Airflow to DataRobot:
 
 ## Create preconfigured connections to DataRobot
 
-You can create preconfigured connections to store and manage credentials to use with Airflow Operators, 
+You can create preconfigured connections to store and manage credentials to use with Airflow Operators,
 replicating the [connection on the DataRobot side](https://docs.datarobot.com/en/docs/data/connect-data/stored-creds.html).
 
 Currently, the supported credential types are:
@@ -87,9 +87,9 @@ Operators and sensors use parameters from the [config](https://airflow.apache.or
     }
 }
 ```
-    
 
-These config values are accessible in the `execute()` method of any operator in the DAG 
+
+These config values are accessible in the `execute()` method of any operator in the DAG
 through the `context["params"]` variable; for example, to get training data, you could use the following:
 
 ``` py
@@ -167,7 +167,7 @@ Required config params:
 
 #### `UpdateDatasetFromFileOperator`
 
-Creates a new dataset version from a file. 
+Creates a new dataset version from a file.
 
 Returns a dataset version ID when the new version uploads successfully.
 
@@ -185,7 +185,7 @@ Required config params:
 Creates a new version of the existing dataset in the AI Catalog.
 
 Returns a dataset version ID.
- 
+
 Required config params:
 
 | Parameter                   | Type | Description |
@@ -215,7 +215,7 @@ Required config params:
 Creates a DataRobot project.
 
 Returns a project ID.
- 
+
 Several options of source dataset supported:
 
 <details>
@@ -234,11 +234,11 @@ Required config params:
 > **Note:** In case of an S3 input, the `training_data` value must be a [pre-signed AWS S3 URL](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html).
 
 </details>
-  
+
 <details>
 
 <summary>AI Catalog dataset from config file</summary>
-  
+
 Create a project from an existing dataset in the DataRobot AI Catalog using a dataset ID defined in the config file.
 
 Required config params:
@@ -254,8 +254,8 @@ Required config params:
 
 <summary>AI Catalog dataset from previous operator</summary>
 
-Create a project from an existing dataset in the DataRobot AI Catalog using a dataset ID from the previous operator. 
-In this case, your previous operator must return a valid dataset ID (for example `UploadDatasetOperator`) 
+Create a project from an existing dataset in the DataRobot AI Catalog using a dataset ID from the previous operator.
+In this case, your previous operator must return a valid dataset ID (for example `UploadDatasetOperator`)
 and you should use this output value as a `dataset_id` argument in the `CreateProjectOperator` object creation step.
 
 Required config params:
@@ -291,7 +291,7 @@ Required config params:
 ``` json
 "autopilot_settings": {
     "target": "readmitted"
-} 
+}
 ```
 
 For more [autopilot settings](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html#datarobot.models.Project.set_target), see the DataRobot documentation.
@@ -353,7 +353,7 @@ Prerequisites:
 - Use `GetOrCreateCredentialOperator` to pass a `credential_id` from the preconfigured DataRobot Credentials (Airflow Connections) or manually set the `credential_id` parameter in the config.
 
     > **Note:** You can [add S3 credentials to DataRobot via the Python API client](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/admin/credentials.html#s3-credentials).
-    
+
 - _Or_ use a Dataset ID from the DataRobot AI Catalog.
 - _Or_ use a DataStore ID for a JDBC source connection; you can use `GetOrCreateDataStoreOperator` to pass `datastore_id` from a preconfigured Airflow Connection.
 
@@ -596,7 +596,7 @@ Sample monitoring settings:
 
 ```
 {
-"drift_tracking_settings": {  } 
+"drift_tracking_settings": {  }
 "association_id_settings": {  }
 "predictions_data_collection_settings": {  }
 }
@@ -609,7 +609,7 @@ Sample monitoring settings:
 | `predictions_data_collection_settings` | The [predictions data collection settings of this deployment](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=predictions_data_collection_settings#datarobot.models.Deployment.get_predictions_data_collection_settings). |
 
 ---
-    
+
 #### `UpdateMonitoringSettingsOperator`
 
 Updates monitoring settings for a deployment.
@@ -726,7 +726,7 @@ Parameters:
 | `model_id`                  | str  | The DataRobot model ID.                                |
 | `base_path`                 | str  | The base path for storing a downloaded model artifact. |
 
-Sample config params: 
+Sample config params:
 
 ```
 "source_code": False,
@@ -1566,6 +1566,7 @@ operators and DAGs. The following steps will construct the two environments need
         pyenv virtualenv 3.12 airflow-provider-datarobot
         pyenv local airflow-provider-datarobot
         pip install -r requirements.txt
+        pre-commit install
     ```
 
 ### Astro Setup
