@@ -18,7 +18,7 @@ def test_operator_get_or_create_dataset(mock_airflow_connection_datarobot_jdbc):
     }
 
     operator = GetOrCreateDataStoreOperator(
-        task_id='get_datastore_id', connection_param_name='datarobot_connection_name'
+        task_id="get_datastore_id", connection_param_name="datarobot_connection_name"
     )
 
     dataset_id = operator.execute(
@@ -37,7 +37,7 @@ def test_operator_get_or_create_dataset_not_found(mock_airflow_connection_dataro
 
     with pytest.raises(AirflowNotFoundException):
         operator = GetOrCreateDataStoreOperator(
-            task_id='get_datastore_id', connection_param_name='datarobot_connection_name'
+            task_id="get_datastore_id", connection_param_name="datarobot_connection_name"
         )
         operator.execute(
             context={

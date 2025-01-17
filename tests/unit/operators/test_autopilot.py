@@ -32,8 +32,8 @@ def test_operator_start_autopilot_timeseries(mocker):
     autopilot_settings = {"target": "readmitted"}
     datetime_partitioning_settings = {
         "use_time_series": True,
-        "datetime_partition_column": 'datetime',
-        "multiseries_id_columns": ['location'],
+        "datetime_partition_column": "datetime",
+        "multiseries_id_columns": ["location"],
     }
     operator.execute(
         context={

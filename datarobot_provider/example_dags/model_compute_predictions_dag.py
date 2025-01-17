@@ -20,7 +20,7 @@ from datarobot_provider.sensors.model_insights import DataRobotJobSensor
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'dataset'],
+    tags=["example", "dataset"],
 )
 def compute_model_predictions(
     project_id=None,
@@ -56,7 +56,7 @@ def compute_model_predictions(
     )
 
     @task(task_id="example_custom_python_code")
-    def using_custom_python_code(project_id, predict_job_id, datarobot_conn_id='datarobot_default'):
+    def using_custom_python_code(project_id, predict_job_id, datarobot_conn_id="datarobot_default"):
         """Example of using custom python code:"""
 
         # Initialize DataRobot client

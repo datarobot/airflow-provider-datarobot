@@ -17,7 +17,7 @@ from datarobot_provider.operators.monitoring import UpdateMonitoringSettingsOper
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'mlops'],
+    tags=["example", "mlops"],
     # Default json config example:
     params={
         "target_drift_enabled": True,

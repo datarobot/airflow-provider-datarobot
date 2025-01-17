@@ -14,6 +14,7 @@ Config example for this dag:
     "was_acted_on_column": 'acted',
 }
 """
+
 from datetime import datetime
 
 from airflow.decorators import dag
@@ -25,13 +26,13 @@ from datarobot_provider.sensors.client import BaseAsyncResolutionSensor
 @dag(
     schedule_interval=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example'],
+    tags=["example"],
     # Default json config example:
     params={
-        "association_id_column": 'id',  # column name with a unique identifier used with a prediction.
-        "actual_value_column": 'ACTUAL',  # column name with the actual value of a prediction.
-        "timestamp_column": '',  # optional - column name with datetime or string in RFC3339 format.
-        "was_acted_on_column": '',  # optional
+        "association_id_column": "id",  # column name with a unique identifier used with a prediction.
+        "actual_value_column": "ACTUAL",  # column name with the actual value of a prediction.
+        "timestamp_column": "",  # optional - column name with datetime or string in RFC3339 format.
+        "was_acted_on_column": "",  # optional
     },
 )
 def datarobot_submit_actuals_from_ai_catalog(deployment_id=None, dataset_id=None):
@@ -41,7 +42,7 @@ def datarobot_submit_actuals_from_ai_catalog(deployment_id=None, dataset_id=None
         raise ValueError("Invalid or missing `dataset_id` value")
 
     upload_actuals_op = SubmitActualsFromCatalogOperator(
-        task_id='upload_actuals',
+        task_id="upload_actuals",
         deployment_id=deployment_id,
         # dataset_id can be received from previous operator
         dataset_id=dataset_id,

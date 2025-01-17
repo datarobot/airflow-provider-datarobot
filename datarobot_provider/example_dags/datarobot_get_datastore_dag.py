@@ -11,6 +11,7 @@ Config example for this dag:
     "datarobot_jdbc_connection": "datarobot_jdbc_test",
 }
 """
+
 from datetime import datetime
 
 from airflow.decorators import dag
@@ -21,7 +22,7 @@ from datarobot_provider.operators.connections import GetOrCreateDataStoreOperato
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example'],
+    tags=["example"],
     # Default json config example:
     params={
         "datarobot_jdbc_connection": "datarobot_jdbc_test",

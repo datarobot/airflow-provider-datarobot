@@ -17,6 +17,7 @@ Config example for this dag:
     "use_feature_discovery": False
 }
 """
+
 from datetime import datetime
 
 from airflow.decorators import dag
@@ -28,7 +29,7 @@ from datarobot_provider.operators.datarobot import CreateProjectOperator
 @dag(
     schedule=None,
     start_date=datetime(2022, 1, 1),
-    tags=['example'],
+    tags=["example"],
     params={
         "dataset_file_path": "/path/to/local/file",
         "project_name": "test project",
@@ -42,7 +43,7 @@ def create_project_from_aicatalog():
     )
 
     create_project_op = CreateProjectOperator(
-        task_id='create_project',
+        task_id="create_project",
         dataset_id=dataset_uploading_op.output,
     )
 

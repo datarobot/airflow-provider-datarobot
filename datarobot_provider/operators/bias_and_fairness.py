@@ -108,28 +108,28 @@ class UpdateBiasAndFairnessSettingsOperator(BaseOperator):
             }
 
         protected_features = context["params"].get(
-            "protected_features", current_bias_and_fairness_settings['protected_features']
+            "protected_features", current_bias_and_fairness_settings["protected_features"]
         )
 
         fairness_metrics_set = context["params"].get(
-            "fairness_metrics_set", current_bias_and_fairness_settings['fairness_metrics_set']
+            "fairness_metrics_set", current_bias_and_fairness_settings["fairness_metrics_set"]
         )
 
         fairness_threshold = context["params"].get(
-            "fairness_threshold", current_bias_and_fairness_settings['fairness_threshold']
+            "fairness_threshold", current_bias_and_fairness_settings["fairness_threshold"]
         )
 
         preferable_target_value = context["params"].get(
-            "preferable_target_value", current_bias_and_fairness_settings['preferable_target_value']
+            "preferable_target_value", current_bias_and_fairness_settings["preferable_target_value"]
         )
 
         if (
-            (protected_features != current_bias_and_fairness_settings['protected_features'])
-            or (fairness_metrics_set != current_bias_and_fairness_settings['fairness_metrics_set'])
-            or (fairness_threshold != current_bias_and_fairness_settings['fairness_threshold'])
+            (protected_features != current_bias_and_fairness_settings["protected_features"])
+            or (fairness_metrics_set != current_bias_and_fairness_settings["fairness_metrics_set"])
+            or (fairness_threshold != current_bias_and_fairness_settings["fairness_threshold"])
             or (
                 preferable_target_value
-                != current_bias_and_fairness_settings['preferable_target_value']
+                != current_bias_and_fairness_settings["preferable_target_value"]
             )
         ):
             self.log.debug(

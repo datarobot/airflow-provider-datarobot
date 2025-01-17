@@ -19,7 +19,7 @@ from datarobot_provider.sensors.model_training import ModelTrainingJobSensor
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'retrain'],
+    tags=["example", "retrain"],
     # Default json config example:
     params={
         "sample_pct": 60,  # training dataset sample size to retrain the model.

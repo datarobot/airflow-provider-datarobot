@@ -16,7 +16,7 @@ from datarobot_provider.sensors.model_insights import DataRobotJobSensor
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'insights'],
+    tags=["example", "insights"],
 )
 def compute_model_shap(project_id=None, model_id=None):
     if not project_id:

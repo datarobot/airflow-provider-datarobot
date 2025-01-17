@@ -21,7 +21,7 @@ from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
 @dag(
     schedule=None,
     start_date=datetime(2022, 1, 1),
-    tags=['example', 'datetime_partitioning'],
+    tags=["example", "datetime_partitioning"],
     params={
         "dataset_file_path": "/train_datetime.csv",
         "project_name": "test airflow datetime-partitioning project",
@@ -31,7 +31,7 @@ from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
         },
         "datetime_partitioning_settings": {
             "use_time_series": False,
-            "datetime_partition_column": 'datetime',
+            "datetime_partition_column": "datetime",
             "number_of_backtests": 1,
             "autopilot_data_selection_method": DATETIME_AUTOPILOT_DATA_SELECTION_METHOD.DURATION,
             "validation_duration": construct_duration_string(years=1),
@@ -47,7 +47,7 @@ def datarobot_datetime_partitioning_pipeline():
     )
 
     create_project_op = CreateProjectOperator(
-        task_id='create_project',
+        task_id="create_project",
         dataset_id=dataset_uploading_op.output,
     )
 

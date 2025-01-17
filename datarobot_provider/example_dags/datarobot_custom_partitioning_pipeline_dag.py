@@ -21,7 +21,7 @@ from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
 @dag(
     schedule=None,
     start_date=datetime(2022, 1, 1),
-    tags=['example', 'timeseries'],
+    tags=["example", "timeseries"],
     params={
         "dataset_file_path": "/dataset.csv",
         "project_name": "test airflow project custom partitioning",
@@ -43,7 +43,7 @@ def datarobot_custom_partitioning_pipeline():
     )
 
     create_project_op = CreateProjectOperator(
-        task_id='create_project',
+        task_id="create_project",
         dataset_id=dataset_uploading_op.output,
     )
 

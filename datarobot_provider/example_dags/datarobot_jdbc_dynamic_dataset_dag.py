@@ -17,6 +17,7 @@ Config example for this dag:
     "do_snapshot": False,
 }
 """
+
 from datetime import datetime
 
 from airflow.decorators import dag
@@ -29,7 +30,7 @@ from datarobot_provider.operators.datarobot import CreateProjectOperator
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example'],
+    tags=["example"],
     # Default json config example:
     params={
         "project_name": "test_project_name",
@@ -53,7 +54,7 @@ def datarobot_dynamic_jdbc_dataset():
     )
 
     create_project_op = CreateProjectOperator(
-        task_id='create_project',
+        task_id="create_project",
         dataset_id=dataset_connect_op.output,
         # In case of dynamic dataset we should provide credential_id
         credential_id=get_jdbc_credentials_op.output,

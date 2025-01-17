@@ -36,9 +36,9 @@ In order to create Prediction Explanations for a particular model and dataset, y
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'dataset', 'model'],
+    tags=["example", "dataset", "model"],
     # Default json config example:
-    params={'threshold_high': 0.9, 'threshold_low': 0.1, 'max_explanations': 3},
+    params={"threshold_high": 0.9, "threshold_low": 0.1, "max_explanations": 3},
 )
 def compute_model_prediction_explanations(
     project_id=None,
@@ -119,7 +119,7 @@ def compute_model_prediction_explanations(
 
     @task(task_id="example_custom_python_code")
     def using_custom_python_code(
-        pe_project_id, pe_model_id, predict_job_id, datarobot_conn_id='datarobot_default'
+        pe_project_id, pe_model_id, predict_job_id, datarobot_conn_id="datarobot_default"
     ):
         """Example of using custom python code:"""
 
@@ -138,8 +138,8 @@ def compute_model_prediction_explanations(
 
         # Put your logic with the model predictions output and prediction explanations here, for example:
         return predictions_df["positive_probability"].mean(), prediction_explanations_df[
-            'explanation_0_feature'
-        ].describe().get('top')
+            "explanation_0_feature"
+        ].describe().get("top")
 
     example_custom_python_code = using_custom_python_code(
         pe_project_id=project_id,

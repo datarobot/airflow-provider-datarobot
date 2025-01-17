@@ -17,7 +17,7 @@ from datarobot_provider.operators.monitoring import GetServiceStatsOperator
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'mlops'],
+    tags=["example", "mlops"],
 )
 def deployment_service_stats_and_accuracy(deployment_id=None):
     if not deployment_id:
@@ -35,9 +35,9 @@ def deployment_service_stats_and_accuracy(deployment_id=None):
         """Example of custom logic based on metrics from the deployment."""
 
         # Put your service stat processing logic here:
-        current_model_id = model_accuracy['model_id']
+        current_model_id = model_accuracy["model_id"]
 
-        total_predictions = model_service_stat['metrics']['totalPredictions']
+        total_predictions = model_service_stat["metrics"]["totalPredictions"]
         print(f"model_id:{current_model_id}, total_predictions:{total_predictions}")
         print(f"model_id:{current_model_id}, model_accuracy: {model_accuracy}")
 

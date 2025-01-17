@@ -25,10 +25,10 @@ class DataRobotHook(BaseHook):
     :type datarobot_conn_id: str, optional
     """
 
-    conn_name_attr = 'datarobot_conn_id'
-    default_conn_name = 'datarobot_default'
-    conn_type = 'http'
-    hook_name = 'DataRobot'
+    conn_name_attr = "datarobot_conn_id"
+    default_conn_name = "datarobot_default"
+    conn_type = "http"
+    hook_name = "DataRobot"
 
     @staticmethod
     def get_connection_form_widgets() -> Dict[str, Any]:
@@ -41,12 +41,12 @@ class DataRobotHook(BaseHook):
 
         return {
             "extra__http__endpoint": StringField(
-                lazy_gettext('DataRobot endpoint URL'),
+                lazy_gettext("DataRobot endpoint URL"),
                 widget=BS3TextFieldWidget(),
-                default='https://app.datarobot.com/api/v2',
+                default="https://app.datarobot.com/api/v2",
             ),
             "extra__http__api_key": PasswordField(
-                lazy_gettext('API Key'), widget=BS3PasswordFieldWidget()
+                lazy_gettext("API Key"), widget=BS3PasswordFieldWidget()
             ),
         }
 
@@ -54,11 +54,11 @@ class DataRobotHook(BaseHook):
     def get_ui_field_behaviour() -> Dict:
         """Returns custom field behaviour."""
         return {
-            "hidden_fields": ['host', 'schema', 'login', 'password', 'port', 'extra'],
+            "hidden_fields": ["host", "schema", "login", "password", "port", "extra"],
             "relabeling": {},
             "placeholders": {
-                'extra__http__endpoint': 'https://app.datarobot.com/api/v2',
-                'extra__http__api_key': 'your-api-key',
+                "extra__http__endpoint": "https://app.datarobot.com/api/v2",
+                "extra__http__api_key": "your-api-key",
             },
         }
 
@@ -72,16 +72,16 @@ class DataRobotHook(BaseHook):
     def get_conn(self) -> dr.Client:
         """Initializes a DataRobot client instance."""
         conn = self.get_connection(self.datarobot_conn_id)
-        endpoint = conn.extra_dejson.get('extra__http__endpoint', '')
+        endpoint = conn.extra_dejson.get("extra__http__endpoint", "")
         if not endpoint:
             raise AirflowException("Endpoint is not defined")
-        api_key = conn.extra_dejson.get('extra__http__api_key', '')
+        api_key = conn.extra_dejson.get("extra__http__api_key", "")
         if not api_key:
             raise AirflowException("API key is not defined")
 
         # Creating version-specific user agent suffix for collecting usage statistics and troubleshoot purposes:
-        provider_package_name = get_provider_info().get('package-name')
-        provider_versions = ''.join(get_provider_info().get('versions'))
+        provider_package_name = get_provider_info().get("package-name")
+        provider_versions = "".join(get_provider_info().get("versions"))
         user_agent_suffix = "{}-{}-airflow-{}".format(
             provider_package_name, provider_versions, AIRFLOW_VERSION
         )
@@ -96,6 +96,6 @@ class DataRobotHook(BaseHook):
         """Test HTTP Connection"""
         try:
             self.run()
-            return True, 'Connection successfully tested'
+            return True, "Connection successfully tested"
         except Exception as e:
             return False, str(e)

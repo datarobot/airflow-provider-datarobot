@@ -22,10 +22,10 @@ from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
 @dag(
     schedule=None,
     start_date=datetime(2022, 1, 1),
-    tags=['example'],
+    tags=["example"],
 )
 def datarobot_pipeline():
-    create_project_op = CreateProjectOperator(task_id='create_project')
+    create_project_op = CreateProjectOperator(task_id="create_project")
 
     train_models_op = TrainModelsOperator(
         task_id="train_models",

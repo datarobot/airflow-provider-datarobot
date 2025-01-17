@@ -50,7 +50,7 @@ def test_operator_compute_model_prediction_explanations(mocker):
     external_dataset_id = "test-external-dataset-id"
     job_id = "test-compute-model-predictions-explanations-job-id"
 
-    params = {'threshold_high': 0.9, 'threshold_low': 0.1, 'max_explanations': 3}
+    params = {"threshold_high": 0.9, "threshold_low": 0.1, "max_explanations": 3}
 
     model_mock = mocker.Mock()
     model_mock.id = model_id
