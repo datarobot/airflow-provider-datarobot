@@ -12,9 +12,11 @@ endif
 .PHONY: format format-no-fix lint lint-fix typecheck check-licenses fix-licenses unit-tests
 
 req:
+	pip install --upgrade pip setuptools
 	pip install -e .
 
 req-dev:
+	pip install --upgrade pip setuptools
 	pip install -e ".[dev]"
 
 lint:
