@@ -26,8 +26,8 @@ class CredentialsBaseHook(BaseHook):
     :type datarobot_credentials_conn_id: str
     """
 
-    conn_name_attr = 'datarobot_credentials_conn_id'
-    hook_name = 'DataRobot Credentials'
+    conn_name_attr = "datarobot_credentials_conn_id"
+    hook_name = "DataRobot Credentials"
     default_credential_description = "Credentials managed by Airflow provider for Datarobot"
 
     def __init__(
@@ -84,7 +84,7 @@ class CredentialsBaseHook(BaseHook):
 
         conn = self.get_connection(self.datarobot_credentials_conn_id)
 
-        datarobot_connection_id = conn.extra_dejson.get('datarobot_connection', '')
+        datarobot_connection_id = conn.extra_dejson.get("datarobot_connection", "")
 
         if not datarobot_connection_id:
             raise AirflowException("datarobot_connection is not defined")
@@ -121,8 +121,8 @@ class CredentialsBaseHook(BaseHook):
 
 
 class BasicCredentialsHook(CredentialsBaseHook):
-    hook_name = 'DataRobot Basic Credentials'
-    conn_type = 'datarobot.credentials.basic'
+    hook_name = "DataRobot Basic Credentials"
+    conn_type = "datarobot.credentials.basic"
 
     def __init__(
         self,
@@ -166,7 +166,7 @@ class BasicCredentialsHook(CredentialsBaseHook):
             )
             raise AirflowException(
                 f"Error updating Basic Credentials: {self.datarobot_credentials_conn_id}"
-            )
+            ) from None
 
     def get_credential_data(self, conn) -> dict:
         # For methods that accept credential data instead of credential ID
@@ -186,9 +186,9 @@ class BasicCredentialsHook(CredentialsBaseHook):
 
         return {
             "datarobot_connection": StringField(
-                lazy_gettext('DataRobot Connection'),
+                lazy_gettext("DataRobot Connection"),
                 widget=BS3TextFieldWidget(),
-                default='datarobot_default',
+                default="datarobot_default",
             ),
         }
 
@@ -196,22 +196,22 @@ class BasicCredentialsHook(CredentialsBaseHook):
     def get_ui_field_behaviour() -> Dict:
         """Returns custom field behaviour."""
         return {
-            "hidden_fields": ['host', 'schema', 'port', 'extra'],
+            "hidden_fields": ["host", "schema", "port", "extra"],
             "relabeling": {},
             "placeholders": {
-                'datarobot_connection': 'datarobot_default',
-                'login': '',
-                'password': '',
+                "datarobot_connection": "datarobot_default",
+                "login": "",
+                "password": "",
             },
         }
 
 
 class GoogleCloudCredentialsHook(CredentialsBaseHook):
-    hook_name = 'DataRobot GCP Credentials'
-    conn_type = 'datarobot.credentials.gcp'
+    hook_name = "DataRobot GCP Credentials"
+    conn_type = "datarobot.credentials.gcp"
 
     def parse_gcp_key(self, conn) -> dict:
-        gcp_key = conn.extra_dejson.get('gcp_key', '')
+        gcp_key = conn.extra_dejson.get("gcp_key", "")
 
         if not gcp_key:
             raise AirflowException("gcp_key is not defined")
@@ -227,7 +227,7 @@ class GoogleCloudCredentialsHook(CredentialsBaseHook):
             )
             raise AirflowException(
                 f"Error parsing GCP key json for credentials: {self.datarobot_credentials_conn_id}"
-            )
+            ) from None
 
     def create_credentials(self, conn) -> Credential:
         """Returns Google Cloud credentials for params in connection object"""
@@ -256,13 +256,13 @@ class GoogleCloudCredentialsHook(CredentialsBaseHook):
             )
             raise AirflowException(
                 f"Error updating Google Cloud Credentials: {self.datarobot_credentials_conn_id}"
-            )
+            ) from None
 
     def get_credential_data(self, conn) -> dict:
         # For methods that accept credential data instead of credential ID
         credential_data = {
             "credentialType": "gcp",
-            "gcpKey": conn.extra_dejson.get('gcp_key', ''),
+            "gcpKey": conn.extra_dejson.get("gcp_key", ""),
         }
         return credential_data
 
@@ -276,12 +276,12 @@ class GoogleCloudCredentialsHook(CredentialsBaseHook):
 
         return {
             "datarobot_connection": StringField(
-                lazy_gettext('DataRobot Connection'),
+                lazy_gettext("DataRobot Connection"),
                 widget=BS3TextFieldWidget(),
-                default='datarobot_default',
+                default="datarobot_default",
             ),
             "gcp_key": StringField(
-                lazy_gettext('GCP Key json content (Service Account)'),
+                lazy_gettext("GCP Key json content (Service Account)"),
                 widget=BS3PasswordFieldWidget(),
             ),
         }
@@ -290,18 +290,18 @@ class GoogleCloudCredentialsHook(CredentialsBaseHook):
     def get_ui_field_behaviour() -> Dict:
         """Returns custom field behaviour."""
         return {
-            "hidden_fields": ['host', 'schema', 'port', 'login', 'password', 'extra'],
+            "hidden_fields": ["host", "schema", "port", "login", "password", "extra"],
             "relabeling": {},
             "placeholders": {
-                'datarobot_connection': 'datarobot_default',
-                'gcp_key': 'Enter a valid JSON string',
+                "datarobot_connection": "datarobot_default",
+                "gcp_key": "Enter a valid JSON string",
             },
         }
 
 
 class AwsCredentialsHook(CredentialsBaseHook):
-    hook_name = 'DataRobot AWS Credentials'
-    conn_type = 'datarobot.credentials.aws'
+    hook_name = "DataRobot AWS Credentials"
+    conn_type = "datarobot.credentials.aws"
 
     def create_credentials(self, conn) -> Credential:
         """Returns AWS credentials for params in connection object"""
@@ -313,7 +313,7 @@ class AwsCredentialsHook(CredentialsBaseHook):
             raise AirflowException("aws_secret_access_key is not defined")
 
         # aws_session_token is optional:
-        aws_session_token = conn.extra_dejson.get('aws_session_token', None)
+        aws_session_token = conn.extra_dejson.get("aws_session_token", None)
 
         try:
             self.log.info(f"Creating AWS Credentials:{self.datarobot_credentials_conn_id}")
@@ -333,7 +333,7 @@ class AwsCredentialsHook(CredentialsBaseHook):
             )
             raise AirflowException(
                 f"Error creating AWS Credentials: {self.datarobot_credentials_conn_id}"
-            )
+            ) from None
 
     def update_credentials(self, conn, credential: Credential) -> None:
         """Updates AWS credentials for params in connection object"""
@@ -345,7 +345,7 @@ class AwsCredentialsHook(CredentialsBaseHook):
             raise AirflowException("aws_secret_access_key is not defined")
 
         # aws_session_token is optional:
-        aws_session_token = conn.extra_dejson.get('aws_session_token', None)
+        aws_session_token = conn.extra_dejson.get("aws_session_token", None)
 
         try:
             self.log.info(f"Updating AWS Credentials:{self.datarobot_credentials_conn_id}")
@@ -364,7 +364,7 @@ class AwsCredentialsHook(CredentialsBaseHook):
             )
             raise AirflowException(
                 f"Error updating AWS Credentials: {self.datarobot_credentials_conn_id}"
-            )
+            ) from None
 
     def get_credential_data(self, conn) -> dict:
         # For methods that accept credential data instead of credential ID
@@ -373,7 +373,7 @@ class AwsCredentialsHook(CredentialsBaseHook):
             "awsAccessKeyId": conn.login,
             "awsSecretAccessKey": conn.password,
         }
-        aws_session_token = conn.extra_dejson.get('aws_session_token', '')
+        aws_session_token = conn.extra_dejson.get("aws_session_token", "")
 
         if aws_session_token:
             # if AWS Session Token is not empty:
@@ -390,9 +390,9 @@ class AwsCredentialsHook(CredentialsBaseHook):
 
         return {
             "datarobot_connection": StringField(
-                lazy_gettext('DataRobot Connection'),
+                lazy_gettext("DataRobot Connection"),
                 widget=BS3TextFieldWidget(),
-                default='datarobot_default',
+                default="datarobot_default",
             ),
             "aws_session_token": StringField(
                 lazy_gettext("AWS session token"),
@@ -404,18 +404,18 @@ class AwsCredentialsHook(CredentialsBaseHook):
     def get_ui_field_behaviour() -> Dict:
         """Returns custom field behaviour."""
         return {
-            "hidden_fields": ['host', 'schema', 'port', 'extra'],
+            "hidden_fields": ["host", "schema", "port", "extra"],
             "relabeling": {
                 "login": "AWS Access Key ID",
                 "password": "AWS Secret Access Key",
             },
-            "placeholders": {'datarobot_connection': 'datarobot_default'},
+            "placeholders": {"datarobot_connection": "datarobot_default"},
         }
 
 
 class AzureStorageCredentialsHook(CredentialsBaseHook):
-    hook_name = 'DataRobot Azure Storage Credentials'
-    conn_type = 'datarobot.credentials.azure'
+    hook_name = "DataRobot Azure Storage Credentials"
+    conn_type = "datarobot.credentials.azure"
 
     def create_azure_connection_string(self, conn) -> str:
         if not conn.login:
@@ -451,7 +451,7 @@ class AzureStorageCredentialsHook(CredentialsBaseHook):
             )
             raise AirflowException(
                 f"Error creating Azure Credentials: {self.datarobot_credentials_conn_id}"
-            )
+            ) from None
 
     def update_credentials(self, conn, credential: Credential) -> None:
         """Updates Azure Storage credentials for params in connection object"""
@@ -467,7 +467,7 @@ class AzureStorageCredentialsHook(CredentialsBaseHook):
             )
             raise AirflowException(
                 f"Error updating Azure Storage Credentials: {self.datarobot_credentials_conn_id}"
-            )
+            ) from None
 
     def get_credential_data(self, conn) -> dict:
         # For methods that accept credential data instead of credential ID
@@ -489,9 +489,9 @@ class AzureStorageCredentialsHook(CredentialsBaseHook):
 
         return {
             "datarobot_connection": StringField(
-                lazy_gettext('DataRobot Connection'),
+                lazy_gettext("DataRobot Connection"),
                 widget=BS3TextFieldWidget(),
-                default='datarobot_default',
+                default="datarobot_default",
             ),
         }
 
@@ -499,18 +499,18 @@ class AzureStorageCredentialsHook(CredentialsBaseHook):
     def get_ui_field_behaviour() -> Dict:
         """Returns custom field behaviour."""
         return {
-            "hidden_fields": ['host', 'schema', 'port', 'extra'],
+            "hidden_fields": ["host", "schema", "port", "extra"],
             "relabeling": {
                 "login": "Azure Storage Account Name",
                 "password": "Azure Storage Account Key",
             },
-            "placeholders": {'datarobot_connection': 'datarobot_default'},
+            "placeholders": {"datarobot_connection": "datarobot_default"},
         }
 
 
 class OAuthCredentialsHook(CredentialsBaseHook):
-    hook_name = 'DataRobot OAuth Credentials'
-    conn_type = 'datarobot.credentials.oauth'
+    hook_name = "DataRobot OAuth Credentials"
+    conn_type = "datarobot.credentials.oauth"
 
     def create_credentials(self, conn) -> Credential:
         """Returns OAuth credentials for params in connection object"""
@@ -521,7 +521,7 @@ class OAuthCredentialsHook(CredentialsBaseHook):
         if not conn.password:
             raise AirflowException("OAuth Token is not defined")
 
-        refresh_token = conn.extra_dejson.get('refresh_token', '')
+        refresh_token = conn.extra_dejson.get("refresh_token", "")
         if not refresh_token:
             raise AirflowException("OAuth Refresh Token is not defined")
 
@@ -542,7 +542,7 @@ class OAuthCredentialsHook(CredentialsBaseHook):
             )
             raise AirflowException(
                 f"Error creating OAuth Credentials: {self.datarobot_credentials_conn_id}"
-            )
+            ) from None
 
     def update_credentials(self, conn, credential: Credential) -> None:
         """Updates OAuth credentials for params in connection object"""
@@ -550,7 +550,7 @@ class OAuthCredentialsHook(CredentialsBaseHook):
         if not conn.password:
             raise AirflowException("OAuth Token is not defined")
 
-        refresh_token = conn.extra_dejson.get('refresh_token', '')
+        refresh_token = conn.extra_dejson.get("refresh_token", "")
         if not refresh_token:
             raise AirflowException("OAuth Refresh Token is not defined")
 
@@ -569,13 +569,13 @@ class OAuthCredentialsHook(CredentialsBaseHook):
             )
             raise AirflowException(
                 f"Error updating OAuth Credentials: {self.datarobot_credentials_conn_id}"
-            )
+            ) from None
 
     def get_credential_data(self, conn) -> dict:
         # For methods that accept credential data instead of credential ID
         credential_data = {
             "credentialType": "oauth",
-            "oauthRefreshToken": conn.extra_dejson.get('refresh_token', ''),
+            "oauthRefreshToken": conn.extra_dejson.get("refresh_token", ""),
             "oauthClientId": conn.login,
             "oauthClientSecret": conn.password,
         }
@@ -595,9 +595,9 @@ class OAuthCredentialsHook(CredentialsBaseHook):
                 widget=BS3PasswordFieldWidget(),
             ),
             "datarobot_connection": StringField(
-                lazy_gettext('DataRobot Connection'),
+                lazy_gettext("DataRobot Connection"),
                 widget=BS3TextFieldWidget(),
-                default='datarobot_default',
+                default="datarobot_default",
             ),
         }
 
@@ -605,10 +605,10 @@ class OAuthCredentialsHook(CredentialsBaseHook):
     def get_ui_field_behaviour() -> Dict:
         """Returns custom field behaviour."""
         return {
-            "hidden_fields": ['host', 'schema', 'port', 'extra'],
+            "hidden_fields": ["host", "schema", "port", "extra"],
             "relabeling": {
                 "login": "OAuth Client Id",
                 "password": "OAuth Token",
             },
-            "placeholders": {'datarobot_connection': 'datarobot_default'},
+            "placeholders": {"datarobot_connection": "datarobot_default"},
         }

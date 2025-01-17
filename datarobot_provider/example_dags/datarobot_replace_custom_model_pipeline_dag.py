@@ -23,15 +23,15 @@ from datarobot_provider.operators.deployment import ReplaceModelOperator
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'custom model'],
+    tags=["example", "custom model"],
     params={
         "programming_language": "python",
         "required_metadata_keys": [],
-        "custom_model_description": 'This is a custom model created by Airflow',
+        "custom_model_description": "This is a custom model created by Airflow",
         "environment_version_description": "created by Airflow provider",
         "custom_model_name": "Airflow Custom model Demo",
         "target_type": TARGET_TYPE.REGRESSION,
-        "target_name": 'Grade 2014',
+        "target_name": "Grade 2014",
         "is_major_update": True,
         "is_training_data_for_versions_permanently_enabled": True,
         "docker_context_path": "/usr/local/airflow/dags/datarobot-user-models/public_dropin_environments/python3_pytorch/",
@@ -48,32 +48,32 @@ def update_custom_model_pipeline(
     deployment_id="650d90d1c03bf7a69afdda85",
 ):
     create_custom_model_version_op = CreateCustomModelVersionOperator(
-        task_id='create_custom_model_version',
+        task_id="create_custom_model_version",
         custom_model_id=custom_inference_model_id,
         base_environment_id=execution_environment_id,
         training_dataset_id=train_dataset_id,
     )
 
     custom_model_test_op = CustomModelTestOperator(
-        task_id='custom_model_test',
+        task_id="custom_model_test",
         custom_model_id=custom_inference_model_id,
         custom_model_version_id=create_custom_model_version_op.output,
         dataset_id=test_dataset_id,
     )
 
     custom_model_test_overall_status_op = GetCustomModelTestOverallStatusOperator(
-        task_id='custom_model_test_overall_status',
+        task_id="custom_model_test_overall_status",
         custom_model_test_id=custom_model_test_op.output,
     )
 
     def choose_branch(custom_model_test_overall_status):
         if custom_model_test_overall_status == "succeeded":
-            return ['replace_deployment_model']
+            return ["replace_deployment_model"]
         else:
-            return ['model_replacement_fail']
+            return ["model_replacement_fail"]
 
     branching = BranchPythonOperator(
-        task_id='if_tests_succeed',
+        task_id="if_tests_succeed",
         python_callable=choose_branch,
         op_args=[
             custom_model_test_overall_status_op.output,
@@ -81,7 +81,7 @@ def update_custom_model_pipeline(
     )
 
     handle_model_replacement_fail_op = EmptyOperator(
-        task_id='model_replacement_fail',
+        task_id="model_replacement_fail",
     )
 
     replace_deployment_model_op = ReplaceModelOperator(

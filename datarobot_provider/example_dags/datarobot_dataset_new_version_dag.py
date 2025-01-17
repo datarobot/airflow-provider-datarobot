@@ -14,6 +14,7 @@ Config example for this dag:
     "table_name": "actuals_demo",
 }
 """
+
 from datetime import datetime
 
 from airflow.decorators import dag
@@ -27,7 +28,7 @@ from datarobot_provider.operators.credentials import GetOrCreateCredentialOperat
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'mlops'],
+    tags=["example", "mlops"],
     # Default json config example:
     params={
         "datarobot_jdbc_connection": "datarobot_jdbc_demo",

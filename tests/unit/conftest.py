@@ -51,9 +51,9 @@ def dr_basic_credentials_conn_details():
 @pytest.fixture()
 def mock_datarobot_basic_credentials(mocker):
     credentials_create_mock = mocker.Mock(
-        credential_id='test-credentials-id',
-        name='datarobot_basic_credentials_test',
-        credential_type='basic',
+        credential_id="test-credentials-id",
+        name="datarobot_basic_credentials_test",
+        credential_type="basic",
         description="Credentials managed by Airflow provider for Datarobot",
     )
 
@@ -93,9 +93,9 @@ def dr_gcp_credentials_conn_details():
 @pytest.fixture()
 def mock_datarobot_gcp_credentials(mocker):
     gcp_credentials_create_mock = mocker.Mock(
-        credential_id='test-gcp-credentials-id',
-        name='datarobot_gcp_credentials_test',
-        credential_type='gcp',
+        credential_id="test-gcp-credentials-id",
+        name="datarobot_gcp_credentials_test",
+        credential_type="gcp",
         description="Credentials managed by Airflow provider for Datarobot",
     )
 
@@ -136,9 +136,9 @@ def dr_aws_credentials_conn_details():
 @pytest.fixture()
 def mock_datarobot_aws_credentials(mocker):
     aws_credentials_create_mock = mocker.Mock(
-        credential_id='test-aws-credentials-id',
-        name='datarobot_aws_credentials_test',
-        credential_type='s3',
+        credential_id="test-aws-credentials-id",
+        name="datarobot_aws_credentials_test",
+        credential_type="s3",
         description="Credentials managed by Airflow provider for Datarobot",
     )
 
@@ -182,9 +182,9 @@ def dr_azure_credentials_conn_details():
 @pytest.fixture()
 def mock_datarobot_azure_credentials(mocker):
     azure_credentials_create_mock = mocker.Mock(
-        credential_id='test-azure-credentials-id',
-        name='datarobot_azure_credentials_test',
-        credential_type='azure',
+        credential_id="test-azure-credentials-id",
+        name="datarobot_azure_credentials_test",
+        credential_type="azure",
         description="Credentials managed by Airflow provider for Datarobot",
     )
 
@@ -226,9 +226,9 @@ def dr_oauth_credentials_conn_details():
 @pytest.fixture()
 def mock_datarobot_oauth_credentials(mocker):
     oauth_credentials_create_mock = mocker.Mock(
-        credential_id='test-oauth-credentials-id',
-        name='datarobot_oauth_credentials_test',
-        credential_type='oauth',
+        credential_id="test-oauth-credentials-id",
+        name="datarobot_oauth_credentials_test",
+        credential_type="oauth",
         description="Credentials managed by Airflow provider for Datarobot",
     )
 
@@ -273,8 +273,8 @@ def dr_jdbc_conn_details():
 def mock_datarobot_driver(mocker):
     driver_list_mock = [
         mocker.Mock(
-            id='test-jdbc-driver-id',
-            canonical_name='test JDBC Driver',
+            id="test-jdbc-driver-id",
+            canonical_name="test JDBC Driver",
         )
     ]
 
@@ -286,10 +286,10 @@ def mock_datarobot_driver(mocker):
 @pytest.fixture()
 def mock_datarobot_datastore(mocker, dr_jdbc_conn_details, mock_datarobot_driver):
     datastore_create_mock = mocker.Mock(
-        id='test-datastore-id',
-        canonical_name='datarobot_test_connection_jdbc_test',
+        id="test-datastore-id",
+        canonical_name="datarobot_test_connection_jdbc_test",
         params=mocker.Mock(
-            driver_id='test-jdbc-driver-id', jdbc_url=dr_jdbc_conn_details["jdbc_url"]
+            driver_id="test-jdbc-driver-id", jdbc_url=dr_jdbc_conn_details["jdbc_url"]
         ),
     )
 

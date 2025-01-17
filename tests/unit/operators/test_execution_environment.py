@@ -31,7 +31,7 @@ def test_operator_create_execution_environment(mocker, execution_environment_par
     )
 
     operator = CreateExecutionEnvironmentOperator(
-        task_id='create_execution_environment',
+        task_id="create_execution_environment",
     )
 
     operator_result = operator.execute(context={"params": execution_environment_params})
@@ -68,7 +68,7 @@ def test_operator_create_execution_environment_version(
     )
 
     operator = CreateExecutionEnvironmentVersionOperator(
-        task_id='create_execution_environment_version',
+        task_id="create_execution_environment_version",
         execution_environment_id=execution_environment_version_id,
         max_wait_sec=max_wait_sec,
     )

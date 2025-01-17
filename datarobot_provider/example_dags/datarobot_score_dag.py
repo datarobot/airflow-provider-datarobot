@@ -21,6 +21,7 @@ Config example for this dag:
     }
 }
 """
+
 from datetime import datetime
 
 from airflow.decorators import dag
@@ -32,7 +33,7 @@ from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
 @dag(
     schedule=None,
     start_date=datetime(2022, 1, 1),
-    tags=['example'],
+    tags=["example"],
 )
 def datarobot_score(deployment_id=None):
     if not deployment_id:

@@ -11,6 +11,7 @@ Config example for this dag:
     "dataset_file_path": "/tests/integration/datasets/titanic.csv",
 }
 """
+
 from datetime import datetime
 
 from airflow.decorators import dag
@@ -21,7 +22,7 @@ from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 @dag(
     schedule=None,
     start_date=datetime(2022, 1, 1),
-    tags=['example'],
+    tags=["example"],
     params={"dataset_file_path": "./titanic.csv"},
 )
 def datarobot_dataset_uploading():

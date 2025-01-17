@@ -210,14 +210,14 @@ class UpdateMonitoringSettingsOperator(BaseOperator):
         current_drift_tracking_settings = deployment.get_drift_tracking_settings()
 
         target_drift_enabled = context["params"].get(
-            "target_drift_enabled", current_drift_tracking_settings['target_drift']['enabled']
+            "target_drift_enabled", current_drift_tracking_settings["target_drift"]["enabled"]
         )
         feature_drift_enabled = context["params"].get(
-            "feature_drift_enabled", current_drift_tracking_settings['feature_drift']['enabled']
+            "feature_drift_enabled", current_drift_tracking_settings["feature_drift"]["enabled"]
         )
 
-        if (target_drift_enabled != current_drift_tracking_settings['target_drift']['enabled']) or (
-            feature_drift_enabled != current_drift_tracking_settings['feature_drift']['enabled']
+        if (target_drift_enabled != current_drift_tracking_settings["target_drift"]["enabled"]) or (
+            feature_drift_enabled != current_drift_tracking_settings["feature_drift"]["enabled"]
         ):
             self.log.debug(
                 f"Trying to update drift settings for deployment_id={self.deployment_id}"
@@ -237,16 +237,16 @@ class UpdateMonitoringSettingsOperator(BaseOperator):
         current_association_id_settings = deployment.get_association_id_settings()
 
         association_id_column = context["params"].get(
-            "association_id_column", current_association_id_settings['column_names']
+            "association_id_column", current_association_id_settings["column_names"]
         )
         required_in_prediction_requests = context["params"].get(
             "required_association_id",
-            current_association_id_settings['required_in_prediction_requests'],
+            current_association_id_settings["required_in_prediction_requests"],
         )
 
-        if (association_id_column != current_association_id_settings['column_names']) or (
+        if (association_id_column != current_association_id_settings["column_names"]) or (
             required_in_prediction_requests
-            != current_association_id_settings['required_in_prediction_requests']
+            != current_association_id_settings["required_in_prediction_requests"]
         ):
             deployment.update_association_id_settings(
                 column_names=association_id_column,

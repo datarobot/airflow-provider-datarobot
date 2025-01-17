@@ -18,7 +18,7 @@ from datarobot_provider.sensors.model_training import ModelTrainingJobSensor
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'dataset'],
+    tags=["example", "dataset"],
 )
 def train_model(
     project_id=None,
