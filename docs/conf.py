@@ -1,5 +1,5 @@
 #
-# Copyright 2021 DataRobot, Inc. and its affiliates.
+# Copyright 2025 DataRobot, Inc. and its affiliates.
 #
 # All rights reserved.
 #
@@ -10,7 +10,7 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 #
-# DataRobot Python API documentation build configuration file, created by
+# DataRobot Airflow documentation build configuration file, created by
 # sphinx-quickstart on Mon Mar 16 10:50:19 2015.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -346,7 +346,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ("index", "datarobotpython", "DataRobot Python API Documentation", ["DataRobot, Inc."], 1)
+    ("index", "datarobotairflow", "DataRobot Airflow Documentation", ["DataRobot, Inc."], 1)
 ]
 
 # If true, show URL addresses after external links.
