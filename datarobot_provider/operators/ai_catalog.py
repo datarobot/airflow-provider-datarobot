@@ -6,13 +6,12 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 import logging
-
 from typing import Any
 from typing import Dict
-from typing import Iterable, Optional
+from typing import Iterable
+from typing import Optional
 
 import datarobot as dr
-from datarobot.models.recipe import Recipe
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 
@@ -310,12 +309,12 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
             )
 
     def _get_dataset_name(
-            self, context: Dict[str, Any],
-            materialization_destination: Optional[dr.models.dataset.MaterializationDestination],
+        self,
+        context: Dict[str, Any],
+        materialization_destination: Optional[dr.models.dataset.MaterializationDestination],
     ):
-        return (
-            context["params"].get(self.dataset_name_param)
-            or (materialization_destination and materialization_destination['table'])
+        return context["params"].get(self.dataset_name_param) or (
+            materialization_destination and materialization_destination['table']
         )
 
     def execute(self, context: Dict[str, Any]) -> str:
