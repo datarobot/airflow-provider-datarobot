@@ -47,7 +47,7 @@ create-astro-dev:
 	echo "RUN pip install -r \"/usr/local/airflow/requirements_dev.txt\"" >> ./astro-dev/Dockerfile
 
 clean-astro-dev:
-	$(MAKE) stop-astro-dev
+	-$(MAKE) stop-astro-dev
 	rm -rf astro-dev
 	$(MAKE) create-astro-dev
 
@@ -58,12 +58,14 @@ stop-astro-dev:
 	cd astro-dev && astro dev stop
 
 build-astro-dev:
-	$(MAKE) stop-astro-dev
+	-$(MAKE) stop-astro-dev
 	rm -rf ./dist
 	pip install --upgrade build
 	python -m build
-	cp -r ./datarobot_provider/example_dags/* ./astro-dev/dags/
 	cp -p "`ls -dtr1 ./dist/*.whl | sort -n | tail -1`" "./astro-dev/"
 	echo "/usr/local/airflow/`find ./dist/*.whl -exec basename {} \; | sort -n | tail -1`" > \
  		./astro-dev/requirements_dev.txt
 	$(MAKE) start-astro-dev
+
+copy-examples-astro-dev:
+	cp -r ./datarobot_provider/example_dags/* ./astro-dev/dags/
