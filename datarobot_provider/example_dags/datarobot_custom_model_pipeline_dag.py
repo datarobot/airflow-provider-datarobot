@@ -15,15 +15,13 @@ from datarobot import TARGET_TYPE
 from datarobot.enums import DEPLOYMENT_IMPORTANCE
 
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
-from datarobot_provider.operators.custom_models import (
-    CreateCustomInferenceModelOperator,
-    CreateCustomModelDeploymentOperator,
-    CreateCustomModelVersionOperator,
-    CreateExecutionEnvironmentOperator,
-    CreateExecutionEnvironmentVersionOperator,
-    CustomModelTestOperator,
-    GetCustomModelTestOverallStatusOperator,
-)
+from datarobot_provider.operators.custom_models import CreateCustomInferenceModelOperator
+from datarobot_provider.operators.custom_models import CreateCustomModelDeploymentOperator
+from datarobot_provider.operators.custom_models import CreateCustomModelVersionOperator
+from datarobot_provider.operators.custom_models import CreateExecutionEnvironmentOperator
+from datarobot_provider.operators.custom_models import CreateExecutionEnvironmentVersionOperator
+from datarobot_provider.operators.custom_models import CustomModelTestOperator
+from datarobot_provider.operators.custom_models import GetCustomModelTestOverallStatusOperator
 
 
 @dag(

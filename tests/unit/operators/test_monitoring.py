@@ -9,15 +9,14 @@ from datetime import datetime
 
 import datarobot as dr
 import pytest
-from datarobot.models.deployment import Accuracy, ServiceStats
+from datarobot.models.deployment import Accuracy
+from datarobot.models.deployment import ServiceStats
 
-from datarobot_provider.operators.monitoring import (
-    GetAccuracyOperator,
-    GetMonitoringSettingsOperator,
-    GetServiceStatsOperator,
-    UpdateMonitoringSettingsOperator,
-    _serialize_metrics,
-)
+from datarobot_provider.operators.monitoring import GetAccuracyOperator
+from datarobot_provider.operators.monitoring import GetMonitoringSettingsOperator
+from datarobot_provider.operators.monitoring import GetServiceStatsOperator
+from datarobot_provider.operators.monitoring import UpdateMonitoringSettingsOperator
+from datarobot_provider.operators.monitoring import _serialize_metrics
 
 
 @pytest.fixture

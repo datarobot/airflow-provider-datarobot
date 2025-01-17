@@ -7,12 +7,11 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from datetime import datetime
 
-from airflow.decorators import dag, task
+from airflow.decorators import dag
+from airflow.decorators import task
 
-from datarobot_provider.operators.monitoring import (
-    GetMonitoringSettingsOperator,
-    UpdateMonitoringSettingsOperator,
-)
+from datarobot_provider.operators.monitoring import GetMonitoringSettingsOperator
+from datarobot_provider.operators.monitoring import UpdateMonitoringSettingsOperator
 
 
 @dag(

@@ -5,9 +5,12 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from typing import Any, Dict, Union
+from typing import Any
+from typing import Dict
+from typing import Union
 
-from airflow.sensors.base import BaseSensorOperator, PokeReturnValue
+from airflow.sensors.base import BaseSensorOperator
+from airflow.sensors.base import PokeReturnValue
 from datarobot import Job
 from datarobot.errors import AsyncProcessUnsuccessfulError
 

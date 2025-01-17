@@ -8,13 +8,11 @@
 
 import datarobot as dr
 
-from datarobot_provider.operators.ai_catalog import (
-    CreateDatasetFromDataStoreOperator,
-    CreateDatasetVersionOperator,
-    CreateOrUpdateDataSourceOperator,
-    UpdateDatasetFromFileOperator,
-    UploadDatasetOperator,
-)
+from datarobot_provider.operators.ai_catalog import CreateDatasetFromDataStoreOperator
+from datarobot_provider.operators.ai_catalog import CreateDatasetVersionOperator
+from datarobot_provider.operators.ai_catalog import CreateOrUpdateDataSourceOperator
+from datarobot_provider.operators.ai_catalog import UpdateDatasetFromFileOperator
+from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 
 
 def test_operator_upload_dataset(mocker):

@@ -10,6 +10,8 @@ import datarobot as dr
 
 from datarobot_provider.operators.prediction_explanations import (
     ComputePredictionExplanationsOperator,
+)
+from datarobot_provider.operators.prediction_explanations import (
     PredictionExplanationsInitializationOperator,
 )
 

@@ -29,9 +29,8 @@ ignore = [
     "C901",  # Method is too complex
 ]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 force-single-line = true
-filter_files = true
 
 [tool.ruff.format]
 quote-style = "double"

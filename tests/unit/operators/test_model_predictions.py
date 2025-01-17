@@ -8,10 +8,8 @@
 
 import datarobot as dr
 
-from datarobot_provider.operators.model_predictions import (
-    AddExternalDatasetOperator,
-    RequestModelPredictionsOperator,
-)
+from datarobot_provider.operators.model_predictions import AddExternalDatasetOperator
+from datarobot_provider.operators.model_predictions import RequestModelPredictionsOperator
 
 
 def test_operator_add_external_dataset(mocker):

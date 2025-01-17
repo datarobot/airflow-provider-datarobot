@@ -10,10 +10,8 @@ import os
 import datarobot as dr
 import pytest
 
-from datarobot_provider.operators.scoring_code import (
-    DownloadDeploymentScoringCodeOperator,
-    DownloadModelScoringCodeOperator,
-)
+from datarobot_provider.operators.scoring_code import DownloadDeploymentScoringCodeOperator
+from datarobot_provider.operators.scoring_code import DownloadModelScoringCodeOperator
 
 
 @pytest.fixture

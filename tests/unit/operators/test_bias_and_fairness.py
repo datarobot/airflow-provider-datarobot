@@ -9,10 +9,8 @@
 import datarobot as dr
 import pytest
 
-from datarobot_provider.operators.bias_and_fairness import (
-    GetBiasAndFairnessSettingsOperator,
-    UpdateBiasAndFairnessSettingsOperator,
-)
+from datarobot_provider.operators.bias_and_fairness import GetBiasAndFairnessSettingsOperator
+from datarobot_provider.operators.bias_and_fairness import UpdateBiasAndFairnessSettingsOperator
 
 
 @pytest.fixture

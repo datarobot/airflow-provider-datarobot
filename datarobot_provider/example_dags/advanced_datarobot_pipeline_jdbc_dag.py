@@ -7,28 +7,26 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from datetime import datetime
 
-from airflow.decorators import dag, task
+from airflow.decorators import dag
+from airflow.decorators import task
 
 from datarobot_provider.operators.ai_catalog import CreateDatasetFromDataStoreOperator
 from datarobot_provider.operators.bias_and_fairness import UpdateBiasAndFairnessSettingsOperator
 from datarobot_provider.operators.connections import GetOrCreateDataStoreOperator
 from datarobot_provider.operators.credentials import GetOrCreateCredentialOperator
-from datarobot_provider.operators.datarobot import (
-    CreateProjectOperator,
-    DeployRecommendedModelOperator,
-    GetFeatureDriftOperator,
-    GetTargetDriftOperator,
-    ScorePredictionsOperator,
-    TrainModelsOperator,
-)
-from datarobot_provider.operators.monitoring import (
-    GetAccuracyOperator,
-    GetServiceStatsOperator,
-    UpdateMonitoringSettingsOperator,
-)
+from datarobot_provider.operators.datarobot import CreateProjectOperator
+from datarobot_provider.operators.datarobot import DeployRecommendedModelOperator
+from datarobot_provider.operators.datarobot import GetFeatureDriftOperator
+from datarobot_provider.operators.datarobot import GetTargetDriftOperator
+from datarobot_provider.operators.datarobot import ScorePredictionsOperator
+from datarobot_provider.operators.datarobot import TrainModelsOperator
+from datarobot_provider.operators.monitoring import GetAccuracyOperator
+from datarobot_provider.operators.monitoring import GetServiceStatsOperator
+from datarobot_provider.operators.monitoring import UpdateMonitoringSettingsOperator
 from datarobot_provider.operators.monitoring_job import BatchMonitoringOperator
 from datarobot_provider.operators.segment_analysis import UpdateSegmentAnalysisSettingsOperator
-from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor, ScoringCompleteSensor
+from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
+from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
 from datarobot_provider.sensors.monitoring_job import MonitoringJobCompleteSensor
 
 

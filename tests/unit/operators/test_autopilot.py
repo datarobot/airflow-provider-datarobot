@@ -7,7 +7,8 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 
 import datarobot as dr
-from datarobot.enums import CV_METHOD, VALIDATION_TYPE
+from datarobot.enums import CV_METHOD
+from datarobot.enums import VALIDATION_TYPE
 
 from datarobot_provider.operators.autopilot import StartAutopilotOperator
 

@@ -10,10 +10,8 @@ from datetime import datetime
 from airflow.decorators import dag
 from airflow.operators.python import BranchPythonOperator
 
-from datarobot_provider.operators.deployment import (
-    ActivateDeploymentOperator,
-    GetDeploymentStatusOperator,
-)
+from datarobot_provider.operators.deployment import ActivateDeploymentOperator
+from datarobot_provider.operators.deployment import GetDeploymentStatusOperator
 
 
 @dag(

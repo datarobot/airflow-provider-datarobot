@@ -9,10 +9,8 @@ from datetime import datetime
 
 from airflow.decorators import dag
 
-from datarobot_provider.operators.model_insights import (
-    ComputeFeatureEffectsOperator,
-    ComputeFeatureImpactOperator,
-)
+from datarobot_provider.operators.model_insights import ComputeFeatureEffectsOperator
+from datarobot_provider.operators.model_insights import ComputeFeatureImpactOperator
 from datarobot_provider.sensors.model_insights import DataRobotJobSensor
 
 

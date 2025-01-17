@@ -10,18 +10,17 @@ from datetime import datetime
 import datarobot as dr
 import pytest
 from airflow.exceptions import AirflowFailException
-from datarobot.models.deployment.data_drift import FeatureDrift, TargetDrift
+from datarobot.models.deployment.data_drift import FeatureDrift
+from datarobot.models.deployment.data_drift import TargetDrift
 
-from datarobot_provider.operators.datarobot import (
-    CreateProjectOperator,
-    DeployModelOperator,
-    DeployRecommendedModelOperator,
-    GetFeatureDriftOperator,
-    GetTargetDriftOperator,
-    ScorePredictionsOperator,
-    TrainModelsOperator,
-    _serialize_drift,
-)
+from datarobot_provider.operators.datarobot import CreateProjectOperator
+from datarobot_provider.operators.datarobot import DeployModelOperator
+from datarobot_provider.operators.datarobot import DeployRecommendedModelOperator
+from datarobot_provider.operators.datarobot import GetFeatureDriftOperator
+from datarobot_provider.operators.datarobot import GetTargetDriftOperator
+from datarobot_provider.operators.datarobot import ScorePredictionsOperator
+from datarobot_provider.operators.datarobot import TrainModelsOperator
+from datarobot_provider.operators.datarobot import _serialize_drift
 
 
 def test_operator_create_project(mocker):

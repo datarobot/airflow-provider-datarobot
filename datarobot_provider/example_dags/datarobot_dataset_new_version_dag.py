@@ -19,10 +19,8 @@ from datetime import datetime
 
 from airflow.decorators import dag
 
-from datarobot_provider.operators.ai_catalog import (
-    CreateDatasetVersionOperator,
-    CreateOrUpdateDataSourceOperator,
-)
+from datarobot_provider.operators.ai_catalog import CreateDatasetVersionOperator
+from datarobot_provider.operators.ai_catalog import CreateOrUpdateDataSourceOperator
 from datarobot_provider.operators.connections import GetOrCreateDataStoreOperator
 from datarobot_provider.operators.credentials import GetOrCreateCredentialOperator
 

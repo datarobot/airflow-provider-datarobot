@@ -7,16 +7,13 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from datetime import datetime
 
-from airflow.decorators import dag, task
+from airflow.decorators import dag
+from airflow.decorators import task
 
-from datarobot_provider.operators.bias_and_fairness import (
-    GetBiasAndFairnessSettingsOperator,
-    UpdateBiasAndFairnessSettingsOperator,
-)
-from datarobot_provider.operators.segment_analysis import (
-    GetSegmentAnalysisSettingsOperator,
-    UpdateSegmentAnalysisSettingsOperator,
-)
+from datarobot_provider.operators.bias_and_fairness import GetBiasAndFairnessSettingsOperator
+from datarobot_provider.operators.bias_and_fairness import UpdateBiasAndFairnessSettingsOperator
+from datarobot_provider.operators.segment_analysis import GetSegmentAnalysisSettingsOperator
+from datarobot_provider.operators.segment_analysis import UpdateSegmentAnalysisSettingsOperator
 
 
 @dag(

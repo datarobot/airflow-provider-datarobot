@@ -9,10 +9,8 @@
 import datarobot as dr
 import pytest
 
-from datarobot_provider.operators.segment_analysis import (
-    GetSegmentAnalysisSettingsOperator,
-    UpdateSegmentAnalysisSettingsOperator,
-)
+from datarobot_provider.operators.segment_analysis import GetSegmentAnalysisSettingsOperator
+from datarobot_provider.operators.segment_analysis import UpdateSegmentAnalysisSettingsOperator
 
 
 @pytest.fixture

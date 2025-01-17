@@ -5,7 +5,8 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from typing import Any, Dict
+from typing import Any
+from typing import Dict
 
 from airflow import AirflowException
 from datarobot import Credential
@@ -28,7 +29,8 @@ class JDBCDataSourceHook(BasicCredentialsHook):
     @staticmethod
     def get_connection_form_widgets() -> Dict[str, Any]:
         """Returns connection widgets to add to connection form."""
-        from flask_appbuilder.fieldwidgets import BS3TextAreaFieldWidget, BS3TextFieldWidget
+        from flask_appbuilder.fieldwidgets import BS3TextAreaFieldWidget
+        from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
         from flask_babel import lazy_gettext
         from wtforms import StringField
 

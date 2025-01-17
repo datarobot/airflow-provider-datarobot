@@ -5,10 +5,13 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from typing import Any, Dict, Iterable
+from typing import Any
+from typing import Dict
+from typing import Iterable
 
 import datarobot as dr
-from airflow.exceptions import AirflowException, AirflowFailException
+from airflow.exceptions import AirflowException
+from airflow.exceptions import AirflowFailException
 from airflow.models import BaseOperator
 from datarobot.utils.waiters import wait_for_async_resolution
 

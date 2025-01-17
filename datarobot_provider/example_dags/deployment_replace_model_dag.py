@@ -7,10 +7,12 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from datetime import datetime
 
-from airflow.decorators import dag, task
+from airflow.decorators import dag
+from airflow.decorators import task
 from datarobot.enums import MODEL_REPLACEMENT_REASON
 
-from datarobot_provider.operators.deployment import GetDeploymentModelOperator, ReplaceModelOperator
+from datarobot_provider.operators.deployment import GetDeploymentModelOperator
+from datarobot_provider.operators.deployment import ReplaceModelOperator
 
 
 @dag(

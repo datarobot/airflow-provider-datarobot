@@ -5,9 +5,12 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from typing import Any, Dict, Iterable
+from typing import Any
+from typing import Dict
+from typing import Iterable
 
-from airflow.exceptions import AirflowException, AirflowNotFoundException
+from airflow.exceptions import AirflowException
+from airflow.exceptions import AirflowNotFoundException
 from airflow.models import BaseOperator
 
 from datarobot_provider.hooks.connections import JDBCDataSourceHook

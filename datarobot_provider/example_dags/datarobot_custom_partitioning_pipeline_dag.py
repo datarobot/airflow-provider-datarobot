@@ -9,7 +9,8 @@ from datetime import datetime
 
 from airflow.decorators import dag
 from datarobot import AUTOPILOT_MODE
-from datarobot.enums import CV_METHOD, VALIDATION_TYPE
+from datarobot.enums import CV_METHOD
+from datarobot.enums import VALIDATION_TYPE
 
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 from datarobot_provider.operators.autopilot import StartAutopilotOperator

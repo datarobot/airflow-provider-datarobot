@@ -8,15 +8,14 @@
 
 import datarobot as dr
 import pytest
-from datarobot import NETWORK_EGRESS_POLICY, TARGET_TYPE
+from datarobot import NETWORK_EGRESS_POLICY
+from datarobot import TARGET_TYPE
 
-from datarobot_provider.operators.custom_models import (
-    CreateCustomInferenceModelOperator,
-    CreateCustomModelDeploymentOperator,
-    CreateCustomModelVersionOperator,
-    CustomModelTestOperator,
-    GetCustomModelTestOverallStatusOperator,
-)
+from datarobot_provider.operators.custom_models import CreateCustomInferenceModelOperator
+from datarobot_provider.operators.custom_models import CreateCustomModelDeploymentOperator
+from datarobot_provider.operators.custom_models import CreateCustomModelVersionOperator
+from datarobot_provider.operators.custom_models import CustomModelTestOperator
+from datarobot_provider.operators.custom_models import GetCustomModelTestOverallStatusOperator
 
 
 @pytest.fixture

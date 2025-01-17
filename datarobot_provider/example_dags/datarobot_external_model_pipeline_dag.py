@@ -12,10 +12,8 @@ from airflow.decorators import dag
 from datarobot import TARGET_TYPE
 from datarobot.enums import DEPLOYMENT_IMPORTANCE
 
-from datarobot_provider.operators.model_package import (
-    CreateExternalModelPackageOperator,
-    DeployModelPackageOperator,
-)
+from datarobot_provider.operators.model_package import CreateExternalModelPackageOperator
+from datarobot_provider.operators.model_package import DeployModelPackageOperator
 from datarobot_provider.operators.monitoring import UpdateMonitoringSettingsOperator
 
 """

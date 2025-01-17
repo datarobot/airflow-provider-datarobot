@@ -9,11 +9,9 @@
 import datarobot as dr
 import pytest
 
-from datarobot_provider.operators.feature_discovery import (
-    DatasetDefinitionOperator,
-    DatasetRelationshipOperator,
-    RelationshipsConfigurationOperator,
-)
+from datarobot_provider.operators.feature_discovery import DatasetDefinitionOperator
+from datarobot_provider.operators.feature_discovery import DatasetRelationshipOperator
+from datarobot_provider.operators.feature_discovery import RelationshipsConfigurationOperator
 
 
 @pytest.fixture

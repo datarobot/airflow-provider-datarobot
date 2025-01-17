@@ -12,11 +12,9 @@ from datarobot import AUTOPILOT_MODE
 
 from datarobot_provider.operators.autopilot import StartAutopilotOperator
 from datarobot_provider.operators.datarobot import CreateProjectOperator
-from datarobot_provider.operators.feature_discovery import (
-    DatasetDefinitionOperator,
-    DatasetRelationshipOperator,
-    RelationshipsConfigurationOperator,
-)
+from datarobot_provider.operators.feature_discovery import DatasetDefinitionOperator
+from datarobot_provider.operators.feature_discovery import DatasetRelationshipOperator
+from datarobot_provider.operators.feature_discovery import RelationshipsConfigurationOperator
 from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
 
 

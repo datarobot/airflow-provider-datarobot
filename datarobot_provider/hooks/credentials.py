@@ -7,7 +7,8 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 
 import json
-from typing import Any, Dict
+from typing import Any
+from typing import Dict
 
 from airflow import AirflowException
 from airflow.hooks.base import BaseHook
@@ -268,7 +269,8 @@ class GoogleCloudCredentialsHook(CredentialsBaseHook):
     @staticmethod
     def get_connection_form_widgets() -> Dict[str, Any]:
         """Returns connection widgets to add to connection form."""
-        from flask_appbuilder.fieldwidgets import BS3PasswordFieldWidget, BS3TextFieldWidget
+        from flask_appbuilder.fieldwidgets import BS3PasswordFieldWidget
+        from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
         from flask_babel import lazy_gettext
         from wtforms import StringField
 
@@ -381,7 +383,8 @@ class AwsCredentialsHook(CredentialsBaseHook):
     @staticmethod
     def get_connection_form_widgets() -> Dict[str, Any]:
         """Returns connection widgets to add to connection form."""
-        from flask_appbuilder.fieldwidgets import BS3TextAreaFieldWidget, BS3TextFieldWidget
+        from flask_appbuilder.fieldwidgets import BS3TextAreaFieldWidget
+        from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
         from flask_babel import lazy_gettext
         from wtforms import StringField
 
@@ -581,7 +584,8 @@ class OAuthCredentialsHook(CredentialsBaseHook):
     @staticmethod
     def get_connection_form_widgets() -> Dict[str, Any]:
         """Returns connection widgets to add to connection form."""
-        from flask_appbuilder.fieldwidgets import BS3PasswordFieldWidget, BS3TextFieldWidget
+        from flask_appbuilder.fieldwidgets import BS3PasswordFieldWidget
+        from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
         from flask_babel import lazy_gettext
         from wtforms import StringField
 

@@ -7,14 +7,13 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from datetime import datetime
 
-from airflow.decorators import dag, task
+from airflow.decorators import dag
+from airflow.decorators import task
 from datarobot import PredictJob
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
-from datarobot_provider.operators.model_predictions import (
-    AddExternalDatasetOperator,
-    RequestModelPredictionsOperator,
-)
+from datarobot_provider.operators.model_predictions import AddExternalDatasetOperator
+from datarobot_provider.operators.model_predictions import RequestModelPredictionsOperator
 from datarobot_provider.sensors.model_insights import DataRobotJobSensor
 
 

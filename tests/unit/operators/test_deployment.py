@@ -11,12 +11,10 @@ import datarobot as dr
 import pytest
 from airflow.exceptions import AirflowFailException
 
-from datarobot_provider.operators.deployment import (
-    ActivateDeploymentOperator,
-    GetDeploymentModelOperator,
-    GetDeploymentStatusOperator,
-    ReplaceModelOperator,
-)
+from datarobot_provider.operators.deployment import ActivateDeploymentOperator
+from datarobot_provider.operators.deployment import GetDeploymentModelOperator
+from datarobot_provider.operators.deployment import GetDeploymentStatusOperator
+from datarobot_provider.operators.deployment import ReplaceModelOperator
 
 
 @pytest.fixture

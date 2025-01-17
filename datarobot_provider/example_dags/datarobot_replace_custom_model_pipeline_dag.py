@@ -14,11 +14,9 @@ from airflow.operators.python import BranchPythonOperator
 from datarobot import TARGET_TYPE
 from datarobot.enums import MODEL_REPLACEMENT_REASON
 
-from datarobot_provider.operators.custom_models import (
-    CreateCustomModelVersionOperator,
-    CustomModelTestOperator,
-    GetCustomModelTestOverallStatusOperator,
-)
+from datarobot_provider.operators.custom_models import CreateCustomModelVersionOperator
+from datarobot_provider.operators.custom_models import CustomModelTestOperator
+from datarobot_provider.operators.custom_models import GetCustomModelTestOverallStatusOperator
 from datarobot_provider.operators.deployment import ReplaceModelOperator
 
 
