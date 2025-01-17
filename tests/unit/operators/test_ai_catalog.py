@@ -10,9 +10,9 @@ import datarobot as dr
 import pytest
 
 from datarobot_provider.operators.ai_catalog import CreateDatasetFromDataStoreOperator
+from datarobot_provider.operators.ai_catalog import CreateDatasetFromRecipeOperator
 from datarobot_provider.operators.ai_catalog import CreateDatasetVersionOperator
 from datarobot_provider.operators.ai_catalog import CreateOrUpdateDataSourceOperator
-from datarobot_provider.operators.ai_catalog import CreateDatasetFromRecipeOperator
 from datarobot_provider.operators.ai_catalog import UpdateDatasetFromFileOperator
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 
