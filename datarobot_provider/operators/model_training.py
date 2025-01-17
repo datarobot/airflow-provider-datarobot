@@ -38,14 +38,14 @@ class TrainModelOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Iterable[str] = [
-        'project_id',
-        'blueprint_id',
-        'featurelist_id',
-        'source_project_id',
+        "project_id",
+        "blueprint_id",
+        "featurelist_id",
+        "source_project_id",
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -54,7 +54,7 @@ class TrainModelOperator(BaseOperator):
         blueprint_id: str = None,
         featurelist_id: str = None,
         source_project_id: str = None,
-        datarobot_conn_id: str = 'datarobot_default',
+        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -63,7 +63,7 @@ class TrainModelOperator(BaseOperator):
         self.featurelist_id = featurelist_id
         self.source_project_id = source_project_id
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -73,25 +73,25 @@ class TrainModelOperator(BaseOperator):
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         if self.project_id is None:
-            raise ValueError('project_id is required.')
+            raise ValueError("project_id is required.")
 
         if self.blueprint_id is None:
-            raise ValueError('blueprint_id is required.')
+            raise ValueError("blueprint_id is required.")
 
         project = dr.Project.get(self.project_id)
         blueprint = dr.Blueprint.get(project.id, self.blueprint_id)
 
         job_id = project.train(
             blueprint,
-            sample_pct=context['params'].get('sample_pct', None),
+            sample_pct=context["params"].get("sample_pct", None),
             featurelist_id=self.featurelist_id,
             source_project_id=self.source_project_id,
-            scoring_type=context['params'].get('scoring_type', None),
-            training_row_count=context['params'].get('training_row_count', None),
-            n_clusters=context['params'].get('n_clusters', None),
+            scoring_type=context["params"].get("scoring_type", None),
+            training_row_count=context["params"].get("training_row_count", None),
+            n_clusters=context["params"].get("n_clusters", None),
         )
 
-        self.log.info(f'Model Training Job submitted job_id={job_id}')
+        self.log.info(f"Model Training Job submitted job_id={job_id}")
 
         return job_id
 
@@ -114,13 +114,13 @@ class RetrainModelOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Iterable[str] = [
-        'project_id',
-        'model_id',
-        'featurelist_id',
+        "project_id",
+        "model_id",
+        "featurelist_id",
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -128,7 +128,7 @@ class RetrainModelOperator(BaseOperator):
         project_id: str = None,
         model_id: str = None,
         featurelist_id: str = None,
-        datarobot_conn_id: str = 'datarobot_default',
+        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -136,7 +136,7 @@ class RetrainModelOperator(BaseOperator):
         self.model_id = model_id
         self.featurelist_id = featurelist_id
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -146,20 +146,20 @@ class RetrainModelOperator(BaseOperator):
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         if self.project_id is None:
-            raise ValueError('project_id is required.')
+            raise ValueError("project_id is required.")
 
         if self.model_id is None:
-            raise ValueError('model_id is required.')
+            raise ValueError("model_id is required.")
 
         model = dr.Model.get(self.project_id, self.model_id)
 
         job_id = model.train(
             featurelist_id=self.featurelist_id,
-            sample_pct=context['params'].get('sample_pct', None),
-            scoring_type=context['params'].get('scoring_type', None),
-            training_row_count=context['params'].get('training_row_count', None),
+            sample_pct=context["params"].get("sample_pct", None),
+            scoring_type=context["params"].get("scoring_type", None),
+            training_row_count=context["params"].get("training_row_count", None),
         )
 
-        self.log.info(f'Model Retraining Job submitted job_id={job_id}')
+        self.log.info(f"Model Retraining Job submitted job_id={job_id}")
 
         return job_id

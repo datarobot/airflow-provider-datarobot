@@ -17,28 +17,28 @@ from datarobot_provider.sensors.model_insights import DataRobotJobSensor
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'insights'],
+    tags=["example", "insights"],
 )
 def compute_model_insights(project_id=None, model_id=None):
     if not project_id:
-        raise ValueError('Invalid or missing `project_id` value')
+        raise ValueError("Invalid or missing `project_id` value")
     if not model_id:
-        raise ValueError('Invalid or missing `model_id` value')
+        raise ValueError("Invalid or missing `model_id` value")
 
     compute_feature_impact_op = ComputeFeatureImpactOperator(
-        task_id='compute_feature_impact',
+        task_id="compute_feature_impact",
         project_id=project_id,
         model_id=model_id,
     )
 
     compute_feature_effects_op = ComputeFeatureEffectsOperator(
-        task_id='compute_feature_effects',
+        task_id="compute_feature_effects",
         project_id=project_id,
         model_id=model_id,
     )
 
     feature_impact_complete_sensor = DataRobotJobSensor(
-        task_id='feature_impact_complete',
+        task_id="feature_impact_complete",
         project_id=project_id,
         job_id=compute_feature_impact_op.output,
         poke_interval=5,
@@ -46,7 +46,7 @@ def compute_model_insights(project_id=None, model_id=None):
     )
 
     feature_feature_effects_sensor = DataRobotJobSensor(
-        task_id='feature_effects_complete',
+        task_id="feature_effects_complete",
         project_id=project_id,
         job_id=compute_feature_effects_op.output,
         poke_interval=5,
@@ -59,5 +59,5 @@ def compute_model_insights(project_id=None, model_id=None):
 
 compute_model_insights_dag = compute_model_insights()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     compute_model_insights_dag.test()

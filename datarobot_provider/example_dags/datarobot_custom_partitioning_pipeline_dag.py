@@ -21,39 +21,39 @@ from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
 @dag(
     schedule=None,
     start_date=datetime(2022, 1, 1),
-    tags=['example', 'timeseries'],
+    tags=["example", "timeseries"],
     params={
-        'dataset_file_path': '/dataset.csv',
-        'project_name': 'test airflow project custom partitioning',
-        'autopilot_settings': {
-            'target': 'y',
-            'mode': AUTOPILOT_MODE.QUICK,
+        "dataset_file_path": "/dataset.csv",
+        "project_name": "test airflow project custom partitioning",
+        "autopilot_settings": {
+            "target": "y",
+            "mode": AUTOPILOT_MODE.QUICK,
         },
-        'partitioning_settings': {
-            'cv_method': CV_METHOD.RANDOM,
-            'validation_type': VALIDATION_TYPE.TVH,
-            'validation_pct': 20,
-            'holdout_pct': 15,
+        "partitioning_settings": {
+            "cv_method": CV_METHOD.RANDOM,
+            "validation_type": VALIDATION_TYPE.TVH,
+            "validation_pct": 20,
+            "holdout_pct": 15,
         },
     },
 )
 def datarobot_custom_partitioning_pipeline():
     dataset_uploading_op = UploadDatasetOperator(
-        task_id='dataset_uploading',
+        task_id="dataset_uploading",
     )
 
     create_project_op = CreateProjectOperator(
-        task_id='create_project',
+        task_id="create_project",
         dataset_id=dataset_uploading_op.output,
     )
 
     train_models_op = StartAutopilotOperator(
-        task_id='train_custom_partitioning_models',
+        task_id="train_custom_partitioning_models",
         project_id=create_project_op.output,
     )
 
     autopilot_complete_sensor = AutopilotCompleteSensor(
-        task_id='check_autopilot_complete',
+        task_id="check_autopilot_complete",
         project_id=create_project_op.output,
     )
 
@@ -62,5 +62,5 @@ def datarobot_custom_partitioning_pipeline():
 
 datarobot_custom_partitioning_pipeline_dag = datarobot_custom_partitioning_pipeline()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     datarobot_custom_partitioning_pipeline_dag.test()

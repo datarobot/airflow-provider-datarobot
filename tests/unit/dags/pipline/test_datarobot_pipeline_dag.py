@@ -11,7 +11,7 @@ from datarobot_provider.example_dags.datarobot_pipeline_dag import datarobot_pip
 
 
 def test_dag_loaded(dagbag):
-    dag = dagbag.get_dag(dag_id='datarobot_pipeline')
+    dag = dagbag.get_dag(dag_id="datarobot_pipeline")
     assert dagbag.import_errors == {}
     assert dag is not None
     assert len(dag.tasks) == 8
@@ -21,22 +21,22 @@ def test_dag_structure():
     dag = datarobot_pipeline()
     pytest.helpers.assert_dag_dict_equal(
         {
-            'create_project': [
-                'train_models',
-                'check_autopilot_complete',
-                'deploy_recommended_model',
+            "create_project": [
+                "train_models",
+                "check_autopilot_complete",
+                "deploy_recommended_model",
             ],
-            'train_models': ['check_autopilot_complete'],
-            'check_autopilot_complete': ['deploy_recommended_model'],
-            'deploy_recommended_model': [
-                'feature_drift',
-                'score_predictions',
-                'target_drift',
+            "train_models": ["check_autopilot_complete"],
+            "check_autopilot_complete": ["deploy_recommended_model"],
+            "deploy_recommended_model": [
+                "feature_drift",
+                "score_predictions",
+                "target_drift",
             ],
-            'score_predictions': ['check_scoring_complete'],
-            'check_scoring_complete': ['target_drift', 'feature_drift'],
-            'target_drift': [],
-            'feature_drift': [],
+            "score_predictions": ["check_scoring_complete"],
+            "check_scoring_complete": ["target_drift", "feature_drift"],
+            "target_drift": [],
+            "feature_drift": [],
         },
         dag,
     )

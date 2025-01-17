@@ -19,57 +19,57 @@ from datarobot_provider.operators.segment_analysis import UpdateSegmentAnalysisS
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'mlops'],
+    tags=["example", "mlops"],
     # Default json config example:
     params={
-        'segment_analysis_enabled': True,
-        'segment_analysis_attributes': ['race', 'gender'],
-        'protected_features': ['gender'],
-        'preferable_target_value': 'True',
-        'fairness_metrics_set': 'equalParity',
-        'fairness_threshold': 0.1,
+        "segment_analysis_enabled": True,
+        "segment_analysis_attributes": ["race", "gender"],
+        "protected_features": ["gender"],
+        "preferable_target_value": "True",
+        "fairness_metrics_set": "equalParity",
+        "fairness_threshold": 0.1,
     },
 )
 def deployment_segment_analysis_settings(deployment_id=None):
     if not deployment_id:
-        raise ValueError('Invalid or missing `deployment_id` value')
+        raise ValueError("Invalid or missing `deployment_id` value")
     get_segment_analysis_settings_before_op = GetSegmentAnalysisSettingsOperator(
-        task_id='get_segment_analysis_settings_before',
+        task_id="get_segment_analysis_settings_before",
         # you can pass deployment_id from previous operator here:
         deployment_id=deployment_id,
     )
 
     get_bias_and_fairness_settings_before_op = GetBiasAndFairnessSettingsOperator(
-        task_id='get_bias_and_fairness_settings_before',
+        task_id="get_bias_and_fairness_settings_before",
         # you can pass deployment_id from previous operator here:
         deployment_id=deployment_id,
     )
 
     update_segment_analysis_settings_op = UpdateSegmentAnalysisSettingsOperator(
-        task_id='update_segment_analysis_settings',
+        task_id="update_segment_analysis_settings",
         # you can pass deployment_id from previous operator here:
         deployment_id=deployment_id,
     )
 
     update_bias_and_fairness_settings_op = UpdateBiasAndFairnessSettingsOperator(
-        task_id='update_bias_and_fairness_settings',
+        task_id="update_bias_and_fairness_settings",
         # you can pass deployment_id from previous operator here:
         deployment_id=deployment_id,
     )
 
     get_segment_analysis_settings_after_op = GetSegmentAnalysisSettingsOperator(
-        task_id='get_segment_analysis_after',
+        task_id="get_segment_analysis_after",
         # you can pass deployment_id from previous operator here:
         deployment_id=deployment_id,
     )
 
     get_bias_and_fairness_settings_after_op = GetBiasAndFairnessSettingsOperator(
-        task_id='get_bias_and_fairness_settings_after',
+        task_id="get_bias_and_fairness_settings_after",
         # you can pass deployment_id from previous operator here:
         deployment_id=deployment_id,
     )
 
-    @task(task_id='example_processing_python')
+    @task(task_id="example_processing_python")
     def settings_processing(
         segment_analysis_settings_before,
         segment_analysis_settings_after,
@@ -115,5 +115,5 @@ def deployment_segment_analysis_settings(deployment_id=None):
 
 deployment_segment_analysis_dag = deployment_segment_analysis_settings()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     deployment_segment_analysis_dag.test()

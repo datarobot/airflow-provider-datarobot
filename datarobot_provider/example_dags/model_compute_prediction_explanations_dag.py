@@ -36,9 +36,9 @@ In order to create Prediction Explanations for a particular model and dataset, y
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'dataset', 'model'],
+    tags=["example", "dataset", "model"],
     # Default json config example:
-    params={'threshold_high': 0.9, 'threshold_low': 0.1, 'max_explanations': 3},
+    params={"threshold_high": 0.9, "threshold_low": 0.1, "max_explanations": 3},
 )
 def compute_model_prediction_explanations(
     project_id=None,
@@ -46,26 +46,26 @@ def compute_model_prediction_explanations(
     dataset_id=None,
 ):
     if not project_id:
-        raise ValueError('Invalid or missing `project_id` value')
+        raise ValueError("Invalid or missing `project_id` value")
     if not model_id:
-        raise ValueError('Invalid or missing `model_id` value')
+        raise ValueError("Invalid or missing `model_id` value")
     if not dataset_id:
-        raise ValueError('Invalid or missing `dataset_id` value')
+        raise ValueError("Invalid or missing `dataset_id` value")
 
     add_external_dataset_op = AddExternalDatasetOperator(
-        task_id='add_external_dataset',
+        task_id="add_external_dataset",
         project_id=project_id,
         dataset_id=dataset_id,
     )
 
     compute_feature_impact_op = ComputeFeatureImpactOperator(
-        task_id='compute_feature_impact',
+        task_id="compute_feature_impact",
         project_id=project_id,
         model_id=model_id,
     )
 
     feature_impact_complete_sensor = DataRobotJobSensor(
-        task_id='feature_impact_complete',
+        task_id="feature_impact_complete",
         project_id=project_id,
         job_id=compute_feature_impact_op.output,
         poke_interval=5,
@@ -73,14 +73,14 @@ def compute_model_prediction_explanations(
     )
 
     request_model_predictions_op = RequestModelPredictionsOperator(
-        task_id='request_model_predictions',
+        task_id="request_model_predictions",
         project_id=project_id,
         model_id=model_id,
         external_dataset_id=add_external_dataset_op.output,
     )
 
     model_predictions_sensor = DataRobotJobSensor(
-        task_id='model_predictions_complete',
+        task_id="model_predictions_complete",
         project_id=project_id,
         job_id=request_model_predictions_op.output,
         poke_interval=5,
@@ -89,13 +89,13 @@ def compute_model_prediction_explanations(
 
     # In order to compute prediction explanations you have to initialize it for a particular model.
     prediction_explanations_initialization_op = PredictionExplanationsInitializationOperator(
-        task_id='prediction_explanations_initialization',
+        task_id="prediction_explanations_initialization",
         project_id=project_id,
         model_id=model_id,
     )
 
     prediction_explanations_initialization_sensor = DataRobotJobSensor(
-        task_id='prediction_explanations_initialization_complete',
+        task_id="prediction_explanations_initialization_complete",
         project_id=project_id,
         job_id=prediction_explanations_initialization_op.output,
         poke_interval=5,
@@ -103,23 +103,23 @@ def compute_model_prediction_explanations(
     )
 
     compute_prediction_explanations_op = ComputePredictionExplanationsOperator(
-        task_id='compute_prediction_explanations',
+        task_id="compute_prediction_explanations",
         project_id=project_id,
         model_id=model_id,
         external_dataset_id=add_external_dataset_op.output,
     )
 
     compute_prediction_explanations_sensor = DataRobotJobSensor(
-        task_id='compute_prediction_explanations_complete',
+        task_id="compute_prediction_explanations_complete",
         project_id=project_id,
         job_id=compute_prediction_explanations_op.output,
         poke_interval=5,
         timeout=3600,
     )
 
-    @task(task_id='example_custom_python_code')
+    @task(task_id="example_custom_python_code")
     def using_custom_python_code(
-        pe_project_id, pe_model_id, predict_job_id, datarobot_conn_id='datarobot_default'
+        pe_project_id, pe_model_id, predict_job_id, datarobot_conn_id="datarobot_default"
     ):
         """Example of using custom python code:"""
 
@@ -137,9 +137,9 @@ def compute_model_prediction_explanations(
         ).get_all_as_dataframe()
 
         # Put your logic with the model predictions output and prediction explanations here, for example:
-        return predictions_df['positive_probability'].mean(), prediction_explanations_df[
-            'explanation_0_feature'
-        ].describe().get('top')
+        return predictions_df["positive_probability"].mean(), prediction_explanations_df[
+            "explanation_0_feature"
+        ].describe().get("top")
 
     example_custom_python_code = using_custom_python_code(
         pe_project_id=project_id,
@@ -163,5 +163,5 @@ def compute_model_prediction_explanations(
 
 compute_model_prediction_explanations_dag = compute_model_prediction_explanations()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     compute_model_prediction_explanations_dag.test()

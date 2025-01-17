@@ -32,23 +32,23 @@ class CreateExternalModelPackageOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Iterable[str] = [
-        'model_package_json',
+        "model_package_json",
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         model_package_json: Dict[str, Any] = None,
-        datarobot_conn_id: str = 'datarobot_default',
+        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.model_package_json = model_package_json
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -56,14 +56,14 @@ class CreateExternalModelPackageOperator(BaseOperator):
     # Utility method to support old Model Registry API
     def create_model_package_from_json(self) -> str:
         response = dr.client.get_client().post(
-            'modelPackages/fromJSON/', data=self.model_package_json
+            "modelPackages/fromJSON/", data=self.model_package_json
         )
         if response.status_code == 201:
             response_json = response.json()
-            model_package_id = response_json['id']
+            model_package_id = response_json["id"]
             return model_package_id
         else:
-            e_msg = 'Server unexpectedly returned status code {}'
+            e_msg = "Server unexpectedly returned status code {}"
             raise AirflowFailException(e_msg.format(response.status_code))
 
     def execute(self, context: Dict[str, Any]) -> str:
@@ -72,14 +72,14 @@ class CreateExternalModelPackageOperator(BaseOperator):
 
         if self.model_package_json is None:
             # If model_package_json not provided, trying to get it from DAG params:
-            self.model_package_json = context['params'].get('model_package_json')
+            self.model_package_json = context["params"].get("model_package_json")
 
         if self.model_package_json is None:
-            raise ValueError('model_package_json is required.')
+            raise ValueError("model_package_json is required.")
 
         model_package_id = self.create_model_package_from_json()
 
-        self.log.info(f'External Model Package Created, model_package_id={model_package_id}')
+        self.log.info(f"External Model Package Created, model_package_id={model_package_id}")
 
         return model_package_id
 
@@ -113,18 +113,18 @@ class DeployModelPackageOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Iterable[str] = [
-        'deployment_name',
-        'model_package_id',
-        'default_prediction_server_id',
-        'prediction_environment_id',
-        'description',
-        'importance',
-        'user_provided_id',
-        'additional_metadata',
+        "deployment_name",
+        "model_package_id",
+        "default_prediction_server_id",
+        "prediction_environment_id",
+        "description",
+        "importance",
+        "user_provided_id",
+        "additional_metadata",
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -138,7 +138,7 @@ class DeployModelPackageOperator(BaseOperator):
         user_provided_id: str = None,
         additional_metadata: Dict[str, str] = None,
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
-        datarobot_conn_id: str = 'datarobot_default',
+        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -152,7 +152,7 @@ class DeployModelPackageOperator(BaseOperator):
         self.additional_metadata = additional_metadata
         self.max_wait_sec = max_wait_sec
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -173,35 +173,35 @@ class DeployModelPackageOperator(BaseOperator):
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
     ) -> str:
         deployment_payload: Dict[str, Any] = {
-            'model_package_id': model_package_id,
-            'label': deployment_name,
-            'description': description,
+            "model_package_id": model_package_id,
+            "label": deployment_name,
+            "description": description,
         }
         if default_prediction_server_id and prediction_environment_id:
             raise ValueError(
-                'When working with prediction environments, default prediction server Id should not be provided'
+                "When working with prediction environments, default prediction server Id should not be provided"
             )
         elif default_prediction_server_id and prediction_environment_id is None:
-            deployment_payload['default_prediction_server_id'] = default_prediction_server_id
+            deployment_payload["default_prediction_server_id"] = default_prediction_server_id
         elif prediction_environment_id and default_prediction_server_id is None:
-            deployment_payload['prediction_environment_id'] = prediction_environment_id
+            deployment_payload["prediction_environment_id"] = prediction_environment_id
 
         if importance:
-            deployment_payload['importance'] = importance
+            deployment_payload["importance"] = importance
         if user_provided_id:
-            deployment_payload['user_provided_id'] = user_provided_id
+            deployment_payload["user_provided_id"] = user_provided_id
         if additional_metadata:
-            deployment_payload['additional_metadata'] = additional_metadata
+            deployment_payload["additional_metadata"] = additional_metadata
         dr_client = dr.client.get_client()
 
-        response = dr_client.post('deployments/fromModelPackage/', data=deployment_payload)
+        response = dr_client.post("deployments/fromModelPackage/", data=deployment_payload)
 
-        if response.status_code == 202 and 'Location' in response.headers:
-            wait_for_async_resolution(dr_client, response.headers['Location'], max_wait_sec)
-            deployment_id = response.json()['id']
+        if response.status_code == 202 and "Location" in response.headers:
+            wait_for_async_resolution(dr_client, response.headers["Location"], max_wait_sec)
+            deployment_id = response.json()["id"]
             return deployment_id
         else:
-            e_msg = 'Server unexpectedly returned status code {}'
+            e_msg = "Server unexpectedly returned status code {}"
             raise AirflowFailException(e_msg.format(response.status_code))
 
     def execute(self, context: Dict[str, Any]) -> str:
@@ -209,14 +209,14 @@ class DeployModelPackageOperator(BaseOperator):
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         if self.deployment_name is None:
-            raise ValueError('deployment_name is required.')
+            raise ValueError("deployment_name is required.")
 
         if self.model_package_id is None:
-            raise ValueError('model_package_id is required.')
+            raise ValueError("model_package_id is required.")
 
         if self.additional_metadata is None:
             # If additional_metadata not provided, trying to get it from DAG params:
-            self.additional_metadata = context['params'].get('additional_metadata')
+            self.additional_metadata = context["params"].get("additional_metadata")
 
         deployment_id = self._create_from_model_package(
             model_package_id=self.model_package_id,
@@ -230,6 +230,6 @@ class DeployModelPackageOperator(BaseOperator):
             max_wait_sec=self.max_wait_sec,
         )
 
-        self.log.info(f'Deployment Created, deployment_id={deployment_id}')
+        self.log.info(f"Deployment Created, deployment_id={deployment_id}")
 
         return deployment_id

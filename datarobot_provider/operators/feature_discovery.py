@@ -45,13 +45,13 @@ class RelationshipsConfigurationOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Iterable[str] = [
-        'dataset_definitions',
-        'relationships',
-        'feature_discovery_settings',
+        "dataset_definitions",
+        "relationships",
+        "feature_discovery_settings",
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -60,7 +60,7 @@ class RelationshipsConfigurationOperator(BaseOperator):
         relationships: Iterable[dict],
         feature_discovery_settings: dict = None,
         max_wait_sec: int = DATAROBOT_MAX_WAIT,
-        datarobot_conn_id: str = 'datarobot_default',
+        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -70,7 +70,7 @@ class RelationshipsConfigurationOperator(BaseOperator):
         self.max_wait_sec = max_wait_sec
         self.datarobot_conn_id = datarobot_conn_id
 
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -81,8 +81,8 @@ class RelationshipsConfigurationOperator(BaseOperator):
 
         # if feature_discovery_settings not provided, trying to get it from DAG configuration params:
         if self.feature_discovery_settings is None:
-            self.feature_discovery_settings = context['params'].get(
-                'feature_discovery_settings', None
+            self.feature_discovery_settings = context["params"].get(
+                "feature_discovery_settings", None
             )
 
         # Create the relationships' configuration to define the connection between the datasets
@@ -125,16 +125,16 @@ class DatasetDefinitionOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Iterable[str] = [
-        'dataset_identifier',
-        'dataset_id',
-        'dataset_version_id',
-        'primary_temporal_key',
-        'feature_list_id',
-        'snapshot_policy',
+        "dataset_identifier",
+        "dataset_id",
+        "dataset_version_id",
+        "primary_temporal_key",
+        "feature_list_id",
+        "snapshot_policy",
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -146,7 +146,7 @@ class DatasetDefinitionOperator(BaseOperator):
         feature_list_id: Optional[str] = None,
         primary_temporal_key: Optional[str] = None,
         max_wait_sec: int = DATAROBOT_MAX_WAIT,
-        datarobot_conn_id: str = 'datarobot_default',
+        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -159,7 +159,7 @@ class DatasetDefinitionOperator(BaseOperator):
         self.max_wait_sec = max_wait_sec
         self.datarobot_conn_id = datarobot_conn_id
 
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -230,20 +230,20 @@ class DatasetRelationshipOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Iterable[str] = [
-        'dataset1_identifier',
-        'dataset2_identifier',
-        'dataset1_keys',
-        'dataset2_keys',
-        'feature_derivation_window_start',
-        'feature_derivation_window_end',
-        'feature_derivation_window_time_unit',
-        'feature_derivation_windows',
-        'prediction_point_rounding',
-        'prediction_point_rounding_time_unit',
+        "dataset1_identifier",
+        "dataset2_identifier",
+        "dataset1_keys",
+        "dataset2_keys",
+        "feature_derivation_window_start",
+        "feature_derivation_window_end",
+        "feature_derivation_window_time_unit",
+        "feature_derivation_windows",
+        "prediction_point_rounding",
+        "prediction_point_rounding_time_unit",
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -259,7 +259,7 @@ class DatasetRelationshipOperator(BaseOperator):
         prediction_point_rounding: Optional[int] = None,
         prediction_point_rounding_time_unit: Optional[str] = None,
         max_wait_sec: int = DATAROBOT_MAX_WAIT,
-        datarobot_conn_id: str = 'datarobot_default',
+        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -276,7 +276,7 @@ class DatasetRelationshipOperator(BaseOperator):
         self.max_wait_sec = max_wait_sec
         self.datarobot_conn_id = datarobot_conn_id
 
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )

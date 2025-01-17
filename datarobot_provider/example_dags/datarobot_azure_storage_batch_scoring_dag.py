@@ -40,40 +40,40 @@ from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'azure'],
+    tags=["example", "azure"],
     params={
-        'azure_storage_credentials': 'demo_azure_storage_test_credentials',
-        'deployment_id': 'put_your_deployment_id',  # you can set deployment_id here
-        'score_settings': {
-            'intake_settings': {
-                'type': 'azure',
-                'url': 'https:// ... .blob.core.windows.net/.../input_filename.csv',
+        "azure_storage_credentials": "demo_azure_storage_test_credentials",
+        "deployment_id": "put_your_deployment_id",  # you can set deployment_id here
+        "score_settings": {
+            "intake_settings": {
+                "type": "azure",
+                "url": "https:// ... .blob.core.windows.net/.../input_filename.csv",
             },
-            'output_settings': {
-                'type': 'azure',
-                'url': 'https:// ... .blob.core.windows.net/.../output_filename.csv',
+            "output_settings": {
+                "type": "azure",
+                "url": "https:// ... .blob.core.windows.net/.../output_filename.csv",
             },
         },
     },
 )
 def datarobot_azure_storage_batch_scoring(deployment_id=None):
     if not deployment_id:
-        raise ValueError('Invalid or missing `deployment_id` value')
+        raise ValueError("Invalid or missing `deployment_id` value")
 
     get_azure_storage_credentials_op = GetOrCreateCredentialOperator(
-        task_id='get_azure_storage_credentials',
-        credentials_param_name='azure_storage_credentials',
+        task_id="get_azure_storage_credentials",
+        credentials_param_name="azure_storage_credentials",
     )
 
     score_predictions_op = ScorePredictionsOperator(
-        task_id='score_predictions',
+        task_id="score_predictions",
         deployment_id=deployment_id,
         intake_credential_id=get_azure_storage_credentials_op.output,
         output_credential_id=get_azure_storage_credentials_op.output,
     )
 
     scoring_complete_sensor = ScoringCompleteSensor(
-        task_id='check_scoring_complete',
+        task_id="check_scoring_complete",
         job_id=score_predictions_op.output,
     )
 
@@ -84,5 +84,5 @@ datarobot_azure_storage_batch_scoring_dag = datarobot_azure_storage_batch_scorin
 
 # Staring from Airflow 2.5.1 Debug Executor is deprecated,
 # dag.test() should be used for dag testing:
-if __name__ == '__main__':
+if __name__ == "__main__":
     datarobot_azure_storage_batch_scoring_dag.test()

@@ -29,25 +29,25 @@ from datarobot_provider.operators.datarobot import CreateProjectOperator
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example'],
+    tags=["example"],
     # Default json config example:
     params={
-        'project_name': 'test_project_name',
-        'datarobot_jdbc_connection': 'datarobot_jdbc_test_connection_name',
-        'dataset_name': 'test_jdbc_dataset_name',
-        'table_schema': 'test_jdbc_table_schema',
-        'table_name': 'test_jdbc_table_name',
-        'persist_data_after_ingestion': True,
-        'do_snapshot': True,
+        "project_name": "test_project_name",
+        "datarobot_jdbc_connection": "datarobot_jdbc_test_connection_name",
+        "dataset_name": "test_jdbc_dataset_name",
+        "table_schema": "test_jdbc_table_schema",
+        "table_name": "test_jdbc_table_name",
+        "persist_data_after_ingestion": True,
+        "do_snapshot": True,
     },
 )
 def datarobot_dataset_connect():
     dataset_connect_op = CreateDatasetFromDataStoreOperator(
-        task_id='create_dataset_jdbc',
+        task_id="create_dataset_jdbc",
     )
 
     create_project_op = CreateProjectOperator(
-        task_id='create_project',
+        task_id="create_project",
         dataset_id=dataset_connect_op.output,
     )
 
@@ -56,5 +56,5 @@ def datarobot_dataset_connect():
 
 datarobot_jdbc_connection_dag = datarobot_dataset_connect()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     datarobot_jdbc_connection_dag.test()

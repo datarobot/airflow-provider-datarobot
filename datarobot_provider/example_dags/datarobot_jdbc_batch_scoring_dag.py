@@ -44,43 +44,43 @@ from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'jdbc'],
+    tags=["example", "jdbc"],
     params={
-        'deployment_id': 'put_your_deployment_id_here',  # you can set deployment_id here
-        'datarobot_jdbc_connection': 'datarobot_jdbc_test_connection',
-        'score_settings': {
-            'intake_settings': {
-                'type': 'jdbc',
-                'table': 'input_table',
-                'schema': 'input_table_schema',
+        "deployment_id": "put_your_deployment_id_here",  # you can set deployment_id here
+        "datarobot_jdbc_connection": "datarobot_jdbc_test_connection",
+        "score_settings": {
+            "intake_settings": {
+                "type": "jdbc",
+                "table": "input_table",
+                "schema": "input_table_schema",
             },
-            'output_settings': {
-                'type': 'jdbc',
-                'schema': 'output_table_schema',
-                'table': 'output_table',
-                'statement_type': 'insert',
-                'create_table_if_not_exists': True,
+            "output_settings": {
+                "type": "jdbc",
+                "schema": "output_table_schema",
+                "table": "output_table",
+                "statement_type": "insert",
+                "create_table_if_not_exists": True,
             },
-            'passthrough_columns_set': 'all',
+            "passthrough_columns_set": "all",
         },
     },
 )
 def datarobot_jdbc_batch_scoring(deployment_id=None):
     if not deployment_id:
-        raise ValueError('Invalid or missing `deployment_id` value')
+        raise ValueError("Invalid or missing `deployment_id` value")
 
     get_jdbc_credentials_op = GetOrCreateCredentialOperator(
-        task_id='get_jdbc_credentials',
-        credentials_param_name='datarobot_jdbc_connection',
+        task_id="get_jdbc_credentials",
+        credentials_param_name="datarobot_jdbc_connection",
     )
 
     get_jdbc_connection_op = GetOrCreateDataStoreOperator(
-        task_id='get_jdbc_connection',
-        connection_param_name='datarobot_jdbc_connection',
+        task_id="get_jdbc_connection",
+        connection_param_name="datarobot_jdbc_connection",
     )
 
     score_predictions_op = ScorePredictionsOperator(
-        task_id='score_predictions',
+        task_id="score_predictions",
         deployment_id=deployment_id,
         intake_datastore_id=get_jdbc_connection_op.output,
         output_datastore_id=get_jdbc_connection_op.output,
@@ -89,7 +89,7 @@ def datarobot_jdbc_batch_scoring(deployment_id=None):
     )
 
     scoring_complete_sensor = ScoringCompleteSensor(
-        task_id='check_scoring_complete',
+        task_id="check_scoring_complete",
         job_id=score_predictions_op.output,
     )
 
@@ -105,5 +105,5 @@ datarobot_jdbc_batch_scoring_dag = datarobot_jdbc_batch_scoring()
 
 # Staring from Airflow 2.5.1 Debug Executor is deprecated,
 # dag.test() should be used for dag testing:
-if __name__ == '__main__':
+if __name__ == "__main__":
     datarobot_jdbc_batch_scoring_dag.test()

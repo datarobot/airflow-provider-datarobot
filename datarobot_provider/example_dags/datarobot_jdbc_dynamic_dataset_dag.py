@@ -30,31 +30,31 @@ from datarobot_provider.operators.datarobot import CreateProjectOperator
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example'],
+    tags=["example"],
     # Default json config example:
     params={
-        'project_name': 'test_project_name',
-        'datarobot_jdbc_connection': 'datarobot_jdbc_test_connection_name',
-        'dataset_name': 'test_jdbc_dataset_name',
-        'table_schema': 'test_jdbc_table_schema',
-        'table_name': 'test_jdbc_table_name',
-        'persist_data_after_ingestion': False,
-        'do_snapshot': False,
+        "project_name": "test_project_name",
+        "datarobot_jdbc_connection": "datarobot_jdbc_test_connection_name",
+        "dataset_name": "test_jdbc_dataset_name",
+        "table_schema": "test_jdbc_table_schema",
+        "table_name": "test_jdbc_table_name",
+        "persist_data_after_ingestion": False,
+        "do_snapshot": False,
     },
 )
 def datarobot_dynamic_jdbc_dataset():
     dataset_connect_op = CreateDatasetFromDataStoreOperator(
-        task_id='create_dataset_jdbc',
+        task_id="create_dataset_jdbc",
     )
 
     # In case of dynamic dataset we should provide credential_id from connection
     get_jdbc_credentials_op = GetOrCreateCredentialOperator(
-        task_id='get_jdbc_credentials',
-        credentials_param_name='datarobot_jdbc_connection',
+        task_id="get_jdbc_credentials",
+        credentials_param_name="datarobot_jdbc_connection",
     )
 
     create_project_op = CreateProjectOperator(
-        task_id='create_project',
+        task_id="create_project",
         dataset_id=dataset_connect_op.output,
         # In case of dynamic dataset we should provide credential_id
         credential_id=get_jdbc_credentials_op.output,
@@ -65,5 +65,5 @@ def datarobot_dynamic_jdbc_dataset():
 
 datarobot_dynamic_jdbc_dataset_dag = datarobot_dynamic_jdbc_dataset()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     datarobot_dynamic_jdbc_dataset.test()

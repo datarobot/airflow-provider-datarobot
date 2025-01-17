@@ -27,13 +27,13 @@ class BaseAsyncResolutionSensor(BaseSensorOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields = ['job_id']
+    template_fields = ["job_id"]
 
     def __init__(
         self,
         *,
         job_id: str,
-        datarobot_conn_id: str = 'datarobot_default',
+        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -47,22 +47,22 @@ class BaseAsyncResolutionSensor(BaseSensorOperator):
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         if not self.job_id:
-            raise AirflowException('job_id is not defined')
+            raise AirflowException("job_id is not defined")
 
-        self.log.info('Checking if DataRobot API async call is complete')
+        self.log.info("Checking if DataRobot API async call is complete")
 
         status_check_job = StatusCheckJob.from_id(self.job_id)
         job_status_result = status_check_job.get_status()
 
-        self.log.debug(f'API async call status:{job_status_result.status}')
+        self.log.debug(f"API async call status:{job_status_result.status}")
         self.log.debug(
-            f'API async call completed_resource_url:{job_status_result.completed_resource_url}'
+            f"API async call completed_resource_url:{job_status_result.completed_resource_url}"
         )
 
-        if job_status_result.status in ['ERROR', 'ABORT']:
+        if job_status_result.status in ["ERROR", "ABORT"]:
             raise AsyncProcessUnsuccessfulError(
-                f'The job did not complete successfully. Job Data: {job_status_result.status}'
+                f"The job did not complete successfully. Job Data: {job_status_result.status}"
             )
-        elif job_status_result.status == 'COMPLETED':
+        elif job_status_result.status == "COMPLETED":
             return True
         return False

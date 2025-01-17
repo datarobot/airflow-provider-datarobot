@@ -16,23 +16,23 @@ from datarobot_provider.operators.monitoring import GetServiceStatsOperator
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'mlops'],
+    tags=["example", "mlops"],
 )
 def deployment_service_stats():
     service_stats_op = GetServiceStatsOperator(
-        task_id='get_service_stats',
+        task_id="get_service_stats",
         # you can pass deployment_id from previous operator here:
-        deployment_id='put your deployment_id here',
+        deployment_id="put your deployment_id here",
     )
 
-    @task(task_id='example_processing_python')
+    @task(task_id="example_processing_python")
     def service_stat_processing(model_service_stat):
         """Example of custom logic based on service stats from the deployment."""
 
         # Put your service stat processing logic here:
-        current_model_id = model_service_stat['model_id']
-        total_predictions = model_service_stat['metrics']['totalPredictions']
-        print(f'model_id:{current_model_id}, total_predictions:{total_predictions}')
+        current_model_id = model_service_stat["model_id"]
+        total_predictions = model_service_stat["metrics"]["totalPredictions"]
+        print(f"model_id:{current_model_id}, total_predictions:{total_predictions}")
 
         return total_predictions
 
@@ -45,5 +45,5 @@ def deployment_service_stats():
 
 deployment_service_stats_dag = deployment_service_stats()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     deployment_service_stats_dag.test()

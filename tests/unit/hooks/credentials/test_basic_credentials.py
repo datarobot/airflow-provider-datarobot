@@ -11,8 +11,8 @@ from datarobot_provider.hooks.credentials import BasicCredentialsHook
 def test_datarobot_basic_credentials_conn(
     dr_basic_credentials_conn_details, mock_airflow_connection_datarobot_basic_credentials
 ):
-    hook = BasicCredentialsHook(datarobot_credentials_conn_id='datarobot_basic_credentials_test')
+    hook = BasicCredentialsHook(datarobot_credentials_conn_id="datarobot_basic_credentials_test")
     credentials, credential_data = hook.get_conn()
 
-    assert credential_data['user'] == dr_basic_credentials_conn_details['login']
-    assert credential_data['password'] == dr_basic_credentials_conn_details['password']
+    assert credential_data["user"] == dr_basic_credentials_conn_details["login"]
+    assert credential_data["password"] == dr_basic_credentials_conn_details["password"]
