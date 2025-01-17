@@ -1,5 +1,5 @@
 #
-# Copyright 2025 DataRobot, Inc. and its affiliates.
+# Copyright 2021-2024 DataRobot, Inc. and its affiliates.
 #
 # All rights reserved.
 #
@@ -9,7 +9,4 @@
 # affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from datarobot_provider import __version__
-
-if __name__ == "__main__":
-    print(__version__)
+__version__ = "0.0.10"
