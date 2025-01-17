@@ -35,7 +35,7 @@ pipeline:
                       identifier: Run_build
                       spec:
                         connectorRef: account.dockerhub_datarobot_read
-                        image: python:3.9
+                        image: python:3.11
                         shell: Bash
                         command: |-
                           set -exuo pipefail
@@ -55,7 +55,7 @@ pipeline:
                         envVariables:
                           PYPI_TOKEN: <+secrets.getValue("PyPI_token_for_airflow-provider-datarobot")>
                         connectorRef: account.dockerhub_datarobot_read
-                        image: python:3.9
+                        image: python:3.11
                         shell: Bash
                         command: |-
                           set -exuo pipefail

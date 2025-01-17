@@ -1565,7 +1565,6 @@ operators and DAGs. The following steps will construct the two environments need
     ```bash
         pyenv virtualenv 3.12 airflow-provider-datarobot
         pyenv local airflow-provider-datarobot
-        pip install --upgrade pip setuptools
         make req-dev
         pre-commit install
     ```

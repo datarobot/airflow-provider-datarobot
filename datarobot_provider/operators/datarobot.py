@@ -88,7 +88,7 @@ class CreateProjectOperator(BaseOperator):
                 else context["params"]["training_dataset_id"]
             )
 
-            project: dr.Project = dr.Project.create_from_dataset(
+            project: dr.Project = dr.Project.create_from_dataset(  # type: ignore[no-redef]
                 dataset_id=training_dataset_id,
                 dataset_version_id=self.dataset_version_id,
                 credential_id=self.credential_id,
