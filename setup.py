@@ -12,6 +12,9 @@ with open("README.md", "r") as fh:
 
 
 dev_require = [
+    "pre-commit>=4.0.1",
+    "ruff>=0.9.2",
+    "mypy>=0.931",
     "pytest>=7.0.0",
     "pytest-mock>=3.7.0",
     "pytest-helpers-namespace>=2021.12.29",
@@ -50,16 +53,13 @@ setup(
         "datarobot_provider.sensors",
         "datarobot_provider.operators",
     ],
-    install_requires=[
-        'apache-airflow>=2.3.0',
-        'datarobot>=3.6.0'
-    ],
-    setup_requires=['setuptools', 'wheel'],
-    author='DataRobot',
-    author_email='support@datarobot.com',
-    url='https://www.datarobot.com/',
-    python_requires='~=3.7',
+    install_requires=["apache-airflow>=2.3.0", "datarobot>=3.6.0"],
+    setup_requires=["setuptools", "wheel"],
+    author="DataRobot",
+    author_email="support@datarobot.com",
+    url="https://www.datarobot.com/",
+    python_requires="~=3.7",
     extras_require={
         "dev": dev_require,
-    }
+    },
 )
