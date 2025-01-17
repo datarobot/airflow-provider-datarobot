@@ -10,6 +10,24 @@ from setuptools import setup
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+
+dev_require = [
+    "pre-commit>=4.0.1",
+    "ruff>=0.9.2",
+    "mypy>=0.931",
+    "pytest>=7.0.0",
+    "pytest-mock>=3.7.0",
+    "pytest-helpers-namespace>=2021.12.29",
+    "Sphinx>=8.1.3",
+    "sphinx_rtd_theme>=3.0",
+    "numpydoc>=1.7.0,<1.8.0",
+    "sphinx-autodoc-typehints>=2'",
+    "pyenchant==3.2.2",
+    "sphinx-copybutton",
+    "sphinx-markdown-builder",
+    "myst-parser==4.0.0",
+]
+
 """Perform the package airflow-provider-datarobot setup."""
 setup(
     name="airflow-provider-datarobot",
@@ -41,4 +59,7 @@ setup(
     author_email="support@datarobot.com",
     url="https://www.datarobot.com/",
     python_requires="~=3.7",
+    extras_require={
+        "dev": dev_require,
+    },
 )

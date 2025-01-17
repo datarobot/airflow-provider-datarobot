@@ -12,7 +12,12 @@ endif
 .PHONY: format format-no-fix lint lint-fix typecheck check-licenses fix-licenses unit-tests
 
 req:
-	pip install -r requirements.txt
+	pip install --upgrade pip setuptools
+	pip install -e .
+
+req-dev:
+	pip install --upgrade pip setuptools
+	pip install -e ".[dev]"
 
 lint:
 	ruff check .
@@ -31,6 +36,9 @@ unit-tests:
 
 typecheck:
 	find . -type f -name "*.py" | grep -v ".git" | xargs mypy --config-file .mypy.ini
+
+test-docs:
+	cd docs && $(MAKE) doctest
 
 # Copyright Notices are handled by the next two targets
 # See .licenserc.yaml for configuration
