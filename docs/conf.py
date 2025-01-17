@@ -396,23 +396,6 @@ nitpick_ignore = [
     ("py:class", "collections.OrderedDict"),
 ]
 
-# options for spelling
-spelling_ignore_contributor_names = False
-spelling_add_pypi_package_names = True
-spelling_ignore_importable_modules = True
-spelling_ignore_python_builtins = True
-spelling_ignore_wiki_words = True
-spelling_filters = [
-    "sdk_docs.spelling_filters.filters.DocstringFilePathFilter",
-    "sdk_docs.spelling_filters.filters.TypeAnnotationFilter",
-    "sdk_docs.spelling_filters.filters.CamelCaseFilter",
-    "sdk_docs.spelling_filters.filters.SortOrderFilter",
-    "sdk_docs.spelling_filters.filters.OrdinalFilter",
-    "sdk_docs.spelling_filters.filters.ObjectIdFilter",
-    "sdk_docs.spelling_filters.filters.DayMonthFilter",
-    "sdk_docs.spelling_filters.filters.DataRobotParameterFilter",
-]
-
 
 def better_versionmodified(self: SphinxDirective, node: versionmodified) -> None:
     if version := node.get("version"):
