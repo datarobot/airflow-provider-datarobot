@@ -11,7 +11,7 @@ from typing import Any
 from typing import Dict
 from typing import Tuple
 
-from airflow import AirflowException
+from airflow.exceptions import AirflowException
 from airflow.hooks.base import BaseHook
 from datarobot.models.credential import Credential
 

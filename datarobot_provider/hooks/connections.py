@@ -9,7 +9,7 @@ from typing import Any
 from typing import Dict
 from typing import Tuple
 
-from airflow import AirflowException
+from airflow.exceptions import AirflowException
 from datarobot import Credential
 from datarobot.models.data_store import DataStore
 from datarobot.models.driver import DataDriver
