@@ -7,17 +7,18 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from datetime import datetime
 
-from airflow.decorators import dag
-from airflow.decorators import task
+from airflow.decorators import dag, task
 
-from datarobot_provider.operators.monitoring import GetMonitoringSettingsOperator
-from datarobot_provider.operators.monitoring import UpdateMonitoringSettingsOperator
+from datarobot_provider.operators.monitoring import (
+    GetMonitoringSettingsOperator,
+    UpdateMonitoringSettingsOperator,
+)
 
 
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'mlops'],
+    tags=["example", "mlops"],
     # Default json config example:
     params={
         "target_drift_enabled": True,

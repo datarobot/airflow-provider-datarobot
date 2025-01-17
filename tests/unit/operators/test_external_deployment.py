@@ -34,7 +34,7 @@ def test_operator_create_external_deployment_op(mocker, external_deployment_para
     )
 
     operator = DeployModelPackageOperator(
-        task_id='create_external_deployment',
+        task_id="create_external_deployment",
         deployment_name=external_deployment_params["deployment_name"],
         description=external_deployment_params["description"],
         model_package_id=external_deployment_params["model_package_id"],
@@ -72,7 +72,7 @@ def test_operator_create_deployment_op(mocker, external_deployment_params):
     )
 
     operator = DeployModelPackageOperator(
-        task_id='create_external_deployment',
+        task_id="create_external_deployment",
         deployment_name=external_deployment_params["deployment_name"],
         description=external_deployment_params["description"],
         model_package_id=external_deployment_params["model_package_id"],
@@ -105,7 +105,7 @@ def test_operator_create_external_deployment_invalid_params_op(mocker, external_
     prediction_environment_id = "test-prediction-environment-id"
 
     operator = DeployModelPackageOperator(
-        task_id='create_external_deployment',
+        task_id="create_external_deployment",
         deployment_name=external_deployment_params["deployment_name"],
         description=external_deployment_params["description"],
         model_package_id=external_deployment_params["model_package_id"],

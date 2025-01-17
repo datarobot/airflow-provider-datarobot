@@ -5,13 +5,10 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from typing import Any
-from typing import Dict
-from typing import Iterable
+from typing import Any, Dict, Iterable
 
 import datarobot as dr
-from airflow.exceptions import AirflowException
-from airflow.exceptions import AirflowFailException
+from airflow.exceptions import AirflowException, AirflowFailException
 from airflow.models import BaseOperator
 from datarobot.utils.waiters import wait_for_async_resolution
 
@@ -36,7 +33,7 @@ class CreateExternalModelPackageOperator(BaseOperator):
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -48,7 +45,7 @@ class CreateExternalModelPackageOperator(BaseOperator):
         super().__init__(**kwargs)
         self.model_package_json = model_package_json
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -124,7 +121,7 @@ class DeployModelPackageOperator(BaseOperator):
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -152,7 +149,7 @@ class DeployModelPackageOperator(BaseOperator):
         self.additional_metadata = additional_metadata
         self.max_wait_sec = max_wait_sec
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )

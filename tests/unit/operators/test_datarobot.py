@@ -10,17 +10,18 @@ from datetime import datetime
 import datarobot as dr
 import pytest
 from airflow.exceptions import AirflowFailException
-from datarobot.models.deployment.data_drift import FeatureDrift
-from datarobot.models.deployment.data_drift import TargetDrift
+from datarobot.models.deployment.data_drift import FeatureDrift, TargetDrift
 
-from datarobot_provider.operators.datarobot import CreateProjectOperator
-from datarobot_provider.operators.datarobot import DeployModelOperator
-from datarobot_provider.operators.datarobot import DeployRecommendedModelOperator
-from datarobot_provider.operators.datarobot import GetFeatureDriftOperator
-from datarobot_provider.operators.datarobot import GetTargetDriftOperator
-from datarobot_provider.operators.datarobot import ScorePredictionsOperator
-from datarobot_provider.operators.datarobot import TrainModelsOperator
-from datarobot_provider.operators.datarobot import _serialize_drift
+from datarobot_provider.operators.datarobot import (
+    CreateProjectOperator,
+    DeployModelOperator,
+    DeployRecommendedModelOperator,
+    GetFeatureDriftOperator,
+    GetTargetDriftOperator,
+    ScorePredictionsOperator,
+    TrainModelsOperator,
+    _serialize_drift,
+)
 
 
 def test_operator_create_project(mocker):
@@ -28,7 +29,7 @@ def test_operator_create_project(mocker):
     project_mock.id = "project-id"
     create_project_mock = mocker.patch.object(dr.Project, "create", return_value=project_mock)
 
-    operator = CreateProjectOperator(task_id='create_project')
+    operator = CreateProjectOperator(task_id="create_project")
     project_id = operator.execute(
         context={
             "params": {
@@ -51,7 +52,7 @@ def test_operator_create_project_from_dataset(mocker):
         dr.Project, "create_from_dataset", return_value=project_mock
     )
 
-    operator = CreateProjectOperator(task_id='create_project_from_dataset')
+    operator = CreateProjectOperator(task_id="create_project_from_dataset")
     project_id = operator.execute(
         context={
             "params": {
@@ -65,9 +66,9 @@ def test_operator_create_project_from_dataset(mocker):
 
     assert project_id == "project-id"
     create_project_mock.assert_called_with(
-        dataset_id='some_dataset_id',
+        dataset_id="some_dataset_id",
         dataset_version_id=None,
-        project_name='test project',
+        project_name="test project",
         credential_id=None,
     )
 
@@ -80,7 +81,7 @@ def test_operator_create_project_from_dataset_id(mocker):
     )
 
     operator = CreateProjectOperator(
-        task_id='create_project_from_dataset_id', dataset_id='some_dataset_id'
+        task_id="create_project_from_dataset_id", dataset_id="some_dataset_id"
     )
     project_id = operator.execute(
         context={
@@ -94,9 +95,9 @@ def test_operator_create_project_from_dataset_id(mocker):
 
     assert project_id == "project-id"
     create_project_mock.assert_called_with(
-        dataset_id='some_dataset_id',
+        dataset_id="some_dataset_id",
         dataset_version_id=None,
-        project_name='test project',
+        project_name="test project",
         credential_id=None,
     )
 
@@ -109,9 +110,9 @@ def test_operator_create_project_from_dataset_id_and_version_id(mocker):
     )
 
     operator = CreateProjectOperator(
-        task_id='create_project_from_dataset_id_version_id',
-        dataset_id='some_dataset_id',
-        dataset_version_id='some_dataset_version_id',
+        task_id="create_project_from_dataset_id_version_id",
+        dataset_id="some_dataset_id",
+        dataset_version_id="some_dataset_version_id",
     )
     project_id = operator.execute(
         context={
@@ -125,15 +126,15 @@ def test_operator_create_project_from_dataset_id_and_version_id(mocker):
 
     assert project_id == "project-id"
     create_project_mock.assert_called_with(
-        dataset_id='some_dataset_id',
-        dataset_version_id='some_dataset_version_id',
-        project_name='test project',
+        dataset_id="some_dataset_id",
+        dataset_version_id="some_dataset_version_id",
+        project_name="test project",
         credential_id=None,
     )
 
 
 def test_operator_create_project_fails_when_no_datasetid_or_training_data():
-    operator = CreateProjectOperator(task_id='create_project_no_dataset_id')
+    operator = CreateProjectOperator(task_id="create_project_no_dataset_id")
 
     # should raise AirflowFailException if no "training_data" or "training_dataset_id"
     # or dataset_id provided

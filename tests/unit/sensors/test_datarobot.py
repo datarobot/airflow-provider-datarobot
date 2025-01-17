@@ -9,8 +9,7 @@ import datarobot as dr
 import pytest
 from datarobot.errors import AsyncProcessUnsuccessfulError
 
-from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
-from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
+from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor, ScoringCompleteSensor
 
 
 def test_sensor_autopilot_complete__success(mocker):

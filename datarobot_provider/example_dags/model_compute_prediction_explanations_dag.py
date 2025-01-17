@@ -8,17 +8,16 @@
 from datetime import datetime
 
 import datarobot as dr
-from airflow.decorators import dag
-from airflow.decorators import task
+from airflow.decorators import dag, task
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 from datarobot_provider.operators.model_insights import ComputeFeatureImpactOperator
-from datarobot_provider.operators.model_predictions import AddExternalDatasetOperator
-from datarobot_provider.operators.model_predictions import RequestModelPredictionsOperator
-from datarobot_provider.operators.prediction_explanations import (
-    ComputePredictionExplanationsOperator,
+from datarobot_provider.operators.model_predictions import (
+    AddExternalDatasetOperator,
+    RequestModelPredictionsOperator,
 )
 from datarobot_provider.operators.prediction_explanations import (
+    ComputePredictionExplanationsOperator,
     PredictionExplanationsInitializationOperator,
 )
 from datarobot_provider.sensors.model_insights import DataRobotJobSensor
@@ -36,9 +35,9 @@ In order to create Prediction Explanations for a particular model and dataset, y
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'dataset', 'model'],
+    tags=["example", "dataset", "model"],
     # Default json config example:
-    params={'threshold_high': 0.9, 'threshold_low': 0.1, 'max_explanations': 3},
+    params={"threshold_high": 0.9, "threshold_low": 0.1, "max_explanations": 3},
 )
 def compute_model_prediction_explanations(
     project_id=None,
@@ -119,7 +118,7 @@ def compute_model_prediction_explanations(
 
     @task(task_id="example_custom_python_code")
     def using_custom_python_code(
-        pe_project_id, pe_model_id, predict_job_id, datarobot_conn_id='datarobot_default'
+        pe_project_id, pe_model_id, predict_job_id, datarobot_conn_id="datarobot_default"
     ):
         """Example of using custom python code:"""
 
@@ -138,8 +137,8 @@ def compute_model_prediction_explanations(
 
         # Put your logic with the model predictions output and prediction explanations here, for example:
         return predictions_df["positive_probability"].mean(), prediction_explanations_df[
-            'explanation_0_feature'
-        ].describe().get('top')
+            "explanation_0_feature"
+        ].describe().get("top")
 
     example_custom_python_code = using_custom_python_code(
         pe_project_id=project_id,

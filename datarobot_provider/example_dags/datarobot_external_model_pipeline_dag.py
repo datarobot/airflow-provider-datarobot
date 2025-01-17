@@ -12,8 +12,10 @@ from airflow.decorators import dag
 from datarobot import TARGET_TYPE
 from datarobot.enums import DEPLOYMENT_IMPORTANCE
 
-from datarobot_provider.operators.model_package import CreateExternalModelPackageOperator
-from datarobot_provider.operators.model_package import DeployModelPackageOperator
+from datarobot_provider.operators.model_package import (
+    CreateExternalModelPackageOperator,
+    DeployModelPackageOperator,
+)
 from datarobot_provider.operators.monitoring import UpdateMonitoringSettingsOperator
 
 """
@@ -78,12 +80,12 @@ Example JSON for a multiclass classification model:
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'mlops', 'external model'],
+    tags=["example", "mlops", "external model"],
     params={
         "model_package_json": {
             "name": "Demo Regression Model",
             "modelDescription": {"description": "Regression on demo dataset"},
-            "target": {"type": TARGET_TYPE.REGRESSION, "name": 'Grade 2014'},
+            "target": {"type": TARGET_TYPE.REGRESSION, "name": "Grade 2014"},
         },
         "target_drift_enabled": True,
         "feature_drift_enabled": True,
@@ -97,7 +99,7 @@ def create_external_deployment_pipeline(prediction_environment_id=None):
         raise ValueError("Invalid or missing `prediction_environment_id` value")
 
     create_model_package_op = CreateExternalModelPackageOperator(
-        task_id='create_model_package',
+        task_id="create_model_package",
     )
 
     deploy_model_package_op = DeployModelPackageOperator(

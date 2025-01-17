@@ -8,8 +8,7 @@
 import logging
 from datetime import datetime
 
-from airflow.decorators import dag
-from airflow.decorators import task
+from airflow.decorators import dag, task
 from datarobot import SCORING_TYPE
 
 from datarobot_provider.operators.model_training import RetrainModelOperator
@@ -19,7 +18,7 @@ from datarobot_provider.sensors.model_training import ModelTrainingJobSensor
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'retrain'],
+    tags=["example", "retrain"],
     # Default json config example:
     params={
         "sample_pct": 60,  # training dataset sample size to retrain the model.

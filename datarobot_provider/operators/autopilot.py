@@ -5,9 +5,7 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from typing import Any
-from typing import Dict
-from typing import Iterable
+from typing import Any, Dict, Iterable
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
@@ -47,7 +45,7 @@ class StartAutopilotOperator(BaseOperator):
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -68,7 +66,7 @@ class StartAutopilotOperator(BaseOperator):
         self.max_wait_sec = max_wait_sec
         self.datarobot_conn_id = datarobot_conn_id
 
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -81,7 +79,7 @@ class StartAutopilotOperator(BaseOperator):
         if project.target:
             raise ValueError(f"Models are already trained for project_id={project.id}")
 
-        autopilot_settings = context['params']['autopilot_settings']
+        autopilot_settings = context["params"]["autopilot_settings"]
 
         self.log.info(
             f"Starting DataRobot Autopilot for project_id={project.id} "
@@ -89,33 +87,33 @@ class StartAutopilotOperator(BaseOperator):
         )
 
         if self.featurelist_id:
-            autopilot_settings['featurelist_id'] = self.featurelist_id
+            autopilot_settings["featurelist_id"] = self.featurelist_id
 
         if self.relationships_configuration_id:
-            autopilot_settings[
-                'relationships_configuration_id'
-            ] = self.relationships_configuration_id
+            autopilot_settings["relationships_configuration_id"] = (
+                self.relationships_configuration_id
+            )
 
         if self.segmentation_task_id:
-            autopilot_settings['segmentation_task_id'] = self.segmentation_task_id
+            autopilot_settings["segmentation_task_id"] = self.segmentation_task_id
 
-        autopilot_settings['max_wait'] = self.max_wait_sec
+        autopilot_settings["max_wait"] = self.max_wait_sec
 
         if (
-            'datetime_partitioning_settings' in context['params']
-            and 'partitioning_settings' in context['params']
+            "datetime_partitioning_settings" in context["params"]
+            and "partitioning_settings" in context["params"]
         ):
             raise ValueError(
                 "parameters: datetime_partitioning_settings and partitioning_settings are mutually exclusive"
             )
 
-        if 'datetime_partitioning_settings' in context['params']:
-            project.set_datetime_partitioning(**context['params']['datetime_partitioning_settings'])
-        elif 'partitioning_settings' in context['params']:
-            project.set_partitioning_method(**context['params']['partitioning_settings'])
+        if "datetime_partitioning_settings" in context["params"]:
+            project.set_datetime_partitioning(**context["params"]["datetime_partitioning_settings"])
+        elif "partitioning_settings" in context["params"]:
+            project.set_partitioning_method(**context["params"]["partitioning_settings"])
 
-        if 'advanced_options' in context['params']:
-            project.set_options(**context['params']['advanced_options'])
+        if "advanced_options" in context["params"]:
+            project.set_options(**context["params"]["advanced_options"])
 
         # finalize the project and start the autopilot
         project.analyze_and_model(**autopilot_settings)

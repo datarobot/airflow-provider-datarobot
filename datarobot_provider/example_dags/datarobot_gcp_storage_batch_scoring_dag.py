@@ -27,6 +27,7 @@ Config example for this dag:
     },
 }
 """
+
 from datetime import datetime
 
 from airflow.decorators import dag
@@ -39,7 +40,7 @@ from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'gcp'],
+    tags=["example", "gcp"],
     params={
         "datarobot_gcp_credentials": "your_gcp_credentials_name",
         "deployment_id": "put_your_deployment_id",  # you can set deployment_id here
@@ -53,7 +54,7 @@ from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
                 "url": "gs://bucket_name/output_file_name.csv",
             },
             # If passthrough columns are required, use this line:
-            "passthrough_columns": ['column1', 'column2'],
+            "passthrough_columns": ["column1", "column2"],
         },
     },
 )

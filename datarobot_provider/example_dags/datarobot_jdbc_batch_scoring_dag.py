@@ -30,6 +30,7 @@ Config example for this dag:
     },
 }
 """
+
 from datetime import datetime
 
 from airflow.decorators import dag
@@ -43,24 +44,24 @@ from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'jdbc'],
+    tags=["example", "jdbc"],
     params={
         "deployment_id": "put_your_deployment_id_here",  # you can set deployment_id here
         "datarobot_jdbc_connection": "datarobot_jdbc_test_connection",
         "score_settings": {
             "intake_settings": {
-                'type': 'jdbc',
-                'table': 'input_table',
-                'schema': 'input_table_schema',
+                "type": "jdbc",
+                "table": "input_table",
+                "schema": "input_table_schema",
             },
             "output_settings": {
-                'type': 'jdbc',
-                'schema': 'output_table_schema',
-                'table': 'output_table',
-                'statement_type': 'insert',
-                'create_table_if_not_exists': True,
+                "type": "jdbc",
+                "schema": "output_table_schema",
+                "table": "output_table",
+                "statement_type": "insert",
+                "create_table_if_not_exists": True,
             },
-            'passthrough_columns_set': 'all',
+            "passthrough_columns_set": "all",
         },
     },
 )

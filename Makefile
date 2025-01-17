@@ -9,19 +9,22 @@ else
 	ASTRO_CMD=curl -sSL install.astronomer.io | sudo bash -s
 endif
 
-.PHONY: black isort lint typecheck check-licenses fix-licenses unit-tests
+.PHONY: format lint lint-fix typecheck check-licenses fix-licenses unit-tests
 
 req:
 	pip install -r requirements.txt
 
 lint:
-	flake8
+	ruff check .
 
-black:
-	black .
+lint-fix:
+	ruff check . --fix
 
-isort:
-	isort .
+format:
+	ruff format .
+
+format-no-fix:
+	ruff format . --check
 
 unit-tests:
 	pytest -vv tests/unit/

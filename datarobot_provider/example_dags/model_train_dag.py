@@ -8,8 +8,7 @@
 import logging
 from datetime import datetime
 
-from airflow.decorators import dag
-from airflow.decorators import task
+from airflow.decorators import dag, task
 
 from datarobot_provider.operators.model_training import TrainModelOperator
 from datarobot_provider.sensors.model_training import ModelTrainingJobSensor
@@ -18,7 +17,7 @@ from datarobot_provider.sensors.model_training import ModelTrainingJobSensor
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'dataset'],
+    tags=["example", "dataset"],
 )
 def train_model(
     project_id=None,

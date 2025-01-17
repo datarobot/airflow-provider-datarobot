@@ -27,6 +27,7 @@ Config example for this dag:
     },
 }
 """
+
 from datetime import datetime
 
 from airflow.decorators import dag
@@ -39,7 +40,7 @@ from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'azure'],
+    tags=["example", "azure"],
     params={
         "azure_storage_credentials": "demo_azure_storage_test_credentials",
         "deployment_id": "put_your_deployment_id",  # you can set deployment_id here

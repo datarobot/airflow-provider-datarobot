@@ -10,14 +10,16 @@ from datetime import datetime
 from airflow.decorators import dag
 from airflow.operators.python import BranchPythonOperator
 
-from datarobot_provider.operators.deployment import ActivateDeploymentOperator
-from datarobot_provider.operators.deployment import GetDeploymentStatusOperator
+from datarobot_provider.operators.deployment import (
+    ActivateDeploymentOperator,
+    GetDeploymentStatusOperator,
+)
 
 
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'mlops'],
+    tags=["example", "mlops"],
 )
 def deployment_deactivate_activate(deployment_id=None):
     if not deployment_id:
@@ -30,11 +32,11 @@ def deployment_deactivate_activate(deployment_id=None):
 
     def choose_branch(deployment_status):
         if deployment_status == "inactive":
-            return ['activate_deployment']
-        return ['deactivate_deployment']
+            return ["activate_deployment"]
+        return ["deactivate_deployment"]
 
     branching = BranchPythonOperator(
-        task_id='branching',
+        task_id="branching",
         python_callable=choose_branch,
         op_args=[get_deployment_status_initial_op.output],
     )

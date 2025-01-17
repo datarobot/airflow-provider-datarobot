@@ -21,6 +21,7 @@ Config example for this dag:
     }
 }
 """
+
 from datetime import datetime
 
 from airflow.decorators import dag
@@ -32,7 +33,7 @@ from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
 @dag(
     schedule=None,
     start_date=datetime(2022, 1, 1),
-    tags=['example', 'scoring'],
+    tags=["example", "scoring"],
 )
 def datarobot_batch_scoring_templated():
     score_predictions_op = ScorePredictionsOperator(
@@ -46,7 +47,7 @@ def datarobot_batch_scoring_templated():
             },
         },
         # custom parameter example
-        params={'myparam': 'test_param_value'},
+        params={"myparam": "test_param_value"},
     )
 
     scoring_complete_sensor = ScoringCompleteSensor(

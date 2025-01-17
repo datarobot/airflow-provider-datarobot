@@ -5,14 +5,10 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from typing import Any
-from typing import Dict
-from typing import Iterable
-from typing import List
+from typing import Any, Dict, Iterable, List
 
 import datarobot as dr
-from airflow.exceptions import AirflowException
-from airflow.exceptions import AirflowFailException
+from airflow.exceptions import AirflowException, AirflowFailException
 from airflow.models import BaseOperator
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
@@ -39,7 +35,7 @@ class CreateProjectOperator(BaseOperator):
     template_fields: Iterable[str] = ["dataset_id", "dataset_version_id", "credential_id"]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -55,7 +51,7 @@ class CreateProjectOperator(BaseOperator):
         self.dataset_version_id = dataset_version_id
         self.datarobot_conn_id = datarobot_conn_id
         self.credential_id = credential_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -67,31 +63,31 @@ class CreateProjectOperator(BaseOperator):
         # Create DataRobot project
         self.log.info("Creating DataRobot project")
 
-        if self.dataset_id is None and "training_data" in context['params']:
+        if self.dataset_id is None and "training_data" in context["params"]:
             # training_data may be a pre-signed URL to a file on S3 or a path to a local file
             project = dr.Project.create(
-                context["params"]["training_data"], context['params']['project_name']
+                context["params"]["training_data"], context["params"]["project_name"]
             )
             self.log.info(f"Project created: project_id={project.id} from local file")
-            project.unsupervised_mode = context['params'].get('unsupervised_mode')
-            project.use_feature_discovery = context['params'].get('use_feature_discovery')
+            project.unsupervised_mode = context["params"].get("unsupervised_mode")
+            project.use_feature_discovery = context["params"].get("use_feature_discovery")
             project.unlock_holdout()
             return project.id
 
-        elif self.dataset_id is not None or 'training_dataset_id' in context['params']:
+        elif self.dataset_id is not None or "training_dataset_id" in context["params"]:
             # training_dataset_id may be provided via params
             # or dataset_id should be returned from previous operator
             training_dataset_id = (
                 self.dataset_id
                 if self.dataset_id is not None
-                else context['params']['training_dataset_id']
+                else context["params"]["training_dataset_id"]
             )
 
             project = dr.Project.create_from_dataset(
                 dataset_id=training_dataset_id,
                 dataset_version_id=self.dataset_version_id,
                 credential_id=self.credential_id,
-                project_name=context['params']['project_name'],
+                project_name=context["params"]["project_name"],
             )
             self.log.info(
                 f"Project created: project_id={project.id} from dataset: dataset_id={training_dataset_id}"
@@ -100,7 +96,7 @@ class CreateProjectOperator(BaseOperator):
 
         else:
             raise AirflowFailException(
-                'For Project creation training_data or training_dataset_id must be provided'
+                "For Project creation training_data or training_dataset_id must be provided"
             )
 
 
@@ -118,7 +114,7 @@ class TrainModelsOperator(BaseOperator):
     template_fields: Iterable[str] = ["project_id"]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -130,7 +126,7 @@ class TrainModelsOperator(BaseOperator):
         super().__init__(**kwargs)
         self.project_id = project_id
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -148,7 +144,7 @@ class TrainModelsOperator(BaseOperator):
                 f"Starting DataRobot Autopilot for project_id={project.id} "
                 f"with settings={context['params']['autopilot_settings']}"
             )
-            project.set_target(**context['params']['autopilot_settings'])
+            project.set_target(**context["params"]["autopilot_settings"])
 
 
 class DeployModelMixin:
@@ -183,7 +179,7 @@ class DeployModelOperator(BaseOperator, DeployModelMixin):
     template_fields: Iterable[str] = ["model_id"]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -195,7 +191,7 @@ class DeployModelOperator(BaseOperator, DeployModelMixin):
         super().__init__(**kwargs)
         self.model_id = model_id
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -207,8 +203,8 @@ class DeployModelOperator(BaseOperator, DeployModelMixin):
         # Deploy the model
         deployment = self.deploy_model(
             self.model_id,
-            context['params']['deployment_label'],
-            context['params'].get('deployment_description'),
+            context["params"]["deployment_label"],
+            context["params"].get("deployment_description"),
         )
         return deployment.id
 
@@ -229,7 +225,7 @@ class DeployRecommendedModelOperator(BaseOperator, DeployModelMixin):
     template_fields: Iterable[str] = ["project_id"]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -241,7 +237,7 @@ class DeployRecommendedModelOperator(BaseOperator, DeployModelMixin):
         super().__init__(**kwargs)
         self.project_id = project_id
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -262,8 +258,8 @@ class DeployRecommendedModelOperator(BaseOperator, DeployModelMixin):
         # Deploy the recommended model
         deployment = self.deploy_recommended_model(
             self.project_id,
-            context['params']['deployment_label'],
-            context['params'].get('deployment_description'),
+            context["params"]["deployment_label"],
+            context["params"].get("deployment_description"),
         )
         return deployment.id
 
@@ -298,7 +294,7 @@ class ScorePredictionsOperator(BaseOperator):
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -320,7 +316,7 @@ class ScorePredictionsOperator(BaseOperator):
         self.output_credential_id = output_credential_id
         self.score_settings = score_settings
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )

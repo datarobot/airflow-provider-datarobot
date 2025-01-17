@@ -8,11 +8,13 @@
 
 import datarobot as dr
 
-from datarobot_provider.operators.ai_catalog import CreateDatasetFromDataStoreOperator
-from datarobot_provider.operators.ai_catalog import CreateDatasetVersionOperator
-from datarobot_provider.operators.ai_catalog import CreateOrUpdateDataSourceOperator
-from datarobot_provider.operators.ai_catalog import UpdateDatasetFromFileOperator
-from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
+from datarobot_provider.operators.ai_catalog import (
+    CreateDatasetFromDataStoreOperator,
+    CreateDatasetVersionOperator,
+    CreateOrUpdateDataSourceOperator,
+    UpdateDatasetFromFileOperator,
+    UploadDatasetOperator,
+)
 
 
 def test_operator_upload_dataset(mocker):
@@ -22,7 +24,7 @@ def test_operator_upload_dataset(mocker):
         dr.Dataset, "create_from_file", return_value=dataset_mock
     )
 
-    operator = UploadDatasetOperator(task_id='upload_dataset')
+    operator = UploadDatasetOperator(task_id="upload_dataset")
     dataset_id = operator.execute(
         context={
             "params": {
@@ -43,7 +45,7 @@ def test_operator_update_dataset_from_file(mocker):
         dr.Dataset, "create_version_from_file", return_value=dataset_mock
     )
 
-    operator = UpdateDatasetFromFileOperator(task_id='create_version_dataset')
+    operator = UpdateDatasetFromFileOperator(task_id="create_version_dataset")
     dataset_version_id = operator.execute(
         context={
             "params": {
@@ -91,7 +93,7 @@ def test_operator_create_dataset_from_jdbc(mocker, mock_airflow_connection_datar
         dr.Dataset, "create_from_data_source", return_value=dataset_mock
     )
 
-    operator = CreateDatasetFromDataStoreOperator(task_id='load_jdbc_dataset')
+    operator = CreateDatasetFromDataStoreOperator(task_id="load_jdbc_dataset")
     dataset_id = operator.execute(
         context={
             "params": test_params,
@@ -121,7 +123,7 @@ def test_operator_create_dataset_version(mocker):
     )
 
     operator = CreateDatasetVersionOperator(
-        task_id='create_dataset_version',
+        task_id="create_dataset_version",
         dataset_id=dataset_id,
         datasource_id=datasource_id,
         credential_id=credential_id,
@@ -176,7 +178,7 @@ def test_operator_create_datasource_operator(mocker):
     create_dataset_mock = mocker.patch.object(dr.DataSource, "create", return_value=datasource_mock)
 
     operator = CreateOrUpdateDataSourceOperator(
-        task_id='create_dataset_version',
+        task_id="create_dataset_version",
         data_store_id=data_store_id,
     )
     data_source_id = operator.execute(
@@ -224,7 +226,7 @@ def test_operator_update_datasource_operator(mocker):
     create_dataset_mock = mocker.patch.object(dr.DataSource, "create", return_value=datasource_mock)
 
     operator = CreateOrUpdateDataSourceOperator(
-        task_id='create_dataset_version',
+        task_id="create_dataset_version",
         data_store_id=data_store_id,
     )
     data_source_id = operator.execute(

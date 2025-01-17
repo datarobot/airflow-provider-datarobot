@@ -18,7 +18,7 @@ def test_datarobot_jdbc_get_conn(
     hook = JDBCDataSourceHook(datarobot_credentials_conn_id="datarobot_test_connection_jdbc_test")
     dr_credentials, dr_credentials_data, dr_datastore = hook.get_conn()
 
-    assert dr_credentials.credential_id == 'test-credentials-id'
+    assert dr_credentials.credential_id == "test-credentials-id"
     assert dr_credentials_data["user"] == dr_jdbc_conn_details["login"]
     assert dr_credentials_data["password"] == dr_jdbc_conn_details["password"]
     assert dr_datastore.params.jdbc_url == dr_jdbc_conn_details["jdbc_url"]

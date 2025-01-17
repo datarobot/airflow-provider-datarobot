@@ -5,8 +5,7 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from typing import Any
-from typing import Dict
+from typing import Any, Dict
 
 from airflow import AirflowException
 from datarobot import Credential
@@ -23,32 +22,31 @@ class JDBCDataSourceHook(BasicCredentialsHook):
     manage JDBC connections with corresponding credentials.
     """
 
-    conn_type = 'datarobot.datasource.jdbc'
-    hook_name = 'DataRobot JDBC DataSource'
+    conn_type = "datarobot.datasource.jdbc"
+    hook_name = "DataRobot JDBC DataSource"
 
     @staticmethod
     def get_connection_form_widgets() -> Dict[str, Any]:
         """Returns connection widgets to add to connection form."""
-        from flask_appbuilder.fieldwidgets import BS3TextAreaFieldWidget
-        from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
+        from flask_appbuilder.fieldwidgets import BS3TextAreaFieldWidget, BS3TextFieldWidget
         from flask_babel import lazy_gettext
         from wtforms import StringField
 
         return {
             "datarobot_connection": StringField(
-                lazy_gettext('DataRobot Connection'),
+                lazy_gettext("DataRobot Connection"),
                 widget=BS3TextFieldWidget(),
-                default='datarobot_default',
+                default="datarobot_default",
             ),
             "jdbc_driver": StringField(
-                lazy_gettext('JDBC Driver'),
+                lazy_gettext("JDBC Driver"),
                 widget=BS3TextFieldWidget(),
-                default='',
+                default="",
             ),
             "jdbc_url": StringField(
-                lazy_gettext('JDBC URL'),
+                lazy_gettext("JDBC URL"),
                 widget=BS3TextAreaFieldWidget(),
-                default='jdbc:',
+                default="jdbc:",
             ),
         }
 
@@ -56,12 +54,12 @@ class JDBCDataSourceHook(BasicCredentialsHook):
     def get_ui_field_behaviour() -> Dict:
         """Returns custom field behaviour."""
         return {
-            "hidden_fields": ['host', 'schema', 'port', 'extra'],
+            "hidden_fields": ["host", "schema", "port", "extra"],
             "relabeling": {},
             "placeholders": {
-                'datarobot_connection': 'datarobot_default',
-                'jdbc_driver': '',
-                'jdbc_url': 'jdbc:',
+                "datarobot_connection": "datarobot_default",
+                "jdbc_driver": "",
+                "jdbc_url": "jdbc:",
             },
         }
 
@@ -71,7 +69,7 @@ class JDBCDataSourceHook(BasicCredentialsHook):
 
         conn = self.get_connection(self.datarobot_credentials_conn_id)
 
-        datarobot_connection_id = conn.extra_dejson.get('datarobot_connection', '')
+        datarobot_connection_id = conn.extra_dejson.get("datarobot_connection", "")
 
         if not datarobot_connection_id:
             raise AirflowException("datarobot_connection is not defined")
@@ -79,12 +77,12 @@ class JDBCDataSourceHook(BasicCredentialsHook):
         # Initialize DataRobot client by DataRobotHook
         DataRobotHook(datarobot_conn_id=datarobot_connection_id).run()
 
-        jdbc_driver_name = conn.extra_dejson.get('jdbc_driver', '')
+        jdbc_driver_name = conn.extra_dejson.get("jdbc_driver", "")
 
         if not jdbc_driver_name:
             raise AirflowException("jdbc_driver is not defined")
 
-        jdbc_url = conn.extra_dejson.get('jdbc_url', '')
+        jdbc_url = conn.extra_dejson.get("jdbc_url", "")
 
         if not jdbc_url:
             raise AirflowException("jdbc_url is not defined")
@@ -123,7 +121,7 @@ class JDBCDataSourceHook(BasicCredentialsHook):
                 f"DataStore:{self.datarobot_credentials_conn_id} does not exist, trying to create it"
             )
             data_store = DataStore.create(
-                data_store_type='jdbc',
+                data_store_type="jdbc",
                 canonical_name=self.datarobot_credentials_conn_id,
                 driver_id=jdbc_driver_id,
                 jdbc_url=jdbc_url,

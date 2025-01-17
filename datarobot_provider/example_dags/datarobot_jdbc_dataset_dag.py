@@ -17,6 +17,7 @@ Config example for this dag:
     "do_snapshot": True,
 }
 """
+
 from datetime import datetime
 
 from airflow.decorators import dag
@@ -28,7 +29,7 @@ from datarobot_provider.operators.datarobot import CreateProjectOperator
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example'],
+    tags=["example"],
     # Default json config example:
     params={
         "project_name": "test_project_name",
@@ -46,7 +47,7 @@ def datarobot_dataset_connect():
     )
 
     create_project_op = CreateProjectOperator(
-        task_id='create_project',
+        task_id="create_project",
         dataset_id=dataset_connect_op.output,
     )
 

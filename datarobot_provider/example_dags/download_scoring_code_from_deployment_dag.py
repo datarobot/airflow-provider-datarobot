@@ -7,8 +7,7 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from datetime import datetime
 
-from airflow.decorators import dag
-from airflow.decorators import task
+from airflow.decorators import dag, task
 
 from datarobot_provider.operators.scoring_code import DownloadDeploymentScoringCodeOperator
 
@@ -16,13 +15,13 @@ from datarobot_provider.operators.scoring_code import DownloadDeploymentScoringC
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'scoring_code'],
+    tags=["example", "scoring_code"],
     # Default json config example:
     params={
-        'source_code': False,
-        'include_agent': False,
-        'include_prediction_explanations': False,
-        'include_prediction_intervals': False,
+        "source_code": False,
+        "include_agent": False,
+        "include_prediction_explanations": False,
+        "include_prediction_intervals": False,
         # as an option you can pass base_path here:
         # 'scoring_code_filepath': "/home/airflow/gcs/data/",
     },

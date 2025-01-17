@@ -7,27 +7,30 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from datetime import datetime
 
-from airflow.decorators import dag
-from airflow.decorators import task
+from airflow.decorators import dag, task
 
-from datarobot_provider.operators.bias_and_fairness import GetBiasAndFairnessSettingsOperator
-from datarobot_provider.operators.bias_and_fairness import UpdateBiasAndFairnessSettingsOperator
-from datarobot_provider.operators.segment_analysis import GetSegmentAnalysisSettingsOperator
-from datarobot_provider.operators.segment_analysis import UpdateSegmentAnalysisSettingsOperator
+from datarobot_provider.operators.bias_and_fairness import (
+    GetBiasAndFairnessSettingsOperator,
+    UpdateBiasAndFairnessSettingsOperator,
+)
+from datarobot_provider.operators.segment_analysis import (
+    GetSegmentAnalysisSettingsOperator,
+    UpdateSegmentAnalysisSettingsOperator,
+)
 
 
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'mlops'],
+    tags=["example", "mlops"],
     # Default json config example:
     params={
-        'segment_analysis_enabled': True,
-        'segment_analysis_attributes': ['race', 'gender'],
-        'protected_features': ['gender'],
-        'preferable_target_value': 'True',
-        'fairness_metrics_set': 'equalParity',
-        'fairness_threshold': 0.1,
+        "segment_analysis_enabled": True,
+        "segment_analysis_attributes": ["race", "gender"],
+        "protected_features": ["gender"],
+        "preferable_target_value": "True",
+        "fairness_metrics_set": "equalParity",
+        "fairness_threshold": 0.1,
     },
 )
 def deployment_segment_analysis_settings(deployment_id=None):

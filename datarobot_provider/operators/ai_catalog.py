@@ -5,9 +5,7 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from typing import Any
-from typing import Dict
-from typing import Iterable
+from typing import Any, Dict, Iterable
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
@@ -40,7 +38,7 @@ class UploadDatasetOperator(BaseOperator):
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -54,7 +52,7 @@ class UploadDatasetOperator(BaseOperator):
         self.file_path = file_path
         self.file_path_param = file_path_param
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -105,13 +103,13 @@ class UpdateDatasetFromFileOperator(BaseOperator):
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         dataset_id: str = None,
-        dataset_id_param: str = 'training_dataset_id',
+        dataset_id_param: str = "training_dataset_id",
         file_path: str = None,
         file_path_param: str = "dataset_file_path",
         datarobot_conn_id: str = "datarobot_default",
@@ -123,7 +121,7 @@ class UpdateDatasetFromFileOperator(BaseOperator):
         self.file_path = file_path
         self.file_path_param = file_path_param
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -136,14 +134,14 @@ class UpdateDatasetFromFileOperator(BaseOperator):
         dataset_id = (
             self.dataset_id
             if self.dataset_id is not None
-            else context['params'][self.dataset_id_param]
+            else context["params"][self.dataset_id_param]
         )
 
         # The path to the file.
         file_path = (
             self.file_path
             if self.file_path is not None
-            else context['params'][self.file_path_param]
+            else context["params"][self.file_path_param]
         )
 
         self.log.info(f"Update Dataset {dataset_id} in AI Catalog from the local file: {file_path}")
@@ -173,7 +171,7 @@ class CreateDatasetFromDataStoreOperator(BaseOperator):
     template_fields: Iterable[str] = []
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -183,7 +181,7 @@ class CreateDatasetFromDataStoreOperator(BaseOperator):
     ) -> None:
         super().__init__(**kwargs)
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -223,7 +221,7 @@ class CreateDatasetFromDataStoreOperator(BaseOperator):
             # Creating DataSource using params with data_store_id
             self.log.info(f"Creating DataSource: {dataset_name}")
             data_source = dr.DataSource.create(
-                data_source_type='jdbc', canonical_name=dataset_name, params=params
+                data_source_type="jdbc", canonical_name=dataset_name, params=params
             )
             self.log.info(f"DataSource:{dataset_name} successfully created, id={data_source.id}")
 
@@ -266,7 +264,7 @@ class CreateDatasetVersionOperator(BaseOperator):
     template_fields: Iterable[str] = ["dataset_id", "datasource_id", "credential_id"]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -282,7 +280,7 @@ class CreateDatasetVersionOperator(BaseOperator):
         self.datasource_id = datasource_id
         self.credential_id = credential_id
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -328,7 +326,7 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
     template_fields: Iterable[str] = ["data_store_id"]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -340,7 +338,7 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
         super().__init__(**kwargs)
         self.data_store_id = data_store_id
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -385,7 +383,7 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
             # Creating DataSource using params with data_store_id
             self.log.info(f"Creating DataSource: {dataset_name}")
             data_source = dr.DataSource.create(
-                data_source_type='jdbc', canonical_name=dataset_name, params=params
+                data_source_type="jdbc", canonical_name=dataset_name, params=params
             )
             self.log.info(f"DataSource:{dataset_name} successfully created, id={data_source.id}")
 

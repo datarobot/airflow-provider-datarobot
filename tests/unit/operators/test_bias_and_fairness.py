@@ -9,17 +9,19 @@
 import datarobot as dr
 import pytest
 
-from datarobot_provider.operators.bias_and_fairness import GetBiasAndFairnessSettingsOperator
-from datarobot_provider.operators.bias_and_fairness import UpdateBiasAndFairnessSettingsOperator
+from datarobot_provider.operators.bias_and_fairness import (
+    GetBiasAndFairnessSettingsOperator,
+    UpdateBiasAndFairnessSettingsOperator,
+)
 
 
 @pytest.fixture
 def bias_and_fairness_settings_details():
     return {
-        'protected_features': ['gender'],
-        'preferable_target_value': 'True',
-        'fairness_metrics_set': 'equalParity',
-        'fairness_threshold': 0.1,
+        "protected_features": ["gender"],
+        "preferable_target_value": "True",
+        "fairness_metrics_set": "equalParity",
+        "fairness_threshold": 0.1,
     }
 
 
@@ -38,7 +40,7 @@ def test_operator_get_bias_and_fairness_settings(mocker, bias_and_fairness_setti
         task_id="get_bias_and_fairness_settings", deployment_id="deployment-id"
     )
 
-    bias_and_fairness_settings_result = operator.execute(context={'params': {}})
+    bias_and_fairness_settings_result = operator.execute(context={"params": {}})
 
     assert bias_and_fairness_settings_result == bias_and_fairness_settings_details
 
@@ -47,10 +49,10 @@ def test_operator_update_bias_and_fairness_settings(mocker, bias_and_fairness_se
     deployment_id = "deployment-id"
 
     bias_and_fairness_settings_params = {
-        'protected_features': ['gender'],
-        'preferable_target_value': 'True',
-        'fairness_metrics_set': 'equalParity',
-        'fairness_threshold': 0.25,
+        "protected_features": ["gender"],
+        "preferable_target_value": "True",
+        "fairness_metrics_set": "equalParity",
+        "fairness_threshold": 0.25,
     }
 
     mocker.patch.object(dr.Deployment, "get", return_value=dr.Deployment(deployment_id))
@@ -69,13 +71,13 @@ def test_operator_update_bias_and_fairness_settings(mocker, bias_and_fairness_se
         task_id="update_bias_and_fairness_settings", deployment_id="deployment-id"
     )
 
-    operator.execute(context={'params': bias_and_fairness_settings_params})
+    operator.execute(context={"params": bias_and_fairness_settings_params})
 
     update_bias_and_fairness_settings_mock.assert_called_with(
-        protected_features=bias_and_fairness_settings_params['protected_features'],
-        fairness_metric_set=bias_and_fairness_settings_params['fairness_metrics_set'],
-        fairness_threshold=bias_and_fairness_settings_params['fairness_threshold'],
-        preferable_target_value=bias_and_fairness_settings_params['preferable_target_value'],
+        protected_features=bias_and_fairness_settings_params["protected_features"],
+        fairness_metric_set=bias_and_fairness_settings_params["fairness_metrics_set"],
+        fairness_threshold=bias_and_fairness_settings_params["fairness_threshold"],
+        preferable_target_value=bias_and_fairness_settings_params["preferable_target_value"],
     )
 
 
@@ -85,10 +87,10 @@ def test_operator_no_need_update_bias_and_fairness_settings(
     deployment_id = "deployment-id"
 
     bias_and_fairness_settings_params = {
-        'protected_features': ['gender'],
-        'preferable_target_value': 'True',
-        'fairness_metrics_set': 'equalParity',
-        'fairness_threshold': 0.1,
+        "protected_features": ["gender"],
+        "preferable_target_value": "True",
+        "fairness_metrics_set": "equalParity",
+        "fairness_threshold": 0.1,
     }
 
     mocker.patch.object(dr.Deployment, "get", return_value=dr.Deployment(deployment_id))
@@ -107,6 +109,6 @@ def test_operator_no_need_update_bias_and_fairness_settings(
         task_id="update_bias_and_fairness_settings", deployment_id="deployment-id"
     )
 
-    operator.execute(context={'params': bias_and_fairness_settings_params})
+    operator.execute(context={"params": bias_and_fairness_settings_params})
 
     update_bias_and_fairness_settings_mock.assert_not_called()

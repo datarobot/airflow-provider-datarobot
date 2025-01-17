@@ -5,9 +5,7 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from typing import Any
-from typing import Dict
-from typing import Iterable
+from typing import Any, Dict, Iterable
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
@@ -41,7 +39,7 @@ class CreateExecutionEnvironmentOperator(BaseOperator):
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -57,7 +55,7 @@ class CreateExecutionEnvironmentOperator(BaseOperator):
         self.description = description
         self.programming_language = programming_language
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -131,7 +129,7 @@ class CreateExecutionEnvironmentVersionOperator(BaseOperator):
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -151,7 +149,7 @@ class CreateExecutionEnvironmentVersionOperator(BaseOperator):
         self.environment_version_description = environment_version_description
         self.max_wait_sec = max_wait_sec
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -209,7 +207,7 @@ class CreateCustomInferenceModelOperator(BaseOperator):
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -223,7 +221,7 @@ class CreateCustomInferenceModelOperator(BaseOperator):
         self.name = name
         self.description = description
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -315,7 +313,7 @@ class CreateCustomModelVersionOperator(BaseOperator):
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -339,7 +337,7 @@ class CreateCustomModelVersionOperator(BaseOperator):
         self.create_from_previous = create_from_previous
         self.max_wait_sec = max_wait_sec
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -432,7 +430,7 @@ class CustomModelTestOperator(BaseOperator):
     template_fields: Iterable[str] = ["custom_model_id", "custom_model_version_id", "dataset_id"]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -450,7 +448,7 @@ class CustomModelTestOperator(BaseOperator):
         self.dataset_id = dataset_id
         self.max_wait_sec = max_wait_sec
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -495,7 +493,7 @@ class GetCustomModelTestOverallStatusOperator(BaseOperator):
     template_fields: Iterable[str] = ["custom_model_test_id"]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -507,7 +505,7 @@ class GetCustomModelTestOverallStatusOperator(BaseOperator):
         super().__init__(**kwargs)
         self.custom_model_test_id = custom_model_test_id
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -557,7 +555,7 @@ class CreateCustomModelDeploymentOperator(BaseOperator):
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -579,7 +577,7 @@ class CreateCustomModelDeploymentOperator(BaseOperator):
         self.importance = importance
         self.max_wait_sec = max_wait_sec
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )

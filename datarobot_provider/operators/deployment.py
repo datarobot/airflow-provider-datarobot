@@ -5,14 +5,10 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from typing import Any
-from typing import Dict
-from typing import Iterable
-from typing import List
+from typing import Any, Dict, Iterable, List
 
 import datarobot as dr
-from airflow.exceptions import AirflowException
-from airflow.exceptions import AirflowFailException
+from airflow.exceptions import AirflowException, AirflowFailException
 from airflow.models import BaseOperator
 from datarobot.enums import MODEL_REPLACEMENT_REASON
 
@@ -115,10 +111,10 @@ class ReplaceModelOperator(BaseOperator):
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         if self.deployment_id is None:
-            raise AirflowFailException('deployment_id must be provided')
+            raise AirflowFailException("deployment_id must be provided")
 
         if self.new_model_id is None:
-            raise AirflowFailException('new_model_id must be provided')
+            raise AirflowFailException("new_model_id must be provided")
 
         self.log.info(f"Getting model_id for deployment_id={self.deployment_id}")
         deployment = dr.Deployment.get(deployment_id=self.deployment_id)
@@ -130,7 +126,7 @@ class ReplaceModelOperator(BaseOperator):
         )
         self.log.info(f"Validation result: {check_result}, message: {check_message}")
         self.log.info(f"Validation result details: {status_list}")
-        if check_result == 'failing':
+        if check_result == "failing":
             raise AirflowFailException(check_message)
         self.log.info(
             f"Trying to replace a model for deployment_id={self.deployment_id} to new_model_id={self.new_model_id}"

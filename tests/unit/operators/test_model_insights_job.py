@@ -9,9 +9,11 @@
 import datarobot as dr
 import pytest
 
-from datarobot_provider.operators.model_insights import ComputeFeatureEffectsOperator
-from datarobot_provider.operators.model_insights import ComputeFeatureImpactOperator
-from datarobot_provider.operators.model_insights import ComputeShapOperator
+from datarobot_provider.operators.model_insights import (
+    ComputeFeatureEffectsOperator,
+    ComputeFeatureImpactOperator,
+    ComputeShapOperator,
+)
 
 
 def test_operator_compute_feature_impact(mocker):

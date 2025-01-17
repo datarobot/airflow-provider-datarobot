@@ -5,9 +5,7 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from typing import Any
-from typing import Dict
-from typing import Iterable
+from typing import Any, Dict, Iterable
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
@@ -100,14 +98,14 @@ class UpdateSegmentAnalysisSettingsOperator(BaseOperator):
         current_segment_analysis_settings = deployment.get_segment_analysis_settings()
 
         segment_analysis_enabled = context["params"].get(
-            "segment_analysis_enabled", current_segment_analysis_settings['enabled']
+            "segment_analysis_enabled", current_segment_analysis_settings["enabled"]
         )
         segment_analysis_attributes = context["params"].get(
-            "segment_analysis_attributes", current_segment_analysis_settings['attributes']
+            "segment_analysis_attributes", current_segment_analysis_settings["attributes"]
         )
 
-        if (segment_analysis_enabled != current_segment_analysis_settings['enabled']) or (
-            segment_analysis_attributes != current_segment_analysis_settings['attributes']
+        if (segment_analysis_enabled != current_segment_analysis_settings["enabled"]) or (
+            segment_analysis_attributes != current_segment_analysis_settings["attributes"]
         ):
             self.log.debug(
                 f"Trying to update segment analysis settings for deployment_id={self.deployment_id}"

@@ -9,8 +9,7 @@ from datetime import datetime
 
 from airflow.decorators import dag
 from datarobot import AUTOPILOT_MODE
-from datarobot.enums import CV_METHOD
-from datarobot.enums import VALIDATION_TYPE
+from datarobot.enums import CV_METHOD, VALIDATION_TYPE
 
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 from datarobot_provider.operators.autopilot import StartAutopilotOperator
@@ -21,7 +20,7 @@ from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
 @dag(
     schedule=None,
     start_date=datetime(2022, 1, 1),
-    tags=['example', 'timeseries'],
+    tags=["example", "timeseries"],
     params={
         "dataset_file_path": "/dataset.csv",
         "project_name": "test airflow project custom partitioning",
@@ -43,7 +42,7 @@ def datarobot_custom_partitioning_pipeline():
     )
 
     create_project_op = CreateProjectOperator(
-        task_id='create_project',
+        task_id="create_project",
         dataset_id=dataset_uploading_op.output,
     )
 

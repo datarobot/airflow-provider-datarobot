@@ -7,33 +7,35 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from datetime import datetime
 
-from airflow.decorators import dag
-from airflow.decorators import task
+from airflow.decorators import dag, task
 
 from datarobot_provider.operators.ai_catalog import CreateDatasetFromDataStoreOperator
 from datarobot_provider.operators.bias_and_fairness import UpdateBiasAndFairnessSettingsOperator
 from datarobot_provider.operators.connections import GetOrCreateDataStoreOperator
 from datarobot_provider.operators.credentials import GetOrCreateCredentialOperator
-from datarobot_provider.operators.datarobot import CreateProjectOperator
-from datarobot_provider.operators.datarobot import DeployRecommendedModelOperator
-from datarobot_provider.operators.datarobot import GetFeatureDriftOperator
-from datarobot_provider.operators.datarobot import GetTargetDriftOperator
-from datarobot_provider.operators.datarobot import ScorePredictionsOperator
-from datarobot_provider.operators.datarobot import TrainModelsOperator
-from datarobot_provider.operators.monitoring import GetAccuracyOperator
-from datarobot_provider.operators.monitoring import GetServiceStatsOperator
-from datarobot_provider.operators.monitoring import UpdateMonitoringSettingsOperator
+from datarobot_provider.operators.datarobot import (
+    CreateProjectOperator,
+    DeployRecommendedModelOperator,
+    GetFeatureDriftOperator,
+    GetTargetDriftOperator,
+    ScorePredictionsOperator,
+    TrainModelsOperator,
+)
+from datarobot_provider.operators.monitoring import (
+    GetAccuracyOperator,
+    GetServiceStatsOperator,
+    UpdateMonitoringSettingsOperator,
+)
 from datarobot_provider.operators.monitoring_job import BatchMonitoringOperator
 from datarobot_provider.operators.segment_analysis import UpdateSegmentAnalysisSettingsOperator
-from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
-from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
+from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor, ScoringCompleteSensor
 from datarobot_provider.sensors.monitoring_job import MonitoringJobCompleteSensor
 
 
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'end-to-end', 'pipline'],
+    tags=["example", "end-to-end", "pipline"],
     params={
         "datarobot_jdbc_connection": "demo_datarobot_jdbc_connection",
         "dataset_name": "Demo-Airflow-training-dataset",
@@ -49,26 +51,26 @@ from datarobot_provider.sensors.monitoring_job import MonitoringJobCompleteSenso
         "deployment_description": "Airflow - Demo Deployment",
         "score_settings": {
             "intake_settings": {
-                'type': 'jdbc',
-                'table': 'DEMO-SCORING-DATASET',
-                'schema': 'DEMO_SCHEMA',
+                "type": "jdbc",
+                "table": "DEMO-SCORING-DATASET",
+                "schema": "DEMO_SCHEMA",
             },
             "output_settings": {
-                'type': 'jdbc',
-                'schema': 'DEMO_SCHEMA',
-                'table': 'DEMO-SCORING-OUTPUT-DATASET',
-                'statement_type': 'insert',
-                'create_table_if_not_exists': True,
+                "type": "jdbc",
+                "schema": "DEMO_SCHEMA",
+                "table": "DEMO-SCORING-OUTPUT-DATASET",
+                "statement_type": "insert",
+                "create_table_if_not_exists": True,
             },
             # "passthrough_columns": ['column1', 'column2'],
-            'passthrough_columns_set': 'all',
+            "passthrough_columns_set": "all",
         },
-        'segment_analysis_enabled': True,
-        'segment_analysis_attributes': ['race', 'gender'],
-        'protected_features': ['gender'],
-        'preferable_target_value': 'True',
-        'fairness_metrics_set': 'equalParity',
-        'fairness_threshold': 0.1,
+        "segment_analysis_enabled": True,
+        "segment_analysis_attributes": ["race", "gender"],
+        "protected_features": ["gender"],
+        "preferable_target_value": "True",
+        "fairness_metrics_set": "equalParity",
+        "fairness_threshold": 0.1,
         "target_drift_enabled": True,
         "feature_drift_enabled": True,
         "association_id_column": ["rowID"],
@@ -76,9 +78,9 @@ from datarobot_provider.sensors.monitoring_job import MonitoringJobCompleteSenso
         "predictions_data_collection_enabled": True,
         "monitoring_settings": {
             "intake_settings": {
-                'type': 'jdbc',
-                'table': 'DEMO-ACTUALS-DATASET',  # table with actuals
-                'schema': 'DEMO_SCHEMA',
+                "type": "jdbc",
+                "table": "DEMO-ACTUALS-DATASET",  # table with actuals
+                "schema": "DEMO_SCHEMA",
             },
             "monitoring_columns": {
                 "association_id_column": "rowID",
@@ -98,7 +100,7 @@ def advanced_datarobot_pipeline_jdbc():
     )
 
     create_project_op = CreateProjectOperator(
-        task_id='create_project',
+        task_id="create_project",
         dataset_id=dataset_connect_op.output,
         credential_id=get_jdbc_credentials_op.output,
     )
@@ -191,8 +193,8 @@ def advanced_datarobot_pipeline_jdbc():
         """Example of custom logic based on service stats from the deployment."""
 
         # Put your service stat processing logic here:
-        current_model_id = model_service_stat['model_id']
-        total_predictions = model_service_stat['metrics']['totalPredictions']
+        current_model_id = model_service_stat["model_id"]
+        total_predictions = model_service_stat["metrics"]["totalPredictions"]
         # example of custom logic:
         return {"model_id": current_model_id, "alive": total_predictions > 0}
 

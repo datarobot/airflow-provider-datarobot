@@ -9,23 +9,24 @@ from datetime import datetime
 
 from airflow.decorators import dag
 
-from datarobot_provider.operators.datarobot import CreateProjectOperator
-from datarobot_provider.operators.datarobot import DeployRecommendedModelOperator
-from datarobot_provider.operators.datarobot import GetFeatureDriftOperator
-from datarobot_provider.operators.datarobot import GetTargetDriftOperator
-from datarobot_provider.operators.datarobot import ScorePredictionsOperator
-from datarobot_provider.operators.datarobot import TrainModelsOperator
-from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
-from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
+from datarobot_provider.operators.datarobot import (
+    CreateProjectOperator,
+    DeployRecommendedModelOperator,
+    GetFeatureDriftOperator,
+    GetTargetDriftOperator,
+    ScorePredictionsOperator,
+    TrainModelsOperator,
+)
+from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor, ScoringCompleteSensor
 
 
 @dag(
     schedule=None,
     start_date=datetime(2022, 1, 1),
-    tags=['example'],
+    tags=["example"],
 )
 def datarobot_pipeline():
-    create_project_op = CreateProjectOperator(task_id='create_project')
+    create_project_op = CreateProjectOperator(task_id="create_project")
 
     train_models_op = TrainModelsOperator(
         task_id="train_models",

@@ -7,8 +7,7 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 
 import datarobot as dr
-from datarobot.enums import CV_METHOD
-from datarobot.enums import VALIDATION_TYPE
+from datarobot.enums import CV_METHOD, VALIDATION_TYPE
 
 from datarobot_provider.operators.autopilot import StartAutopilotOperator
 
@@ -32,8 +31,8 @@ def test_operator_start_autopilot_timeseries(mocker):
     autopilot_settings = {"target": "readmitted"}
     datetime_partitioning_settings = {
         "use_time_series": True,
-        "datetime_partition_column": 'datetime',
-        "multiseries_id_columns": ['location'],
+        "datetime_partition_column": "datetime",
+        "multiseries_id_columns": ["location"],
     }
     operator.execute(
         context={

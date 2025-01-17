@@ -7,18 +7,16 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from datetime import datetime
 
-from airflow.decorators import dag
-from airflow.decorators import task
+from airflow.decorators import dag, task
 from datarobot.enums import MODEL_REPLACEMENT_REASON
 
-from datarobot_provider.operators.deployment import GetDeploymentModelOperator
-from datarobot_provider.operators.deployment import ReplaceModelOperator
+from datarobot_provider.operators.deployment import GetDeploymentModelOperator, ReplaceModelOperator
 
 
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'mlops'],
+    tags=["example", "mlops"],
 )
 def deployment_replace_model(deployment_id=None, new_model_id=None):
     if not deployment_id:
@@ -48,7 +46,7 @@ def deployment_replace_model(deployment_id=None, new_model_id=None):
         """Example of custom logic based on comparing old and replaced from the deployment."""
 
         # Put your custom logic here:
-        return deployment_model_before['id'] != deployment_model_after['id']
+        return deployment_model_before["id"] != deployment_model_after["id"]
 
     example_deployment_model_check = deployment_model_check_example(
         deployment_model_before=get_deployment_model_before_op.output,

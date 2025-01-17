@@ -6,9 +6,7 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 import os
-from typing import Any
-from typing import Dict
-from typing import Iterable
+from typing import Any, Dict, Iterable
 
 import datarobot as dr
 from airflow.exceptions import AirflowException

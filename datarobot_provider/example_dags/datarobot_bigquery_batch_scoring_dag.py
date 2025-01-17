@@ -30,6 +30,7 @@ Config example for this dag:
     },
 }
 """
+
 from datetime import datetime
 
 from airflow.decorators import dag
@@ -42,7 +43,7 @@ from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=['example', 'gcp', 'bigquery'],
+    tags=["example", "gcp", "bigquery"],
     params={
         "deployment_id": "put_your_deployment_id_here",
         "datarobot_gcp_credentials": "demo_bigquery_test_credentials",
@@ -59,7 +60,7 @@ from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
                 "table": "output_table_name",
                 "bucket": "gcp_bucket_name",
             },
-            'passthrough_columns_set': 'all',
+            "passthrough_columns_set": "all",
         },
     },
 )

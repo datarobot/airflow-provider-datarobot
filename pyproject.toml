@@ -1,18 +1,33 @@
-[tool.black]
+[tool.ruff]
+# General settings
 line-length = 100
-skip-string-normalization = true
-target-version = ['py37']
-exclude = '''
-(
-    ^/\.git/
-)
-'''
+target-version = "py37"
 
-[tool.isort]
-# Requires isort>5 for profile support
-# See https://pycqa.github.io/isort/docs/configuration/profiles/
-profile = "black"
-# Overrides for the profile:
-line_length = 100
-force_single_line = true
-filter_files = true
+# Extend default excludes (based on Flake8 configuration)
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+]
+
+[tool.ruff.lint]
+# Rules to select (corresponds to Flake8's select)
+select = [
+    "C",
+    "E",
+    "F",
+    "W",
+    "B",
+    "I",
+]
+
+# Rules to ignore (corresponds to Flake8's ignore)
+ignore = [
+    "E501",  # Line length handled by `line-length` setting
+    "C408",  # Unnecessary `dict()` call (rewrite as a literal)
+    "B018",  # Found useless expression. Either assign it to a variable or remove it.
+    "C901",  # Method is too complex
+]
+
+[tool.ruff.format]
+quote-style = "double"
