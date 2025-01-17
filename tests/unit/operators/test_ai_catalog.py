@@ -112,20 +112,20 @@ def test_operator_create_dataset_from_jdbc(mocker, mock_airflow_connection_datar
 
 
 @pytest.mark.parametrize(
-    'test_params, expected_do_snapshot, expected_name, expected_mat_destination',
+    "test_params, expected_do_snapshot, expected_name, expected_mat_destination",
     [
         ({}, True, None, None),
         (
-            {'dataset1_name': 'The dataset name.', 'dataset_name': 'another'},
+            {"dataset1_name": "The dataset name.", "dataset_name": "another"},
             True,
-            'The dataset name.',
+            "The dataset name.",
             None,
         ),
         (
-            {'materialization_schema': 'testSchema', 'materialization_table': 'testTable'},
+            {"materialization_schema": "testSchema", "materialization_table": "testTable"},
             False,
-            'testTable',
-            {'catalog': None, 'schema': 'testSchema', 'table': 'testTable'},
+            "testTable",
+            {"catalog": None, "schema": "testSchema", "table": "testTable"},
         ),
     ],
 )
@@ -133,14 +133,14 @@ def test_operator_create_dataset_from_recipe(
     mocker, test_params, expected_do_snapshot, expected_name, expected_mat_destination
 ):
     dataset_mock = mocker.Mock()
-    recipe_mock = mocker.Mock(recipe_id='test-recipe-id')
+    recipe_mock = mocker.Mock(recipe_id="test-recipe-id")
     dataset_mock.id = "dataset-id"
     create_dataset_from_recipe_mock = mocker.patch.object(
         dr.Dataset, "create_from_recipe", return_value=dataset_mock
     )
     get_recipe_mock = mocker.patch.object(dr.models.Recipe, "get", return_value=recipe_mock)
     operator = CreateDatasetFromRecipeOperator(
-        task_id='create_from_recipe', recipe_id='test-recipe-id', dataset_name_param='dataset1_name'
+        task_id="create_from_recipe", recipe_id="test-recipe-id", dataset_name_param="dataset1_name"
     )
 
     dataset_id = operator.execute(context={"params": test_params})
@@ -153,7 +153,7 @@ def test_operator_create_dataset_from_recipe(
         persist_data_after_ingestion=True,
         materialization_destination=expected_mat_destination,
     )
-    get_recipe_mock.assert_called_once_with('test-recipe-id')
+    get_recipe_mock.assert_called_once_with("test-recipe-id")
 
 
 def test_operator_create_dataset_version(mocker):

@@ -271,7 +271,7 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
     template_fields: Iterable[str] = []
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = '#f4a460'
+    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -293,7 +293,7 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
         self.materialization_schema_param = materialization_schema_param
         self.materialization_table_param = materialization_table_param
 
-        if kwargs.get('xcom_push') is not None:
+        if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -314,7 +314,7 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
         materialization_destination: Optional[dr.models.dataset.MaterializationDestination],
     ):
         return context["params"].get(self.dataset_name_param) or (
-            materialization_destination and materialization_destination['table']
+            materialization_destination and materialization_destination["table"]
         )
 
     def execute(self, context: Dict[str, Any]) -> str:
@@ -335,16 +335,16 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
 
         logging.info(
             '%s dataset "%s" created.',
-            'Snapshot' if do_snapshot else 'Dynamic',
+            "Snapshot" if do_snapshot else "Dynamic",
             dataset.name,
         )
 
-        if context['params'].get('experiment_container_id'):
-            dr.UseCase.get(use_case_id=context['params']['experiment_container_id']).add(dataset)
+        if context["params"].get("experiment_container_id"):
+            dr.UseCase.get(use_case_id=context["params"]["experiment_container_id"]).add(dataset)
 
             logging.info(
-                'The dataset is added into experiment container %s.',
-                context['params']['experiment_container_id'],
+                "The dataset is added into experiment container %s.",
+                context["params"]["experiment_container_id"],
             )
 
         else:
