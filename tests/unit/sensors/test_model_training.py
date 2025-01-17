@@ -12,21 +12,21 @@ from datarobot_provider.sensors.model_training import ModelTrainingJobSensor
 
 
 def test_model_training_job_sensor__success(mocker):
-    trained_model_id = "trained-model-id"
+    trained_model_id = 'trained-model-id'
 
     job_mock = mocker.Mock()
-    job_mock.status = "COMPLETED"
+    job_mock.status = 'COMPLETED'
 
     model_mock = mocker.Mock()
     model_mock.id = trained_model_id
 
-    mocker.patch.object(dr.Job, "get", return_value=job_mock)
-    mocker.patch.object(dr.ModelJob, "get_model", return_value=model_mock)
+    mocker.patch.object(dr.Job, 'get', return_value=job_mock)
+    mocker.patch.object(dr.ModelJob, 'get_model', return_value=model_mock)
 
     operator = ModelTrainingJobSensor(
-        task_id="check_model_training_job_finished",
-        project_id="project-id",
-        job_id="job-id",
+        task_id='check_model_training_job_finished',
+        project_id='project-id',
+        job_id='job-id',
     )
     result = operator.poke(context={})
 

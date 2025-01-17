@@ -23,8 +23,8 @@ class JDBCDataSourceHook(BasicCredentialsHook):
     manage JDBC connections with corresponding credentials.
     """
 
-    conn_type = "datarobot.datasource.jdbc"
-    hook_name = "DataRobot JDBC DataSource"
+    conn_type = 'datarobot.datasource.jdbc'
+    hook_name = 'DataRobot JDBC DataSource'
 
     @staticmethod
     def get_connection_form_widgets() -> Dict[str, Any]:
@@ -35,20 +35,20 @@ class JDBCDataSourceHook(BasicCredentialsHook):
         from wtforms import StringField
 
         return {
-            "datarobot_connection": StringField(
-                lazy_gettext("DataRobot Connection"),
+            'datarobot_connection': StringField(
+                lazy_gettext('DataRobot Connection'),
                 widget=BS3TextFieldWidget(),
-                default="datarobot_default",
+                default='datarobot_default',
             ),
-            "jdbc_driver": StringField(
-                lazy_gettext("JDBC Driver"),
+            'jdbc_driver': StringField(
+                lazy_gettext('JDBC Driver'),
                 widget=BS3TextFieldWidget(),
-                default="",
+                default='',
             ),
-            "jdbc_url": StringField(
-                lazy_gettext("JDBC URL"),
+            'jdbc_url': StringField(
+                lazy_gettext('JDBC URL'),
                 widget=BS3TextAreaFieldWidget(),
-                default="jdbc:",
+                default='jdbc:',
             ),
         }
 
@@ -56,12 +56,12 @@ class JDBCDataSourceHook(BasicCredentialsHook):
     def get_ui_field_behaviour() -> Dict:
         """Returns custom field behaviour."""
         return {
-            "hidden_fields": ["host", "schema", "port", "extra"],
-            "relabeling": {},
-            "placeholders": {
-                "datarobot_connection": "datarobot_default",
-                "jdbc_driver": "",
-                "jdbc_url": "jdbc:",
+            'hidden_fields': ['host', 'schema', 'port', 'extra'],
+            'relabeling': {},
+            'placeholders': {
+                'datarobot_connection': 'datarobot_default',
+                'jdbc_driver': '',
+                'jdbc_url': 'jdbc:',
             },
         }
 
@@ -71,29 +71,29 @@ class JDBCDataSourceHook(BasicCredentialsHook):
 
         conn = self.get_connection(self.datarobot_credentials_conn_id)
 
-        datarobot_connection_id = conn.extra_dejson.get("datarobot_connection", "")
+        datarobot_connection_id = conn.extra_dejson.get('datarobot_connection', '')
 
         if not datarobot_connection_id:
-            raise AirflowException("datarobot_connection is not defined")
+            raise AirflowException('datarobot_connection is not defined')
 
         # Initialize DataRobot client by DataRobotHook
         DataRobotHook(datarobot_conn_id=datarobot_connection_id).run()
 
-        jdbc_driver_name = conn.extra_dejson.get("jdbc_driver", "")
+        jdbc_driver_name = conn.extra_dejson.get('jdbc_driver', '')
 
         if not jdbc_driver_name:
-            raise AirflowException("jdbc_driver is not defined")
+            raise AirflowException('jdbc_driver is not defined')
 
-        jdbc_url = conn.extra_dejson.get("jdbc_url", "")
+        jdbc_url = conn.extra_dejson.get('jdbc_url', '')
 
         if not jdbc_url:
-            raise AirflowException("jdbc_url is not defined")
+            raise AirflowException('jdbc_url is not defined')
 
         if not conn.login:
-            raise AirflowException("login is not defined")
+            raise AirflowException('login is not defined')
 
         if not conn.password:
-            raise AirflowException("password is not defined")
+            raise AirflowException('password is not defined')
 
         credential = self.get_or_create_credential(conn)
 
@@ -105,7 +105,7 @@ class JDBCDataSourceHook(BasicCredentialsHook):
             if jdbc_drv_item.canonical_name == jdbc_driver_name:
                 jdbc_driver_id = jdbc_drv_item.id
                 self.log.info(
-                    f"Found JDBC Driver:{jdbc_drv_item.canonical_name} , id={jdbc_drv_item.id}"
+                    f'Found JDBC Driver:{jdbc_drv_item.canonical_name} , id={jdbc_drv_item.id}'
                 )
                 break
         else:
@@ -115,26 +115,26 @@ class JDBCDataSourceHook(BasicCredentialsHook):
         for data_store in DataStore.list():
             if data_store.canonical_name == self.datarobot_credentials_conn_id:
                 self.log.info(
-                    f"Found existing DataStore:{data_store.canonical_name} , id={data_store.id}"
+                    f'Found existing DataStore:{data_store.canonical_name} , id={data_store.id}'
                 )
                 break
         else:
             self.log.info(
-                f"DataStore:{self.datarobot_credentials_conn_id} does not exist, trying to create it"
+                f'DataStore:{self.datarobot_credentials_conn_id} does not exist, trying to create it'
             )
             data_store = DataStore.create(
-                data_store_type="jdbc",
+                data_store_type='jdbc',
                 canonical_name=self.datarobot_credentials_conn_id,
                 driver_id=jdbc_driver_id,
                 jdbc_url=jdbc_url,
             )
             self.log.info(
-                f"DataStore:{self.datarobot_credentials_conn_id} successfully created, id={data_store.id}"
+                f'DataStore:{self.datarobot_credentials_conn_id} successfully created, id={data_store.id}'
             )
 
         if jdbc_url != data_store.params.jdbc_url or jdbc_driver_id != data_store.params.driver_id:
             self.log.info(
-                f"Updating DataStore:{self.datarobot_credentials_conn_id} with new params..."
+                f'Updating DataStore:{self.datarobot_credentials_conn_id} with new params...'
             )
             data_store.update(
                 canonical_name=self.datarobot_credentials_conn_id,
@@ -142,7 +142,7 @@ class JDBCDataSourceHook(BasicCredentialsHook):
                 jdbc_url=jdbc_url,
             )
             self.log.info(
-                f"DataStore:{self.datarobot_credentials_conn_id} successfully updated, id={data_store.id}"
+                f'DataStore:{self.datarobot_credentials_conn_id} successfully updated, id={data_store.id}'
             )
 
         return credential, credential_data, data_store
@@ -157,10 +157,10 @@ class JDBCDataSourceHook(BasicCredentialsHook):
             credential, credential_data, data_store = self.run()
 
             test_result = data_store.test(
-                username=credential_data["user"], password=credential_data["password"]
+                username=credential_data['user'], password=credential_data['password']
             )
 
-            success_massage = f"{test_result['message']}"
+            success_massage = f'{test_result["message"]}'
             return True, success_massage
         except Exception as e:
             return False, str(e)

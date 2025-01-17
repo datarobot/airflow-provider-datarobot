@@ -28,13 +28,13 @@ class AutopilotCompleteSensor(BaseSensorOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields = ["project_id"]
+    template_fields = ['project_id']
 
     def __init__(
         self,
         *,
         project_id: str,
-        datarobot_conn_id: str = "datarobot_default",
+        datarobot_conn_id: str = 'datarobot_default',
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -47,9 +47,9 @@ class AutopilotCompleteSensor(BaseSensorOperator):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
-        self.log.info("Checking if Autopilot is complete")
+        self.log.info('Checking if Autopilot is complete')
         project = dr.Project.get(self.project_id)
-        if project._autopilot_status_check()["autopilot_done"]:
+        if project._autopilot_status_check()['autopilot_done']:
             return True
         return False
 
@@ -67,13 +67,13 @@ class ScoringCompleteSensor(BaseSensorOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields = ["job_id"]
+    template_fields = ['job_id']
 
     def __init__(
         self,
         *,
         job_id: str,
-        datarobot_conn_id: str = "datarobot_default",
+        datarobot_conn_id: str = 'datarobot_default',
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -86,13 +86,13 @@ class ScoringCompleteSensor(BaseSensorOperator):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
-        self.log.info("Checking if scoring is complete")
+        self.log.info('Checking if scoring is complete')
         job = dr.BatchPredictionJob.get(self.job_id)
         job_data = job.get_status()
-        if job_data["status"].lower()[:5] in ["error", "abort"]:
+        if job_data['status'].lower()[:5] in ['error', 'abort']:
             raise AsyncProcessUnsuccessfulError(
-                f"The job did not complete successfully. Job Data: {job_data}"
+                f'The job did not complete successfully. Job Data: {job_data}'
             )
-        if job_data["status"].lower() == "completed":
+        if job_data['status'].lower() == 'completed':
             return True
         return False

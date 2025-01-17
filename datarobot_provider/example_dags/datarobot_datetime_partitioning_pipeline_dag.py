@@ -21,43 +21,43 @@ from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
 @dag(
     schedule=None,
     start_date=datetime(2022, 1, 1),
-    tags=["example", "datetime_partitioning"],
+    tags=['example', 'datetime_partitioning'],
     params={
-        "dataset_file_path": "/train_datetime.csv",
-        "project_name": "test airflow datetime-partitioning project",
-        "autopilot_settings": {
-            "target": "y",
-            "mode": AUTOPILOT_MODE.QUICK,
+        'dataset_file_path': '/train_datetime.csv',
+        'project_name': 'test airflow datetime-partitioning project',
+        'autopilot_settings': {
+            'target': 'y',
+            'mode': AUTOPILOT_MODE.QUICK,
         },
-        "datetime_partitioning_settings": {
-            "use_time_series": False,
-            "datetime_partition_column": "datetime",
-            "number_of_backtests": 1,
-            "autopilot_data_selection_method": DATETIME_AUTOPILOT_DATA_SELECTION_METHOD.DURATION,
-            "validation_duration": construct_duration_string(years=1),
-            "gap_duration": construct_duration_string(days=1),
+        'datetime_partitioning_settings': {
+            'use_time_series': False,
+            'datetime_partition_column': 'datetime',
+            'number_of_backtests': 1,
+            'autopilot_data_selection_method': DATETIME_AUTOPILOT_DATA_SELECTION_METHOD.DURATION,
+            'validation_duration': construct_duration_string(years=1),
+            'gap_duration': construct_duration_string(days=1),
         },
-        "unsupervised_mode": False,
-        "use_feature_discovery": False,
+        'unsupervised_mode': False,
+        'use_feature_discovery': False,
     },
 )
 def datarobot_datetime_partitioning_pipeline():
     dataset_uploading_op = UploadDatasetOperator(
-        task_id="dataset_uploading",
+        task_id='dataset_uploading',
     )
 
     create_project_op = CreateProjectOperator(
-        task_id="create_project",
+        task_id='create_project',
         dataset_id=dataset_uploading_op.output,
     )
 
     train_models_op = StartAutopilotOperator(
-        task_id="train_otv_models",
+        task_id='train_otv_models',
         project_id=create_project_op.output,
     )
 
     autopilot_complete_sensor = AutopilotCompleteSensor(
-        task_id="check_autopilot_complete",
+        task_id='check_autopilot_complete',
         project_id=create_project_op.output,
     )
 
@@ -66,5 +66,5 @@ def datarobot_datetime_partitioning_pipeline():
 
 datarobot_datetime_partitioning_pipeline_dag = datarobot_datetime_partitioning_pipeline()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     datarobot_datetime_partitioning_pipeline_dag.test()

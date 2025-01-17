@@ -12,8 +12,8 @@ def test_datarobot_gcp_credentials_conn(
     dr_gcp_credentials_conn_details, mock_airflow_connection_datarobot_gcp_credentials
 ):
     hook = GoogleCloudCredentialsHook(
-        datarobot_credentials_conn_id="datarobot_gcp_credentials_test"
+        datarobot_credentials_conn_id='datarobot_gcp_credentials_test'
     )
     credentials, credential_data = hook.get_conn()
 
-    assert credential_data["gcpKey"] == dr_gcp_credentials_conn_details["gcp_key"]
+    assert credential_data['gcpKey'] == dr_gcp_credentials_conn_details['gcp_key']

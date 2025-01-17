@@ -28,33 +28,33 @@ from datarobot_provider.operators.credentials import GetOrCreateCredentialOperat
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=["example", "mlops"],
+    tags=['example', 'mlops'],
     # Default json config example:
     params={
-        "datarobot_jdbc_connection": "datarobot_jdbc_demo",
-        "dataset_name": "integration_example_demo",
-        "table_schema": "integration_example_demo",
-        "table_name": "actuals_demo",
+        'datarobot_jdbc_connection': 'datarobot_jdbc_demo',
+        'dataset_name': 'integration_example_demo',
+        'table_schema': 'integration_example_demo',
+        'table_name': 'actuals_demo',
     },
 )
 def datarobot_dataset_new_version(dataset_id=None):
     get_credentials_op = GetOrCreateCredentialOperator(
-        task_id="get_jdbc_credentials",
-        credentials_param_name="datarobot_jdbc_connection",
+        task_id='get_jdbc_credentials',
+        credentials_param_name='datarobot_jdbc_connection',
     )
 
     get_datastore_op = GetOrCreateDataStoreOperator(
-        task_id="get_datastore",
-        connection_param_name="datarobot_jdbc_connection",
+        task_id='get_datastore',
+        connection_param_name='datarobot_jdbc_connection',
     )
 
     get_datasource_op = CreateOrUpdateDataSourceOperator(
-        task_id="get_datasource",
+        task_id='get_datasource',
         data_store_id=get_datastore_op.output,
     )
 
     create_dataset_version_op = CreateDatasetVersionOperator(
-        task_id="create_new_version_of_dataset",
+        task_id='create_new_version_of_dataset',
         dataset_id=dataset_id,
         datasource_id=get_datasource_op.output,
         credential_id=get_credentials_op.output,
@@ -65,5 +65,5 @@ def datarobot_dataset_new_version(dataset_id=None):
 
 datarobot_dataset_new_version_dag = datarobot_dataset_new_version()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     datarobot_dataset_new_version_dag.test()

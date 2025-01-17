@@ -35,13 +35,13 @@ class CreateExecutionEnvironmentOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Iterable[str] = [
-        "name",
-        "description",
-        "programming_language",
+        'name',
+        'description',
+        'programming_language',
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = "#f4a460"
+    ui_color = '#f4a460'
 
     def __init__(
         self,
@@ -49,7 +49,7 @@ class CreateExecutionEnvironmentOperator(BaseOperator):
         name: str = None,
         description: str = None,
         programming_language: str = None,
-        datarobot_conn_id: str = "datarobot_default",
+        datarobot_conn_id: str = 'datarobot_default',
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -57,7 +57,7 @@ class CreateExecutionEnvironmentOperator(BaseOperator):
         self.description = description
         self.programming_language = programming_language
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
+        if kwargs.get('xcom_push') is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -66,26 +66,26 @@ class CreateExecutionEnvironmentOperator(BaseOperator):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
-        required_metadata_keys = context["params"].get("required_metadata_keys", None)
+        required_metadata_keys = context['params'].get('required_metadata_keys', None)
         metadata_keys = []
         if required_metadata_keys:
             metadata_keys = [
-                RequiredMetadataKey(field_name=key["field_name"], display_name=key["display_name"])
+                RequiredMetadataKey(field_name=key['field_name'], display_name=key['display_name'])
                 for key in required_metadata_keys
             ]
 
         execution_environment_name = (
-            context["params"].get("execution_environment_name", None)
+            context['params'].get('execution_environment_name', None)
             if self.name is None
             else self.name
         )
         execution_environment_description = (
-            context["params"].get("execution_environment_description", None)
+            context['params'].get('execution_environment_description', None)
             if self.description is None
             else self.description
         )
         programming_language = (
-            context["params"].get("programming_language", None)
+            context['params'].get('programming_language', None)
             if self.programming_language is None
             else self.programming_language
         )
@@ -98,7 +98,7 @@ class CreateExecutionEnvironmentOperator(BaseOperator):
         )
 
         self.log.info(
-            f"Execution environment created, execution_environment_id={execution_environment.id}"
+            f'Execution environment created, execution_environment_id={execution_environment.id}'
         )
 
         return execution_environment.id
@@ -124,14 +124,14 @@ class CreateExecutionEnvironmentVersionOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Iterable[str] = [
-        "execution_environment_id",
-        "docker_context_path",
-        "environment_version_label",
-        "environment_version_description",
+        'execution_environment_id',
+        'docker_context_path',
+        'environment_version_label',
+        'environment_version_description',
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = "#f4a460"
+    ui_color = '#f4a460'
 
     def __init__(
         self,
@@ -141,7 +141,7 @@ class CreateExecutionEnvironmentVersionOperator(BaseOperator):
         environment_version_label: str = None,
         environment_version_description: str = None,
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
-        datarobot_conn_id: str = "datarobot_default",
+        datarobot_conn_id: str = 'datarobot_default',
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -151,7 +151,7 @@ class CreateExecutionEnvironmentVersionOperator(BaseOperator):
         self.environment_version_description = environment_version_description
         self.max_wait_sec = max_wait_sec
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
+        if kwargs.get('xcom_push') is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -161,17 +161,17 @@ class CreateExecutionEnvironmentVersionOperator(BaseOperator):
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         docker_context_path = (
-            context["params"].get("docker_context_path", None)
+            context['params'].get('docker_context_path', None)
             if self.docker_context_path is None
             else self.docker_context_path
         )
         version_label = (
-            context["params"].get("environment_version_label", None)
+            context['params'].get('environment_version_label', None)
             if self.environment_version_label is None
             else self.environment_version_label
         )
         version_description = (
-            context["params"].get("environment_version_description", None)
+            context['params'].get('environment_version_description', None)
             if self.environment_version_description is None
             else self.environment_version_description
         )
@@ -185,7 +185,7 @@ class CreateExecutionEnvironmentVersionOperator(BaseOperator):
         )
 
         self.log.info(
-            f"Execution environment version created, environment_version_id={environment_version.id}"
+            f'Execution environment version created, environment_version_id={environment_version.id}'
         )
 
         return environment_version.id
@@ -204,26 +204,26 @@ class CreateCustomInferenceModelOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Iterable[str] = [
-        "name",
-        "description",
+        'name',
+        'description',
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = "#f4a460"
+    ui_color = '#f4a460'
 
     def __init__(
         self,
         *,
         name: str = None,
         description: str = None,
-        datarobot_conn_id: str = "datarobot_default",
+        datarobot_conn_id: str = 'datarobot_default',
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.name = name
         self.description = description
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
+        if kwargs.get('xcom_push') is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -233,47 +233,47 @@ class CreateCustomInferenceModelOperator(BaseOperator):
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         custom_model_name = (
-            context["params"].get("custom_model_name", None) if self.name is None else self.name
+            context['params'].get('custom_model_name', None) if self.name is None else self.name
         )
 
         if custom_model_name is None:
             raise ValueError(
-                "Custom model name is required attribute for CreateCustomInferenceModelOperator"
+                'Custom model name is required attribute for CreateCustomInferenceModelOperator'
             )
 
         custom_model_description = (
-            context["params"].get("custom_model_description", None)
+            context['params'].get('custom_model_description', None)
             if self.description is None
             else self.description
         )
 
-        target_type = context["params"].get("target_type", None)
+        target_type = context['params'].get('target_type', None)
 
         if target_type is None:
             raise ValueError(
-                "target_type is required attribute for CreateCustomInferenceModelOperator"
+                'target_type is required attribute for CreateCustomInferenceModelOperator'
             )
 
         custom_model = dr.CustomInferenceModel.create(
             name=custom_model_name,
             description=custom_model_description,
-            target_type=context["params"].get("target_type", None),
-            target_name=context["params"].get("target_name", None),
-            language=context["params"].get("programming_language", None),
-            positive_class_label=context["params"].get("positive_class_label", None),
-            negative_class_label=context["params"].get("negative_class_label", None),
-            prediction_threshold=context["params"].get("prediction_threshold", None),
-            class_labels=context["params"].get("class_labels", None),
-            class_labels_file=context["params"].get("class_labels_file", None),
-            network_egress_policy=context["params"].get("network_egress_policy", None),
-            maximum_memory=context["params"].get("maximum_memory", None),
-            replicas=context["params"].get("replicas", None),
-            is_training_data_for_versions_permanently_enabled=context["params"].get(
-                "is_training_data_for_versions_permanently_enabled", None
+            target_type=context['params'].get('target_type', None),
+            target_name=context['params'].get('target_name', None),
+            language=context['params'].get('programming_language', None),
+            positive_class_label=context['params'].get('positive_class_label', None),
+            negative_class_label=context['params'].get('negative_class_label', None),
+            prediction_threshold=context['params'].get('prediction_threshold', None),
+            class_labels=context['params'].get('class_labels', None),
+            class_labels_file=context['params'].get('class_labels_file', None),
+            network_egress_policy=context['params'].get('network_egress_policy', None),
+            maximum_memory=context['params'].get('maximum_memory', None),
+            replicas=context['params'].get('replicas', None),
+            is_training_data_for_versions_permanently_enabled=context['params'].get(
+                'is_training_data_for_versions_permanently_enabled', None
             ),
         )
 
-        self.log.info(f"Custom Inference Model created, custom_model_id={custom_model.id}")
+        self.log.info(f'Custom Inference Model created, custom_model_id={custom_model.id}')
 
         return custom_model.id
 
@@ -306,16 +306,16 @@ class CreateCustomModelVersionOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Iterable[str] = [
-        "custom_model_id",
-        "base_environment_id",
-        "training_dataset_id",
-        "holdout_dataset_id",
-        "custom_model_folder",
-        "create_from_previous",
+        'custom_model_id',
+        'base_environment_id',
+        'training_dataset_id',
+        'holdout_dataset_id',
+        'custom_model_folder',
+        'create_from_previous',
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = "#f4a460"
+    ui_color = '#f4a460'
 
     def __init__(
         self,
@@ -327,7 +327,7 @@ class CreateCustomModelVersionOperator(BaseOperator):
         custom_model_folder: str = None,
         create_from_previous: bool = False,
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
-        datarobot_conn_id: str = "datarobot_default",
+        datarobot_conn_id: str = 'datarobot_default',
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -339,7 +339,7 @@ class CreateCustomModelVersionOperator(BaseOperator):
         self.create_from_previous = create_from_previous
         self.max_wait_sec = max_wait_sec
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
+        if kwargs.get('xcom_push') is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -349,19 +349,19 @@ class CreateCustomModelVersionOperator(BaseOperator):
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         folder_path = (
-            context["params"].get("custom_model_folder", None)
+            context['params'].get('custom_model_folder', None)
             if self.custom_model_folder is None
             else self.custom_model_folder
         )
 
         if self.custom_model_id is None:
             raise ValueError(
-                "custom_model_id is required attribute for CreateCustomModelVersionOperator"
+                'custom_model_id is required attribute for CreateCustomModelVersionOperator'
             )
 
         if self.base_environment_id is None:
             raise ValueError(
-                "base_environment_id is required attribute for CreateCustomModelVersionOperator"
+                'base_environment_id is required attribute for CreateCustomModelVersionOperator'
             )
 
         if self.create_from_previous:
@@ -371,16 +371,16 @@ class CreateCustomModelVersionOperator(BaseOperator):
                 base_environment_id=self.base_environment_id,
                 holdout_dataset_id=self.holdout_dataset_id,
                 folder_path=folder_path,
-                is_major_update=context["params"].get("is_major_update", None),
-                files=context["params"].get("files", None),
-                files_to_delete=context["params"].get("files_to_delete", None),
-                network_egress_policy=context["params"].get("network_egress_policy", None),
-                maximum_memory=context["params"].get("maximum_memory", None),
-                replicas=context["params"].get("replicas", None),
-                required_metadata_values=context["params"].get("required_metadata_values", None),
-                partition_column=context["params"].get("partition_column", None),
-                keep_training_holdout_data=context["params"].get(
-                    "keep_training_holdout_data", None
+                is_major_update=context['params'].get('is_major_update', None),
+                files=context['params'].get('files', None),
+                files_to_delete=context['params'].get('files_to_delete', None),
+                network_egress_policy=context['params'].get('network_egress_policy', None),
+                maximum_memory=context['params'].get('maximum_memory', None),
+                replicas=context['params'].get('replicas', None),
+                required_metadata_values=context['params'].get('required_metadata_values', None),
+                partition_column=context['params'].get('partition_column', None),
+                keep_training_holdout_data=context['params'].get(
+                    'keep_training_holdout_data', None
                 ),
                 max_wait=self.max_wait_sec,
             )
@@ -391,21 +391,21 @@ class CreateCustomModelVersionOperator(BaseOperator):
                 base_environment_id=self.base_environment_id,
                 holdout_dataset_id=self.holdout_dataset_id,
                 folder_path=folder_path,
-                is_major_update=context["params"].get("is_major_update", None),
-                files=context["params"].get("files", None),
-                network_egress_policy=context["params"].get("network_egress_policy", None),
-                maximum_memory=context["params"].get("maximum_memory", None),
-                replicas=context["params"].get("replicas", None),
-                required_metadata_values=context["params"].get("required_metadata_values", None),
-                partition_column=context["params"].get("partition_column", None),
-                keep_training_holdout_data=context["params"].get(
-                    "keep_training_holdout_data", None
+                is_major_update=context['params'].get('is_major_update', None),
+                files=context['params'].get('files', None),
+                network_egress_policy=context['params'].get('network_egress_policy', None),
+                maximum_memory=context['params'].get('maximum_memory', None),
+                replicas=context['params'].get('replicas', None),
+                required_metadata_values=context['params'].get('required_metadata_values', None),
+                partition_column=context['params'].get('partition_column', None),
+                keep_training_holdout_data=context['params'].get(
+                    'keep_training_holdout_data', None
                 ),
                 max_wait=self.max_wait_sec,
             )
 
         self.log.info(
-            f"Custom Model Version created, custom_model_version_id={custom_model_version.id}"
+            f'Custom Model Version created, custom_model_version_id={custom_model_version.id}'
         )
 
         return custom_model_version.id
@@ -429,10 +429,10 @@ class CustomModelTestOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["custom_model_id", "custom_model_version_id", "dataset_id"]
+    template_fields: Iterable[str] = ['custom_model_id', 'custom_model_version_id', 'dataset_id']
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = "#f4a460"
+    ui_color = '#f4a460'
 
     def __init__(
         self,
@@ -441,7 +441,7 @@ class CustomModelTestOperator(BaseOperator):
         custom_model_version_id: str,
         dataset_id: str = None,
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
-        datarobot_conn_id: str = "datarobot_default",
+        datarobot_conn_id: str = 'datarobot_default',
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -450,7 +450,7 @@ class CustomModelTestOperator(BaseOperator):
         self.dataset_id = dataset_id
         self.max_wait_sec = max_wait_sec
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
+        if kwargs.get('xcom_push') is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -460,10 +460,10 @@ class CustomModelTestOperator(BaseOperator):
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         if self.custom_model_id is None:
-            raise ValueError("custom_model_id is required attribute")
+            raise ValueError('custom_model_id is required attribute')
 
         if self.custom_model_version_id is None:
-            raise ValueError("custom_model_version_id is required attribute")
+            raise ValueError('custom_model_version_id is required attribute')
 
         # Perform custom model tests
         custom_model_test = dr.CustomModelTest.create(
@@ -471,12 +471,12 @@ class CustomModelTestOperator(BaseOperator):
             custom_model_version_id=self.custom_model_version_id,
             dataset_id=self.dataset_id,
             max_wait=self.max_wait_sec,
-            network_egress_policy=context["params"].get("network_egress_policy", None),
-            maximum_memory=context["params"].get("maximum_memory", None),
-            replicas=context["params"].get("replicas", None),
+            network_egress_policy=context['params'].get('network_egress_policy', None),
+            maximum_memory=context['params'].get('maximum_memory', None),
+            replicas=context['params'].get('replicas', None),
         )
 
-        self.log.info(f"Overall testing status: {custom_model_test.overall_status}")
+        self.log.info(f'Overall testing status: {custom_model_test.overall_status}')
 
         return custom_model_test.id
 
@@ -492,22 +492,22 @@ class GetCustomModelTestOverallStatusOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["custom_model_test_id"]
+    template_fields: Iterable[str] = ['custom_model_test_id']
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = "#f4a460"
+    ui_color = '#f4a460'
 
     def __init__(
         self,
         *,
         custom_model_test_id: str,
-        datarobot_conn_id: str = "datarobot_default",
+        datarobot_conn_id: str = 'datarobot_default',
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.custom_model_test_id = custom_model_test_id
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
+        if kwargs.get('xcom_push') is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -517,11 +517,11 @@ class GetCustomModelTestOverallStatusOperator(BaseOperator):
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         if self.custom_model_test_id is None:
-            raise ValueError("custom_model_test_id is required attribute")
+            raise ValueError('custom_model_test_id is required attribute')
 
         custom_model_test = dr.CustomModelTest.get(custom_model_test_id=self.custom_model_test_id)
 
-        self.log.info(f"Overall testing status: {custom_model_test.overall_status}")
+        self.log.info(f'Overall testing status: {custom_model_test.overall_status}')
 
         return custom_model_test.overall_status
 
@@ -551,13 +551,13 @@ class CreateCustomModelDeploymentOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Iterable[str] = [
-        "custom_model_version_id",
-        "deployment_name",
-        "prediction_server_id",
+        'custom_model_version_id',
+        'deployment_name',
+        'prediction_server_id',
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = "#f4a460"
+    ui_color = '#f4a460'
 
     def __init__(
         self,
@@ -568,7 +568,7 @@ class CreateCustomModelDeploymentOperator(BaseOperator):
         description: str = None,
         importance: str = None,
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
-        datarobot_conn_id: str = "datarobot_default",
+        datarobot_conn_id: str = 'datarobot_default',
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -579,7 +579,7 @@ class CreateCustomModelDeploymentOperator(BaseOperator):
         self.importance = importance
         self.max_wait_sec = max_wait_sec
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
+        if kwargs.get('xcom_push') is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -589,10 +589,10 @@ class CreateCustomModelDeploymentOperator(BaseOperator):
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         if self.custom_model_version_id is None:
-            raise ValueError("Invalid or missing `custom_model_version_id` value")
+            raise ValueError('Invalid or missing `custom_model_version_id` value')
 
         if self.deployment_name is None:
-            raise ValueError("Invalid or missing `deployment_name` value")
+            raise ValueError('Invalid or missing `deployment_name` value')
 
         deployment = dr.Deployment.create_from_custom_model_version(
             custom_model_version_id=self.custom_model_version_id,
@@ -603,5 +603,5 @@ class CreateCustomModelDeploymentOperator(BaseOperator):
             max_wait=self.max_wait_sec,
         )
 
-        self.log.info(f"Deployment created, deployment_id: {deployment.id}")
+        self.log.info(f'Deployment created, deployment_id: {deployment.id}')
         return deployment.id

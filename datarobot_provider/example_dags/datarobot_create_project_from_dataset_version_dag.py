@@ -30,22 +30,22 @@ from datarobot_provider.operators.datarobot import CreateProjectOperator
 @dag(
     schedule=None,
     start_date=datetime(2022, 1, 1),
-    tags=["example"],
+    tags=['example'],
     params={
-        "training_dataset_id": "644...590",
-        "dataset_file_path": "/path/to/local/file",
-        "project_name": "test project updated",
-        "unsupervised_mode": False,
-        "use_feature_discovery": False,
+        'training_dataset_id': '644...590',
+        'dataset_file_path': '/path/to/local/file',
+        'project_name': 'test project updated',
+        'unsupervised_mode': False,
+        'use_feature_discovery': False,
     },
 )
 def create_project_from_dataset_version():
     dataset_new_version_op = UpdateDatasetFromFileOperator(
-        task_id="dataset_new_version",
+        task_id='dataset_new_version',
     )
 
     create_project_op = CreateProjectOperator(
-        task_id="create_project", dataset_version_id=dataset_new_version_op.output
+        task_id='create_project', dataset_version_id=dataset_new_version_op.output
     )
 
     dataset_new_version_op >> create_project_op

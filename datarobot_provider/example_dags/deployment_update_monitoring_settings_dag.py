@@ -17,38 +17,38 @@ from datarobot_provider.operators.monitoring import UpdateMonitoringSettingsOper
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=["example", "mlops"],
+    tags=['example', 'mlops'],
     # Default json config example:
     params={
-        "target_drift_enabled": True,
-        "feature_drift_enabled": True,
-        "association_id_column": ["id"],
-        "required_association_id": False,
-        "predictions_data_collection_enabled": False,
+        'target_drift_enabled': True,
+        'feature_drift_enabled': True,
+        'association_id_column': ['id'],
+        'required_association_id': False,
+        'predictions_data_collection_enabled': False,
     },
 )
 def deployment_monitoring_settings(deployment_id=None):
     if not deployment_id:
-        raise ValueError("Invalid or missing `deployment_id` value")
+        raise ValueError('Invalid or missing `deployment_id` value')
     get_monitoring_settings_before_op = GetMonitoringSettingsOperator(
-        task_id="get_monitoring_settings_before",
+        task_id='get_monitoring_settings_before',
         # you can pass deployment_id from previous operator here:
         deployment_id=deployment_id,
     )
 
     update_monitoring_settings_op = UpdateMonitoringSettingsOperator(
-        task_id="update_monitoring_settings",
+        task_id='update_monitoring_settings',
         # you can pass deployment_id from previous operator here:
         deployment_id=deployment_id,
     )
 
     get_monitoring_settings_after_op = GetMonitoringSettingsOperator(
-        task_id="get_monitoring_settings_after",
+        task_id='get_monitoring_settings_after',
         # you can pass deployment_id from previous operator here:
         deployment_id=deployment_id,
     )
 
-    @task(task_id="example_processing_python")
+    @task(task_id='example_processing_python')
     def monitoring_settings_processing(
         model_monitoring_settings_before, model_monitoring_settings_after
     ):
@@ -79,5 +79,5 @@ def deployment_monitoring_settings(deployment_id=None):
 
 deployment_monitoring_settings_dag = deployment_monitoring_settings()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     deployment_monitoring_settings_dag.test()

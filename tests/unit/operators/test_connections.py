@@ -14,35 +14,35 @@ from datarobot_provider.operators.connections import GetOrCreateDataStoreOperato
 
 def test_operator_get_or_create_dataset(mock_airflow_connection_datarobot_jdbc):
     test_params = {
-        "datarobot_connection_name": "datarobot_test_connection_jdbc_test",
+        'datarobot_connection_name': 'datarobot_test_connection_jdbc_test',
     }
 
     operator = GetOrCreateDataStoreOperator(
-        task_id="get_datastore_id", connection_param_name="datarobot_connection_name"
+        task_id='get_datastore_id', connection_param_name='datarobot_connection_name'
     )
 
     dataset_id = operator.execute(
         context={
-            "params": test_params,
+            'params': test_params,
         }
     )
 
-    assert dataset_id == "test-datastore-id"
+    assert dataset_id == 'test-datastore-id'
 
 
 def test_operator_get_or_create_dataset_not_found(mock_airflow_connection_datarobot_jdbc):
     test_params = {
-        "datarobot_connection_name": "datarobot_jdbc_not_found",
+        'datarobot_connection_name': 'datarobot_jdbc_not_found',
     }
 
     with pytest.raises(AirflowNotFoundException):
         operator = GetOrCreateDataStoreOperator(
-            task_id="get_datastore_id", connection_param_name="datarobot_connection_name"
+            task_id='get_datastore_id', connection_param_name='datarobot_connection_name'
         )
         operator.execute(
             context={
-                "params": {
-                    "params": test_params,
+                'params': {
+                    'params': test_params,
                 },
             }
         )

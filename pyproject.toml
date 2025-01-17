@@ -33,4 +33,4 @@ ignore = [
 force-single-line = true
 
 [tool.ruff.format]
-quote-style = "double"
+quote-style = "single"

@@ -43,45 +43,45 @@ from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=["example", "gcp", "bigquery"],
+    tags=['example', 'gcp', 'bigquery'],
     params={
-        "deployment_id": "put_your_deployment_id_here",
-        "datarobot_gcp_credentials": "demo_bigquery_test_credentials",
-        "score_settings": {
-            "intake_settings": {
-                "type": "bigquery",
-                "dataset": "integration_demo",
-                "table": "input_table_name",
-                "bucket": "gcp_bucket_name",
+        'deployment_id': 'put_your_deployment_id_here',
+        'datarobot_gcp_credentials': 'demo_bigquery_test_credentials',
+        'score_settings': {
+            'intake_settings': {
+                'type': 'bigquery',
+                'dataset': 'integration_demo',
+                'table': 'input_table_name',
+                'bucket': 'gcp_bucket_name',
             },
-            "output_settings": {
-                "type": "bigquery",
-                "dataset": "integration_demo",
-                "table": "output_table_name",
-                "bucket": "gcp_bucket_name",
+            'output_settings': {
+                'type': 'bigquery',
+                'dataset': 'integration_demo',
+                'table': 'output_table_name',
+                'bucket': 'gcp_bucket_name',
             },
-            "passthrough_columns_set": "all",
+            'passthrough_columns_set': 'all',
         },
     },
 )
 def datarobot_bigquery_batch_scoring(deployment_id=None):
     if not deployment_id:
-        raise ValueError("Invalid or missing `deployment_id` value")
+        raise ValueError('Invalid or missing `deployment_id` value')
 
     get_bigquery_credentials_op = GetOrCreateCredentialOperator(
-        task_id="get_gcp_credentials",
-        credentials_param_name="datarobot_gcp_credentials",
+        task_id='get_gcp_credentials',
+        credentials_param_name='datarobot_gcp_credentials',
     )
 
     score_predictions_op = ScorePredictionsOperator(
-        task_id="score_predictions",
+        task_id='score_predictions',
         deployment_id=deployment_id,
         intake_credential_id=get_bigquery_credentials_op.output,
         output_credential_id=get_bigquery_credentials_op.output,
     )
 
     scoring_complete_sensor = ScoringCompleteSensor(
-        task_id="check_scoring_complete",
+        task_id='check_scoring_complete',
         job_id=score_predictions_op.output,
     )
 
@@ -92,5 +92,5 @@ datarobot_bigquery_batch_scoring_dag = datarobot_bigquery_batch_scoring()
 
 # Staring from Airflow 2.5.1 Debug Executor is deprecated,
 # dag.test() should be used for dag testing:
-if __name__ == "__main__":
+if __name__ == '__main__':
     datarobot_bigquery_batch_scoring_dag.test()

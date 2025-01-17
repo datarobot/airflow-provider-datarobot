@@ -22,16 +22,16 @@ from datarobot_provider.operators.connections import GetOrCreateDataStoreOperato
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=["example"],
+    tags=['example'],
     # Default json config example:
     params={
-        "datarobot_jdbc_connection": "datarobot_jdbc_test",
+        'datarobot_jdbc_connection': 'datarobot_jdbc_test',
     },
 )
 def datarobot_test_datastore():
     dataset_connect_op = GetOrCreateDataStoreOperator(
-        task_id="create_dataset_jdbc",
-        connection_param_name="datarobot_jdbc_connection",
+        task_id='create_dataset_jdbc',
+        connection_param_name='datarobot_jdbc_connection',
     )
 
     dataset_connect_op
@@ -39,5 +39,5 @@ def datarobot_test_datastore():
 
 datarobot_test_datastore_dag = datarobot_test_datastore()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     datarobot_test_datastore_dag.test()

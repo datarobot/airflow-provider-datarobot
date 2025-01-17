@@ -33,19 +33,19 @@ from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
 @dag(
     schedule=None,
     start_date=datetime(2022, 1, 1),
-    tags=["example"],
+    tags=['example'],
 )
 def datarobot_score(deployment_id=None):
     if not deployment_id:
-        raise ValueError("Invalid or missing `deployment_id` value")
+        raise ValueError('Invalid or missing `deployment_id` value')
 
     score_predictions_op = ScorePredictionsOperator(
-        task_id="score_predictions",
+        task_id='score_predictions',
         deployment_id=deployment_id,
     )
 
     scoring_complete_sensor = ScoringCompleteSensor(
-        task_id="check_scoring_complete",
+        task_id='check_scoring_complete',
         job_id=score_predictions_op.output,
     )
 

@@ -78,39 +78,39 @@ Example JSON for a multiclass classification model:
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=["example", "mlops", "external model"],
+    tags=['example', 'mlops', 'external model'],
     params={
-        "model_package_json": {
-            "name": "Demo Regression Model",
-            "modelDescription": {"description": "Regression on demo dataset"},
-            "target": {"type": TARGET_TYPE.REGRESSION, "name": "Grade 2014"},
+        'model_package_json': {
+            'name': 'Demo Regression Model',
+            'modelDescription': {'description': 'Regression on demo dataset'},
+            'target': {'type': TARGET_TYPE.REGRESSION, 'name': 'Grade 2014'},
         },
-        "target_drift_enabled": True,
-        "feature_drift_enabled": True,
-        "association_id_column": ["id"],
-        "required_association_id": False,
-        "predictions_data_collection_enabled": False,
+        'target_drift_enabled': True,
+        'feature_drift_enabled': True,
+        'association_id_column': ['id'],
+        'required_association_id': False,
+        'predictions_data_collection_enabled': False,
     },
 )
 def create_external_deployment_pipeline(prediction_environment_id=None):
     if not prediction_environment_id:
-        raise ValueError("Invalid or missing `prediction_environment_id` value")
+        raise ValueError('Invalid or missing `prediction_environment_id` value')
 
     create_model_package_op = CreateExternalModelPackageOperator(
-        task_id="create_model_package",
+        task_id='create_model_package',
     )
 
     deploy_model_package_op = DeployModelPackageOperator(
-        task_id="deployment_from_model_package",
-        deployment_name="demo_airflow_deployment",
-        description="demo_airflow_deployment",
+        task_id='deployment_from_model_package',
+        deployment_name='demo_airflow_deployment',
+        description='demo_airflow_deployment',
         model_package_id=create_model_package_op.output,
         prediction_environment_id=prediction_environment_id,
         importance=DEPLOYMENT_IMPORTANCE.LOW,
     )
 
     update_monitoring_settings_op = UpdateMonitoringSettingsOperator(
-        task_id="update_monitoring_settings",
+        task_id='update_monitoring_settings',
         deployment_id=deploy_model_package_op.output,
     )
 
@@ -119,5 +119,5 @@ def create_external_deployment_pipeline(prediction_environment_id=None):
 
 create_external_deployment_pipeline_dag = create_external_deployment_pipeline()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     create_external_deployment_pipeline_dag.test()

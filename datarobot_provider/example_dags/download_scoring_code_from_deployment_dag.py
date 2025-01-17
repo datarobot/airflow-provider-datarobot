@@ -16,30 +16,30 @@ from datarobot_provider.operators.scoring_code import DownloadDeploymentScoringC
 @dag(
     schedule=None,
     start_date=datetime(2023, 1, 1),
-    tags=["example", "scoring_code"],
+    tags=['example', 'scoring_code'],
     # Default json config example:
     params={
-        "source_code": False,
-        "include_agent": False,
-        "include_prediction_explanations": False,
-        "include_prediction_intervals": False,
+        'source_code': False,
+        'include_agent': False,
+        'include_prediction_explanations': False,
+        'include_prediction_intervals': False,
         # as an option you can pass base_path here:
         # 'scoring_code_filepath': "/home/airflow/gcs/data/",
     },
 )
 def download_scoring_code(deployment_id=None):
     if not deployment_id:
-        raise ValueError("Invalid or missing `deployment_id` value")
+        raise ValueError('Invalid or missing `deployment_id` value')
 
     download_deployment_scoring_code_op = DownloadDeploymentScoringCodeOperator(
-        task_id="download_scoring_code_from_deployment",
+        task_id='download_scoring_code_from_deployment',
         # you can pass deployment_id from previous operator here:
         deployment_id=deployment_id,
         # you can pass base_path from previous operator here:
-        base_path="/.../models/",
+        base_path='/.../models/',
     )
 
-    @task(task_id="example_using_scoring_code")
+    @task(task_id='example_using_scoring_code')
     def using_scoring_code_example(scoring_code_filepath):
         """Example of using scoring code locally"""
 
@@ -50,8 +50,8 @@ def download_scoring_code(deployment_id=None):
         # To run this example, DataRobot Prediction Library (https://datarobot.github.io/datarobot-predict)
         # should be installed first.
 
-        input_file = "/.../input_file.csv"
-        output_file = "/.../output_predictions.csv"
+        input_file = '/.../input_file.csv'
+        output_file = '/.../output_predictions.csv'
 
         import pandas as pd
         from datarobot_predict.scoring_code import ScoringCodeModel
@@ -70,5 +70,5 @@ def download_scoring_code(deployment_id=None):
 
 download_scoring_code_dag = download_scoring_code()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     download_scoring_code_dag.test()

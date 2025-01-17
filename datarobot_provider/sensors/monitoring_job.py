@@ -28,13 +28,13 @@ class MonitoringJobCompleteSensor(BaseSensorOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields = ["job_id"]
+    template_fields = ['job_id']
 
     def __init__(
         self,
         *,
         job_id: str,
-        datarobot_conn_id: str = "datarobot_default",
+        datarobot_conn_id: str = 'datarobot_default',
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -47,13 +47,13 @@ class MonitoringJobCompleteSensor(BaseSensorOperator):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
-        self.log.info("Checking if batch monitoring job is complete")
-        job = dr.BatchMonitoringJob.get(project_id="", job_id=self.job_id)
+        self.log.info('Checking if batch monitoring job is complete')
+        job = dr.BatchMonitoringJob.get(project_id='', job_id=self.job_id)
         job_data = job.get_status()
-        if job_data["status"].lower()[:5] in ["error", "abort"]:
+        if job_data['status'].lower()[:5] in ['error', 'abort']:
             raise AsyncProcessUnsuccessfulError(
-                f"The job did not complete successfully. Job Data: {job_data}"
+                f'The job did not complete successfully. Job Data: {job_data}'
             )
-        if job_data["status"].lower() == "completed":
+        if job_data['status'].lower() == 'completed':
             return True
         return False

@@ -12,7 +12,7 @@ from airflow.models import DagBag
 
 @pytest.fixture()
 def dagbag(provider_dir):
-    return DagBag(dag_folder=f"{str(provider_dir)}/example_dags", include_examples=False)
+    return DagBag(dag_folder=f'{str(provider_dir)}/example_dags', include_examples=False)
 
 
 @pytest.helpers.register

@@ -13,7 +13,7 @@ from datarobot_provider.example_dags.datarobot_create_project_from_ai_catalog_da
 
 
 def test_dag_loaded(dagbag):
-    dag = dagbag.get_dag(dag_id="create_project_from_aicatalog")
+    dag = dagbag.get_dag(dag_id='create_project_from_aicatalog')
     assert dagbag.import_errors == {}
     assert dag is not None
     assert len(dag.tasks) == 2
@@ -22,6 +22,6 @@ def test_dag_loaded(dagbag):
 def test_dag_structure():
     dag = create_project_from_aicatalog()
     pytest.helpers.assert_dag_dict_equal(
-        {"dataset_uploading": ["create_project"], "create_project": []},
+        {'dataset_uploading': ['create_project'], 'create_project': []},
         dag,
     )

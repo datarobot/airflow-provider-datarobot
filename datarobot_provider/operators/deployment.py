@@ -32,22 +32,22 @@ class GetDeploymentModelOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["deployment_id"]
+    template_fields: Iterable[str] = ['deployment_id']
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = "#f4a460"
+    ui_color = '#f4a460'
 
     def __init__(
         self,
         *,
         deployment_id: str,
-        datarobot_conn_id: str = "datarobot_default",
+        datarobot_conn_id: str = 'datarobot_default',
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.deployment_id = deployment_id
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
+        if kwargs.get('xcom_push') is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -56,7 +56,7 @@ class GetDeploymentModelOperator(BaseOperator):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
-        self.log.info(f"Getting model_id for deployment_id={self.deployment_id}")
+        self.log.info(f'Getting model_id for deployment_id={self.deployment_id}')
         deployment = dr.Deployment.get(self.deployment_id)
         return deployment.model
 
@@ -84,10 +84,10 @@ class ReplaceModelOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["deployment_id", "new_model_id", "reason"]
+    template_fields: Iterable[str] = ['deployment_id', 'new_model_id', 'reason']
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = "#f4a460"
+    ui_color = '#f4a460'
 
     def __init__(
         self,
@@ -96,7 +96,7 @@ class ReplaceModelOperator(BaseOperator):
         new_model_id: str,
         reason: str = MODEL_REPLACEMENT_REASON.OTHER,
         max_wait_sec: int = 600,
-        datarobot_conn_id: str = "datarobot_default",
+        datarobot_conn_id: str = 'datarobot_default',
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -105,7 +105,7 @@ class ReplaceModelOperator(BaseOperator):
         self.reason = reason
         self.max_wait_sec = max_wait_sec
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
+        if kwargs.get('xcom_push') is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -115,31 +115,31 @@ class ReplaceModelOperator(BaseOperator):
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         if self.deployment_id is None:
-            raise AirflowFailException("deployment_id must be provided")
+            raise AirflowFailException('deployment_id must be provided')
 
         if self.new_model_id is None:
-            raise AirflowFailException("new_model_id must be provided")
+            raise AirflowFailException('new_model_id must be provided')
 
-        self.log.info(f"Getting model_id for deployment_id={self.deployment_id}")
+        self.log.info(f'Getting model_id for deployment_id={self.deployment_id}')
         deployment = dr.Deployment.get(deployment_id=self.deployment_id)
         self.log.info(
-            f"Validating replacement model new_model_id={self.new_model_id} for deployment_id={self.deployment_id}"
+            f'Validating replacement model new_model_id={self.new_model_id} for deployment_id={self.deployment_id}'
         )
         check_result, check_message, status_list = deployment.validate_replacement_model(
             new_model_id=self.new_model_id
         )
-        self.log.info(f"Validation result: {check_result}, message: {check_message}")
-        self.log.info(f"Validation result details: {status_list}")
-        if check_result == "failing":
+        self.log.info(f'Validation result: {check_result}, message: {check_message}')
+        self.log.info(f'Validation result details: {status_list}')
+        if check_result == 'failing':
             raise AirflowFailException(check_message)
         self.log.info(
-            f"Trying to replace a model for deployment_id={self.deployment_id} to new_model_id={self.new_model_id}"
+            f'Trying to replace a model for deployment_id={self.deployment_id} to new_model_id={self.new_model_id}'
         )
         deployment.replace_model(
             new_model_id=self.new_model_id, reason=self.reason, max_wait=self.max_wait_sec
         )
         self.log.info(
-            f"Model for deployment_id={self.deployment_id} replaced to new_model_id={self.new_model_id}"
+            f'Model for deployment_id={self.deployment_id} replaced to new_model_id={self.new_model_id}'
         )
 
 
@@ -160,10 +160,10 @@ class ActivateDeploymentOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["deployment_id", "activate"]
+    template_fields: Iterable[str] = ['deployment_id', 'activate']
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = "#f4a460"
+    ui_color = '#f4a460'
 
     def __init__(
         self,
@@ -171,7 +171,7 @@ class ActivateDeploymentOperator(BaseOperator):
         deployment_id: str,
         activate: bool = True,
         max_wait_sec: int = 600,
-        datarobot_conn_id: str = "datarobot_default",
+        datarobot_conn_id: str = 'datarobot_default',
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -179,7 +179,7 @@ class ActivateDeploymentOperator(BaseOperator):
         self.activate = activate
         self.max_wait_sec = max_wait_sec
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
+        if kwargs.get('xcom_push') is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -189,9 +189,9 @@ class ActivateDeploymentOperator(BaseOperator):
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         if self.deployment_id is None:
-            raise ValueError("Invalid or missing `deployment_id` value")
+            raise ValueError('Invalid or missing `deployment_id` value')
 
-        self.log.info(f"Getting Deployment with deployment_id={self.deployment_id}")
+        self.log.info(f'Getting Deployment with deployment_id={self.deployment_id}')
         deployment = dr.Deployment.get(self.deployment_id)
         if self.activate:
             deployment.activate(max_wait=self.max_wait_sec)
@@ -213,22 +213,22 @@ class GetDeploymentStatusOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["deployment_id"]
+    template_fields: Iterable[str] = ['deployment_id']
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Iterable[str] = ()
-    ui_color = "#f4a460"
+    ui_color = '#f4a460'
 
     def __init__(
         self,
         *,
         deployment_id: str,
-        datarobot_conn_id: str = "datarobot_default",
+        datarobot_conn_id: str = 'datarobot_default',
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.deployment_id = deployment_id
         self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
+        if kwargs.get('xcom_push') is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
@@ -238,8 +238,8 @@ class GetDeploymentStatusOperator(BaseOperator):
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         if self.deployment_id is None:
-            raise ValueError("Invalid or missing `deployment_id` value")
+            raise ValueError('Invalid or missing `deployment_id` value')
 
-        self.log.info(f"Getting Deployment for deployment_id={self.deployment_id}")
+        self.log.info(f'Getting Deployment for deployment_id={self.deployment_id}')
         deployment = dr.Deployment.get(self.deployment_id)
         return deployment.status

@@ -12,11 +12,11 @@ def test_datarobot_azure_credentials_conn(
     dr_azure_credentials_conn_details, mock_airflow_connection_datarobot_azure_credentials
 ):
     hook = AzureStorageCredentialsHook(
-        datarobot_credentials_conn_id="datarobot_azure_credentials_test"
+        datarobot_credentials_conn_id='datarobot_azure_credentials_test'
     )
     credentials, credential_data = hook.get_conn()
 
     assert (
-        credential_data["azureConnectionString"]
-        == dr_azure_credentials_conn_details["azure_connection_string"]
+        credential_data['azureConnectionString']
+        == dr_azure_credentials_conn_details['azure_connection_string']
     )

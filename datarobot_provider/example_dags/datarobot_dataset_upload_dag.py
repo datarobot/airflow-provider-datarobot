@@ -22,12 +22,12 @@ from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 @dag(
     schedule=None,
     start_date=datetime(2022, 1, 1),
-    tags=["example"],
-    params={"dataset_file_path": "./titanic.csv"},
+    tags=['example'],
+    params={'dataset_file_path': './titanic.csv'},
 )
 def datarobot_dataset_uploading():
     dataset_uploading_op = UploadDatasetOperator(
-        task_id="dataset_uploading",
+        task_id='dataset_uploading',
     )
 
     dataset_uploading_op
@@ -35,5 +35,5 @@ def datarobot_dataset_uploading():
 
 datarobot_pipeline_dag = datarobot_dataset_uploading()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     print(datarobot_pipeline_dag.test())
