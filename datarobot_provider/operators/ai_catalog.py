@@ -256,6 +256,14 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
     :type datarobot_conn_id: str, optional
     :param recipe_id: Wrangling or Feature Discovery Recipe Id
     :type recipe_id: str
+    :param dataset_name_param: Name of the parameter in the configuration to use as dataset_name
+    :type dataset_name_param: str
+    :param materialization_catalog_param: Name of the parameter in the configuration to use as materialization_catalog
+    :type materialization_catalog_param: str
+    :param materialization_schema_param: Name of the parameter in the configuration to use as materialization_schema
+    :type materialization_schema: str
+    :param materialization_table_param: Name of the parameter in the configuration to use as materialization_table
+    :type materialization_table: str
     :return: DataRobot AI Catalog dataset ID
     :rtype: str
     """
@@ -271,49 +279,66 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
         *,
         datarobot_conn_id: str = "datarobot_default",
         recipe_id: str,
-        materialization_catalog: Optional[str] = None,
-        materialization_schema: Optional[str] = None,
-        materialization_table: Optional[str] = None,
+        dataset_name_param: str = "dataset_name",
+        materialization_catalog_param: str = "materialization_catalog",
+        materialization_schema_param: str = "materialization_schema",
+        materialization_table_param: str = "materialization_table",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.datarobot_conn_id = datarobot_conn_id
         self.recipe_id = recipe_id
 
-        self.materialization_catalog = materialization_catalog
-        self.materialization_schema = materialization_schema
-        self.materialization_table = materialization_table
-
-        self._in_source_materialization = bool(self.materialization_table)
-
-        if self._in_source_materialization:
-            self.materialization_destination = dr.models.dataset.MaterializationDestination(
-            catalog=materialization_catalog,
-            schema=materialization_schema,
-            table=materialization_table,
-        )
-
-        else:
-            self.materialization_destination = None
+        self.dataset_name_param = dataset_name_param
+        self.materialization_catalog_param = materialization_catalog_param
+        self.materialization_schema_param = materialization_schema_param
+        self.materialization_table_param = materialization_table_param
 
         if kwargs.get('xcom_push') is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
+    def _get_materialization_destination(
+        self, context: Dict[str, Any]
+    ) -> Optional[dr.models.dataset.MaterializationDestination]:
+        if context["params"].get(self.materialization_table_param):
+            return dr.models.dataset.MaterializationDestination(
+                catalog=context["params"].get(self.materialization_catalog_param),
+                schema=context["params"].get(self.materialization_schema_param),
+                table=context["params"].get(self.materialization_table_param),
+            )
+
+    def _get_dataset_name(
+            self, context: Dict[str, Any],
+            materialization_destination: Optional[dr.models.dataset.MaterializationDestination],
+    ):
+        return (
+            context["params"].get(self.dataset_name_param)
+            or (materialization_destination and materialization_destination['table'])
+        )
+
     def execute(self, context: Dict[str, Any]) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
+        materialization_destination = self._get_materialization_destination(context)
+        dataset_name = self._get_dataset_name(context, materialization_destination)
+        do_snapshot = materialization_destination is None
+
         dataset = dr.Dataset.create_from_recipe(
             dr.models.Recipe.get(self.recipe_id),
-            name=context["params"].get("dataset_name"),
-            do_snapshot=not self._in_source_materialization,
-            persist_data_after_ingestion=not self._in_source_materialization,
-            materialization_destination=self.materialization_destination,
+            name=dataset_name,
+            do_snapshot=do_snapshot,
+            persist_data_after_ingestion=True,
+            materialization_destination=materialization_destination,
         )
 
-        logging.info('Dataset created.')
+        logging.info(
+            '%s dataset "%s" created.',
+            'Snapshot' if do_snapshot else 'Dynamic',
+            dataset.name,
+        )
 
         if context['params'].get('experiment_container_id'):
             dr.UseCase.get(use_case_id=context['params']['experiment_container_id']).add(dataset)
@@ -325,7 +350,6 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
 
         else:
             logging.info("New Dataset won't belong to any experiment container.")
-
 
         return dataset.id
 
