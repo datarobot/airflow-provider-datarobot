@@ -510,3 +510,53 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
             self.log.info(f"DataSource:{dataset_name} successfully created, id={data_source.id}")
 
         return data_source.id
+
+
+class CreateRecipeOperator(BaseOperator):
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Iterable[str] = []
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Iterable[str] = ()
+    ui_color = "#f4a460"
+
+    def __init__(
+        self,
+        *,
+        datarobot_conn_id: str = "datarobot_default",
+        primary_dataset_id: str,
+        dialect: str,
+        operations_param: str = "operations",
+        downsampling_param: str = "downsampling",
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+        self.datarobot_conn_id = datarobot_conn_id
+        self.primary_dataset_id = primary_dataset_id
+        self.dialect = dialect
+
+        self.operations_param = operations_param,
+        self.downsampling_param = downsampling_param
+
+        if kwargs.get("xcom_push") is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Dict[str, Any]) -> str:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        operations = context["params"].get(self.operations_param)
+        downsampling = context["params"].get(self.downsampling_param)
+
+        experiment_container = dr.UseCase.get(context["params"]["experiment_container_id"])
+        dataset = dr.Dataset.get(self.primary_dataset_id)
+
+        recipe = dr.models.Recipe.from_dataset(
+            experiment_container, dataset, dialect=dr.enums.DataWranglingDialect(self.dialect)
+        )
+
+        dr.models.Recipe.set_operations(recipe.id, operations)
+        dr.models.Recipe.update_downsampling(recipe.id, downsampling)
+
+        return recipe.id
