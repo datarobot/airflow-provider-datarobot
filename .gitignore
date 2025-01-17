@@ -147,3 +147,7 @@ notebooks/
 
 # Astro development environments
 astro-dev/
+
+# Build documentation
+docs/_build
+docs/CHANGES.md

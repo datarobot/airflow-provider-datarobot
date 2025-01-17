@@ -12,7 +12,10 @@ endif
 .PHONY: format format-no-fix lint lint-fix typecheck check-licenses fix-licenses unit-tests
 
 req:
-	pip install -r requirements.txt
+	pip install -e .
+
+req-dev:
+	pip install -e ".[dev]"
 
 lint:
 	ruff check .

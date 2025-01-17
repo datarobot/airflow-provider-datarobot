@@ -1,0 +1,8 @@
+User-agent: *
+
+Disallow: /
+
+Allow: /en/latest-release/
+Allow: /en/early-access/
+
+Sitemap: https://datarobot-public-api-client.readthedocs-hosted.com/sitemap.xml
