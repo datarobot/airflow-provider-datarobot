@@ -35,6 +35,9 @@ unit-tests:
 typecheck:
 	find . -type f -name "*.py" | grep -v ".git" | xargs mypy --config-file .mypy.ini
 
+test-docs:
+	cd docs && $(MAKE) doctest
+
 # Copyright Notices are handled by the next two targets
 # See .licenserc.yaml for configuration
 fix-licenses:

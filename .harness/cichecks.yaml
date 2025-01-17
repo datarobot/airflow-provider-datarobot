@@ -41,7 +41,7 @@ pipeline:
                           command: |-
                             set -exuo pipefail
                             pip install -U pip
-                            make req-dev
+                            pip install -r requirements.txt
                             make lint
                     - step:
                         type: Run
@@ -54,7 +54,7 @@ pipeline:
                           command: |-
                             set -exuo pipefail
                             pip install -U pip
-                            make req-dev
+                            pip install -r requirements.txt
                             make format-no-fix
         - stage:
             name: test_unit
@@ -83,7 +83,8 @@ pipeline:
                         shell: Bash
                         command: |-
                           set -exuo pipefail
-                          make req-dev
+                          pip install apache-airflow
+                          pip install -r requirements.txt
                           pip install airflow-provider-datarobot
                           airflow db init
                           airflow db check
