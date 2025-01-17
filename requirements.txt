@@ -7,3 +7,4 @@ mypy>=0.931
 pytest>=7.0.0
 pytest-mock>=3.7.0
 pytest-helpers-namespace>=2021.12.29
+pre-commit>=4.0.1

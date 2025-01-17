@@ -1,0 +1,19 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-added-large-files
+-   repo: https://github.com/lk16/detect-missing-init
+    rev: v0.1.6
+    hooks:
+    -   id: detect-missing-init
+        args: [
+            "--create",
+            "--track",
+            "--python-folders",
+            "worker/worker,web/web,engine/engine,worker/tests,web/tests,engine/tests,api_tests/api_tests"
+        ]
