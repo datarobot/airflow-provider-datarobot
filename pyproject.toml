@@ -79,3 +79,47 @@ force-single-line = true
 
 [tool.ruff.format]
 quote-style = "double"
+
+[tool.mypy]
+python_version = 3.11
+exclude = '''(?x)(
+    docs/*
+    | tests/*
+)'''
+enable_error_code = "ignore-without-code"
+ignore_missing_imports = true
+follow_imports_for_stubs = true
+no_implicit_optional = true
+show_column_numbers = true
+warn_redundant_casts = true
+# warn_return_any = true  # TODO: Enable this check
+warn_unused_configs = true
+warn_unused_ignores = true
+show_error_codes = true
+pretty = true
+
+# Rationale: We want mypy to pass on all new code and we can piece-meal address the existing errors until this whole
+# section can be deleted.
+[[tool.mypy.overrides]]
+module = [
+    # hooks (~8 errors)
+    "datarobot_provider.hooks.connections",
+    "datarobot_provider.hooks.credentials",
+    "datarobot_provider.hooks.datarobot",
+
+    # operators (~39 errors)
+    "datarobot_provider.operators.ai_catalog",
+    "datarobot_provider.operators.autopilot",
+    "datarobot_provider.operators.bias_and_fairness",
+    "datarobot_provider.operators.credentials",
+    "datarobot_provider.operators.datarobot",
+    "datarobot_provider.operators.deployment",
+    "datarobot_provider.operators.feature_discovery",
+    "datarobot_provider.operators.model_package",
+    "datarobot_provider.operators.model_training",
+    "datarobot_provider.operators.monitoring",
+    "datarobot_provider.operators.scoring",
+    "datarobot_provider.operators.scoring_code",
+    "datarobot_provider.operators.segment_analysis",
+]
+ignore_errors = true
