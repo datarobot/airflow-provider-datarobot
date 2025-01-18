@@ -7,13 +7,14 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from typing import Any
 from typing import Dict
-from typing import Iterable
 from typing import List
+from typing import Sequence
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.exceptions import AirflowFailException
 from airflow.models import BaseOperator
+from airflow.utils.context import Context
 from datarobot.enums import MODEL_REPLACEMENT_REASON
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
@@ -32,9 +33,9 @@ class GetDeploymentModelOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["deployment_id"]
+    template_fields: Sequence[str] = ["deployment_id"]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -52,7 +53,7 @@ class GetDeploymentModelOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> List[dict]:
+    def execute(self, context: Context) -> List[dict]:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -84,9 +85,9 @@ class ReplaceModelOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["deployment_id", "new_model_id", "reason"]
+    template_fields: Sequence[str] = ["deployment_id", "new_model_id", "reason"]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -110,7 +111,7 @@ class ReplaceModelOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> None:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -160,9 +161,9 @@ class ActivateDeploymentOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["deployment_id", "activate"]
+    template_fields: Sequence[str] = ["deployment_id", "activate"]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -184,7 +185,7 @@ class ActivateDeploymentOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -213,9 +214,9 @@ class GetDeploymentStatusOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["deployment_id"]
+    template_fields: Sequence[str] = ["deployment_id"]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -233,7 +234,7 @@ class GetDeploymentStatusOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 

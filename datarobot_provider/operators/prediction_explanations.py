@@ -7,11 +7,12 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from typing import Any
 from typing import Dict
-from typing import Iterable
+from typing import Sequence
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
+from airflow.utils.context import Context
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
@@ -32,19 +33,19 @@ class PredictionExplanationsInitializationOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
+    template_fields: Sequence[str] = [
         "project_id",
         "model_id",
     ]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
-        project_id: str = None,
-        model_id: str = None,
+        project_id: str | None = None,
+        model_id: str | None = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
@@ -57,7 +58,7 @@ class PredictionExplanationsInitializationOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -97,21 +98,21 @@ class ComputePredictionExplanationsOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
+    template_fields: Sequence[str] = [
         "project_id",
         "model_id",
         "external_dataset_id",
     ]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
-        project_id: str = None,
-        model_id: str = None,
-        external_dataset_id: str = None,
+        project_id: str | None = None,
+        model_id: str | None = None,
+        external_dataset_id: str | None = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
@@ -125,7 +126,7 @@ class ComputePredictionExplanationsOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 

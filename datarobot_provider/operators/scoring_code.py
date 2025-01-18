@@ -8,11 +8,12 @@
 import os
 from typing import Any
 from typing import Dict
-from typing import Iterable
+from typing import Sequence
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
+from airflow.utils.context import Context
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
@@ -32,16 +33,16 @@ class DownloadDeploymentScoringCodeOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["deployment_id", "base_path"]
+    template_fields: Sequence[str] = ["deployment_id", "base_path"]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         deployment_id: str,
-        base_path: str = None,
+        base_path: str | None = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
@@ -54,7 +55,7 @@ class DownloadDeploymentScoringCodeOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -110,9 +111,9 @@ class DownloadModelScoringCodeOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["project_id", "model_id"]
+    template_fields: Sequence[str] = ["project_id", "model_id"]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -120,7 +121,7 @@ class DownloadModelScoringCodeOperator(BaseOperator):
         *,
         project_id: str,
         model_id: str,
-        base_path: str = None,
+        base_path: str | None = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
@@ -134,7 +135,7 @@ class DownloadModelScoringCodeOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 

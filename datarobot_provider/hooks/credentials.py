@@ -9,6 +9,7 @@
 import json
 from typing import Any
 from typing import Dict
+from typing import Tuple
 
 from airflow import AirflowException
 from airflow.hooks.base import BaseHook
@@ -79,7 +80,7 @@ class CredentialsBaseHook(BaseHook):
             )
         return credential
 
-    def get_conn(self) -> (Credential, dict):
+    def get_conn(self) -> Tuple[Credential, dict]:
         """Get or Create DataRobot associated credentials managed by Airflow provider."""
 
         conn = self.get_connection(self.datarobot_credentials_conn_id)

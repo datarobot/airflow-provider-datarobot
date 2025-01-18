@@ -10,10 +10,12 @@ from typing import Dict
 from typing import Iterable
 from typing import List
 from typing import Optional
+from typing import Sequence
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
+from airflow.utils.context import Context
 from datarobot import SNAPSHOT_POLICY
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
@@ -44,13 +46,13 @@ class RelationshipsConfigurationOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
+    template_fields: Sequence[str] = [
         "dataset_definitions",
         "relationships",
         "feature_discovery_settings",
     ]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -75,7 +77,7 @@ class RelationshipsConfigurationOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> None:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -124,7 +126,7 @@ class DatasetDefinitionOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
+    template_fields: Sequence[str] = [
         "dataset_identifier",
         "dataset_id",
         "dataset_version_id",
@@ -133,7 +135,7 @@ class DatasetDefinitionOperator(BaseOperator):
         "snapshot_policy",
     ]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -164,7 +166,7 @@ class DatasetDefinitionOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> None:
+    def execute(self, context: Context) -> str:
         dataset_definition = dr.DatasetDefinition(
             identifier=self.dataset_identifier,
             catalog_id=self.dataset_id,
@@ -229,7 +231,7 @@ class DatasetRelationshipOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
+    template_fields: Sequence[str] = [
         "dataset1_identifier",
         "dataset2_identifier",
         "dataset1_keys",
@@ -242,7 +244,7 @@ class DatasetRelationshipOperator(BaseOperator):
         "prediction_point_rounding_time_unit",
     ]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -281,7 +283,7 @@ class DatasetRelationshipOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> None:
+    def execute(self, context: Context) -> str:
         relationship = dr.Relationship(
             dataset1_identifier=self.dataset1_identifier,  # join profile
             dataset2_identifier=self.dataset2_identifier,  # to transactions

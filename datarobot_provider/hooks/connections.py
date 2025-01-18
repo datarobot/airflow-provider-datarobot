@@ -7,6 +7,7 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from typing import Any
 from typing import Dict
+from typing import Tuple
 
 from airflow import AirflowException
 from datarobot import Credential
@@ -65,7 +66,7 @@ class JDBCDataSourceHook(BasicCredentialsHook):
             },
         }
 
-    def get_conn(self) -> (Credential, dict, DataStore):
+    def get_conn(self) -> Tuple[Credential, dict, DataStore]:
         """Retrieving corresponding DataStore object or creating if not exist,
         updating it with new parameters in case of changes."""
 

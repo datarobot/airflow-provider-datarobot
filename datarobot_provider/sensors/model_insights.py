@@ -11,6 +11,7 @@ from typing import Union
 
 from airflow.sensors.base import BaseSensorOperator
 from airflow.sensors.base import PokeReturnValue
+from airflow.utils.context import Context
 from datarobot import Job
 from datarobot.errors import AsyncProcessUnsuccessfulError
 
@@ -53,7 +54,7 @@ class DataRobotJobSensor(BaseSensorOperator):
         # Default implementation return True if job is completed:
         return True
 
-    def poke(self, context: Dict[Any, Any]) -> Union[bool, PokeReturnValue]:
+    def poke(self, context: Context) -> Union[bool, PokeReturnValue]:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 

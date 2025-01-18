@@ -7,12 +7,13 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from typing import Any
 from typing import Dict
-from typing import Iterable
+from typing import Sequence
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.exceptions import AirflowFailException
 from airflow.models import BaseOperator
+from airflow.utils.context import Context
 from datarobot.utils.waiters import wait_for_async_resolution
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
@@ -31,17 +32,17 @@ class CreateExternalModelPackageOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
+    template_fields: Sequence[str] = [
         "model_package_json",
     ]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
-        model_package_json: Dict[str, Any] = None,
+        model_package_json: Dict[str, Any] | None = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
@@ -66,7 +67,7 @@ class CreateExternalModelPackageOperator(BaseOperator):
             e_msg = "Server unexpectedly returned status code {}"
             raise AirflowFailException(e_msg.format(response.status_code))
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -112,7 +113,7 @@ class DeployModelPackageOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
+    template_fields: Sequence[str] = [
         "deployment_name",
         "model_package_id",
         "default_prediction_server_id",
@@ -123,7 +124,7 @@ class DeployModelPackageOperator(BaseOperator):
         "additional_metadata",
     ]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -131,11 +132,11 @@ class DeployModelPackageOperator(BaseOperator):
         *,
         deployment_name: str,
         model_package_id: str,
-        default_prediction_server_id: str = None,
-        prediction_environment_id: str = None,
-        description: str = None,
-        importance: str = None,
-        user_provided_id: str = None,
+        default_prediction_server_id: str | None = None,
+        prediction_environment_id: str | None = None,
+        description: str | None = None,
+        importance: str | None = None,
+        user_provided_id: str | None = None,
         additional_metadata: Dict[str, str] = None,
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
         datarobot_conn_id: str = "datarobot_default",
@@ -164,12 +165,12 @@ class DeployModelPackageOperator(BaseOperator):
         cls,
         model_package_id: str,
         deployment_name: str,
-        description: str = None,
-        default_prediction_server_id: str = None,
-        prediction_environment_id: str = None,
-        importance: str = None,
-        user_provided_id: str = None,
-        additional_metadata: Dict[str, str] = None,
+        description: str | None = None,
+        default_prediction_server_id: str | None = None,
+        prediction_environment_id: str | None = None,
+        importance: str | None = None,
+        user_provided_id: str | None = None,
+        additional_metadata: Dict[str, str] | None = None,
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
     ) -> str:
         deployment_payload: Dict[str, Any] = {
@@ -204,7 +205,7 @@ class DeployModelPackageOperator(BaseOperator):
             e_msg = "Server unexpectedly returned status code {}"
             raise AirflowFailException(e_msg.format(response.status_code))
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
