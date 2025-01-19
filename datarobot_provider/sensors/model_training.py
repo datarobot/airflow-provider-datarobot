@@ -5,10 +5,8 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from typing import Any
-from typing import Dict
-
 from airflow.sensors.base import PokeReturnValue
+from airflow.utils.context import Context
 from datarobot import ModelJob
 
 from datarobot_provider.sensors.model_insights import DataRobotJobSensor
@@ -28,6 +26,6 @@ class ModelTrainingJobSensor(DataRobotJobSensor):
     :rtype: bool | PokeReturnValue
     """
 
-    def get_job_result(self, context: Dict[Any, Any]) -> PokeReturnValue:
+    def get_job_result(self, context: Context) -> PokeReturnValue:
         trained_model = ModelJob.get_model(self.project_id, self.job_id)
         return PokeReturnValue(True, trained_model.id)

@@ -6,7 +6,6 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from typing import Any
-from typing import Dict
 from typing import Union
 
 from airflow.sensors.base import BaseSensorOperator
@@ -50,7 +49,7 @@ class DataRobotJobSensor(BaseSensorOperator):
 
         self.hook = DataRobotHook(datarobot_conn_id)
 
-    def get_job_result(self, context: Dict[Any, Any]) -> bool:
+    def get_job_result(self, context: Context) -> Union[bool, PokeReturnValue]:
         # Default implementation return True if job is completed:
         return True
 
