@@ -93,10 +93,11 @@ class CreateProjectOperator(BaseOperator):
                 credential_id=self.credential_id,
                 project_name=context["params"]["project_name"],
             )
+            # Some weird problem with mypy: it passes here locally, but fails in CI
             self.log.info(
                 f"Project created: project_id={project.id} from dataset: dataset_id={training_dataset_id}"  # type: ignore[attr-defined, unused-ignore]
             )
-            return project.id
+            return project.id  # type: ignore[attr-defined, unused-ignore]
 
         else:
             raise AirflowFailException(
