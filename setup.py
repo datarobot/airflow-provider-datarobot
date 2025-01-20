@@ -31,7 +31,7 @@ dev_require = [
 """Perform the package airflow-provider-datarobot setup."""
 setup(
     name="airflow-provider-datarobot",
-    version="0.0.10",
+    version="0.0.11",
     description="DataRobot Airflow provider.",
     long_description=long_description,
     long_description_content_type="text/markdown",
