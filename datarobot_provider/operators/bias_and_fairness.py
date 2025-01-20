@@ -102,11 +102,11 @@ class UpdateBiasAndFairnessSettingsOperator(BaseOperator):
         self.log.info(f"Getting Deployment for deployment_id={self.deployment_id}")
         deployment = dr.Deployment.get(deployment_id=self.deployment_id)
 
-        current_bias_and_fairness_settings = deployment.get_bias_and_fairness_settings() | {  # type: ignore
-            "protected_features": None,
-            "fairness_metric_set": None,
-            "fairness_threshold": None,
-            "preferable_target_value": None,
+        current_bias_and_fairness_settings = deployment.get_bias_and_fairness_settings() or {
+            "protected_features": [],
+            "fairness_metric_set": "",
+            "fairness_threshold": 0.0,
+            "preferable_target_value": False,
         }
 
         protected_features = context["params"].get(
@@ -114,7 +114,11 @@ class UpdateBiasAndFairnessSettingsOperator(BaseOperator):
         )
 
         fairness_metric_set = context["params"].get(
-            "fairness_metric_set", current_bias_and_fairness_settings["fairness_metric_set"]
+            "fairness_metric_set",
+            # Backward compatibility with parameter name fairness_metrics_set
+            context["params"].get(
+                "fairness_metrics_set", current_bias_and_fairness_settings["fairness_metric_set"]
+            ),
         )
 
         fairness_threshold = context["params"].get(
