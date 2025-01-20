@@ -6,6 +6,7 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from collections.abc import Sequence
+from typing import TYPE_CHECKING
 from typing import Any
 from typing import Optional
 
@@ -15,9 +16,11 @@ from airflow.exceptions import AirflowFailException
 from airflow.models import BaseOperator
 from airflow.utils.context import Context
 from datarobot.enums import MODEL_REPLACEMENT_REASON
-from datarobot.models.deployment.deployment import ModelDict
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
+
+if TYPE_CHECKING:
+    from datarobot.models.deployment.deployment import ModelDict
 
 
 class GetDeploymentModelOperator(BaseOperator):

@@ -6,6 +6,7 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from collections.abc import Sequence
+from typing import TYPE_CHECKING
 from typing import Any
 from typing import Optional
 
@@ -13,9 +14,11 @@ import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 from airflow.utils.context import Context
-from datarobot.models.deployment.deployment import BiasAndFairnessSettings
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
+
+if TYPE_CHECKING:
+    from datarobot.models.deployment.deployment import BiasAndFairnessSettings
 
 
 class GetBiasAndFairnessSettingsOperator(BaseOperator):
