@@ -7,8 +7,6 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from collections.abc import Sequence
 from typing import Any
-from typing import Dict
-from typing import List
 from typing import Optional
 
 import datarobot as dr
@@ -30,12 +28,12 @@ class GetServiceStatsOperator(BaseOperator):
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
     :return: Service stats for a Deployment
-    :rtype: List[dict]
+    :rtype: list[dict]
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["deployment_id"]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -54,7 +52,7 @@ class GetServiceStatsOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Context) -> List[dict]:
+    def execute(self, context: Context) -> list[dict]:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -83,12 +81,12 @@ class GetAccuracyOperator(BaseOperator):
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
     :return: accuracy for a Deployment
-    :rtype: List[dict]
+    :rtype: list[dict]
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["deployment_id"]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -107,7 +105,7 @@ class GetAccuracyOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Context) -> List[dict]:
+    def execute(self, context: Context) -> list[dict]:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -130,7 +128,7 @@ class GetMonitoringSettingsOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["deployment_id"]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -181,7 +179,7 @@ class UpdateMonitoringSettingsOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["deployment_id"]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 

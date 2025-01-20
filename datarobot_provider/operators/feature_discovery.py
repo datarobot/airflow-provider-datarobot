@@ -7,9 +7,7 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from collections.abc import Sequence
 from typing import Any
-from typing import Dict
 from typing import Iterable
-from typing import List
 from typing import Optional
 
 import datarobot as dr
@@ -51,7 +49,7 @@ class RelationshipsConfigurationOperator(BaseOperator):
         "relationships",
         "feature_discovery_settings",
     ]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -134,7 +132,7 @@ class DatasetDefinitionOperator(BaseOperator):
         "feature_list_id",
         "snapshot_policy",
     ]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -243,7 +241,7 @@ class DatasetRelationshipOperator(BaseOperator):
         "prediction_point_rounding",
         "prediction_point_rounding_time_unit",
     ]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -251,8 +249,8 @@ class DatasetRelationshipOperator(BaseOperator):
         self,
         *,
         dataset2_identifier: str,
-        dataset1_keys: List[str],
-        dataset2_keys: List[str],
+        dataset1_keys: list[str],
+        dataset2_keys: list[str],
         dataset1_identifier: Optional[str] = None,
         feature_derivation_window_start: Optional[int] = None,
         feature_derivation_window_end: Optional[int] = None,

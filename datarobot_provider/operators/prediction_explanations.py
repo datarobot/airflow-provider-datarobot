@@ -7,7 +7,6 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from collections.abc import Sequence
 from typing import Any
-from typing import Dict
 from typing import Optional
 
 import datarobot as dr
@@ -38,7 +37,7 @@ class PredictionExplanationsInitializationOperator(BaseOperator):
         "project_id",
         "model_id",
     ]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -104,7 +103,7 @@ class ComputePredictionExplanationsOperator(BaseOperator):
         "model_id",
         "external_dataset_id",
     ]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 

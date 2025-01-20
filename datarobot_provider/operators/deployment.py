@@ -7,7 +7,6 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from collections.abc import Sequence
 from typing import Any
-from typing import Dict
 from typing import Optional
 
 import datarobot as dr
@@ -35,7 +34,7 @@ class GetDeploymentModelOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["deployment_id"]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -87,7 +86,7 @@ class ReplaceModelOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["deployment_id", "new_model_id", "reason"]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -163,7 +162,7 @@ class ActivateDeploymentOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["deployment_id", "activate"]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -216,7 +215,7 @@ class GetDeploymentStatusOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["deployment_id"]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 

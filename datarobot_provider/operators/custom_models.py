@@ -7,7 +7,6 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from collections.abc import Sequence
 from typing import Any
-from typing import Dict
 from typing import Optional
 
 import datarobot as dr
@@ -41,7 +40,7 @@ class CreateExecutionEnvironmentOperator(BaseOperator):
         "description",
         "programming_language",
     ]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -131,7 +130,7 @@ class CreateExecutionEnvironmentVersionOperator(BaseOperator):
         "environment_version_label",
         "environment_version_description",
     ]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -209,7 +208,7 @@ class CreateCustomInferenceModelOperator(BaseOperator):
         "name",
         "description",
     ]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -315,7 +314,7 @@ class CreateCustomModelVersionOperator(BaseOperator):
         "custom_model_folder",
         "create_from_previous",
     ]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -432,7 +431,7 @@ class CustomModelTestOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["custom_model_id", "custom_model_version_id", "dataset_id"]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -495,7 +494,7 @@ class GetCustomModelTestOverallStatusOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["custom_model_test_id"]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -557,7 +556,7 @@ class CreateCustomModelDeploymentOperator(BaseOperator):
         "deployment_name",
         "prediction_server_id",
     ]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 

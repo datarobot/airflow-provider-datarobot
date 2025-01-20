@@ -383,7 +383,7 @@ texinfo_documents = [
 # These are third-party packages that don't expose documentation for sphinx to link
 
 nitpick_ignore = [
-    ("py:data", "typing.Tuple"),
+    ("py:data", "typing.tuple"),
     ("py:data", "typing.Optional"),
     ("py:data", "typing.Union"),
     ("py:data", "typing.NoReturn"),

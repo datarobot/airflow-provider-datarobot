@@ -7,8 +7,6 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from collections.abc import Sequence
 from typing import Any
-from typing import Dict
-from typing import List
 from typing import Optional
 
 import datarobot as dr
@@ -39,7 +37,7 @@ class CreateProjectOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["dataset_id", "dataset_version_id", "credential_id"]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -118,7 +116,7 @@ class TrainModelsOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["project_id"]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -185,7 +183,7 @@ class DeployModelOperator(BaseOperator, DeployModelMixin):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["model_id"]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -231,7 +229,7 @@ class DeployRecommendedModelOperator(BaseOperator, DeployModelMixin):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["project_id"]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -302,7 +300,7 @@ class ScorePredictionsOperator(BaseOperator):
         "output_credential_id",
         "score_settings",
     ]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -399,7 +397,7 @@ class GetTargetDriftOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["deployment_id"]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -418,7 +416,7 @@ class GetTargetDriftOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Context) -> Dict[str, Any]:
+    def execute(self, context: Context) -> dict[str, Any]:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -438,12 +436,12 @@ class GetFeatureDriftOperator(BaseOperator):
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
     :return: Drift stats for a Deployment's features
-    :rtype: List[dict]
+    :rtype: list[dict]
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["deployment_id"]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -462,7 +460,7 @@ class GetFeatureDriftOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Context) -> List[dict]:
+    def execute(self, context: Context) -> list[dict]:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 

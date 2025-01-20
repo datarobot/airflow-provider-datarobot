@@ -8,7 +8,6 @@
 import os
 from collections.abc import Sequence
 from typing import Any
-from typing import Dict
 from typing import Optional
 
 import datarobot as dr
@@ -35,7 +34,7 @@ class DownloadDeploymentScoringCodeOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["deployment_id", "base_path"]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -118,7 +117,7 @@ class DownloadModelScoringCodeOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["project_id", "model_id"]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 

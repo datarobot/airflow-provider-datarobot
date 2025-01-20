@@ -8,9 +8,7 @@
 
 import json
 from typing import Any
-from typing import Dict
 from typing import Optional
-from typing import Tuple
 from typing import Union
 
 from airflow import AirflowException
@@ -89,7 +87,7 @@ class CredentialsBaseHook(BaseHook):
             )
         return credential
 
-    def get_conn(self) -> Union[Tuple[Credential, dict, DataStore], Tuple[Credential, dict]]:
+    def get_conn(self) -> Union[tuple[Credential, dict, DataStore], tuple[Credential, dict]]:
         """Get or Create DataRobot associated credentials managed by Airflow provider."""
         if not self.datarobot_credentials_conn_id:
             raise AirflowException("datarobot_credentials_conn_id is not defined")
@@ -193,7 +191,7 @@ class BasicCredentialsHook(CredentialsBaseHook):
         return credential_data
 
     @staticmethod
-    def get_connection_form_widgets() -> Dict[str, Any]:
+    def get_connection_form_widgets() -> dict[str, Any]:
         """Returns connection widgets to add to connection form."""
         from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
         from flask_babel import lazy_gettext
@@ -208,7 +206,7 @@ class BasicCredentialsHook(CredentialsBaseHook):
         }
 
     @staticmethod
-    def get_ui_field_behaviour() -> Dict:
+    def get_ui_field_behaviour() -> dict:
         """Returns custom field behaviour."""
         return {
             "hidden_fields": ["host", "schema", "port", "extra"],
@@ -290,7 +288,7 @@ class GoogleCloudCredentialsHook(CredentialsBaseHook):
         return credential_data
 
     @staticmethod
-    def get_connection_form_widgets() -> Dict[str, Any]:
+    def get_connection_form_widgets() -> dict[str, Any]:
         """Returns connection widgets to add to connection form."""
         from flask_appbuilder.fieldwidgets import BS3PasswordFieldWidget
         from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
@@ -310,7 +308,7 @@ class GoogleCloudCredentialsHook(CredentialsBaseHook):
         }
 
     @staticmethod
-    def get_ui_field_behaviour() -> Dict:
+    def get_ui_field_behaviour() -> dict:
         """Returns custom field behaviour."""
         return {
             "hidden_fields": ["host", "schema", "port", "login", "password", "extra"],
@@ -407,7 +405,7 @@ class AwsCredentialsHook(CredentialsBaseHook):
         return credential_data
 
     @staticmethod
-    def get_connection_form_widgets() -> Dict[str, Any]:
+    def get_connection_form_widgets() -> dict[str, Any]:
         """Returns connection widgets to add to connection form."""
         from flask_appbuilder.fieldwidgets import BS3TextAreaFieldWidget
         from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
@@ -427,7 +425,7 @@ class AwsCredentialsHook(CredentialsBaseHook):
         }
 
     @staticmethod
-    def get_ui_field_behaviour() -> Dict:
+    def get_ui_field_behaviour() -> dict:
         """Returns custom field behaviour."""
         return {
             "hidden_fields": ["host", "schema", "port", "extra"],
@@ -510,7 +508,7 @@ class AzureStorageCredentialsHook(CredentialsBaseHook):
         return credential_data
 
     @staticmethod
-    def get_connection_form_widgets() -> Dict[str, Any]:
+    def get_connection_form_widgets() -> dict[str, Any]:
         """Returns connection widgets to add to connection form."""
         from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
         from flask_babel import lazy_gettext
@@ -525,7 +523,7 @@ class AzureStorageCredentialsHook(CredentialsBaseHook):
         }
 
     @staticmethod
-    def get_ui_field_behaviour() -> Dict:
+    def get_ui_field_behaviour() -> dict:
         """Returns custom field behaviour."""
         return {
             "hidden_fields": ["host", "schema", "port", "extra"],
@@ -614,7 +612,7 @@ class OAuthCredentialsHook(CredentialsBaseHook):
         return credential_data
 
     @staticmethod
-    def get_connection_form_widgets() -> Dict[str, Any]:
+    def get_connection_form_widgets() -> dict[str, Any]:
         """Returns connection widgets to add to connection form."""
         from flask_appbuilder.fieldwidgets import BS3PasswordFieldWidget
         from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
@@ -634,7 +632,7 @@ class OAuthCredentialsHook(CredentialsBaseHook):
         }
 
     @staticmethod
-    def get_ui_field_behaviour() -> Dict:
+    def get_ui_field_behaviour() -> dict:
         """Returns custom field behaviour."""
         return {
             "hidden_fields": ["host", "schema", "port", "extra"],

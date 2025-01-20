@@ -6,8 +6,6 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from typing import Any
-from typing import Dict
-from typing import Tuple
 
 from airflow import AirflowException
 from datarobot import Credential
@@ -28,7 +26,7 @@ class JDBCDataSourceHook(BasicCredentialsHook):
     hook_name = "DataRobot JDBC DataSource"
 
     @staticmethod
-    def get_connection_form_widgets() -> Dict[str, Any]:
+    def get_connection_form_widgets() -> dict[str, Any]:
         """Returns connection widgets to add to connection form."""
         from flask_appbuilder.fieldwidgets import BS3TextAreaFieldWidget
         from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
@@ -54,7 +52,7 @@ class JDBCDataSourceHook(BasicCredentialsHook):
         }
 
     @staticmethod
-    def get_ui_field_behaviour() -> Dict:
+    def get_ui_field_behaviour() -> dict:
         """Returns custom field behaviour."""
         return {
             "hidden_fields": ["host", "schema", "port", "extra"],
@@ -66,7 +64,7 @@ class JDBCDataSourceHook(BasicCredentialsHook):
             },
         }
 
-    def get_conn(self) -> Tuple[Credential, dict, DataStore]:
+    def get_conn(self) -> tuple[Credential, dict, DataStore]:
         """Retrieving corresponding DataStore object or creating if not exist,
         updating it with new parameters in case of changes."""
 

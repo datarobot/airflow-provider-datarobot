@@ -7,7 +7,6 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from collections.abc import Sequence
 from typing import Any
-from typing import Dict
 from typing import Optional
 
 import datarobot as dr
@@ -36,14 +35,14 @@ class CreateExternalModelPackageOperator(BaseOperator):
     template_fields: Sequence[str] = [
         "model_package_json",
     ]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
-        model_package_json: Optional[Dict[str, Any]] = None,
+        model_package_json: Optional[dict[str, Any]] = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
@@ -105,7 +104,7 @@ class DeployModelPackageOperator(BaseOperator):
     :user_provided_id: A user-provided unique ID associated with a deployment definition in a remote git repository.
     :user_provided_id: str, optional
     :additional_metadata: A Key/Value pair dict, with additional metadata
-    :additional_metadata: Dict[str, str], optional
+    :additional_metadata: dict[str, str], optional
     :max_wait: The amount of seconds to wait for successful resolution of a deployment creation job.
         Deployment supports making predictions only after a deployment creating job has successfully finished.
     :max_wait: int, optional
@@ -124,7 +123,7 @@ class DeployModelPackageOperator(BaseOperator):
         "user_provided_id",
         "additional_metadata",
     ]
-    template_fields_renderers: Dict[str, str] = {}
+    template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
@@ -138,7 +137,7 @@ class DeployModelPackageOperator(BaseOperator):
         description: Optional[str] = None,
         importance: Optional[str] = None,
         user_provided_id: Optional[str] = None,
-        additional_metadata: Optional[Dict[str, str]] = None,
+        additional_metadata: Optional[dict[str, str]] = None,
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
@@ -171,10 +170,10 @@ class DeployModelPackageOperator(BaseOperator):
         prediction_environment_id: Optional[str] = None,
         importance: Optional[str] = None,
         user_provided_id: Optional[str] = None,
-        additional_metadata: Optional[Dict[str, str]] = None,
+        additional_metadata: Optional[dict[str, str]] = None,
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
     ) -> str:
-        deployment_payload: Dict[str, Any] = {
+        deployment_payload: dict[str, Any] = {
             "model_package_id": model_package_id,
             "label": deployment_name,
             "description": description,
