@@ -26,7 +26,7 @@ from datarobot_provider.operators.segment_analysis import UpdateSegmentAnalysisS
         "segment_analysis_attributes": ["race", "gender"],
         "protected_features": ["gender"],
         "preferable_target_value": "True",
-        "fairness_metrics_set": "equalParity",
+        "fairness_metric_set": "equalParity",
         "fairness_threshold": 0.1,
     },
 )

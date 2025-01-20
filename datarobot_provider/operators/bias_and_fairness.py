@@ -113,7 +113,7 @@ class UpdateBiasAndFairnessSettingsOperator(BaseOperator):
             "protected_features", current_bias_and_fairness_settings["protected_features"]
         )
 
-        fairness_metrics_set = context["params"].get(
+        fairness_metric_set = context["params"].get(
             "fairness_metric_set", current_bias_and_fairness_settings["fairness_metric_set"]
         )
 
@@ -127,7 +127,7 @@ class UpdateBiasAndFairnessSettingsOperator(BaseOperator):
 
         if (
             (protected_features != current_bias_and_fairness_settings["protected_features"])
-            or (fairness_metrics_set != current_bias_and_fairness_settings["fairness_metric_set"])
+            or (fairness_metric_set != current_bias_and_fairness_settings["fairness_metric_set"])
             or (fairness_threshold != current_bias_and_fairness_settings["fairness_threshold"])
             or (
                 preferable_target_value
@@ -139,7 +139,7 @@ class UpdateBiasAndFairnessSettingsOperator(BaseOperator):
             )
             deployment.update_bias_and_fairness_settings(
                 protected_features=protected_features,
-                fairness_metric_set=fairness_metrics_set,
+                fairness_metric_set=fairness_metric_set,
                 fairness_threshold=fairness_threshold,
                 preferable_target_value=preferable_target_value,
             )

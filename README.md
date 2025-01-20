@@ -537,7 +537,7 @@ Sample config params:
 ```
 "protected_features": ["attribute1"],
 "preferable_target_value": "True",
-"fairness_metrics_set": "equalParity",
+"fairness_metric_set": "equalParity",
 "fairness_threshold": 0.1,
 ```
 

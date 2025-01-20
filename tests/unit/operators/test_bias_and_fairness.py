@@ -18,7 +18,7 @@ def bias_and_fairness_settings_details():
     return {
         "protected_features": ["gender"],
         "preferable_target_value": "True",
-        "fairness_metrics_set": "equalParity",
+        "fairness_metric_set": "equalParity",
         "fairness_threshold": 0.1,
     }
 
@@ -49,7 +49,7 @@ def test_operator_update_bias_and_fairness_settings(mocker, bias_and_fairness_se
     bias_and_fairness_settings_params = {
         "protected_features": ["gender"],
         "preferable_target_value": "True",
-        "fairness_metrics_set": "equalParity",
+        "fairness_metric_set": "equalParity",
         "fairness_threshold": 0.25,
     }
 
@@ -73,7 +73,7 @@ def test_operator_update_bias_and_fairness_settings(mocker, bias_and_fairness_se
 
     update_bias_and_fairness_settings_mock.assert_called_with(
         protected_features=bias_and_fairness_settings_params["protected_features"],
-        fairness_metric_set=bias_and_fairness_settings_params["fairness_metrics_set"],
+        fairness_metric_set=bias_and_fairness_settings_params["fairness_metric_set"],
         fairness_threshold=bias_and_fairness_settings_params["fairness_threshold"],
         preferable_target_value=bias_and_fairness_settings_params["preferable_target_value"],
     )
@@ -87,7 +87,7 @@ def test_operator_no_need_update_bias_and_fairness_settings(
     bias_and_fairness_settings_params = {
         "protected_features": ["gender"],
         "preferable_target_value": "True",
-        "fairness_metrics_set": "equalParity",
+        "fairness_metric_set": "equalParity",
         "fairness_threshold": 0.1,
     }
 
