@@ -68,7 +68,7 @@ pipeline:
                             set -exuo pipefail
                             pip install -U pip
                             pip install -r requirements.txt
-                            make format-no-fix
+                            make typecheck
         - stage:
             name: Unit tests
             identifier: test_unit
