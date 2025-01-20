@@ -255,6 +255,8 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
     :type datarobot_conn_id: str, optional
     :param recipe_id: Wrangling or Feature Discovery Recipe Id
     :type recipe_id: str
+    :param do_snapshot: *True* to download and store whole dataframe into DataRobot AI Catalog. *False* to create a dynamic dataset.
+    :type do_snapshot: bool
     :param dataset_name_param: Name of the parameter in the configuration to use as dataset_name
     :type dataset_name_param: str
     :param materialization_catalog_param: Name of the parameter in the configuration to use as materialization_catalog
@@ -278,6 +280,7 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
         *,
         datarobot_conn_id: str = "datarobot_default",
         recipe_id: str,
+        do_snapshot: bool,
         dataset_name_param: str = "dataset_name",
         materialization_catalog_param: str = "materialization_catalog",
         materialization_schema_param: str = "materialization_schema",
@@ -287,6 +290,7 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
         super().__init__(**kwargs)
         self.datarobot_conn_id = datarobot_conn_id
         self.recipe_id = recipe_id
+        self.do_snapshot = do_snapshot
 
         self.dataset_name_param = dataset_name_param
         self.materialization_catalog_param = materialization_catalog_param
@@ -321,21 +325,27 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
+        recipe = dr.models.Recipe.get(self.recipe_id)
+        if recipe.dialect == dr.enums.DataWranglingDialect.SPARK and not self.do_snapshot:
+            raise AirflowException(
+                "Dynamic datasets are not suitable for 'spark' recipes. "
+                "Please, either specify do_snapshot=True for the operator or use another recipe."
+            )
+
         materialization_destination = self._get_materialization_destination(context)
         dataset_name = self._get_dataset_name(context, materialization_destination)
-        do_snapshot = materialization_destination is None
 
         dataset = dr.Dataset.create_from_recipe(
-            dr.models.Recipe.get(self.recipe_id),
+            recipe,
             name=dataset_name,
-            do_snapshot=do_snapshot,
+            do_snapshot=self.do_snapshot,
             persist_data_after_ingestion=True,
             materialization_destination=materialization_destination,
         )
 
         logging.info(
             '%s dataset "%s" created.',
-            "Snapshot" if do_snapshot else "Dynamic",
+            "Snapshot" if self.do_snapshot else "Dynamic",
             dataset.name,
         )
 
