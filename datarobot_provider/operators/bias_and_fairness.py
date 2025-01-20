@@ -52,7 +52,7 @@ class GetBiasAndFairnessSettingsOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Context) -> Optional[BiasAndFairnessSettings]:
+    def execute(self, context: Context) -> Optional["BiasAndFairnessSettings"]:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 

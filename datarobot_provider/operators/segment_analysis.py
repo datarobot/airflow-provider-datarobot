@@ -51,7 +51,7 @@ class GetSegmentAnalysisSettingsOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Context) -> SegmentAnalysisSettings:
+    def execute(self, context: Context) -> "SegmentAnalysisSettings":
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
