@@ -60,7 +60,7 @@ class CreateProjectOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Context) -> str:
+    def execute(self, context: Context) -> Optional[str]:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -94,7 +94,7 @@ class CreateProjectOperator(BaseOperator):
                 project_name=context["params"]["project_name"],
             )
             self.log.info(
-                f"Project created: project_id={project.id} from dataset: dataset_id={training_dataset_id}"
+                f"Project created: project_id={project.id} from dataset: dataset_id={training_dataset_id}"  # type: ignore[attr-defined, unused-ignore]
             )
             return project.id
 
