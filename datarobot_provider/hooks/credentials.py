@@ -9,10 +9,14 @@
 import json
 from typing import Any
 from typing import Dict
+from typing import Optional
+from typing import Tuple
+from typing import Union
 
 from airflow import AirflowException
 from airflow.hooks.base import BaseHook
 from datarobot.models.credential import Credential
+from datarobot.models.data_store import DataStore
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
@@ -32,7 +36,7 @@ class CredentialsBaseHook(BaseHook):
 
     def __init__(
         self,
-        datarobot_credentials_conn_id: str = None,
+        datarobot_credentials_conn_id: Optional[str] = None,
     ) -> None:
         super().__init__()
         self.datarobot_credentials_conn_id = datarobot_credentials_conn_id
@@ -52,12 +56,18 @@ class CredentialsBaseHook(BaseHook):
 
     def get_or_create_credential(self, conn) -> Credential:
         # Trying to find existing DataRobot Credentials:
+        if not self.datarobot_credentials_conn_id:
+            raise AirflowException("datarobot_credentials_conn_id is not defined")
+
         for credential in Credential.list():
             if credential.name == self.datarobot_credentials_conn_id:
                 self.log.info(
                     f"Found Existing Credentials :{credential.name} , id={credential.credential_id}"
                 )
-                if self.default_credential_description in credential.description:
+                if (
+                    credential.description
+                    and self.default_credential_description in credential.description
+                ):
                     self.log.info(
                         f"Trying to update provided credential:{credential.name} using Airflow preconfigured"
                         f" credentials"
@@ -79,8 +89,10 @@ class CredentialsBaseHook(BaseHook):
             )
         return credential
 
-    def get_conn(self) -> (Credential, dict):
+    def get_conn(self) -> Union[Tuple[Credential, dict, DataStore], Tuple[Credential, dict]]:
         """Get or Create DataRobot associated credentials managed by Airflow provider."""
+        if not self.datarobot_credentials_conn_id:
+            raise AirflowException("datarobot_credentials_conn_id is not defined")
 
         conn = self.get_connection(self.datarobot_credentials_conn_id)
 
@@ -126,7 +138,7 @@ class BasicCredentialsHook(CredentialsBaseHook):
 
     def __init__(
         self,
-        datarobot_credentials_conn_id: str = None,
+        datarobot_credentials_conn_id: Optional[str] = None,
     ) -> None:
         super().__init__()
         self.datarobot_credentials_conn_id = datarobot_credentials_conn_id
@@ -138,6 +150,9 @@ class BasicCredentialsHook(CredentialsBaseHook):
 
         if not conn.password:
             raise AirflowException("password is not defined")
+
+        if not self.datarobot_credentials_conn_id:
+            raise AirflowException("datarobot_credentials_conn_id is not defined")
 
         self.log.info(f"Creating Basic Credentials:{self.datarobot_credentials_conn_id}")
         credential = Credential.create_basic(
@@ -232,6 +247,10 @@ class GoogleCloudCredentialsHook(CredentialsBaseHook):
     def create_credentials(self, conn) -> Credential:
         """Returns Google Cloud credentials for params in connection object"""
         gcp_key_json = self.parse_gcp_key(conn)
+
+        if not self.datarobot_credentials_conn_id:
+            raise AirflowException("datarobot_credentials_conn_id is not defined")
+
         self.log.info(f"Creating Google Cloud Credentials:{self.datarobot_credentials_conn_id}")
         credential = Credential.create_gcp(
             name=self.datarobot_credentials_conn_id,
@@ -246,9 +265,13 @@ class GoogleCloudCredentialsHook(CredentialsBaseHook):
         gcp_credentials = {
             "gcp_key": self.parse_gcp_key(conn),
         }
+
+        if not self.datarobot_credentials_conn_id:
+            raise AirflowException("datarobot_credentials_conn_id is not defined")
+
         self.log.info(f"Updating Google Cloud Credentials:{self.datarobot_credentials_conn_id}")
         try:
-            credential.update(**gcp_credentials)
+            credential.update(**gcp_credentials)  # type: ignore
 
         except Exception as e:
             self.log.error(
@@ -316,6 +339,9 @@ class AwsCredentialsHook(CredentialsBaseHook):
         aws_session_token = conn.extra_dejson.get("aws_session_token", None)
 
         try:
+            if not self.datarobot_credentials_conn_id:
+                raise AirflowException("datarobot_credentials_conn_id is not defined")
+
             self.log.info(f"Creating AWS Credentials:{self.datarobot_credentials_conn_id}")
             credential = Credential.create_s3(
                 name=self.datarobot_credentials_conn_id,
@@ -434,6 +460,9 @@ class AzureStorageCredentialsHook(CredentialsBaseHook):
         """Returns Azure Storage credentials for params in connection object"""
 
         try:
+            if not self.datarobot_credentials_conn_id:
+                raise AirflowException("datarobot_credentials_conn_id is not defined")
+
             self.log.info(
                 f"Creating Azure Storage Credentials: {self.datarobot_credentials_conn_id}"
             )
@@ -526,6 +555,9 @@ class OAuthCredentialsHook(CredentialsBaseHook):
             raise AirflowException("OAuth Refresh Token is not defined")
 
         try:
+            if not self.datarobot_credentials_conn_id:
+                raise AirflowException("datarobot_credentials_conn_id is not defined")
+
             self.log.info(f"Creating OAuth Credentials: {self.datarobot_credentials_conn_id}")
             credential = Credential.create_oauth(
                 name=self.datarobot_credentials_conn_id,

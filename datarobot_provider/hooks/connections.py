@@ -7,6 +7,7 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from typing import Any
 from typing import Dict
+from typing import Tuple
 
 from airflow import AirflowException
 from datarobot import Credential
@@ -65,9 +66,12 @@ class JDBCDataSourceHook(BasicCredentialsHook):
             },
         }
 
-    def get_conn(self) -> (Credential, dict, DataStore):
+    def get_conn(self) -> Tuple[Credential, dict, DataStore]:
         """Retrieving corresponding DataStore object or creating if not exist,
         updating it with new parameters in case of changes."""
+
+        if not self.datarobot_credentials_conn_id:
+            raise AirflowException("datarobot_credentials_conn_id is not defined")
 
         conn = self.get_connection(self.datarobot_credentials_conn_id)
 
@@ -119,6 +123,9 @@ class JDBCDataSourceHook(BasicCredentialsHook):
                 )
                 break
         else:
+            if not self.datarobot_credentials_conn_id:
+                raise AirflowException("datarobot_credentials_conn_id is not defined")
+
             self.log.info(
                 f"DataStore:{self.datarobot_credentials_conn_id} does not exist, trying to create it"
             )
@@ -131,6 +138,9 @@ class JDBCDataSourceHook(BasicCredentialsHook):
             self.log.info(
                 f"DataStore:{self.datarobot_credentials_conn_id} successfully created, id={data_store.id}"
             )
+
+        if not data_store.params:
+            raise AirflowException(f"DataStore:{self.datarobot_credentials_conn_id} has no params")
 
         if jdbc_url != data_store.params.jdbc_url or jdbc_driver_id != data_store.params.driver_id:
             self.log.info(

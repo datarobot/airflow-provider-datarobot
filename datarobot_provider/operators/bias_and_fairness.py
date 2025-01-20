@@ -5,13 +5,16 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+from collections.abc import Sequence
 from typing import Any
 from typing import Dict
-from typing import Iterable
+from typing import Optional
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
+from airflow.utils.context import Context
+from datarobot.models.deployment.deployment import BiasAndFairnessSettings
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
@@ -27,9 +30,9 @@ class GetBiasAndFairnessSettingsOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["deployment_id"]
+    template_fields: Sequence[str] = ["deployment_id"]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -47,7 +50,7 @@ class GetBiasAndFairnessSettingsOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> dict:
+    def execute(self, context: Context) -> Optional[BiasAndFairnessSettings]:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -70,9 +73,9 @@ class UpdateBiasAndFairnessSettingsOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["deployment_id"]
+    template_fields: Sequence[str] = ["deployment_id"]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -90,29 +93,26 @@ class UpdateBiasAndFairnessSettingsOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> None:
+    def execute(self, context: Context) -> None:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         self.log.info(f"Getting Deployment for deployment_id={self.deployment_id}")
         deployment = dr.Deployment.get(deployment_id=self.deployment_id)
 
-        current_bias_and_fairness_settings = deployment.get_bias_and_fairness_settings()
-
-        if current_bias_and_fairness_settings is None:
-            current_bias_and_fairness_settings = {
-                "protected_features": None,
-                "fairness_metrics_set": None,
-                "fairness_threshold": None,
-                "preferable_target_value": None,
-            }
+        current_bias_and_fairness_settings = deployment.get_bias_and_fairness_settings() | {  # type: ignore
+            "protected_features": None,
+            "fairness_metric_set": None,
+            "fairness_threshold": None,
+            "preferable_target_value": None,
+        }
 
         protected_features = context["params"].get(
             "protected_features", current_bias_and_fairness_settings["protected_features"]
         )
 
         fairness_metrics_set = context["params"].get(
-            "fairness_metrics_set", current_bias_and_fairness_settings["fairness_metrics_set"]
+            "fairness_metric_set", current_bias_and_fairness_settings["fairness_metric_set"]
         )
 
         fairness_threshold = context["params"].get(
@@ -125,7 +125,7 @@ class UpdateBiasAndFairnessSettingsOperator(BaseOperator):
 
         if (
             (protected_features != current_bias_and_fairness_settings["protected_features"])
-            or (fairness_metrics_set != current_bias_and_fairness_settings["fairness_metrics_set"])
+            or (fairness_metrics_set != current_bias_and_fairness_settings["fairness_metric_set"])
             or (fairness_threshold != current_bias_and_fairness_settings["fairness_threshold"])
             or (
                 preferable_target_value

@@ -8,11 +8,11 @@
 from typing import Any
 from typing import Dict
 
-import datarobot as dr
 from airflow import AirflowException
 from airflow import __version__ as AIRFLOW_VERSION
 from airflow.hooks.base import BaseHook
 from datarobot.client import Client
+from datarobot.rest import RESTClientObject
 
 from datarobot_provider import get_provider_info
 
@@ -69,7 +69,7 @@ class DataRobotHook(BaseHook):
         super().__init__()
         self.datarobot_conn_id = datarobot_conn_id
 
-    def get_conn(self) -> dr.Client:
+    def get_conn(self) -> RESTClientObject:
         """Initializes a DataRobot client instance."""
         conn = self.get_connection(self.datarobot_conn_id)
         endpoint = conn.extra_dejson.get("extra__http__endpoint", "")

@@ -35,7 +35,7 @@ unit-tests:
 	pytest -vv tests/unit/
 
 typecheck:
-	find . -type f -name "*.py" | grep -v ".git" | xargs mypy --config-file .mypy.ini
+	mypy --config-file pyproject.toml datarobot_provider
 
 test-docs:
 	cd docs && $(MAKE) doctest

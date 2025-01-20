@@ -93,7 +93,7 @@ These config values are accessible in the `execute()` method of any operator in 
 through the `context["params"]` variable; for example, to get training data, you could use the following:
 
 ``` py
-def execute(self, context: Dict[str, Any]) -> str:
+def execute(self, context: Context) -> str:
     ...
     training_data = context["params"]["training_data"]
     ...

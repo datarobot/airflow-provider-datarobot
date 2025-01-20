@@ -5,13 +5,15 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+from collections.abc import Sequence
 from typing import Any
 from typing import Dict
-from typing import Iterable
+from typing import Optional
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
+from airflow.utils.context import Context
 from datarobot.models.execution_environment import RequiredMetadataKey
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
@@ -34,21 +36,21 @@ class CreateExecutionEnvironmentOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
+    template_fields: Sequence[str] = [
         "name",
         "description",
         "programming_language",
     ]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
-        name: str = None,
-        description: str = None,
-        programming_language: str = None,
+        name: Optional[str] = None,
+        description: Optional[str] = None,
+        programming_language: Optional[str] = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
@@ -62,7 +64,7 @@ class CreateExecutionEnvironmentOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -123,23 +125,23 @@ class CreateExecutionEnvironmentVersionOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
+    template_fields: Sequence[str] = [
         "execution_environment_id",
         "docker_context_path",
         "environment_version_label",
         "environment_version_description",
     ]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         execution_environment_id: str,
-        docker_context_path: str = None,
-        environment_version_label: str = None,
-        environment_version_description: str = None,
+        docker_context_path: Optional[str] = None,
+        environment_version_label: Optional[str] = None,
+        environment_version_description: Optional[str] = None,
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
@@ -156,7 +158,7 @@ class CreateExecutionEnvironmentVersionOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -203,19 +205,19 @@ class CreateCustomInferenceModelOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
+    template_fields: Sequence[str] = [
         "name",
         "description",
     ]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
-        name: str = None,
-        description: str = None,
+        name: Optional[str] = None,
+        description: Optional[str] = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
@@ -228,7 +230,7 @@ class CreateCustomInferenceModelOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -305,7 +307,7 @@ class CreateCustomModelVersionOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
+    template_fields: Sequence[str] = [
         "custom_model_id",
         "base_environment_id",
         "training_dataset_id",
@@ -314,7 +316,7 @@ class CreateCustomModelVersionOperator(BaseOperator):
         "create_from_previous",
     ]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -322,9 +324,9 @@ class CreateCustomModelVersionOperator(BaseOperator):
         *,
         custom_model_id: str,
         base_environment_id: str,
-        training_dataset_id: str = None,
-        holdout_dataset_id: str = None,
-        custom_model_folder: str = None,
+        training_dataset_id: Optional[str] = None,
+        holdout_dataset_id: Optional[str] = None,
+        custom_model_folder: Optional[str] = None,
         create_from_previous: bool = False,
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
         datarobot_conn_id: str = "datarobot_default",
@@ -344,7 +346,7 @@ class CreateCustomModelVersionOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -429,9 +431,9 @@ class CustomModelTestOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["custom_model_id", "custom_model_version_id", "dataset_id"]
+    template_fields: Sequence[str] = ["custom_model_id", "custom_model_version_id", "dataset_id"]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -439,7 +441,7 @@ class CustomModelTestOperator(BaseOperator):
         *,
         custom_model_id: str,
         custom_model_version_id: str,
-        dataset_id: str = None,
+        dataset_id: Optional[str] = None,
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
@@ -455,7 +457,7 @@ class CustomModelTestOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -492,9 +494,9 @@ class GetCustomModelTestOverallStatusOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["custom_model_test_id"]
+    template_fields: Sequence[str] = ["custom_model_test_id"]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -512,7 +514,7 @@ class GetCustomModelTestOverallStatusOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -550,13 +552,13 @@ class CreateCustomModelDeploymentOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
+    template_fields: Sequence[str] = [
         "custom_model_version_id",
         "deployment_name",
         "prediction_server_id",
     ]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -564,9 +566,9 @@ class CreateCustomModelDeploymentOperator(BaseOperator):
         *,
         custom_model_version_id: str,
         deployment_name: str,
-        prediction_server_id: str = None,
-        description: str = None,
-        importance: str = None,
+        prediction_server_id: Optional[str] = None,
+        description: Optional[str] = None,
+        importance: Optional[str] = None,
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
@@ -584,7 +586,7 @@ class CreateCustomModelDeploymentOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 

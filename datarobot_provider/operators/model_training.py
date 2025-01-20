@@ -5,13 +5,15 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+from collections.abc import Sequence
 from typing import Any
 from typing import Dict
-from typing import Iterable
+from typing import Optional
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
+from airflow.utils.context import Context
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
@@ -37,23 +39,23 @@ class TrainModelOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
+    template_fields: Sequence[str] = [
         "project_id",
         "blueprint_id",
         "featurelist_id",
         "source_project_id",
     ]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
-        project_id: str = None,
-        blueprint_id: str = None,
-        featurelist_id: str = None,
-        source_project_id: str = None,
+        project_id: Optional[str] = None,
+        blueprint_id: Optional[str] = None,
+        featurelist_id: Optional[str] = None,
+        source_project_id: Optional[str] = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
@@ -68,18 +70,18 @@ class TrainModelOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
-        if self.project_id is None:
+        if not self.project_id:
             raise ValueError("project_id is required.")
 
-        if self.blueprint_id is None:
+        if not self.blueprint_id:
             raise ValueError("blueprint_id is required.")
 
-        project = dr.Project.get(self.project_id)
-        blueprint = dr.Blueprint.get(project.id, self.blueprint_id)
+        project: dr.Project = dr.Project.get(self.project_id)
+        blueprint = dr.Blueprint.get(self.project_id, self.blueprint_id)
 
         job_id = project.train(
             blueprint,
@@ -113,21 +115,21 @@ class RetrainModelOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
+    template_fields: Sequence[str] = [
         "project_id",
         "model_id",
         "featurelist_id",
     ]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
-        project_id: str = None,
-        model_id: str = None,
-        featurelist_id: str = None,
+        project_id: Optional[str] = None,
+        model_id: Optional[str] = None,
+        featurelist_id: Optional[str] = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
@@ -141,7 +143,7 @@ class RetrainModelOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
