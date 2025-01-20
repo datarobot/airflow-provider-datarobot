@@ -9,8 +9,8 @@ from typing import Any
 from typing import Dict
 
 import datarobot as dr
-from airflow import AirflowException
 from airflow import __version__ as AIRFLOW_VERSION
+from airflow.exceptions import AirflowException
 from airflow.hooks.base import BaseHook
 from datarobot.client import Client
 
