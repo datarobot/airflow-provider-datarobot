@@ -112,7 +112,7 @@ def test_operator_create_dataset_from_jdbc(mocker, mock_airflow_connection_datar
 
 
 @pytest.mark.parametrize(
-    "test_params, expected_do_snapshot, expected_name, expected_mat_destination",
+    "test_params, do_snapshot, expected_name, expected_mat_destination",
     [
         ({}, True, None, None),
         (
@@ -130,7 +130,7 @@ def test_operator_create_dataset_from_jdbc(mocker, mock_airflow_connection_datar
     ],
 )
 def test_operator_create_dataset_from_recipe(
-    mocker, test_params, expected_do_snapshot, expected_name, expected_mat_destination
+    mocker, test_params, do_snapshot, expected_name, expected_mat_destination
 ):
     dataset_mock = mocker.Mock()
     recipe_mock = mocker.Mock(recipe_id="test-recipe-id")
@@ -140,7 +140,10 @@ def test_operator_create_dataset_from_recipe(
     )
     get_recipe_mock = mocker.patch.object(dr.models.Recipe, "get", return_value=recipe_mock)
     operator = CreateDatasetFromRecipeOperator(
-        task_id="create_from_recipe", recipe_id="test-recipe-id", dataset_name_param="dataset1_name"
+        task_id="create_from_recipe",
+        recipe_id="test-recipe-id",
+        dataset_name_param="dataset1_name",
+        do_snapshot=do_snapshot,
     )
 
     dataset_id = operator.execute(context={"params": test_params})
@@ -149,7 +152,7 @@ def test_operator_create_dataset_from_recipe(
     create_dataset_from_recipe_mock.assert_called_once_with(
         recipe_mock,
         name=expected_name,
-        do_snapshot=expected_do_snapshot,
+        do_snapshot=do_snapshot,
         persist_data_after_ingestion=True,
         materialization_destination=expected_mat_destination,
     )
