@@ -66,4 +66,4 @@ def datarobot_dynamic_jdbc_dataset():
 datarobot_dynamic_jdbc_dataset_dag = datarobot_dynamic_jdbc_dataset()
 
 if __name__ == "__main__":
-    datarobot_dynamic_jdbc_dataset.test()  # type: ignore[attr-defined]
+    datarobot_dynamic_jdbc_dataset_dag.test()
