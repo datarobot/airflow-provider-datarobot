@@ -87,6 +87,7 @@ def test_operator_update_bias_and_fairness_settings__backward_compatibility(
     bias_and_fairness_settings_params = {
         "protected_features": ["gender"],
         "preferable_target_value": "True",
+        # fairness_metrics_set instead of fairness_metric_set
         "fairness_metrics_set": "equalParity",
         "fairness_threshold": 0.25,
     }
