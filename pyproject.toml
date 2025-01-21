@@ -84,7 +84,7 @@ force-single-line = true
 quote-style = "double"
 
 [tool.mypy]
-python_version = 3.9
+python_version = 3.12
 ignore_missing_imports = true
 follow_imports_for_stubs = true
 warn_redundant_casts = true
