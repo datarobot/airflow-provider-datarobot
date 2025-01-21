@@ -72,8 +72,8 @@ class GetOrCreateCredentialOperator(BaseOperator):
                 "Airflow connection with the same name"
             )
             hook = CredentialsBaseHook.get_hook(conn_id=credential_name)
-            if hook.conn_type == "datarobot.datasource.jdbc":  # type: ignore
-                credentials, _, _ = hook.run()  # type: ignore
+            if hook.conn_type == "datarobot.datasource.jdbc":  # type: ignore[attr-defined]
+                credentials, _, _ = hook.run()  # type: ignore[attr-defined]
             else:
-                credentials, _ = hook.run()  # type: ignore
+                credentials, _ = hook.run()  # type: ignore[attr-defined]
             return credentials.credential_id
