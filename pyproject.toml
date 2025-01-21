@@ -7,7 +7,7 @@ name = "airflow-provider-datarobot"
 version = "0.0.12"
 description = "DataRobot Airflow provider."
 readme = "README.md"
-requires-python = ">=3.9,<3.13"
+requires-python = ">=3.9"
 license = {text = "DataRobot Tool and Utility Agreement"}
 authors = [
    {name = "DataRobot", email = "support@datarobot.com"}
