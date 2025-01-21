@@ -30,45 +30,45 @@ pipeline:
               execution:
                 steps:
                   - parallel:
-                    - step:
-                        type: Run
-                        name: lint check step
-                        identifier: run_lint
-                        spec:
-                          connectorRef: account.dockerhub_datarobot_read
-                          image: python:3.12
-                          shell: Bash
-                          command: |-
-                            set -exuo pipefail
-                            pip install -U pip
-                            pip install -r requirements.txt
-                            make lint
-                    - step:
-                        type: Run
-                        name: format check step
-                        identifier: format_lint
-                        spec:
-                          connectorRef: account.dockerhub_datarobot_read
-                          image: python:3.12
-                          shell: Bash
-                          command: |-
-                            set -exuo pipefail
-                            pip install -U pip
-                            pip install -r requirements.txt
-                            make format-no-fix
-                    - step:
-                        type: Run
-                        name: mypy check step
-                        identifier: mypy
-                        spec:
-                          connectorRef: account.dockerhub_datarobot_read
-                          image: python:3.12
-                          shell: Bash
-                          command: |-
-                            set -exuo pipefail
-                            pip install -U pip
-                            pip install -r requirements.txt
-                            make typecheck
+                      - step:
+                          type: Run
+                          name: lint check step
+                          identifier: run_lint
+                          spec:
+                            connectorRef: account.dockerhub_datarobot_read
+                            image: python:3.12
+                            shell: Bash
+                            command: |-
+                              set -exuo pipefail
+                              pip install -U pip
+                              pip install -r requirements.txt
+                              make lint
+                      - step:
+                          type: Run
+                          name: format check step
+                          identifier: format_lint
+                          spec:
+                            connectorRef: account.dockerhub_datarobot_read
+                            image: python:3.12
+                            shell: Bash
+                            command: |-
+                              set -exuo pipefail
+                              pip install -U pip
+                              pip install -r requirements.txt
+                              make format-no-fix
+                      - step:
+                          type: Run
+                          name: mypy check step
+                          identifier: mypy
+                          spec:
+                            connectorRef: account.dockerhub_datarobot_read
+                            image: python:3.12
+                            shell: Bash
+                            command: |-
+                              set -exuo pipefail
+                              pip install -U pip
+                              pip install -r requirements.txt
+                              make typecheck
         - stage:
             name: Unit tests
             identifier: test_unit
@@ -107,6 +107,10 @@ pipeline:
                           spec:
                             paths:
                               - /harness/unit_test_report.xml
+                        resources:
+                          limits:
+                            memory: 1Gi
+                            cpu: "1.5"
                       strategy:
                         matrix:
                           python_version:
