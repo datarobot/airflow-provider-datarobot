@@ -10,17 +10,6 @@ from numpydoc.docscrape import Parameter
 from datarobot_provider.autogen.generate_operator import GenerateOperators
 
 
-def test_generate_operator():
-    with open("whitelist_test.yaml", "r") as f:
-        whitelist = yaml.safe_load(f)
-    with open("example_output.txt") as f:
-        example_output = f.read()
-
-    generator = GenerateOperators(whitelist)
-    results = generator.generate()
-    assert results["operators.modeljob.ModelJobGetOperator"] == example_output
-
-
 @pytest.fixture
 def generator():
     whitelist = {"datarobot.models.modeljob": {"ModelJob": ["get"]}}
@@ -37,6 +26,17 @@ def docstring_fixture():
     ]
     docstring["Returns"] = [Parameter("model_job", "ModelJob", [""])]
     return docstring
+
+
+def test_generate_operator_from_test_whitelist():
+    with open("whitelist_test.yaml", "r") as f:
+        whitelist = yaml.safe_load(f)
+    with open("example_output.txt") as f:
+        example_output = f.read()
+
+    generator = GenerateOperators(whitelist)
+    results = generator.generate()
+    assert results["operators.modeljob.ModelJobGetOperator"] == example_output
 
 
 @patch("datarobot_provider.autogen.generate_operator.black.format_file_contents")
