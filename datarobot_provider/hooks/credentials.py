@@ -269,7 +269,7 @@ class GoogleCloudCredentialsHook(CredentialsBaseHook):
 
         self.log.info(f"Updating Google Cloud Credentials:{self.datarobot_credentials_conn_id}")
         try:
-            credential.update(**gcp_credentials)  # type: ignore
+            credential.update(**gcp_credentials)  # type: ignore[arg-type]
 
         except Exception as e:
             self.log.error(

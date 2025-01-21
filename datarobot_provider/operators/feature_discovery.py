@@ -287,7 +287,7 @@ class DatasetRelationshipOperator(BaseOperator):
             dataset2_identifier=self.dataset2_identifier,  # to transactions
             dataset1_keys=self.dataset1_keys,  # on CustomerID
             dataset2_keys=self.dataset2_keys,
-            feature_derivation_windows=self.feature_derivation_windows,  # type: ignore
+            feature_derivation_windows=self.feature_derivation_windows,  # type: ignore[arg-type]
             prediction_point_rounding=self.prediction_point_rounding,
             prediction_point_rounding_time_unit=self.prediction_point_rounding_time_unit,
             feature_derivation_window_start=self.feature_derivation_window_start,
