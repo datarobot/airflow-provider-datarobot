@@ -26,11 +26,6 @@ class GenerateOperators:
                     )
         return generated_code
 
-    @staticmethod
-    def format_code_block_with_black(code_block: str) -> str:
-        """Reformat a string of python code using black."""
-        return str(black.format_file_contents(code_block, fast=False, mode=black.FileMode()))
-
     @classmethod
     def generate_operator_for_method(
         cls, module_key: str, module_obj_key: str, method: str, method_docstring: NumpyDocString
@@ -70,6 +65,11 @@ class GenerateOperators:
         )
         op_python_code = cls.format_code_block_with_black(op_python_code)
         return op_python_code
+
+    @staticmethod
+    def format_code_block_with_black(code_block: str) -> str:
+        """Reformat a string of python code using black."""
+        return str(black.format_file_contents(code_block, fast=False, mode=black.FileMode()))
 
     @staticmethod
     def construct_operator_docstring(docstring: NumpyDocString) -> str:
