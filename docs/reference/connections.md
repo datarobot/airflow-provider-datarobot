@@ -3,7 +3,7 @@
 
 The next step is to create a connection from Airflow to DataRobot:
 
-1. In the Airflow user interface, click **Admin > Connections** to 
+1. In the Airflow user interface, click **Admin > Connections** to
    [add an Airflow connection](https://airflow.apache.org/docs/apache-airflow/stable/howto/connection.html#creating-a-connection-with-the-ui).
 
 2. On the **List Connection** page, click **+ Add a new record**.
@@ -23,7 +23,7 @@ The next step is to create a connection from Airflow to DataRobot:
 
 ## Create preconfigured connections to DataRobot
 
-You can create preconfigured connections to store and manage credentials to use with Airflow Operators, 
+You can create preconfigured connections to store and manage credentials to use with Airflow Operators,
 replicating the [connection on the DataRobot side](https://docs.datarobot.com/en/docs/data/connect-data/stored-creds.html).
 
 Currently, the supported credential types are:
@@ -68,13 +68,13 @@ Operators and sensors use parameters from the [config](https://airflow.apache.or
     }
 }
 ```
-    
 
-These config values are accessible in the `execute()` method of any operator in the DAG 
+
+These config values are accessible in the `execute()` method of any operator in the DAG
 through the `context["params"]` variable; for example, to get training data, you could use the following:
 
 ``` py
-def execute(self, context: Dict[str, Any]) -> str:
+def execute(self, context: Context) -> str:
     ...
     training_data = context["params"]["training_data"]
     ...

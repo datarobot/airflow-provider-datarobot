@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "airflow-provider-datarobot"
-version = "0.0.10"
+version = "0.0.11"
 description = "DataRobot Airflow provider."
 readme = "README.md"
 requires-python = "~=3.11"
@@ -79,3 +79,12 @@ force-single-line = true
 
 [tool.ruff.format]
 quote-style = "double"
+
+[tool.mypy]
+python_version = 3.9
+ignore_missing_imports = true
+follow_imports_for_stubs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+show_error_codes = true
+pretty = true

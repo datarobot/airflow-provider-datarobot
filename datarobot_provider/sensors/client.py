@@ -6,10 +6,10 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from typing import Any
-from typing import Dict
 
 from airflow.exceptions import AirflowException
 from airflow.sensors.base import BaseSensorOperator
+from airflow.utils.context import Context
 from datarobot.errors import AsyncProcessUnsuccessfulError
 from datarobot.models.status_check_job import StatusCheckJob
 
@@ -42,7 +42,7 @@ class BaseAsyncResolutionSensor(BaseSensorOperator):
 
         self.hook = DataRobotHook(datarobot_conn_id)
 
-    def poke(self, context: Dict[Any, Any]) -> bool:
+    def poke(self, context: Context) -> bool:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
