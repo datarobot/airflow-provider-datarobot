@@ -36,7 +36,7 @@ pipeline:
                         identifier: run_lint
                         spec:
                           connectorRef: account.dockerhub_datarobot_read
-                          image: python:3.9
+                          image: python:3.11
                           shell: Bash
                           command: |-
                             set -exuo pipefail
@@ -49,7 +49,7 @@ pipeline:
                         identifier: format_lint
                         spec:
                           connectorRef: account.dockerhub_datarobot_read
-                          image: python:3.9
+                          image: python:3.11
                           shell: Bash
                           command: |-
                             set -exuo pipefail
@@ -92,7 +92,7 @@ pipeline:
                       identifier: run_unit_tests
                       spec:
                         connectorRef: account.dockerhub_datarobot_read
-                        image: python:3.9
+                        image: python:3.11
                         shell: Bash
                         command: |-
                           set -exuo pipefail

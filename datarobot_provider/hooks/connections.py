@@ -7,7 +7,7 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from typing import Any
 
-from airflow import AirflowException
+from airflow.exceptions import AirflowException
 from datarobot import Credential
 from datarobot.models.data_store import DataStore
 from datarobot.models.driver import DataDriver

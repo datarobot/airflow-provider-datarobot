@@ -7,8 +7,8 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from typing import Any
 
-from airflow import AirflowException
 from airflow import __version__ as AIRFLOW_VERSION
+from airflow.exceptions import AirflowException
 from airflow.hooks.base import BaseHook
 from datarobot.client import Client
 from datarobot.rest import RESTClientObject

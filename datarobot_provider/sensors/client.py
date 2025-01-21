@@ -7,7 +7,7 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from typing import Any
 
-from airflow import AirflowException
+from airflow.exceptions import AirflowException
 from airflow.sensors.base import BaseSensorOperator
 from airflow.utils.context import Context
 from datarobot.errors import AsyncProcessUnsuccessfulError

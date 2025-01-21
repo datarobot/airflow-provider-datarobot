@@ -11,7 +11,7 @@ from typing import Any
 from typing import Optional
 from typing import Union
 
-from airflow import AirflowException
+from airflow.exceptions import AirflowException
 from airflow.hooks.base import BaseHook
 from datarobot.models.credential import Credential
 from datarobot.models.data_store import DataStore
