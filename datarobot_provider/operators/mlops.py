@@ -5,26 +5,27 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+from collections.abc import Sequence
 from typing import Any
-from typing import Dict
-from typing import Iterable
+from typing import Optional
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
+from airflow.utils.context import Context
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
 
 class SubmitActualsFromCatalogOperator(BaseOperator):
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
+    template_fields: Sequence[str] = [
         "deployment_id",
         "dataset_id",
         "dataset_version_id",
     ]
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_fields_renderers: dict[str, str] = {}
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -32,7 +33,7 @@ class SubmitActualsFromCatalogOperator(BaseOperator):
         *,
         deployment_id: str,
         dataset_id: str,
-        dataset_version_id: str = None,
+        dataset_version_id: Optional[str] = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
@@ -46,7 +47,7 @@ class SubmitActualsFromCatalogOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 

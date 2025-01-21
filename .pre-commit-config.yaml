@@ -26,3 +26,16 @@ repos:
         args: [ --fix ]
         # Run the formatter.
     -   id: ruff-format
+-   repo: local
+    hooks:
+    -   id: typecheck
+        name: typecheck
+        entry: make typecheck
+        language: python
+        types: [python]
+        # use require_serial so that script
+        # is only called once per commit
+        require_serial: true
+        # Print the number of files as a sanity-check
+        verbose: true
+        pass_filenames: false

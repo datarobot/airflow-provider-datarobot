@@ -5,13 +5,14 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+from collections.abc import Sequence
 from typing import Any
-from typing import Dict
-from typing import Iterable
+from typing import Optional
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
+from airflow.utils.context import Context
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
@@ -36,14 +37,14 @@ class AddExternalDatasetOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
+    template_fields: Sequence[str] = [
         "project_id",
         "dataset_id",
         "credential_id",
         "dataset_version_id",
     ]
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_fields_renderers: dict[str, str] = {}
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -51,8 +52,8 @@ class AddExternalDatasetOperator(BaseOperator):
         *,
         project_id: str,
         dataset_id: str,
-        credential_id: str = None,
-        dataset_version_id: str = None,
+        credential_id: Optional[str] = None,
+        dataset_version_id: Optional[str] = None,
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
@@ -69,7 +70,7 @@ class AddExternalDatasetOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -111,21 +112,21 @@ class RequestModelPredictionsOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
+    template_fields: Sequence[str] = [
         "project_id",
         "model_id",
         "external_dataset_id",
     ]
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_fields_renderers: dict[str, str] = {}
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
-        project_id: str = None,
-        model_id: str = None,
-        external_dataset_id: str = None,
+        project_id: Optional[str] = None,
+        model_id: Optional[str] = None,
+        external_dataset_id: Optional[str] = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
@@ -139,7 +140,7 @@ class RequestModelPredictionsOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 

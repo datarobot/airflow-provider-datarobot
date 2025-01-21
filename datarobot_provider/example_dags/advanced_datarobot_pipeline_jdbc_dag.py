@@ -67,7 +67,7 @@ from datarobot_provider.sensors.monitoring_job import MonitoringJobCompleteSenso
         "segment_analysis_attributes": ["race", "gender"],
         "protected_features": ["gender"],
         "preferable_target_value": "True",
-        "fairness_metrics_set": "equalParity",
+        "fairness_metric_set": "equalParity",
         "fairness_threshold": 0.1,
         "target_drift_enabled": True,
         "feature_drift_enabled": True,

@@ -6,13 +6,14 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 import os
+from collections.abc import Sequence
 from typing import Any
-from typing import Dict
-from typing import Iterable
+from typing import Optional
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
+from airflow.utils.context import Context
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
@@ -32,16 +33,16 @@ class DownloadDeploymentScoringCodeOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["deployment_id", "base_path"]
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_fields: Sequence[str] = ["deployment_id", "base_path"]
+    template_fields_renderers: dict[str, str] = {}
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         deployment_id: str,
-        base_path: str = None,
+        base_path: Optional[str] = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
@@ -54,7 +55,7 @@ class DownloadDeploymentScoringCodeOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -64,6 +65,11 @@ class DownloadDeploymentScoringCodeOperator(BaseOperator):
         self.base_path = context["params"].get("scoring_code_filepath", self.base_path)
         if self.base_path is None or not os.path.exists(self.base_path):
             raise ValueError("Invalid or missing base path value, make sure that directory exists")
+
+        if not deployment.model:
+            raise AirflowException(
+                f"Deployment {self.deployment_id} does not have a model associated"
+            )
 
         scoring_code_path = os.path.join(
             self.base_path, f"{deployment.id}-{deployment.model['id']}.jar"
@@ -110,9 +116,9 @@ class DownloadModelScoringCodeOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["project_id", "model_id"]
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_fields: Sequence[str] = ["project_id", "model_id"]
+    template_fields_renderers: dict[str, str] = {}
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -120,7 +126,7 @@ class DownloadModelScoringCodeOperator(BaseOperator):
         *,
         project_id: str,
         model_id: str,
-        base_path: str = None,
+        base_path: Optional[str] = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
@@ -134,7 +140,7 @@ class DownloadModelScoringCodeOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 

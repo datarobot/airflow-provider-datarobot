@@ -6,13 +6,12 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from typing import Any
-from typing import Dict
 
-import datarobot as dr
 from airflow import __version__ as AIRFLOW_VERSION
 from airflow.exceptions import AirflowException
 from airflow.hooks.base import BaseHook
 from datarobot.client import Client
+from datarobot.rest import RESTClientObject
 
 from datarobot_provider import get_provider_info
 
@@ -31,7 +30,7 @@ class DataRobotHook(BaseHook):
     hook_name = "DataRobot"
 
     @staticmethod
-    def get_connection_form_widgets() -> Dict[str, Any]:
+    def get_connection_form_widgets() -> dict[str, Any]:
         """Returns connection widgets to add to connection form."""
         from flask_appbuilder.fieldwidgets import BS3PasswordFieldWidget
         from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
@@ -51,7 +50,7 @@ class DataRobotHook(BaseHook):
         }
 
     @staticmethod
-    def get_ui_field_behaviour() -> Dict:
+    def get_ui_field_behaviour() -> dict:
         """Returns custom field behaviour."""
         return {
             "hidden_fields": ["host", "schema", "login", "password", "port", "extra"],
@@ -69,7 +68,7 @@ class DataRobotHook(BaseHook):
         super().__init__()
         self.datarobot_conn_id = datarobot_conn_id
 
-    def get_conn(self) -> dr.Client:
+    def get_conn(self) -> RESTClientObject:
         """Initializes a DataRobot client instance."""
         conn = self.get_connection(self.datarobot_conn_id)
         endpoint = conn.extra_dejson.get("extra__http__endpoint", "")
