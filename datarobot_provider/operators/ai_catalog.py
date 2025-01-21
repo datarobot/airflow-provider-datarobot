@@ -9,7 +9,6 @@ import logging
 from collections.abc import Sequence
 from typing import Any
 from typing import Dict
-from typing import Iterable
 from typing import Optional
 
 import datarobot as dr
@@ -272,9 +271,9 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = []
+    template_fields: Sequence[str] = []
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -305,25 +304,27 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
             )
 
     def _get_materialization_destination(
-        self, context: Dict[str, Any]
+        self, context: Context
     ) -> Optional[dr.models.dataset.MaterializationDestination]:
         if context["params"].get(self.materialization_table_param):
             return dr.models.dataset.MaterializationDestination(
-                catalog=context["params"].get(self.materialization_catalog_param),
-                schema=context["params"].get(self.materialization_schema_param),
-                table=context["params"].get(self.materialization_table_param),
+                catalog=context["params"].get(self.materialization_catalog_param),  # type: ignore
+                schema=context["params"].get(self.materialization_schema_param),  # type: ignore
+                table=context["params"].get(self.materialization_table_param),  # type: ignore
             )
+
+        return None
 
     def _get_dataset_name(
         self,
-        context: Dict[str, Any],
+        context: Context,
         materialization_destination: Optional[dr.models.dataset.MaterializationDestination],
     ):
         return context["params"].get(self.dataset_name_param) or (
             materialization_destination and materialization_destination["table"]
         )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -337,7 +338,7 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
         materialization_destination = self._get_materialization_destination(context)
         dataset_name = self._get_dataset_name(context, materialization_destination)
 
-        dataset = dr.Dataset.create_from_recipe(
+        dataset: dr.Dataset = dr.Dataset.create_from_recipe(
             recipe,
             name=dataset_name,
             do_snapshot=self.do_snapshot,
