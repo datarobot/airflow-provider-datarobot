@@ -308,9 +308,9 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
     ) -> Optional[dr.models.dataset.MaterializationDestination]:
         if context["params"].get(self.materialization_table_param):
             return dr.models.dataset.MaterializationDestination(
-                catalog=context["params"].get(self.materialization_catalog_param),  # type: ignore
-                schema=context["params"].get(self.materialization_schema_param),  # type: ignore
-                table=context["params"].get(self.materialization_table_param),  # type: ignore
+                catalog=context["params"].get(self.materialization_catalog_param),  # type: ignore[typeddict-item]
+                schema=context["params"].get(self.materialization_schema_param),  # type: ignore[typeddict-item]
+                table=context["params"].get(self.materialization_table_param),  # type: ignore[typeddict-item]
             )
 
         return None
