@@ -12,6 +12,13 @@
 
 ### Documentation changes
 
+## 0.0.13
+
+### New features
+
+Introduce `CreateDatasetFromRecipeOperator <datarobot_provider.operators.ai_catalog.CreateDatasetFromRecipeOperator>` 
+to publish a dataset based on existing wrangling recipe. 
+
 ## 0.0.12
 
 ### New features
