@@ -5,15 +5,15 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+from collections.abc import Sequence
 from typing import Any
-from typing import Dict
-from typing import Iterable
-from typing import List
+from typing import Optional
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.exceptions import AirflowFailException
 from airflow.models import BaseOperator
+from airflow.utils.context import Context
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
@@ -36,17 +36,17 @@ class CreateProjectOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["dataset_id", "dataset_version_id", "credential_id"]
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_fields: Sequence[str] = ["dataset_id", "dataset_version_id", "credential_id"]
+    template_fields_renderers: dict[str, str] = {}
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
-        dataset_id: str = None,
-        dataset_version_id: str = None,
-        credential_id: str = None,
+        dataset_id: Optional[str] = None,
+        dataset_version_id: Optional[str] = None,
+        credential_id: Optional[str] = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
@@ -60,7 +60,7 @@ class CreateProjectOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> Optional[str]:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -69,7 +69,7 @@ class CreateProjectOperator(BaseOperator):
 
         if self.dataset_id is None and "training_data" in context["params"]:
             # training_data may be a pre-signed URL to a file on S3 or a path to a local file
-            project = dr.Project.create(
+            project: dr.Project = dr.Project.create(
                 context["params"]["training_data"], context["params"]["project_name"]
             )
             self.log.info(f"Project created: project_id={project.id} from local file")
@@ -93,10 +93,11 @@ class CreateProjectOperator(BaseOperator):
                 credential_id=self.credential_id,
                 project_name=context["params"]["project_name"],
             )
+            # Some weird problem with mypy: it passes here locally, but fails in CI
             self.log.info(
-                f"Project created: project_id={project.id} from dataset: dataset_id={training_dataset_id}"
+                f"Project created: project_id={project.id} from dataset: dataset_id={training_dataset_id}"  # type: ignore[attr-defined, unused-ignore]
             )
-            return project.id
+            return project.id  # type: ignore[attr-defined, unused-ignore]
 
         else:
             raise AirflowFailException(
@@ -115,9 +116,9 @@ class TrainModelsOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["project_id"]
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_fields: Sequence[str] = ["project_id"]
+    template_fields_renderers: dict[str, str] = {}
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -135,7 +136,7 @@ class TrainModelsOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> None:
+    def execute(self, context: Context) -> None:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -152,7 +153,9 @@ class TrainModelsOperator(BaseOperator):
 
 
 class DeployModelMixin:
-    def deploy_model(self, model_id: str, label: str, description: str = None) -> dr.Deployment:
+    def deploy_model(
+        self, model_id: str, label: str, description: Optional[str] = None
+    ) -> dr.Deployment:
         """Deploys the provided model to production."""
         self.log.info(f"Deploying model_id={model_id} with label={label}")  # type: ignore
         prediction_server = dr.PredictionServer.list()[0]
@@ -180,9 +183,9 @@ class DeployModelOperator(BaseOperator, DeployModelMixin):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["model_id"]
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_fields: Sequence[str] = ["model_id"]
+    template_fields_renderers: dict[str, str] = {}
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -200,7 +203,7 @@ class DeployModelOperator(BaseOperator, DeployModelMixin):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -226,9 +229,9 @@ class DeployRecommendedModelOperator(BaseOperator, DeployModelMixin):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["project_id"]
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_fields: Sequence[str] = ["project_id"]
+    template_fields_renderers: dict[str, str] = {}
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -247,15 +250,17 @@ class DeployRecommendedModelOperator(BaseOperator, DeployModelMixin):
             )
 
     def deploy_recommended_model(
-        self, project_id: str, label: str, description: str = None
+        self, project_id: str, label: str, description: Optional[str] = None
     ) -> dr.Deployment:
         """Deploys the recommended model to production."""
         self.log.info(f"Retrieving recommended model for project_id={project_id}")
-        project = dr.Project.get(project_id)
+        project: dr.Project = dr.Project.get(project_id)
         model = project.recommended_model()
+        if model is None:
+            raise AirflowFailException(f"No recommended model found for project_id={project_id}")
         return self.deploy_model(model.id, label, description)
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -288,7 +293,7 @@ class ScorePredictionsOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
+    template_fields: Sequence[str] = [
         "deployment_id",
         "intake_datastore_id",
         "intake_credential_id",
@@ -296,19 +301,19 @@ class ScorePredictionsOperator(BaseOperator):
         "output_credential_id",
         "score_settings",
     ]
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_fields_renderers: dict[str, str] = {}
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
-        deployment_id: str = None,
-        intake_datastore_id: str = None,
-        intake_credential_id: str = None,
-        output_datastore_id: str = None,
-        output_credential_id: str = None,
-        score_settings: dict = None,
+        deployment_id: Optional[str] = None,
+        intake_datastore_id: Optional[str] = None,
+        intake_credential_id: Optional[str] = None,
+        output_datastore_id: Optional[str] = None,
+        output_credential_id: Optional[str] = None,
+        score_settings: Optional[dict] = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
@@ -325,7 +330,7 @@ class ScorePredictionsOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -392,9 +397,9 @@ class GetTargetDriftOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["deployment_id"]
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_fields: Sequence[str] = ["deployment_id"]
+    template_fields_renderers: dict[str, str] = {}
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -412,7 +417,7 @@ class GetTargetDriftOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> Dict[str, Any]:
+    def execute(self, context: Context) -> dict[str, Any]:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -432,13 +437,13 @@ class GetFeatureDriftOperator(BaseOperator):
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
     :return: Drift stats for a Deployment's features
-    :rtype: List[dict]
+    :rtype: list[dict]
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["deployment_id"]
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_fields: Sequence[str] = ["deployment_id"]
+    template_fields_renderers: dict[str, str] = {}
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -456,7 +461,7 @@ class GetFeatureDriftOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> List[dict]:
+    def execute(self, context: Context) -> list[dict]:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 

@@ -6,6 +6,7 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 import logging
+from collections.abc import Sequence
 from typing import Any
 from typing import Dict
 from typing import Iterable
@@ -14,6 +15,7 @@ from typing import Optional
 import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
+from airflow.utils.context import Context
 
 from datarobot_provider.hooks.connections import JDBCDataSourceHook
 from datarobot_provider.hooks.datarobot import DataRobotHook
@@ -36,18 +38,18 @@ class UploadDatasetOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
+    template_fields: Sequence[str] = [
         "file_path",
         "file_path_param",
     ]
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_fields_renderers: dict[str, str] = {}
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
-        file_path: str = None,
+        file_path: Optional[str] = None,
         file_path_param: str = "dataset_file_path",
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
@@ -61,7 +63,7 @@ class UploadDatasetOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -70,7 +72,7 @@ class UploadDatasetOperator(BaseOperator):
         if self.file_path is None:
             self.file_path = context["params"][self.file_path_param]
 
-        ai_catalog_dataset = dr.Dataset.create_from_file(
+        ai_catalog_dataset: dr.Dataset = dr.Dataset.create_from_file(
             file_path=self.file_path,
             max_wait=DATAROBOT_MAX_WAIT_SEC,
         )
@@ -99,22 +101,22 @@ class UpdateDatasetFromFileOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
+    template_fields: Sequence[str] = [
         "dataset_id",
         "dataset_id_param",
         "file_path",
         "file_path_param",
     ]
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_fields_renderers: dict[str, str] = {}
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
-        dataset_id: str = None,
+        dataset_id: Optional[str] = None,
         dataset_id_param: str = "training_dataset_id",
-        file_path: str = None,
+        file_path: Optional[str] = None,
         file_path_param: str = "dataset_file_path",
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
@@ -130,7 +132,7 @@ class UpdateDatasetFromFileOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -172,9 +174,9 @@ class CreateDatasetFromDataStoreOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = []
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_fields: Sequence[str] = []
+    template_fields_renderers: dict[str, str] = {}
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -190,7 +192,7 @@ class CreateDatasetFromDataStoreOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -237,7 +239,7 @@ class CreateDatasetFromDataStoreOperator(BaseOperator):
             self.log.info(f"DataSource:{dataset_name} successfully updated, id={data_source.id}")
 
         self.log.info(f"Creating Dataset from DataSource: {dataset_name}")
-        ai_catalog_dataset = dr.Dataset.create_from_data_source(
+        ai_catalog_dataset: dr.Dataset = dr.Dataset.create_from_data_source(
             data_source_id=data_source.id,
             credential_data=credential_data,
             persist_data_after_ingestion=context["params"]["persist_data_after_ingestion"],
@@ -380,9 +382,9 @@ class CreateDatasetVersionOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["dataset_id", "datasource_id", "credential_id"]
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_fields: Sequence[str] = ["dataset_id", "datasource_id", "credential_id"]
+    template_fields_renderers: dict[str, str] = {}
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -404,7 +406,7 @@ class CreateDatasetVersionOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -442,9 +444,9 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["data_store_id"]
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_fields: Sequence[str] = ["data_store_id"]
+    template_fields_renderers: dict[str, str] = {}
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -462,7 +464,7 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> Optional[str]:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 

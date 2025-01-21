@@ -5,13 +5,13 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+from collections.abc import Sequence
 from typing import Any
-from typing import Dict
-from typing import Iterable
 
 from airflow.exceptions import AirflowException
 from airflow.exceptions import AirflowNotFoundException
 from airflow.models import BaseOperator
+from airflow.utils.context import Context
 
 from datarobot_provider.hooks.connections import JDBCDataSourceHook
 from datarobot_provider.hooks.datarobot import DataRobotHook
@@ -31,9 +31,9 @@ class GetOrCreateDataStoreOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = []
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_fields: Sequence[str] = []
+    template_fields_renderers: dict[str, str] = {}
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -51,7 +51,7 @@ class GetOrCreateDataStoreOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
