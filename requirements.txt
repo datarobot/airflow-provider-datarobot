@@ -14,3 +14,4 @@ pyenchant==3.2.2
 sphinx-copybutton
 sphinx-markdown-builder
 myst-parser==3.0.1
+black==24.10.0
