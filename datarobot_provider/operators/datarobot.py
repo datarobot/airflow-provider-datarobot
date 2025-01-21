@@ -157,13 +157,13 @@ class DeployModelMixin:
         self, model_id: str, label: str, description: Optional[str] = None
     ) -> dr.Deployment:
         """Deploys the provided model to production."""
-        self.log.info(f"Deploying model_id={model_id} with label={label}")  # type: ignore
+        self.log.info(f"Deploying model_id={model_id} with label={label}")  # type: ignore[attr-defined]
         prediction_server = dr.PredictionServer.list()[0]
         deployment = dr.Deployment.create_from_learning_model(
             model_id, label, description, prediction_server.id
         )
-        self.log.info(f"Model deployed: deployment_id={deployment.id}")  # type: ignore
-        self.log.info("Enabling tracking for target drift and feature drift")  # type: ignore
+        self.log.info(f"Model deployed: deployment_id={deployment.id}")  # type: ignore[attr-defined]
+        self.log.info("Enabling tracking for target drift and feature drift")  # type: ignore[attr-defined]
         deployment.update_drift_tracking_settings(
             target_drift_enabled=True, feature_drift_enabled=True, max_wait=DATAROBOT_MAX_WAIT
         )

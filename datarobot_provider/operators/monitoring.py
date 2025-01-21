@@ -235,7 +235,7 @@ class UpdateMonitoringSettingsOperator(BaseOperator):
             )
 
         # Possibly a bug: deployment.get_association_id_settings returns str
-        current_association_id_settings: dict = deployment.get_association_id_settings()  # type: ignore
+        current_association_id_settings: dict = deployment.get_association_id_settings()  # type: ignore[assignment]
 
         association_id_column = context["params"].get(
             "association_id_column", current_association_id_settings["column_names"]
