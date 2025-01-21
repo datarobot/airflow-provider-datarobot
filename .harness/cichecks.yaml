@@ -30,32 +30,32 @@ pipeline:
               execution:
                 steps:
                   - parallel:
-                    - step:
-                        type: Run
-                        name: lint check step
-                        identifier: run_lint
-                        spec:
-                          connectorRef: account.dockerhub_datarobot_read
-                          image: python:3.12-alpine
-                          shell: Bash
-                          command: |-
-                            set -exuo pipefail
-                            pip install -U pip
-                            pip install -r requirements.txt
-                            make lint
-                    - step:
-                        type: Run
-                        name: format check step
-                        identifier: format_lint
-                        spec:
-                          connectorRef: account.dockerhub_datarobot_read
-                          image: python:3.12-alpine
-                          shell: Bash
-                          command: |-
-                            set -exuo pipefail
-                            pip install -U pip
-                            pip install -r requirements.txt
-                            make format-no-fix
+                      - step:
+                          type: Run
+                          name: lint check step
+                          identifier: run_lint
+                          spec:
+                            connectorRef: account.dockerhub_datarobot_read
+                            image: python:3.12-alpine
+                            shell: Bash
+                            command: |-
+                              set -exuo pipefail
+                              pip install -U pip
+                              pip install -r requirements.txt
+                              make lint
+                      - step:
+                          type: Run
+                          name: format check step
+                          identifier: format_lint
+                          spec:
+                            connectorRef: account.dockerhub_datarobot_read
+                            image: python:3.12-alpine
+                            shell: Bash
+                            command: |-
+                              set -exuo pipefail
+                              pip install -U pip
+                              pip install -r requirements.txt
+                              make format-no-fix
         - stage:
             name: test_unit
             identifier: test_unit
@@ -79,7 +79,7 @@ pipeline:
                       identifier: run_unit_tests
                       spec:
                         connectorRef: account.dockerhub_datarobot_read
-                        image: python:3.12-alpine
+                        image: python:<+matrix.python_version>-alpine
                         shell: Bash
                         command: |-
                           set -exuo pipefail
@@ -94,3 +94,11 @@ pipeline:
                           spec:
                             paths:
                               - /harness/unit_test_report.xml
+                      strategy:
+                        matrix:
+                          python_version:
+                            - 3.9
+                            - 3.1
+                            - 3.11
+                            - 3.12
+                            - 3.13
