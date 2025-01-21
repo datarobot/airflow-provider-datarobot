@@ -4,17 +4,20 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "airflow-provider-datarobot"
-version = "0.0.11"
+version = "0.0.12"
 description = "DataRobot Airflow provider."
 readme = "README.md"
-requires-python = "~=3.11"
+requires-python = ">=3.9"
 license = {text = "DataRobot Tool and Utility Agreement"}
 authors = [
    {name = "DataRobot", email = "support@datarobot.com"}
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "License :: Other/Proprietary License",
 ]
 dependencies = [
@@ -46,7 +49,7 @@ provider_info = "datarobot_provider.__init__:get_provider_info"
 [tool.ruff]
 # General settings
 line-length = 100
-target-version = "py311"
+target-version = "py312"
 
 # Extend default excludes (based on Flake8 configuration)
 exclude = [
@@ -81,7 +84,7 @@ force-single-line = true
 quote-style = "double"
 
 [tool.mypy]
-python_version = 3.9
+python_version = 3.12
 ignore_missing_imports = true
 follow_imports_for_stubs = true
 warn_redundant_casts = true
