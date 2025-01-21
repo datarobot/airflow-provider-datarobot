@@ -23,3 +23,8 @@ def tests_dir(root):
 @pytest.fixture(scope="session")
 def provider_dir(root):
     return root / "datarobot_provider"
+
+
+@pytest.fixture(scope="session")
+def tests_fixtures_dir(tests_dir):
+    return tests_dir / "fixtures"

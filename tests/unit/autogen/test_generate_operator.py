@@ -35,10 +35,10 @@ def docstring_fixture():
     return docstring
 
 
-def test_generate_operator_from_test_whitelist():
-    with open("whitelist_test.yaml", "r") as f:
+def test_generate_operator_from_test_whitelist(tests_fixtures_dir):
+    with open(f"{tests_fixtures_dir}/whitelist_test.yaml", "r") as f:
         whitelist = yaml.safe_load(f)
-    with open("example_output.txt") as f:
+    with open(f"{tests_fixtures_dir}/example_output.txt") as f:
         example_output = f.read()
 
     generator = GenerateOperators(whitelist)
