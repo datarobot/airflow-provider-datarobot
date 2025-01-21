@@ -5,8 +5,10 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+import logging
 from collections.abc import Sequence
 from typing import Any
+from typing import Dict
 from typing import Optional
 
 import datarobot as dr
@@ -245,6 +247,123 @@ class CreateDatasetFromDataStoreOperator(BaseOperator):
         )
         self.log.info(f"Dataset created: dataset_id={ai_catalog_dataset.id}")
         return ai_catalog_dataset.id
+
+
+class CreateDatasetFromRecipeOperator(BaseOperator):
+    """
+
+    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
+    :type datarobot_conn_id: str, optional
+    :param recipe_id: Wrangling or Feature Discovery Recipe Id
+    :type recipe_id: str
+    :param do_snapshot: *True* to download and store whole dataframe into DataRobot AI Catalog. *False* to create a dynamic dataset.
+    :type do_snapshot: bool
+    :param dataset_name_param: Name of the parameter in the configuration to use as dataset_name
+    :type dataset_name_param: str
+    :param materialization_catalog_param: Name of the parameter in the configuration to use as materialization_catalog
+    :type materialization_catalog_param: str
+    :param materialization_schema_param: Name of the parameter in the configuration to use as materialization_schema
+    :type materialization_schema: str
+    :param materialization_table_param: Name of the parameter in the configuration to use as materialization_table
+    :type materialization_table: str
+    :return: DataRobot AI Catalog dataset ID
+    :rtype: str
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Sequence[str] = []
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Sequence[str] = ()
+    ui_color = "#f4a460"
+
+    def __init__(
+        self,
+        *,
+        datarobot_conn_id: str = "datarobot_default",
+        recipe_id: str,
+        do_snapshot: bool,
+        dataset_name_param: str = "dataset_name",
+        materialization_catalog_param: str = "materialization_catalog",
+        materialization_schema_param: str = "materialization_schema",
+        materialization_table_param: str = "materialization_table",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.datarobot_conn_id = datarobot_conn_id
+        self.recipe_id = recipe_id
+        self.do_snapshot = do_snapshot
+
+        self.dataset_name_param = dataset_name_param
+        self.materialization_catalog_param = materialization_catalog_param
+        self.materialization_schema_param = materialization_schema_param
+        self.materialization_table_param = materialization_table_param
+
+        if kwargs.get("xcom_push") is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def _get_materialization_destination(
+        self, context: Context
+    ) -> Optional[dr.models.dataset.MaterializationDestination]:
+        if context["params"].get(self.materialization_table_param):
+            return dr.models.dataset.MaterializationDestination(
+                catalog=context["params"].get(self.materialization_catalog_param),  # type: ignore[typeddict-item]
+                schema=context["params"].get(self.materialization_schema_param),  # type: ignore[typeddict-item]
+                table=context["params"].get(self.materialization_table_param),  # type: ignore[typeddict-item]
+            )
+
+        return None
+
+    def _get_dataset_name(
+        self,
+        context: Context,
+        materialization_destination: Optional[dr.models.dataset.MaterializationDestination],
+    ):
+        return context["params"].get(self.dataset_name_param) or (
+            materialization_destination and materialization_destination["table"]
+        )
+
+    def execute(self, context: Context) -> str:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        recipe = dr.models.Recipe.get(self.recipe_id)
+        if recipe.dialect == dr.enums.DataWranglingDialect.SPARK and not self.do_snapshot:
+            raise AirflowException(
+                "Dynamic datasets are not suitable for 'spark' recipes. "
+                "Please, either specify do_snapshot=True for the operator or use another recipe."
+            )
+
+        materialization_destination = self._get_materialization_destination(context)
+        dataset_name = self._get_dataset_name(context, materialization_destination)
+
+        dataset: dr.Dataset = dr.Dataset.create_from_recipe(
+            recipe,
+            name=dataset_name,
+            do_snapshot=self.do_snapshot,
+            persist_data_after_ingestion=True,
+            materialization_destination=materialization_destination,
+        )
+
+        logging.info(
+            '%s dataset "%s" created.',
+            "Snapshot" if self.do_snapshot else "Dynamic",
+            dataset.name,
+        )
+
+        if context["params"].get("experiment_container_id"):
+            dr.UseCase.get(use_case_id=context["params"]["experiment_container_id"]).add(dataset)
+
+            logging.info(
+                "The dataset is added into experiment container %s.",
+                context["params"]["experiment_container_id"],
+            )
+
+        else:
+            logging.info("New Dataset won't belong to any experiment container.")
+
+        return dataset.id
 
 
 class CreateDatasetVersionOperator(BaseOperator):

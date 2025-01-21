@@ -7,8 +7,10 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 
 import datarobot as dr
+import pytest
 
 from datarobot_provider.operators.ai_catalog import CreateDatasetFromDataStoreOperator
+from datarobot_provider.operators.ai_catalog import CreateDatasetFromRecipeOperator
 from datarobot_provider.operators.ai_catalog import CreateDatasetVersionOperator
 from datarobot_provider.operators.ai_catalog import CreateOrUpdateDataSourceOperator
 from datarobot_provider.operators.ai_catalog import UpdateDatasetFromFileOperator
@@ -107,6 +109,54 @@ def test_operator_create_dataset_from_jdbc(mocker, mock_airflow_connection_datar
         do_snapshot=test_params["do_snapshot"],
         max_wait=3600,
     )
+
+
+@pytest.mark.parametrize(
+    "test_params, do_snapshot, expected_name, expected_mat_destination",
+    [
+        ({}, True, None, None),
+        (
+            {"dataset1_name": "The dataset name.", "dataset_name": "another"},
+            True,
+            "The dataset name.",
+            None,
+        ),
+        (
+            {"materialization_schema": "testSchema", "materialization_table": "testTable"},
+            False,
+            "testTable",
+            {"catalog": None, "schema": "testSchema", "table": "testTable"},
+        ),
+    ],
+)
+def test_operator_create_dataset_from_recipe(
+    mocker, test_params, do_snapshot, expected_name, expected_mat_destination
+):
+    dataset_mock = mocker.Mock()
+    recipe_mock = mocker.Mock(recipe_id="test-recipe-id")
+    dataset_mock.id = "dataset-id"
+    create_dataset_from_recipe_mock = mocker.patch.object(
+        dr.Dataset, "create_from_recipe", return_value=dataset_mock
+    )
+    get_recipe_mock = mocker.patch.object(dr.models.Recipe, "get", return_value=recipe_mock)
+    operator = CreateDatasetFromRecipeOperator(
+        task_id="create_from_recipe",
+        recipe_id="test-recipe-id",
+        dataset_name_param="dataset1_name",
+        do_snapshot=do_snapshot,
+    )
+
+    dataset_id = operator.execute(context={"params": test_params})
+
+    assert dataset_id == "dataset-id"
+    create_dataset_from_recipe_mock.assert_called_once_with(
+        recipe_mock,
+        name=expected_name,
+        do_snapshot=do_snapshot,
+        persist_data_after_ingestion=True,
+        materialization_destination=expected_mat_destination,
+    )
+    get_recipe_mock.assert_called_once_with("test-recipe-id")
 
 
 def test_operator_create_dataset_version(mocker):
