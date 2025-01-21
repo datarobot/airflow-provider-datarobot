@@ -9,6 +9,7 @@ class GenerateOperators:
         self.whitelist = whitelist
 
     def generate(self):
+        """Generate operator python code for each class/method in the whitelist."""
         generated_code = {}
         for module_key in self.whitelist.keys():
             module = importlib.import_module(module_key)
@@ -27,28 +28,63 @@ class GenerateOperators:
 
     @staticmethod
     def format_code_block_with_black(code_block: str) -> str:
+        """Reformat a string of python code using black."""
         return str(black.format_file_contents(code_block, fast=False, mode=black.FileMode()))
 
-    def generate_operator_for_method(self, module_key, module_obj_key, method, method_docstring):
+    @classmethod
+    def generate_operator_for_method(
+        cls, module_key: str, module_obj_key: str, method: str, method_docstring: NumpyDocString
+    ) -> str:
+        """Generate the operator code for a given method in a module.
+
+        Parameters
+        ----------
+        module_key : str
+            The module name.
+        module_obj_key : str
+            The object name within the module.
+        method : str
+            The method name.
+        method_docstring : NumpyDocString
+            The docstring for the method.
+
+        Returns
+        -------
+        str
+            The generated operator code.
+        """
         print(f"Generating operator for {module_obj_key} {method}")
         doc = NumpyDocString(str(method_docstring))
         operator_name = f"{module_obj_key}{method.title()}Operator"
         op_python_code = (
             f"from {module_key} import {module_obj_key}\n\n"
             + f"class {operator_name}(BaseOperator):\n"
-            + self.construct_operator_docstring(doc)
+            + cls.construct_operator_docstring(doc)
             + "\n\n"
-            + self.construct_operator_attibutes(doc)
+            + cls.construct_operator_attibutes(doc)
             + "\n\n"
-            + self.construct_operator_init(doc)
+            + cls.construct_operator_init(doc)
             + "\n\n"
-            + self.construct_operator_execute(doc, module_key, module_obj_key, method)
+            + cls.construct_operator_execute(doc, module_key, module_obj_key, method)
             + "\n"
         )
-        op_python_code = self.format_code_block_with_black(op_python_code)
+        op_python_code = cls.format_code_block_with_black(op_python_code)
         return op_python_code
 
-    def construct_operator_docstring(self, docstring: NumpyDocString) -> str:
+    @staticmethod
+    def construct_operator_docstring(docstring: NumpyDocString) -> str:
+        """Construct the operator docstring based on the provided NumpyDocString.
+
+        Parameters
+        ----------
+        docstring : NumpyDocString
+            The NumpyDocString object containing the documentation.
+
+        Returns
+        -------
+        str
+            The constructed operator docstring.
+        """
         op_docstring = f'\t"""\t{" ".join(docstring["Summary"])}\n\n'
         for param in docstring["Parameters"]:
             op_docstring += f"\t:param {param.name}: {' '.join(param.desc)}\n"
@@ -59,7 +95,20 @@ class GenerateOperators:
         op_docstring += '\t"""\n'
         return op_docstring
 
-    def construct_operator_attibutes(self, docstring: NumpyDocString) -> str:
+    @staticmethod
+    def construct_operator_attibutes(docstring: NumpyDocString) -> str:
+        """Construct the operator attributes code based on the provided NumpyDocString.
+
+        Parameters
+        ----------
+        docstring : NumpyDocString
+            The NumpyDocString object containing the documentation.
+
+        Returns
+        -------
+        str
+            The constructed operator attributes code.
+        """
         param_names = [param.name for param in docstring["Parameters"]]
         param_types = [param.type for param in docstring["Parameters"]]
         op_attributes = f"\ttemplate_fields: Sequence[str] = {param_names}\n"
@@ -70,7 +119,20 @@ class GenerateOperators:
         op_attributes += '\tui_color = "#f4a460"\n'
         return op_attributes
 
-    def construct_operator_init(self, docstring: NumpyDocString) -> str:
+    @staticmethod
+    def construct_operator_init(docstring: NumpyDocString) -> str:
+        """Construct the operator init code based on the provided NumpyDocString.
+
+        Parameters
+        ----------
+        docstring : NumpyDocString
+            The NumpyDocString object containing the documentation.
+
+        Returns
+        -------
+        str
+            The constructed operator init code.
+        """
         op_init = "\tdef __init__(self,*,"
         for param in docstring["Parameters"]:
             op_init += f"{param.name}: {param.type} = None,"
@@ -82,13 +144,31 @@ class GenerateOperators:
         op_init += "\t\tself.datarobot_conn_id = datarobot_conn_id\n"
         return op_init
 
+    @staticmethod
     def construct_operator_execute(
-        self,
         docstring: NumpyDocString,
         operator_module: str,
         operator_name: str,
         operator_method: str,
     ) -> str:
+        """Construct the operator execute code based on the provided NumpyDocString.
+
+        Parameters
+        ----------
+        docstring : NumpyDocString
+            The NumpyDocString object containing the documentation.
+        operator_module : str
+            The module name.
+        operator_name : str
+            The name of the operator.
+        operator_method : str
+            The method name.
+
+        Returns
+        -------
+        str
+            The constructed operator execute code.
+        """
         op_execute = "\tdef execute(self, context: Context) -> str:\n"
         op_execute += "\t\t# Initialize DataRobot client\n"
         op_execute += "\t\tDataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()\n\n"
