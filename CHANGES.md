@@ -12,9 +12,13 @@
 
 ### Documentation changes
 
-## 0.0.11
+## 0.0.12
 
 ### New features
+
+Specified supported Python versions to >=3.9
+
+## 0.0.11
 
 ### Bugfixes
 
@@ -27,5 +31,3 @@ UpdateBiasAndFairnessSettingsOperator now accepts param fairness_metric_set inst
 ### Deprecation summary
 
 Param UpdateBiasAndFairnessSettingsOperator.fairness_metrics_set is deprecated, and going to be removed in the next minor release.
-
-### Documentation changes
