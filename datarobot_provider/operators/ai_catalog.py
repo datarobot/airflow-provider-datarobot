@@ -5,6 +5,7 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+import json
 import logging
 from collections.abc import Sequence
 from typing import Any
@@ -523,23 +524,25 @@ class CreateRecipeOperator(BaseOperator):
         self,
         *,
         datarobot_conn_id: str = "datarobot_default",
-        primary_dataset_id: str,
+        dataset_id: str,
         dialect: dr.enums.DataWranglingDialect,
         operations_param: str = "operations",
         downsampling_directive_param: str = "downsampling_directive",
         downsampling_arguments_param: str = "downsampling_arguments",
         recipe_name: Optional[str] = None,
-        recipe_description: Optional[str] = None,
+        recipe_description: Optional[str] = "Created with Apache-Airflow",
         **kwargs,
     ):
         super().__init__(**kwargs)
         self.datarobot_conn_id = datarobot_conn_id
-        self.primary_dataset_id = primary_dataset_id
+        self.dataset_id = dataset_id
         self.dialect = dialect
 
         self.operations_param = operations_param
         self.downsampling_directive_param = downsampling_directive_param
         self.downsampling_arguments_param = downsampling_arguments_param
+        self.recipe_name = recipe_name
+        self.recipe_description = recipe_description
 
         if kwargs.get("xcom_push") is not None:
             raise AirflowException(
@@ -553,9 +556,16 @@ class CreateRecipeOperator(BaseOperator):
         operations = downsampling = None
 
         if context["params"].get(self.operations_param):
+            if isinstance(context["params"][self.operations_param], str):
+                raw_operations = json.loads(context["params"][self.operations_param])
+
+            else:
+                raw_operations = context["params"][self.operations_param]
+
+            logging.info(raw_operations)
+
             operations = [
-                dr.models.recipe.WranglingOperation.from_data(x)
-                for x in context["params"][self.operations_param]
+                dr.models.recipe.WranglingOperation.from_data(x) for x in raw_operations
             ]
 
         if context["params"].get(self.downsampling_directive_param):
@@ -565,12 +575,12 @@ class CreateRecipeOperator(BaseOperator):
             )
 
         experiment_container = dr.UseCase.get(context["params"]["experiment_container_id"])
-        dataset = dr.Dataset.get(self.primary_dataset_id)
+        dataset = dr.Dataset.get(self.dataset_id)
 
         recipe = dr.models.Recipe.from_dataset(
             experiment_container, dataset, dialect=dr.enums.DataWranglingDialect(self.dialect)
         )
-        logging.info('Recipe id=%s created. Configuring...', recipe.id)
+        logging.info('%s recipe id=%s created. Configuring...', self.dialect, recipe.id)
 
         if operations is not None:
             dr.models.Recipe.set_operations(recipe.id, operations)
@@ -579,6 +589,13 @@ class CreateRecipeOperator(BaseOperator):
         if downsampling is not None:
             dr.models.Recipe.update_downsampling(recipe.id, downsampling)
             logging.info('%s dowsnsampling set.', downsampling.directive)
+
+        if self.recipe_name or self.recipe_description:
+            dr.client.get_client().patch(
+                f'recipes/{recipe.id}/',
+                json={'name': self.recipe_name, 'description': self.recipe_description},
+            )
+            logging.info('Recipe name/description set.')
 
         logging.info('The recipe is ready.')
         return recipe.id
