@@ -43,7 +43,7 @@ dev = [
     "myst-parser==4.0.0",
     "black==24.10.0",
     "pyyaml>=6.0.2",
-    "types-PyYAML-6.0.12>=6.0.12",
+    "types-PyYAML>=6.0.12",
 ]
 
 [project.entry-points."apache_airflow_provider"]
