@@ -514,9 +514,9 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
 
 class CreateRecipeOperator(BaseOperator):
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = []
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_fields: Sequence[str] = []
+    template_fields_renderers: dict[str, str] = {}
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -524,9 +524,12 @@ class CreateRecipeOperator(BaseOperator):
         *,
         datarobot_conn_id: str = "datarobot_default",
         primary_dataset_id: str,
-        dialect: str,
+        dialect: dr.enums.DataWranglingDialect,
         operations_param: str = "operations",
-        downsampling_param: str = "downsampling",
+        downsampling_directive_param: str = "downsampling_directive",
+        downsampling_arguments_param: str = "downsampling_arguments",
+        recipe_name: Optional[str] = None,
+        recipe_description: Optional[str] = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -534,20 +537,32 @@ class CreateRecipeOperator(BaseOperator):
         self.primary_dataset_id = primary_dataset_id
         self.dialect = dialect
 
-        self.operations_param = operations_param,
-        self.downsampling_param = downsampling_param
+        self.operations_param = operations_param
+        self.downsampling_directive_param = downsampling_directive_param
+        self.downsampling_arguments_param = downsampling_arguments_param
 
         if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> str:
+    def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
-        operations = context["params"].get(self.operations_param)
-        downsampling = context["params"].get(self.downsampling_param)
+        operations = downsampling = None
+
+        if context["params"].get(self.operations_param):
+            operations = [
+                dr.models.recipe.WranglingOperation.from_data(x)
+                for x in context["params"][self.operations_param]
+            ]
+
+        if context["params"].get(self.downsampling_directive_param):
+            downsampling = dr.models.recipe.DownsamplingOperation(
+                directive=context["params"][self.downsampling_directive_param],
+                arguments=context["params"][self.downsampling_arguments_param],
+            )
 
         experiment_container = dr.UseCase.get(context["params"]["experiment_container_id"])
         dataset = dr.Dataset.get(self.primary_dataset_id)
@@ -555,8 +570,15 @@ class CreateRecipeOperator(BaseOperator):
         recipe = dr.models.Recipe.from_dataset(
             experiment_container, dataset, dialect=dr.enums.DataWranglingDialect(self.dialect)
         )
+        logging.info('Recipe id=%s created. Configuring...', recipe.id)
 
-        dr.models.Recipe.set_operations(recipe.id, operations)
-        dr.models.Recipe.update_downsampling(recipe.id, downsampling)
+        if operations is not None:
+            dr.models.Recipe.set_operations(recipe.id, operations)
+            logging.info('%d operations set.', len(operations))
 
+        if downsampling is not None:
+            dr.models.Recipe.update_downsampling(recipe.id, downsampling)
+            logging.info('%s dowsnsampling set.', downsampling.directive)
+
+        logging.info('The recipe is ready.')
         return recipe.id
