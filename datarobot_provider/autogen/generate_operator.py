@@ -45,11 +45,11 @@ class GenerateOperators:
 
         Parameters
         ----------
-        module_key
+        module_key : str
             The module name.
-        module_obj_key
+        module_obj_key : str
             The object name within the module.
-        method
+        method : str
             The method name.
         method_docstring : NumpyDocString
             The docstring for the method.
