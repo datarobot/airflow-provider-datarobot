@@ -1,4 +1,12 @@
+from collections.abc import Sequence
+from typing import Any
+from typing import Optional
+
+from airflow.models import BaseOperator
+from airflow.utils.context import Context
 from datarobot.models.modeljob import ModelJob
+
+from datarobot_provider.hooks.datarobot import DataRobotHook
 
 
 class ModelJobGetOperator(BaseOperator):
@@ -20,8 +28,8 @@ class ModelJobGetOperator(BaseOperator):
     def __init__(
         self,
         *,
-        project_id: str = None,
-        model_job_id: str = None,
+        project_id: Optional[str] = None,
+        model_job_id: Optional[str] = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any
     ) -> None:
@@ -39,7 +47,7 @@ class ModelJobGetOperator(BaseOperator):
         if self.model_job_id is None:
             raise ValueError("model_job_id is required for ModelJob.")
 
-        result = datarobot.models.modeljob.ModelJob.get(
+        result = ModelJob.get(
             self.project_id,
             self.model_job_id,
         )
