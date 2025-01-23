@@ -250,8 +250,104 @@ class CreateDatasetFromDataStoreOperator(BaseOperator):
         return ai_catalog_dataset.id
 
 
-class CreateDatasetFromRecipeOperator(BaseOperator):
+class CreateRecipeOperator(BaseOperator):
+    """Create a Wrangling Recipe inside the Experiment Container
+    specified with *experiment_container_id* context parameter.
+
+    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
+    :param dataset_id: The dataset to wrangle
+    :param dialect: SQL dialect to apply while wrangling.
+    :param downsampling_directive_param: Context parameter name to apply as a downsampling method.
+    :param downsampling_arguments_param: Context parameter name to apply as a downsampling arguments.
+    :param recipe_name: New recipe name.
+    :param recipe_description: New recipe description.
     """
+    ui_color = "#f4a460"
+
+    def __init__(
+        self,
+        *,
+        datarobot_conn_id: str = "datarobot_default",
+        dataset_id: str,
+        dialect: dr.enums.DataWranglingDialect,
+        operations_param: str = "operations",
+        downsampling_directive_param: str = "downsampling_directive",
+        downsampling_arguments_param: str = "downsampling_arguments",
+        recipe_name: Optional[str] = None,
+        recipe_description: Optional[str] = "Created with Apache-Airflow",
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+        self.datarobot_conn_id = datarobot_conn_id
+        self.dataset_id = dataset_id
+        self.dialect = dialect
+
+        self.operations_param = operations_param
+        self.downsampling_directive_param = downsampling_directive_param
+        self.downsampling_arguments_param = downsampling_arguments_param
+        self.recipe_name = recipe_name
+        self.recipe_description = recipe_description
+
+        if kwargs.get("xcom_push") is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Context) -> str:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        operations = downsampling = None
+
+        if context["params"].get(self.operations_param):
+            if isinstance(context["params"][self.operations_param], str):
+                raw_operations = json.loads(context["params"][self.operations_param])
+
+            else:
+                raw_operations = context["params"][self.operations_param]
+
+            operations = [
+                dr.models.recipe.WranglingOperation.from_data(x) for x in raw_operations
+            ]
+
+        if context["params"].get(self.downsampling_directive_param):
+            downsampling = dr.models.recipe.DownsamplingOperation(
+                directive=context["params"][self.downsampling_directive_param],
+                arguments=context["params"][self.downsampling_arguments_param],
+            )
+
+        experiment_container = dr.UseCase.get(context["params"]["experiment_container_id"])
+        dataset = dr.Dataset.get(self.dataset_id)
+
+        recipe = dr.models.Recipe.from_dataset(
+            experiment_container, dataset, dialect=dr.enums.DataWranglingDialect(self.dialect)
+        )
+        logging.info('%s recipe id=%s created. Configuring...', self.dialect, recipe.id)
+
+        if operations is not None:
+            dr.models.Recipe.set_operations(recipe.id, operations)
+            logging.info('%d operations set.', len(operations))
+
+        if downsampling is not None:
+            dr.models.Recipe.update_downsampling(recipe.id, downsampling)
+            logging.info('%s dowsnsampling set.', downsampling.directive)
+
+        if self.recipe_name or self.recipe_description:
+            dr.client.get_client().patch(
+                f'recipes/{recipe.id}/',
+                json={'name': self.recipe_name, 'description': self.recipe_description},
+            )
+            logging.info('Recipe name/description set.')
+
+        logging.info('The recipe is ready.')
+        return recipe.id
+
+
+class CreateDatasetFromRecipeOperator(BaseOperator):
+    """ Create a dataset based on a wrangling recipe.
+    The dataset can be dynamic or a snapshot depending on the mandatory *do_snapshot* parameter.
+    The dataset is added into the Experiment Container if experiment_container_id is specified
+    in the context parameters.
 
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
@@ -445,10 +541,6 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
     :rtype: str
     """
 
-    # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = ["data_store_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -511,91 +603,3 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
             self.log.info(f"DataSource:{dataset_name} successfully created, id={data_source.id}")
 
         return data_source.id
-
-
-class CreateRecipeOperator(BaseOperator):
-    # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = []
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
-
-    def __init__(
-        self,
-        *,
-        datarobot_conn_id: str = "datarobot_default",
-        dataset_id: str,
-        dialect: dr.enums.DataWranglingDialect,
-        operations_param: str = "operations",
-        downsampling_directive_param: str = "downsampling_directive",
-        downsampling_arguments_param: str = "downsampling_arguments",
-        recipe_name: Optional[str] = None,
-        recipe_description: Optional[str] = "Created with Apache-Airflow",
-        **kwargs,
-    ):
-        super().__init__(**kwargs)
-        self.datarobot_conn_id = datarobot_conn_id
-        self.dataset_id = dataset_id
-        self.dialect = dialect
-
-        self.operations_param = operations_param
-        self.downsampling_directive_param = downsampling_directive_param
-        self.downsampling_arguments_param = downsampling_arguments_param
-        self.recipe_name = recipe_name
-        self.recipe_description = recipe_description
-
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
-
-    def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
-        operations = downsampling = None
-
-        if context["params"].get(self.operations_param):
-            if isinstance(context["params"][self.operations_param], str):
-                raw_operations = json.loads(context["params"][self.operations_param])
-
-            else:
-                raw_operations = context["params"][self.operations_param]
-
-            logging.info(raw_operations)
-
-            operations = [
-                dr.models.recipe.WranglingOperation.from_data(x) for x in raw_operations
-            ]
-
-        if context["params"].get(self.downsampling_directive_param):
-            downsampling = dr.models.recipe.DownsamplingOperation(
-                directive=context["params"][self.downsampling_directive_param],
-                arguments=context["params"][self.downsampling_arguments_param],
-            )
-
-        experiment_container = dr.UseCase.get(context["params"]["experiment_container_id"])
-        dataset = dr.Dataset.get(self.dataset_id)
-
-        recipe = dr.models.Recipe.from_dataset(
-            experiment_container, dataset, dialect=dr.enums.DataWranglingDialect(self.dialect)
-        )
-        logging.info('%s recipe id=%s created. Configuring...', self.dialect, recipe.id)
-
-        if operations is not None:
-            dr.models.Recipe.set_operations(recipe.id, operations)
-            logging.info('%d operations set.', len(operations))
-
-        if downsampling is not None:
-            dr.models.Recipe.update_downsampling(recipe.id, downsampling)
-            logging.info('%s dowsnsampling set.', downsampling.directive)
-
-        if self.recipe_name or self.recipe_description:
-            dr.client.get_client().patch(
-                f'recipes/{recipe.id}/',
-                json={'name': self.recipe_name, 'description': self.recipe_description},
-            )
-            logging.info('Recipe name/description set.')
-
-        logging.info('The recipe is ready.')
-        return recipe.id
