@@ -252,7 +252,7 @@ class CreateDatasetFromDataStoreOperator(BaseOperator):
 class CreateDatasetFromRecipeOperator(BaseOperator):
     """Create a dataset based on a wrangling recipe.
     The dataset can be dynamic or a snapshot depending on the mandatory *do_snapshot* parameter.
-    The dataset is added into the Experiment Container if experiment_container_id is specified
+    The dataset is added into the Use Case if use_case_id is specified
     in the context parameters.
 
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
@@ -352,16 +352,13 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
             dataset.name,
         )
 
-        if context["params"].get("experiment_container_id"):
-            dr.UseCase.get(use_case_id=context["params"]["experiment_container_id"]).add(dataset)
-
-            logging.info(
-                "The dataset is added into experiment container %s.",
-                context["params"]["experiment_container_id"],
-            )
+        if context["params"].get("use_case_id"):
+            use_case = dr.UseCase.get(use_case_id=context["params"]["use_case_id"])
+            use_case.add(dataset)
+            logging.info('The dataset is added into use case "%s".', use_case.name)
 
         else:
-            logging.info("New Dataset won't belong to any experiment container.")
+            logging.info("New Dataset won't belong to any use case.")
 
         return dataset.id
 
@@ -585,8 +582,8 @@ class CreateWranglingRecipeOperator(BaseOperator):
 
         if not self.use_case_id:
             raise AirflowException(
-                '*use_case_id* is a mandatory parameter. '
-                'You can set it either explicitly or via the context variable *use_case_id*'
+                "*use_case_id* is a mandatory parameter. "
+                "You can set it either explicitly or via the context variable *use_case_id*"
             )
 
         use_case = dr.UseCase.get(self.use_case_id)
