@@ -12,6 +12,7 @@ from typing import Optional
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
+from airflow.exceptions import AirflowFailException
 from airflow.models import BaseOperator
 from airflow.utils.context import Context
 from datarobot import SNAPSHOT_POLICY
@@ -19,6 +20,85 @@ from datarobot import SNAPSHOT_POLICY
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
 DATAROBOT_MAX_WAIT = 600
+
+
+class CreateFeatureDiscoveryRecipeOperator(BaseOperator):
+    """
+    Create a Feature Discovery recipe.
+
+    :param dataset_id: DataRobot Dataset Catalog ID to use as the primary dataset
+    :type dataset_id: str
+    :param use_case_id: ID of the use case to add the recipe to
+    :type use_case_id: str
+    :param relationships_configuration_id: ID of a relationships configuration defining secondary datasets and relationships
+    :type relationships_configuration_id: str
+    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
+    :type datarobot_conn_id: str, optional
+    :return: DataRobot Recipe ID
+    :rtype: str
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Iterable[str] = [
+        "dataset_id",
+        "use_case_id",
+        "relationships_configuration_id",
+    ]
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Iterable[str] = ()
+    ui_color = "#f4a460"
+
+    def __init__(
+        self,
+        *,
+        dataset_id: str,
+        use_case_id: str,
+        relationships_configuration_id: str,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.dataset_id = dataset_id
+        self.use_case_id = use_case_id
+        self.relationships_configuration_id = relationships_configuration_id
+        self.datarobot_conn_id = datarobot_conn_id
+
+        if kwargs.get("xcom_push") is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Dict[str, Any]) -> None:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        response = dr.client.get_client().post(
+            "/recipes/fromDataset/", data={
+                'useCaseId': self.use_case_id,
+                'status': 'draft',
+                'datasetId': self.dataset_id,
+                'recipeType': 'FEATURE_DISCOVERY',
+            }
+        )
+        if response.status_code != 201:
+            e_msg = "Server unexpectedly returned status code {}"
+            raise AirflowFailException(e_msg.format(response.status_code))
+
+        recipe = response.json()
+        recipe_id = recipe["id"]
+        recipe_config_id = recipe["settings"]["relationshipsConfigurationId"]
+
+        # Copy the secondary relationships into the Recipe config
+        relationship_config = dr.RelationshipsConfiguration(self.relationships_configuration_id).get()
+        dr.RelationshipsConfiguration(recipe_config_id).replace(
+            relationship_config.dataset_definitions,
+            relationship_config.relationships,
+            relationship_config.feature_discovery_settings,
+        )
+
+        self.log.info(f"Feature Discovery recipe created: recipe_id={recipe_id}")
+
+        return recipe_id
 
 
 class RelationshipsConfigurationOperator(BaseOperator):
