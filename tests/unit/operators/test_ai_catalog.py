@@ -120,6 +120,7 @@ def test_operator_create_wrangling_recipe(mocker):
     ).return_value
     recipe_mock = mocker.patch("datarobot_provider.operators.ai_catalog.dr.models.Recipe")
     recipe_mock.from_dataset.return_value.id = "test-recipe-id"
+    context = {"params": {"use_case_id": "test-use-case-id"}}
 
     operator = CreateWranglingRecipeOperator(
         task_id="create_recipe",
@@ -135,11 +136,13 @@ def test_operator_create_wrangling_recipe(mocker):
         downsampling_directive=dr.enums.DownsamplingOperations.RANDOM_SAMPLE,
         downsampling_arguments={"value": 100, "seed": 25},
     )
-    recipe_id = operator.execute(context={"params": {"experiment_container_id": "test-exp-con-id"}})
+    operator.render_template_fields(context)
+
+    recipe_id = operator.execute(context=context)
 
     assert recipe_id == "test-recipe-id"
     get_dataset_mock.assert_called_once_with("test-dataset-id")
-    get_exp_container_mock.assert_called_once_with("test-exp-con-id")
+    get_exp_container_mock.assert_called_once_with("test-use-case-id")
     client_mock.patch.assert_called_once_with(
         "recipes/test-recipe-id/",
         json={"name": "Test name", "description": "Created with Apache-Airflow"},

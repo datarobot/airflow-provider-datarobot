@@ -513,10 +513,10 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
 
 
 class CreateWranglingRecipeOperator(BaseOperator):
-    """Create a Wrangling Recipe inside an Experiment Container
-    specified by *experiment_container_id* context parameter.
+    """Create a Wrangling Recipe
 
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
+    :param use_case_id: Use Case ID to create the recipe in.
     :param dataset_id: The dataset to wrangle
     :param dialect: SQL dialect to apply while wrangling.
     :param recipe_name: New recipe name.
@@ -528,6 +528,7 @@ class CreateWranglingRecipeOperator(BaseOperator):
     """
 
     template_fields: Sequence[str] = [
+        "use_case_id",
         "dataset_id",
         "dialect",
         "recipe_name",
@@ -537,6 +538,7 @@ class CreateWranglingRecipeOperator(BaseOperator):
         "downsampling_arguments",
     ]
     template_fields_renderers: dict[str, str] = {
+        "use_case_id": "string",
         "dataset_id": "string",
         "dialect": "string",
         "recipe_name": "string",
@@ -551,6 +553,7 @@ class CreateWranglingRecipeOperator(BaseOperator):
         self,
         *,
         datarobot_conn_id: str = "datarobot_default",
+        use_case_id: str = '{{ params.get("use_case_id", "") }}',
         dataset_id: str,
         dialect: dr.enums.DataWranglingDialect,
         recipe_name: Optional[str] = None,
@@ -562,6 +565,7 @@ class CreateWranglingRecipeOperator(BaseOperator):
     ):
         super().__init__(**kwargs)
         self.datarobot_conn_id = datarobot_conn_id
+        self.use_case_id = use_case_id
         self.dataset_id = dataset_id
         self.dialect = dialect
         self.recipe_name = recipe_name
@@ -579,13 +583,24 @@ class CreateWranglingRecipeOperator(BaseOperator):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
-        experiment_container = dr.UseCase.get(context["params"]["experiment_container_id"])
+        if not self.use_case_id:
+            raise AirflowException(
+                '*use_case_id* is a mandatory parameter. '
+                'You can set it either explicitly or via the context variable *use_case_id*'
+            )
+
+        use_case = dr.UseCase.get(self.use_case_id)
         dataset = dr.Dataset.get(self.dataset_id)
 
         recipe = dr.models.Recipe.from_dataset(
-            experiment_container, dataset, dialect=dr.enums.DataWranglingDialect(self.dialect)
+            use_case, dataset, dialect=dr.enums.DataWranglingDialect(self.dialect)
         )
-        logging.info("%s recipe id=%s created. Configuring...", self.dialect, recipe.id)
+        logging.info(
+            '%s recipe id=%s created in use case "%s". Configuring...',
+            self.dialect,
+            recipe.id,
+            use_case.name,
+        )
 
         if self.operations:
             client_operations = [
