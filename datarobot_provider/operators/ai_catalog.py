@@ -555,19 +555,9 @@ class CreateRecipeOperator(BaseOperator):
         self.dialect = dialect
         self.recipe_name = recipe_name
         self.recipe_description = recipe_description
-
-        self._client_operations = (operations and [
-            dr.models.recipe.WranglingOperation.from_data(x) for x in operations
-        ]) or []
-
-        if downsampling_directive:
-            self._downsampling = dr.models.recipe.DownsamplingOperation(
-                directive= dr.enums.DownsamplingOperations(downsampling_directive),
-                arguments=downsampling_arguments,
-            )
-
-        else:
-            self._downsampling = None
+        self.operations = operations
+        self.downsampling_directive = downsampling_directive
+        self.downsampling_arguments = downsampling_arguments
 
         if kwargs.get("xcom_push") is not None:
             raise AirflowException(
@@ -586,13 +576,20 @@ class CreateRecipeOperator(BaseOperator):
         )
         logging.info('%s recipe id=%s created. Configuring...', self.dialect, recipe.id)
 
-        if self._client_operations:
-            dr.models.Recipe.set_operations(recipe.id, self._client_operations)
-            logging.info('%d operations set.', len(self._client_operations))
+        if self.operations:
+            client_operations = [
+                dr.models.recipe.WranglingOperation.from_data(x) for x in self.operations
+            ]
+            dr.models.Recipe.set_operations(recipe.id, client_operations)
+            logging.info('%d operations set.', len(client_operations))
 
-        if self._downsampling is not None:
-            dr.models.Recipe.update_downsampling(recipe.id, self._downsampling)
-            logging.info('%s dowsnsampling set.', self._downsampling.directive)
+        if self.downsampling_directive is not None:
+            client_downsampling = dr.models.recipe.DownsamplingOperation(
+                directive= dr.enums.DownsamplingOperations(self.downsampling_directive),
+                arguments=self.downsampling_arguments,
+            )
+            dr.models.Recipe.update_downsampling(recipe.id, client_downsampling)
+            logging.info('%s dowsnsampling set.', self.downsampling_directive)
 
         if self.recipe_name or self.recipe_description:
             dr.client.get_client().patch(
@@ -601,5 +598,5 @@ class CreateRecipeOperator(BaseOperator):
             )
             logging.info('Recipe name/description set.')
 
-        logging.info('The recipe is ready.')
+        logging.info('Recipe id=%s is ready.', recipe.id)
         return recipe.id
