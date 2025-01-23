@@ -266,13 +266,14 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
     :param materialization_catalog_param: Name of the parameter in the configuration to use as materialization_catalog
     :type materialization_catalog_param: str
     :param materialization_schema_param: Name of the parameter in the configuration to use as materialization_schema
-    :type materialization_schema: str
+    :type materialization_schema_param: str
     :param materialization_table_param: Name of the parameter in the configuration to use as materialization_table
-    :type materialization_table: str
+    :type materialization_table_param: str
     :return: DataRobot AI Catalog dataset ID
     :rtype: str
     """
 
+    template_fields = ["recipe_id"]
     ui_color = "#f4a460"
 
     def __init__(
