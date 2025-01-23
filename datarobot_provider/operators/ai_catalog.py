@@ -5,11 +5,11 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-import json
 import logging
 from collections.abc import Sequence
-from typing import Any, List
+from typing import Any
 from typing import Dict
+from typing import List
 from typing import Optional
 
 import datarobot as dr
@@ -513,8 +513,8 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
 
 
 class CreateRecipeOperator(BaseOperator):
-    """Create a Wrangling Recipe inside the Experiment Container
-    specified with *experiment_container_id* context parameter.
+    """Create a Wrangling Recipe inside an Experiment Container
+    specified by *experiment_container_id* context parameter.
 
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :param dataset_id: The dataset to wrangle
@@ -531,8 +531,12 @@ class CreateRecipeOperator(BaseOperator):
     ]
     template_fields_renderers: dict[str, str] = {
         "dataset_id": "string",
-        "dialect": "string", "recipe_name": "string", "recipe_description": "string", "operations": "json",
-        "downsampling_directive": "string", "downsampling_arguments": "json"
+        "dialect": "string",
+        "recipe_name": "string",
+        "recipe_description": "string",
+        "operations": "json",
+        "downsampling_directive": "string",
+        "downsampling_arguments": "json",
     }
     ui_color = "#f4a460"
 
