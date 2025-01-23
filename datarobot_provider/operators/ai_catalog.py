@@ -274,10 +274,6 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
     :rtype: str
     """
 
-    # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = []
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -448,6 +444,10 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
     :rtype: str
     """
 
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Sequence[str] = ["data_store_id"]
+    template_fields_renderers: dict[str, str] = {}
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
