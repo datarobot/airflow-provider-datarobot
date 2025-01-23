@@ -13,7 +13,7 @@ from datarobot_provider.operators.ai_catalog import CreateDatasetFromDataStoreOp
 from datarobot_provider.operators.ai_catalog import CreateDatasetFromRecipeOperator
 from datarobot_provider.operators.ai_catalog import CreateDatasetVersionOperator
 from datarobot_provider.operators.ai_catalog import CreateOrUpdateDataSourceOperator
-from datarobot_provider.operators.ai_catalog import CreateRecipeOperator
+from datarobot_provider.operators.ai_catalog import CreateWranglingRecipeOperator
 from datarobot_provider.operators.ai_catalog import UpdateDatasetFromFileOperator
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 
@@ -112,14 +112,14 @@ def test_operator_create_dataset_from_jdbc(mocker, mock_airflow_connection_datar
     )
 
 
-def test_operator_create_recipe(mocker):
+def test_operator_create_wrangling_recipe(mocker):
     get_dataset_mock = mocker.patch.object(dr.Dataset, "get")
     get_exp_container_mock = mocker.patch.object(dr.UseCase, "get")
     client_mock = mocker.patch('datarobot_provider.operators.ai_catalog.dr.client.get_client').return_value
     recipe_mock = mocker.patch('datarobot_provider.operators.ai_catalog.dr.models.Recipe')
     recipe_mock.from_dataset.return_value.id = 'test-recipe-id'
 
-    operator = CreateRecipeOperator(
+    operator = CreateWranglingRecipeOperator(
         task_id="create_recipe",
         recipe_name="Test name",
         dataset_id='test-dataset-id',

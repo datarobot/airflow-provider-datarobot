@@ -512,7 +512,7 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
         return data_source.id
 
 
-class CreateRecipeOperator(BaseOperator):
+class CreateWranglingRecipeOperator(BaseOperator):
     """Create a Wrangling Recipe inside an Experiment Container
     specified by *experiment_container_id* context parameter.
 
