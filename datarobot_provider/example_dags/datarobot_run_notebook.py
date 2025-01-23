@@ -18,6 +18,7 @@ from airflow.decorators import dag
 from airflow.models.param import Param
 
 from datarobot_provider.operators.notebook import NotebookOperator
+from datarobot_provider.sensors.notebook import NotebookJobCompleteSensor
 
 
 @dag(
@@ -33,13 +34,21 @@ from datarobot_provider.operators.notebook import NotebookOperator
     },
 )
 def datarobot_notebook_connect(notebook_id=None, notebook_parameters=None):
-    notebook_connect_op = NotebookOperator(
+    notebook_op = NotebookOperator(
         task_id="notebook_running",
         notebook_id=notebook_id,
         parameters=notebook_parameters,
     )
 
-    notebook_connect_op
+    notebook_execution_complete_sensor = NotebookJobCompleteSensor(
+        task_id="check_notebook_execution_complete",
+        notebook_id=notebook_op.output,
+        poke_interval=15,  # status check each 15 sec
+        # TODO: Update this timeout to something more like 24 hours
+        timeout=600,  # timeout after 10min (10*60sec = 600 sec)
+    )
+
+    notebook_op >> notebook_execution_complete_sensor
 
 
 datarobot_notebook_connection_dag = datarobot_notebook_connect()

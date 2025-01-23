@@ -72,7 +72,7 @@ class NotebookOperator(BaseOperator):
         )
 
         self.log.info(f"Using client {dr_client=}")
-        self.log.info(f"Using client {dr_client.endpoint=}")
+        self.log.info(f"Using client {dr_client.domain=}")
 
         # Parameters is possibly None hence using .get()
         # TODO - Clean this up.
@@ -124,25 +124,29 @@ class NotebookOperator(BaseOperator):
             execution_response.text,
         )
 
-        # TODO: Make this either configurable and/or `while True:` infinite loop
-        # We wait for execution of the notebook to be complete (execution status of "idle")
-        minutes_to_wait = 10  # Adjust this accordingly if your notebook takes longer to run
-        for _ in range(minutes_to_wait * 60):
-            exec_status_resp = api_gw_client.get(f"{orch_url}/executionStatus/")
-            assert exec_status_resp.status_code == 200, (
-                exec_status_resp.status_code,
-                exec_status_resp.text,
-            )
-            exec_status = exec_status_resp.json()["status"]
-            if exec_status == "idle":
-                self.log.info("Notebook execution status now idle.")
-                break
-            self.log.info(f"Notebook still executing {exec_status=}")
-            time.sleep(1)  # Adjust this to poll less frequently than once a second
+        return self.notebook_id
 
-        # Now stop the notebook
-        stop_response = api_gw_client.post(url=f"{orch_url}/stop/")
-        self.log.info(f"{stop_response.status_code=}")
+        # BELOW CODE works as-is _without_ using Sensors
 
-        # TODO: Decide what to return here
-        return "TODO"
+        # # TODO: Make this either configurable and/or `while True:` infinite loop
+        # # We wait for execution of the notebook to be complete (execution status of "idle")
+        # minutes_to_wait = 10  # Adjust this accordingly if your notebook takes longer to run
+        # for _ in range(minutes_to_wait * 60):
+        #     exec_status_resp = api_gw_client.get(f"{orch_url}/executionStatus/")
+        #     assert exec_status_resp.status_code == 200, (
+        #         exec_status_resp.status_code,
+        #         exec_status_resp.text,
+        #     )
+        #     exec_status = exec_status_resp.json()["status"]
+        #     if exec_status == "idle":
+        #         self.log.info("Notebook execution status now idle.")
+        #         break
+        #     self.log.info(f"Notebook still executing {exec_status=}")
+        #     time.sleep(1)  # Adjust this to poll less frequently than once a second
+
+        # # Now stop the notebook
+        # stop_response = api_gw_client.post(url=f"{orch_url}/stop/")
+        # self.log.info(f"{stop_response.status_code=}")
+
+        # # TODO: Decide what to return here
+        # return "TODO"
