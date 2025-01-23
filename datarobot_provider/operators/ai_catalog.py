@@ -251,7 +251,7 @@ class CreateDatasetFromDataStoreOperator(BaseOperator):
 
 
 class CreateDatasetFromRecipeOperator(BaseOperator):
-    """ Create a dataset based on a wrangling recipe.
+    """Create a dataset based on a wrangling recipe.
     The dataset can be dynamic or a snapshot depending on the mandatory *do_snapshot* parameter.
     The dataset is added into the Experiment Container if experiment_container_id is specified
     in the context parameters.
@@ -526,8 +526,15 @@ class CreateWranglingRecipeOperator(BaseOperator):
     :param downsampling_arguments_param: Downsampling arguments.
 
     """
+
     template_fields: Sequence[str] = [
-        "dataset_id", "dialect", "recipe_name", "recipe_description", "operations", "downsampling_directive", "downsampling_arguments"
+        "dataset_id",
+        "dialect",
+        "recipe_name",
+        "recipe_description",
+        "operations",
+        "downsampling_directive",
+        "downsampling_arguments",
     ]
     template_fields_renderers: dict[str, str] = {
         "dataset_id": "string",
@@ -578,29 +585,29 @@ class CreateWranglingRecipeOperator(BaseOperator):
         recipe = dr.models.Recipe.from_dataset(
             experiment_container, dataset, dialect=dr.enums.DataWranglingDialect(self.dialect)
         )
-        logging.info('%s recipe id=%s created. Configuring...', self.dialect, recipe.id)
+        logging.info("%s recipe id=%s created. Configuring...", self.dialect, recipe.id)
 
         if self.operations:
             client_operations = [
                 dr.models.recipe.WranglingOperation.from_data(x) for x in self.operations
             ]
             dr.models.Recipe.set_operations(recipe.id, client_operations)
-            logging.info('%d operations set.', len(client_operations))
+            logging.info("%d operations set.", len(client_operations))
 
         if self.downsampling_directive is not None:
             client_downsampling = dr.models.recipe.DownsamplingOperation(
-                directive= dr.enums.DownsamplingOperations(self.downsampling_directive),
+                directive=dr.enums.DownsamplingOperations(self.downsampling_directive),
                 arguments=self.downsampling_arguments,
             )
             dr.models.Recipe.update_downsampling(recipe.id, client_downsampling)
-            logging.info('%s dowsnsampling set.', self.downsampling_directive)
+            logging.info("%s dowsnsampling set.", self.downsampling_directive)
 
         if self.recipe_name or self.recipe_description:
             dr.client.get_client().patch(
-                f'recipes/{recipe.id}/',
-                json={'name': self.recipe_name, 'description': self.recipe_description},
+                f"recipes/{recipe.id}/",
+                json={"name": self.recipe_name, "description": self.recipe_description},
             )
-            logging.info('Recipe name/description set.')
+            logging.info("Recipe name/description set.")
 
-        logging.info('Recipe id=%s is ready.', recipe.id)
+        logging.info("Recipe id=%s is ready.", recipe.id)
         return recipe.id
