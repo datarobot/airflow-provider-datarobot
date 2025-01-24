@@ -13,6 +13,7 @@ from datarobot_provider.operators.ai_catalog import CreateDatasetFromDataStoreOp
 from datarobot_provider.operators.ai_catalog import CreateDatasetFromRecipeOperator
 from datarobot_provider.operators.ai_catalog import CreateDatasetVersionOperator
 from datarobot_provider.operators.ai_catalog import CreateOrUpdateDataSourceOperator
+from datarobot_provider.operators.ai_catalog import CreateWranglingRecipeOperator
 from datarobot_provider.operators.ai_catalog import UpdateDatasetFromFileOperator
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 
@@ -109,6 +110,59 @@ def test_operator_create_dataset_from_jdbc(mocker, mock_airflow_connection_datar
         do_snapshot=test_params["do_snapshot"],
         max_wait=3600,
     )
+
+
+def test_operator_create_wrangling_recipe(mocker):
+    get_dataset_mock = mocker.patch.object(dr.Dataset, "get")
+    get_exp_container_mock = mocker.patch.object(dr.UseCase, "get")
+    client_mock = mocker.patch(
+        "datarobot_provider.operators.ai_catalog.dr.client.get_client"
+    ).return_value
+    recipe_mock = mocker.patch("datarobot_provider.operators.ai_catalog.dr.models.Recipe")
+    recipe_mock.from_dataset.return_value.id = "test-recipe-id"
+    context = {"params": {"use_case_id": "test-use-case-id"}}
+
+    operator = CreateWranglingRecipeOperator(
+        task_id="create_recipe",
+        recipe_name="Test name",
+        dataset_id="test-dataset-id",
+        dialect=dr.enums.DataWranglingDialect.SNOWFLAKE,
+        operations=[
+            {
+                "directive": "drop-columns",
+                "arguments": {"columns": ["test-feature-1", "test-feature-2"]},
+            }
+        ],
+        downsampling_directive=dr.enums.DownsamplingOperations.RANDOM_SAMPLE,
+        downsampling_arguments={"value": 100, "seed": 25},
+    )
+    operator.render_template_fields(context)
+
+    recipe_id = operator.execute(context=context)
+
+    assert recipe_id == "test-recipe-id"
+    get_dataset_mock.assert_called_once_with("test-dataset-id")
+    get_exp_container_mock.assert_called_once_with("test-use-case-id")
+    client_mock.patch.assert_called_once_with(
+        "recipes/test-recipe-id/",
+        json={"name": "Test name", "description": "Created with Apache-Airflow"},
+    )
+    recipe_mock.from_dataset.assert_called_once_with(
+        get_exp_container_mock.return_value,
+        get_dataset_mock.return_value,
+        dialect=dr.enums.DataWranglingDialect.SNOWFLAKE,
+    )
+    recipe_mock.set_operations.assert_called_once()
+    assert isinstance(
+        recipe_mock.set_operations.call_args.args[1][0], dr.models.recipe.WranglingOperation
+    )
+
+    recipe_mock.update_downsampling.assert_called_once()
+    assert (
+        recipe_mock.update_downsampling.call_args.args[1].directive
+        == dr.enums.DownsamplingOperations.RANDOM_SAMPLE
+    )
+    assert recipe_mock.update_downsampling.call_args.args[1].arguments == {"value": 100, "seed": 25}
 
 
 @pytest.mark.parametrize(

@@ -3,8 +3,9 @@
 ## Unreleased
 
 ### New features
-- Introduce `CreateDatasetFromRecipeOperator <datarobot_provider.operators.ai_catalog.CreateDatasetFromRecipeOperator>` 
-to publish a dataset based on existing wrangling recipe. 
+- Introduce `CreateWranglingRecipeOperator <datarobot_provider.operators.ai_catalog.CreateWranglingRecipeOperator>` 
+and `CreateDatasetFromRecipeOperator <datarobot_provider.operators.ai_catalog.CreateDatasetFromRecipeOperator>` 
+to create a wrangling recipe and publish it as a dataset into an existing use case.
 
 ### Bugfixes
 

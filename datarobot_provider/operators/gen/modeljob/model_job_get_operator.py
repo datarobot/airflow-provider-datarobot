@@ -31,7 +31,7 @@ class ModelJobGetOperator(BaseOperator):
         project_id: Optional[str] = None,
         model_job_id: Optional[str] = None,
         datarobot_conn_id: str = "datarobot_default",
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.project_id = project_id
