@@ -80,3 +80,6 @@ build-astro-dev:
 
 copy-examples-astro-dev:
 	cp -r ./datarobot_provider/example_dags/* ./astro-dev/dags/
+
+autogen-operators:
+	python ./datarobot_provider/autogen/generate_operator.py --whitelist ./datarobot_provider/autogen/whitelist.yaml --output_folder ./datarobot_provider/operators/gen
