@@ -8,7 +8,7 @@
 import logging
 from collections.abc import Sequence
 from typing import Any
-from typing import Dict
+from typing import List
 from typing import Optional
 
 import datarobot as dr
@@ -250,7 +250,10 @@ class CreateDatasetFromDataStoreOperator(BaseOperator):
 
 
 class CreateDatasetFromRecipeOperator(BaseOperator):
-    """
+    """Create a dataset based on a wrangling recipe.
+    The dataset can be dynamic or a snapshot depending on the mandatory *do_snapshot* parameter.
+    The dataset is added into the Use Case if use_case_id is specified
+    in the context parameters.
 
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
@@ -263,17 +266,14 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
     :param materialization_catalog_param: Name of the parameter in the configuration to use as materialization_catalog
     :type materialization_catalog_param: str
     :param materialization_schema_param: Name of the parameter in the configuration to use as materialization_schema
-    :type materialization_schema: str
+    :type materialization_schema_param: str
     :param materialization_table_param: Name of the parameter in the configuration to use as materialization_table
-    :type materialization_table: str
+    :type materialization_table_param: str
     :return: DataRobot AI Catalog dataset ID
     :rtype: str
     """
 
-    # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = []
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Sequence[str] = ()
+    template_fields = ["recipe_id"]
     ui_color = "#f4a460"
 
     def __init__(
@@ -352,16 +352,13 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
             dataset.name,
         )
 
-        if context["params"].get("experiment_container_id"):
-            dr.UseCase.get(use_case_id=context["params"]["experiment_container_id"]).add(dataset)
-
-            logging.info(
-                "The dataset is added into experiment container %s.",
-                context["params"]["experiment_container_id"],
-            )
+        if context["params"].get("use_case_id"):
+            use_case = dr.UseCase.get(use_case_id=context["params"]["use_case_id"])
+            use_case.add(dataset)
+            logging.info('The dataset is added into use case "%s".', use_case.name)
 
         else:
-            logging.info("New Dataset won't belong to any experiment container.")
+            logging.info("New Dataset won't belong to any use case.")
 
         return dataset.id
 
@@ -510,3 +507,119 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
             self.log.info(f"DataSource:{dataset_name} successfully created, id={data_source.id}")
 
         return data_source.id
+
+
+class CreateWranglingRecipeOperator(BaseOperator):
+    """Create a Wrangling Recipe
+
+    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
+    :param use_case_id: Use Case ID to create the recipe in.
+    :param dataset_id: The dataset to wrangle
+    :param dialect: SQL dialect to apply while wrangling.
+    :param recipe_name: New recipe name.
+    :param recipe_description: New recipe description.
+    :param operations: Wrangling operations to apply.
+    :param downsampling_directive: Downsampling method to apply. *None* for non downsampling.
+    :param downsampling_arguments_param: Downsampling arguments.
+
+    """
+
+    template_fields: Sequence[str] = [
+        "use_case_id",
+        "dataset_id",
+        "dialect",
+        "recipe_name",
+        "recipe_description",
+        "operations",
+        "downsampling_directive",
+        "downsampling_arguments",
+    ]
+    template_fields_renderers: dict[str, str] = {
+        "use_case_id": "string",
+        "dataset_id": "string",
+        "dialect": "string",
+        "recipe_name": "string",
+        "recipe_description": "string",
+        "operations": "json",
+        "downsampling_directive": "string",
+        "downsampling_arguments": "json",
+    }
+    ui_color = "#f4a460"
+
+    def __init__(
+        self,
+        *,
+        datarobot_conn_id: str = "datarobot_default",
+        use_case_id: str = '{{ params.get("use_case_id", "") }}',
+        dataset_id: str,
+        dialect: dr.enums.DataWranglingDialect,
+        recipe_name: Optional[str] = None,
+        recipe_description: Optional[str] = "Created with Apache-Airflow",
+        operations: Optional[List[dict]] = None,
+        downsampling_directive: Optional[dr.enums.DownsamplingOperations] = None,
+        downsampling_arguments: Optional[dict] = None,
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+        self.datarobot_conn_id = datarobot_conn_id
+        self.use_case_id = use_case_id
+        self.dataset_id = dataset_id
+        self.dialect = dialect
+        self.recipe_name = recipe_name
+        self.recipe_description = recipe_description
+        self.operations = operations
+        self.downsampling_directive = downsampling_directive
+        self.downsampling_arguments = downsampling_arguments
+
+        if kwargs.get("xcom_push") is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Context) -> str:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        if not self.use_case_id:
+            raise AirflowException(
+                "*use_case_id* is a mandatory parameter. "
+                "You can set it either explicitly or via the context variable *use_case_id*"
+            )
+
+        use_case = dr.UseCase.get(self.use_case_id)
+        dataset = dr.Dataset.get(self.dataset_id)
+
+        recipe = dr.models.Recipe.from_dataset(
+            use_case, dataset, dialect=dr.enums.DataWranglingDialect(self.dialect)
+        )
+        logging.info(
+            '%s recipe id=%s created in use case "%s". Configuring...',
+            self.dialect,
+            recipe.id,
+            use_case.name,
+        )
+
+        if self.operations:
+            client_operations = [
+                dr.models.recipe.WranglingOperation.from_data(x) for x in self.operations
+            ]
+            dr.models.Recipe.set_operations(recipe.id, client_operations)
+            logging.info("%d operations set.", len(client_operations))
+
+        if self.downsampling_directive is not None:
+            client_downsampling = dr.models.recipe.DownsamplingOperation(
+                directive=dr.enums.DownsamplingOperations(self.downsampling_directive),
+                arguments=self.downsampling_arguments,
+            )
+            dr.models.Recipe.update_downsampling(recipe.id, client_downsampling)
+            logging.info("%s dowsnsampling set.", self.downsampling_directive)
+
+        if self.recipe_name or self.recipe_description:
+            dr.client.get_client().patch(
+                f"recipes/{recipe.id}/",
+                json={"name": self.recipe_name, "description": self.recipe_description},
+            )
+            logging.info("Recipe name/description set.")
+
+        logging.info("Recipe id=%s is ready.", recipe.id)
+        return recipe.id
