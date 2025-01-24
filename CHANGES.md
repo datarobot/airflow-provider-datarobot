@@ -5,7 +5,7 @@
 ### New features
 - Introduce `CreateWranglingRecipeOperator <datarobot_provider.operators.ai_catalog.CreateWranglingRecipeOperator>` 
 and `CreateDatasetFromRecipeOperator <datarobot_provider.operators.ai_catalog.CreateDatasetFromRecipeOperator>` 
-to create a wranglig recipe and publish it as a dataset into an existing experiment container. 
+to create a wrangling recipe and publish it as a dataset into an existing use case.
 
 ### Bugfixes
 
