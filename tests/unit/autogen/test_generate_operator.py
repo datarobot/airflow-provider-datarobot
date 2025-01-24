@@ -5,6 +5,8 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+import tempfile
+from pathlib import Path
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
@@ -15,6 +17,7 @@ from numpydoc.docscrape import NumpyDocString
 from numpydoc.docscrape import Parameter
 
 from datarobot_provider.autogen.generate_operator import GenerateOperators
+from datarobot_provider.autogen.generate_operator import main
 
 
 @pytest.fixture
@@ -117,7 +120,7 @@ def test_construct_operator_attibutes(generator, docstring_fixture):
 def test_construct_operator_init(generator, docstring_fixture):
     result = generator.construct_operator_init(docstring_fixture)
     expected = (
-        '\tdef __init__(self,*,project_id: str = None,model_job_id: str = None,datarobot_conn_id: str = "datarobot_default",\n'
+        '\tdef __init__(self,*,project_id: Optional[str] = None,model_job_id: Optional[str] = None,datarobot_conn_id: str = "datarobot_default",\n'
         "**kwargs: Any) -> None:\n"
         "\t\tsuper().__init__(**kwargs)\n"
         "\t\tself.project_id = project_id\n"
@@ -139,7 +142,25 @@ def test_construct_operator_execute(generator, docstring_fixture):
         '\t\t\traise ValueError("project_id is required for ModelJob.")\n'
         "\t\tif self.model_job_id is None:\n"
         '\t\t\traise ValueError("model_job_id is required for ModelJob.")\n\n'
-        "\t\tresult = datarobot.models.modeljob.ModelJob.get(\n\t\tself.project_id, self.model_job_id, \n\t)\n"
+        "\t\tresult = ModelJob.get(\n\t\tself.project_id, self.model_job_id, \n\t)\n"
         "\t\treturn result.id\n"
     )
     assert result == expected
+
+
+@patch.object(GenerateOperators, "generate")
+def test_main(mock_generate, tests_fixtures_dir):
+    mock_generate.return_value = {"operators.modeljob.ModelJobGetOperator": "code"}
+
+    with tempfile.TemporaryDirectory() as tempdir:
+        whitelist_path = f"{tests_fixtures_dir}/whitelist_test.yaml"
+        main(Path(whitelist_path), Path(tempdir))
+        with open(f"{tempdir}/modeljob/model_job_get_operator.py") as f:
+            result = f.read()
+            assert result == "code"
+        with open(f"{tempdir}/modeljob/__init__.py") as f:
+            result = f.read()
+            assert (
+                result
+                == "from .model_job_get_operator import ModelJobGetOperator as ModelJobGetOperator\n"
+            )
