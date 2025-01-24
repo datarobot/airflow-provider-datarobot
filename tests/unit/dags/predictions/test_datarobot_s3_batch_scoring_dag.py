@@ -7,7 +7,7 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 import pytest
 
-from datarobot_provider.example_dags.datarobot_aws_s3_batch_scoring_dag import (
+from datarobot_provider.example_dags.deprecated.datarobot_aws_s3_batch_scoring_dag import (
     datarobot_s3_batch_scoring,
 )
 
