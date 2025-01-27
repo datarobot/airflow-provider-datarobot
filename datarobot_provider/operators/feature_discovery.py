@@ -31,7 +31,8 @@ class CreateFeatureDiscoveryRecipeOperator(BaseOperator):
     :type dataset_id: str
     :param use_case_id: ID of the use case to add the recipe to
     :type use_case_id: str
-    :param relationships_configuration_id: ID of a relationships configuration defining secondary datasets and relationships
+    :param relationships_configuration_id: ID of a relationships configuration
+            defining secondary datasets and relationships
     :type relationships_configuration_id: str
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
@@ -74,12 +75,13 @@ class CreateFeatureDiscoveryRecipeOperator(BaseOperator):
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         response = dr.client.get_client().post(
-            "/recipes/fromDataset/", data={
-                'useCaseId': self.use_case_id,
-                'status': 'draft',
-                'datasetId': self.dataset_id,
-                'recipeType': 'FEATURE_DISCOVERY',
-            }
+            "/recipes/fromDataset/",
+            data={
+                "useCaseId": self.use_case_id,
+                "status": "draft",
+                "datasetId": self.dataset_id,
+                "recipeType": "FEATURE_DISCOVERY",
+            },
         )
         if response.status_code != 201:
             e_msg = "Server unexpectedly returned status code {}"
@@ -90,7 +92,9 @@ class CreateFeatureDiscoveryRecipeOperator(BaseOperator):
         recipe_config_id = recipe["settings"]["relationshipsConfigurationId"]
 
         # Copy the secondary relationships into the Recipe config
-        relationship_config = dr.RelationshipsConfiguration(self.relationships_configuration_id).get()
+        relationship_config = dr.RelationshipsConfiguration(
+            self.relationships_configuration_id
+        ).get()
         dr.RelationshipsConfiguration(recipe_config_id).replace(
             relationship_config.dataset_definitions,
             relationship_config.relationships,
@@ -113,10 +117,11 @@ class RelationshipsConfigurationOperator(BaseOperator):
         Each element is a dict retrieved from DatasetRelationshipOperator operator
     :type relationships: Iterable[dict]
     :param feature_discovery_settings: list of feature discovery settings, optional
-        If not provided, it will be retrieved from DAG configuration params otherwise default settings will be used.
+        If not provided, it will be retrieved from DAG configuration params otherwise default
+        settings will be used.
     :type feature_discovery_settings: dict
-    :param max_wait_sec: For some settings, an asynchronous task must be run to analyze the dataset.  max_wait
-            governs the maximum time (in seconds) to wait before giving up.
+    :param max_wait_sec: For some settings, an asynchronous task must be run to analyze the
+            dataset.  max_wait governs the maximum time (in seconds) to wait before giving up.
     :type max_wait_sec: int, optional
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
@@ -160,7 +165,7 @@ class RelationshipsConfigurationOperator(BaseOperator):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
-        # if feature_discovery_settings not provided, trying to get it from DAG configuration params:
+        # if feature_discovery_settings not provided, try to get it from DAG configuration params:
         if self.feature_discovery_settings is None:
             self.feature_discovery_settings = context["params"].get(
                 "feature_discovery_settings", None
@@ -181,7 +186,8 @@ class DatasetDefinitionOperator(BaseOperator):
     """
     Dataset definition for the Feature Discovery
 
-    :param dataset_identifier: Alias of the dataset (used directly as part of the generated feature names)
+    :param dataset_identifier: Alias of the dataset (used directly as part of the
+            generated feature names)
     :type dataset_identifier: str
     :param dataset_id: Identifier of the dataset in DataRobot AI Catalog
     :type dataset_id: str
@@ -301,7 +307,8 @@ class DatasetRelationshipOperator(BaseOperator):
         if present.Only applicable when dataset1_identifier is not provided.
     :type prediction_point_rounding: list[dict], optional
     :param prediction_point_rounding_time_unit: Time unit of the prediction point rounding.
-        One of ``datarobot.enums.AllowedTimeUnitsSAFER`` Only applicable when dataset1_identifier is not provided.
+        One of ``datarobot.enums.AllowedTimeUnitsSAFER`` Only applicable when dataset1_identifier
+        is not provided.
     :type prediction_point_rounding_time_unit:  str, optional
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional

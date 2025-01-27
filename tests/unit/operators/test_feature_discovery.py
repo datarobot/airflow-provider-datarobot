@@ -151,7 +151,8 @@ def test_dataset_relationship_operator(relationships):
 def test_create_feature_discovery_recipe(mocker):
     mock_client_response = mocker.Mock(status_code=201)
     mock_client_response.json.return_value = {
-        "id": "recipe_id", "settings": {"relationshipsConfigurationId": "recipe_config_id"}
+        "id": "recipe_id",
+        "settings": {"relationshipsConfigurationId": "recipe_config_id"},
     }
     mock_client = mocker.Mock()
     mock_client.post.return_value = mock_client_response
@@ -179,8 +180,6 @@ def test_create_feature_discovery_recipe(mocker):
 
     assert get_client_mock.called_once()
     assert get_config_mock.called_once()
-    assert patch_config_mock.called_once_with(
-        "dataset_definitions", "relationships", "fd_settings"
-    )
+    assert patch_config_mock.called_once_with("dataset_definitions", "relationships", "fd_settings")
 
     assert operator_result == "recipe_id"
