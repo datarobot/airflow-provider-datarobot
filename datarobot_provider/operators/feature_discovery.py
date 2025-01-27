@@ -41,13 +41,13 @@ class CreateFeatureDiscoveryRecipeOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = [
+    template_fields: Sequence[str] = [
         "dataset_id",
         "use_case_id",
         "relationships_configuration_id",
     ]
     template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
+    template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -70,7 +70,7 @@ class CreateFeatureDiscoveryRecipeOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Dict[str, Any]) -> None:
+    def execute(self, context: Context) -> None:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 

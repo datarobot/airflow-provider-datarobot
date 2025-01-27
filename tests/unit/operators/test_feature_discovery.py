@@ -178,8 +178,8 @@ def test_create_feature_discovery_recipe(mocker):
 
     operator_result = operator.execute(context={"params": {}})
 
-    assert get_client_mock.called_once()
-    assert get_config_mock.called_once()
-    assert patch_config_mock.called_once_with("dataset_definitions", "relationships", "fd_settings")
+    get_client_mock.assert_called_once()
+    get_config_mock.assert_called_once()
+    patch_config_mock.assert_called_once_with("dataset_definitions", "relationships", "fd_settings")
 
     assert operator_result == "recipe_id"
