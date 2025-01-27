@@ -12,7 +12,7 @@ def test_datarobot_aws_credentials_conn(
     dr_aws_credentials_conn_details, mock_airflow_connection_datarobot_aws_credentials
 ):
     hook = AwsCredentialsHook(datarobot_credentials_conn_id="datarobot_aws_credentials_test")
-    credentials, credential_data = hook.get_conn()
+    _, credential_data = hook.get_conn()
 
     assert credential_data["awsAccessKeyId"] == dr_aws_credentials_conn_details["aws_access_key_id"]
     assert (

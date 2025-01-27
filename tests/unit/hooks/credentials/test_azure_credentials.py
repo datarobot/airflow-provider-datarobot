@@ -14,7 +14,7 @@ def test_datarobot_azure_credentials_conn(
     hook = AzureStorageCredentialsHook(
         datarobot_credentials_conn_id="datarobot_azure_credentials_test"
     )
-    credentials, credential_data = hook.get_conn()
+    _, credential_data = hook.get_conn()
 
     assert (
         credential_data["azureConnectionString"]
