@@ -10,5 +10,6 @@
 /datarobot_provider/operators/monitoring_job.py          @datarobot/tracking-agent
 /datarobot_provider/operators/notebooks                  @datarobot/cfx
 /datarobot_provider/operators/prediction_explanations.py @datarobot/trust-explainable-ai
+/datarobot_provider/sensors/notebooks                    @datarobot/cfx
 /docs                                                    @datarobot/api-docs
 /tests/                                                  @datarobot/machine-learning-development

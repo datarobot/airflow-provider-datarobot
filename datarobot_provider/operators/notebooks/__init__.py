@@ -6,5 +6,13 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from .revision import NotebookRevisionCreateOperator
+from .session import NotebookExecuteOperator
+from .session import NotebookSessionStartOperator
+from .session import NotebookSessionStopOperator
 
-__all__ = ("NotebookRevisionCreateOperator",)
+__all__ = (
+    "NotebookExecuteOperator",
+    "NotebookRevisionCreateOperator",
+    "NotebookSessionStartOperator",
+    "NotebookSessionStopOperator",
+)
