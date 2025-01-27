@@ -7,6 +7,7 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from collections.abc import Sequence
 from typing import Any
+from typing import Dict
 from typing import Iterable
 from typing import Optional
 
