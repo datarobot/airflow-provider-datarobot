@@ -142,9 +142,6 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# Jupyter notebooks
-notebooks/
-
 # Astro development environments
 astro-dev/
 
