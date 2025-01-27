@@ -70,6 +70,7 @@ select = [
     "W",
     "B",
     "I",
+    "C90"
 ]
 
 # Rules to ignore (corresponds to Flake8's ignore)
