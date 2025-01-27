@@ -94,7 +94,7 @@ def create_custom_model_pipeline(
             return ["deploy_custom_model"]
         return ["custom_model_test_fail"]
 
-    branching = BranchPythonOperator(
+    if_tests_succeed = BranchPythonOperator(
         task_id="if_tests_succeed",
         python_callable=choose_branch,
         op_args=[custom_model_test_overall_status_op.output],
@@ -108,7 +108,7 @@ def create_custom_model_pipeline(
         importance=DEPLOYMENT_IMPORTANCE.LOW,
     )
 
-    custom_model_test_fail_case_op = EmptyOperator(
+    custom_model_test_fail = EmptyOperator(
         task_id="custom_model_test_fail",
     )
 
@@ -121,8 +121,8 @@ def create_custom_model_pipeline(
         >> test_dataset_uploading_op
         >> custom_model_test_op
         >> custom_model_test_overall_status_op
-        >> branching
-        >> [deploy_custom_model_op, custom_model_test_fail_case_op]
+        >> if_tests_succeed
+        >> [deploy_custom_model_op, custom_model_test_fail]
     )
 
 
