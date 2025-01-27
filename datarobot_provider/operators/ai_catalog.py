@@ -25,8 +25,8 @@ DATAROBOT_MAX_WAIT_SEC = 3600
 
 class UploadDatasetOperator(BaseOperator):
     """
-    Uploading local file to DataRobot AI Catalog and return Dataset ID.
-    :param file_path: The path to the file.
+    Uploading a file to DataRobot AI Catalog and return Dataset ID.
+    :param file_path: The path to the local file or the file URL.
     :type file_path: str, optional
     :param file_path_param: Name of the parameter in the configuration to use as file_path, defaults to `dataset_file_path`
     :type file_path_param: str, optional
@@ -40,6 +40,7 @@ class UploadDatasetOperator(BaseOperator):
     template_fields: Sequence[str] = [
         "file_path",
         "file_path_param",
+        "use_case_id",
     ]
     template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
@@ -50,12 +51,14 @@ class UploadDatasetOperator(BaseOperator):
         *,
         file_path: Optional[str] = None,
         file_path_param: str = "dataset_file_path",
+        use_case_id: Optional[str] = "{{ params.get('use_case_id', "")}}",
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.file_path = file_path
         self.file_path_param = file_path_param
+        self.use_case_id = use_case_id
         self.datarobot_conn_id = datarobot_conn_id
         if kwargs.get("xcom_push") is not None:
             raise AirflowException(
@@ -71,12 +74,15 @@ class UploadDatasetOperator(BaseOperator):
         if self.file_path is None:
             self.file_path = context["params"][self.file_path_param]
 
-        ai_catalog_dataset: dr.Dataset = dr.Dataset.create_from_file(
-            file_path=self.file_path,
-            max_wait=DATAROBOT_MAX_WAIT_SEC,
-        )
+        ai_catalog_dataset: dr.Dataset = dr.Dataset.upload(source=self.file_path)
 
         self.log.info(f"Dataset created: dataset_id={ai_catalog_dataset.id}")
+
+        if self.use_case_id:
+            use_case = dr.UseCase.get(self.use_case_id)
+            use_case.add(ai_catalog_dataset)
+            self.log.info('Dataset added into "%s" use case.', use_case.name)
+
         return ai_catalog_dataset.id
 
 
@@ -252,8 +258,7 @@ class CreateDatasetFromDataStoreOperator(BaseOperator):
 class CreateDatasetFromRecipeOperator(BaseOperator):
     """Create a dataset based on a wrangling recipe.
     The dataset can be dynamic or a snapshot depending on the mandatory *do_snapshot* parameter.
-    The dataset is added into the Use Case if use_case_id is specified
-    in the context parameters.
+    The dataset is added into the Use Case if use_case_id parameter is specified.
 
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
@@ -261,8 +266,10 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
     :type recipe_id: str
     :param do_snapshot: *True* to download and store whole dataframe into DataRobot AI Catalog. *False* to create a dynamic dataset.
     :type do_snapshot: bool
-    :param dataset_name_param: Name of the parameter in the configuration to use as dataset_name
-    :type dataset_name_param: str
+    :param use_case_id: Use Case to add the dataset into.
+    :type use_case_id: str or None
+    :param dataset_name: Name of the new dataset.
+    :type dataset_name: str or None
     :param materialization_catalog_param: Name of the parameter in the configuration to use as materialization_catalog
     :type materialization_catalog_param: str
     :param materialization_schema_param: Name of the parameter in the configuration to use as materialization_schema
@@ -273,16 +280,17 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
     :rtype: str
     """
 
-    template_fields = ["recipe_id"]
+    template_fields = ["recipe_id", "use_case_id", "dataset_name"]
     ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         datarobot_conn_id: str = "datarobot_default",
-        recipe_id: str,
+        recipe_id: str = "{{ params.recipe_id }}",
         do_snapshot: bool,
-        dataset_name_param: str = "dataset_name",
+        use_case_id: Optional[str] = "{{ params.use_case_id| default('') }}",
+        dataset_name: Optional[str] = "{{ params.dataset_name| default('Wrangled Data') }}",
         materialization_catalog_param: str = "materialization_catalog",
         materialization_schema_param: str = "materialization_schema",
         materialization_table_param: str = "materialization_table",
@@ -293,7 +301,8 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
         self.recipe_id = recipe_id
         self.do_snapshot = do_snapshot
 
-        self.dataset_name_param = dataset_name_param
+        self.use_case_id = use_case_id
+        self.dataset_name = dataset_name
         self.materialization_catalog_param = materialization_catalog_param
         self.materialization_schema_param = materialization_schema_param
         self.materialization_table_param = materialization_table_param
@@ -315,15 +324,6 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
 
         return None
 
-    def _get_dataset_name(
-        self,
-        context: Context,
-        materialization_destination: Optional[dr.models.dataset.MaterializationDestination],
-    ):
-        return context["params"].get(self.dataset_name_param) or (
-            materialization_destination and materialization_destination["table"]
-        )
-
     def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
@@ -336,11 +336,10 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
             )
 
         materialization_destination = self._get_materialization_destination(context)
-        dataset_name = self._get_dataset_name(context, materialization_destination)
 
         dataset: dr.Dataset = dr.Dataset.create_from_recipe(
             recipe,
-            name=dataset_name,
+            name=self.dataset_name,
             do_snapshot=self.do_snapshot,
             persist_data_after_ingestion=True,
             materialization_destination=materialization_destination,
@@ -352,8 +351,8 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
             dataset.name,
         )
 
-        if context["params"].get("use_case_id"):
-            use_case = dr.UseCase.get(use_case_id=context["params"]["use_case_id"])
+        if self.use_case_id:
+            use_case = dr.UseCase.get(use_case_id=self.use_case_id)
             use_case.add(dataset)
             logging.info('The dataset is added into use case "%s".', use_case.name)
 
@@ -600,11 +599,8 @@ class CreateWranglingRecipeOperator(BaseOperator):
         )
 
         if self.operations:
-            client_operations = [
-                dr.models.recipe.WranglingOperation.from_data(x) for x in self.operations
-            ]
-            dr.models.Recipe.set_operations(recipe.id, client_operations)
-            logging.info("%d operations set.", len(client_operations))
+            self._set_operations(recipe)
+            logging.info("%d operations set.", len(self.operations))
 
         if self.downsampling_directive is not None:
             client_downsampling = dr.models.recipe.DownsamplingOperation(
@@ -615,11 +611,51 @@ class CreateWranglingRecipeOperator(BaseOperator):
             logging.info("%s dowsnsampling set.", self.downsampling_directive)
 
         if self.recipe_name or self.recipe_description:
-            dr.client.get_client().patch(
-                f"recipes/{recipe.id}/",
-                json={"name": self.recipe_name, "description": self.recipe_description},
-            )
+            data = {"description": self.recipe_description}
+            if self.recipe_name:
+                data['name'] = self.recipe_name
+
+            dr.client.get_client().patch(f"recipes/{recipe.id}/", json=data)
             logging.info("Recipe name/description set.")
 
         logging.info("Recipe id=%s is ready.", recipe.id)
         return recipe.id
+
+    def _set_operations(self, recipe: dr.models.Recipe):
+        secondary_inputs = {}
+
+        if recipe.inputs[0].input_type == dr.enums.RecipeInputType.DATASOURCE:
+            data_store_id = recipe.inputs[0].data_store_id
+        else:
+            data_store_id = None
+
+        for operation_data in self.operations:
+            if operation_data['directive'] == 'join':
+                if operation_data['arguments'].get('rightDatasourceId'):
+                    secondary_inputs[operation_data['arguments']['rightDatasourceId']] = dr.models.JDBCTableDataSourceInput(
+                        input_type=dr.enums.RecipeInputType.DATASOURCE,
+                        data_store_id=data_store_id,
+                        data_source_id=operation_data['arguments']['rightDatasourceId'],
+                    )
+
+                else:
+                    if not operation_data['arguments'].get('rightDatasetVersionId'):
+                        dataset = dr.Dataset.get(operation_data['arguments']['rightDatasetId'])
+                        operation_data['arguments']['rightDatasetVersionId'] = dataset.version_id
+
+                    secondary_inputs[operation_data['arguments'][
+                        'rightDatasetVersionId']] = dr.models.RecipeDatasetInput(
+                        input_type=dr.enums.RecipeInputType.DATASET,
+                        dataset_id=operation_data['arguments']['rightDatasetId'],
+                        dataset_version_id=operation_data['arguments']['rightDatasetVersionId'],
+                    )
+
+        if secondary_inputs:
+            inputs = recipe.inputs + list(secondary_inputs.values())
+            dr.models.Recipe.set_inputs(recipe.id, inputs)
+
+        client_operations = [
+            dr.models.recipe.WranglingOperation.from_data(x) for x in self.operations
+        ]
+
+        dr.models.Recipe.set_operations(recipe.id, client_operations)
