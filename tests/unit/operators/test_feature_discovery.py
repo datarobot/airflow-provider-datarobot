@@ -9,6 +9,7 @@
 import datarobot as dr
 import pytest
 
+from datarobot_provider.operators.feature_discovery import CreateFeatureDiscoveryRecipeOperator
 from datarobot_provider.operators.feature_discovery import DatasetDefinitionOperator
 from datarobot_provider.operators.feature_discovery import DatasetRelationshipOperator
 from datarobot_provider.operators.feature_discovery import RelationshipsConfigurationOperator
@@ -145,3 +146,45 @@ def test_dataset_relationship_operator(relationships):
     operator_result = operator.execute(context={"params": {}})
 
     assert operator_result == relationships[0]
+
+
+def test_create_feature_discovery_recipe(
+    mocker, dataset_definitions, relationships, feature_discovery_settings
+):
+    mock_client_response = mocker.Mock(status_code=201)
+    mock_client_response.json.return_value = {
+        "id": "recipe_id",
+        "settings": {"relationshipsConfigurationId": "recipe_config_id"},
+    }
+    mock_client = mocker.Mock()
+    mock_client.post.return_value = mock_client_response
+    get_client_mock = mocker.patch.object(dr.client, "get_client", return_value=mock_client)
+
+    replace_config_mock = mocker.patch.object(dr.RelationshipsConfiguration, "replace")
+
+    operator = CreateFeatureDiscoveryRecipeOperator(
+        task_id="create_feature_discovery_recipe_operator",
+        dataset_id="dataset_id",
+        use_case_id="use_case_id",
+        dataset_definitions=dataset_definitions,
+        relationships=relationships,
+        feature_discovery_settings=feature_discovery_settings,
+    )
+
+    operator_result = operator.execute(context={"params": {}})
+
+    mock_client.post.assert_called_once_with(
+        "/recipes/fromDataset/",
+        data={
+            "useCaseId": "use_case_id",
+            "status": "draft",
+            "datasetId": "dataset_id",
+            "recipeType": "FEATURE_DISCOVERY",
+        },
+    )
+    get_client_mock.assert_called_once()
+    replace_config_mock.assert_called_once_with(
+        dataset_definitions, relationships, feature_discovery_settings
+    )
+
+    assert operator_result == "recipe_id"
