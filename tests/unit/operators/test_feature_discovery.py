@@ -148,7 +148,9 @@ def test_dataset_relationship_operator(relationships):
     assert operator_result == relationships[0]
 
 
-def test_create_feature_discovery_recipe(mocker):
+def test_create_feature_discovery_recipe(
+    mocker, dataset_definitions, relationships, feature_discovery_settings
+):
     mock_client_response = mocker.Mock(status_code=201)
     mock_client_response.json.return_value = {
         "id": "recipe_id",
@@ -158,28 +160,31 @@ def test_create_feature_discovery_recipe(mocker):
     mock_client.post.return_value = mock_client_response
     get_client_mock = mocker.patch.object(dr.client, "get_client", return_value=mock_client)
 
-    relationships_configuration_mock = mocker.Mock(
-        dataset_definitions="dataset_definitions",
-        relationships="relationships",
-        feature_discovery_settings="fd_settings",
-    )
-    get_config_mock = mocker.patch.object(
-        dr.RelationshipsConfiguration, "get", return_value=relationships_configuration_mock
-    )
-
-    patch_config_mock = mocker.patch.object(dr.RelationshipsConfiguration, "replace")
+    replace_config_mock = mocker.patch.object(dr.RelationshipsConfiguration, "replace")
 
     operator = CreateFeatureDiscoveryRecipeOperator(
         task_id="create_feature_discovery_recipe_operator",
         dataset_id="dataset_id",
         use_case_id="use_case_id",
-        relationships_configuration_id="relationships_config_id",
+        dataset_definitions=dataset_definitions,
+        relationships=relationships,
+        feature_discovery_settings=feature_discovery_settings,
     )
 
     operator_result = operator.execute(context={"params": {}})
 
+    mock_client.post.assert_called_once_with(
+        "/recipes/fromDataset/",
+        data={
+            "useCaseId": "use_case_id",
+            "status": "draft",
+            "datasetId": "dataset_id",
+            "recipeType": "FEATURE_DISCOVERY",
+        },
+    )
     get_client_mock.assert_called_once()
-    get_config_mock.assert_called_once()
-    patch_config_mock.assert_called_once_with("dataset_definitions", "relationships", "fd_settings")
+    replace_config_mock.assert_called_once_with(
+        dataset_definitions, relationships, feature_discovery_settings
+    )
 
     assert operator_result == "recipe_id"

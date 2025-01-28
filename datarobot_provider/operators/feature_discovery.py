@@ -31,9 +31,16 @@ class CreateFeatureDiscoveryRecipeOperator(BaseOperator):
     :type dataset_id: str
     :param use_case_id: ID of the use case to add the recipe to
     :type use_case_id: str
-    :param relationships_configuration_id: ID of a relationships configuration
-            defining secondary datasets and relationships
-    :type relationships_configuration_id: str
+    :param dataset_definitions: list of dataset definitions
+        Each element is a dict retrieved from DatasetDefinitionOperator operator
+    :type dataset_definitions: Iterable[dict]
+    :param relationships: list of relationships
+        Each element is a dict retrieved from DatasetRelationshipOperator operator
+    :type relationships: Iterable[dict]
+    :param feature_discovery_settings: list of feature discovery settings, optional
+        If not provided, it will be retrieved from DAG configuration params otherwise default
+        settings will be used.
+    :type feature_discovery_settings: Iterable[dict]
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
     :return: DataRobot Recipe ID
@@ -44,7 +51,9 @@ class CreateFeatureDiscoveryRecipeOperator(BaseOperator):
     template_fields: Sequence[str] = [
         "dataset_id",
         "use_case_id",
-        "relationships_configuration_id",
+        "dataset_definitions",
+        "relationships",
+        "feature_discovery_settings",
     ]
     template_fields_renderers: Dict[str, str] = {}
     template_ext: Sequence[str] = ()
@@ -55,14 +64,18 @@ class CreateFeatureDiscoveryRecipeOperator(BaseOperator):
         *,
         dataset_id: str,
         use_case_id: str,
-        relationships_configuration_id: str,
+        dataset_definitions: Iterable[dict],
+        relationships: Iterable[dict],
+        feature_discovery_settings: Optional[Iterable[dict]] = None,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.dataset_id = dataset_id
         self.use_case_id = use_case_id
-        self.relationships_configuration_id = relationships_configuration_id
+        self.dataset_definitions = dataset_definitions
+        self.relationships = relationships
+        self.feature_discovery_settings = feature_discovery_settings
         self.datarobot_conn_id = datarobot_conn_id
 
         if kwargs.get("xcom_push") is not None:
@@ -91,14 +104,11 @@ class CreateFeatureDiscoveryRecipeOperator(BaseOperator):
         recipe_id = recipe["id"]
         recipe_config_id = recipe["settings"]["relationshipsConfigurationId"]
 
-        # Copy the secondary relationships into the Recipe config
-        relationship_config = dr.RelationshipsConfiguration(
-            self.relationships_configuration_id
-        ).get()
+        # Add secondary dataset configuration information into the Recipe config
         dr.RelationshipsConfiguration(recipe_config_id).replace(
-            relationship_config.dataset_definitions,
-            relationship_config.relationships,
-            relationship_config.feature_discovery_settings,
+            self.dataset_definitions,
+            self.relationships,
+            self.feature_discovery_settings,
         )
 
         self.log.info(f"Feature Discovery recipe created: recipe_id={recipe_id}")
@@ -119,7 +129,7 @@ class RelationshipsConfigurationOperator(BaseOperator):
     :param feature_discovery_settings: list of feature discovery settings, optional
         If not provided, it will be retrieved from DAG configuration params otherwise default
         settings will be used.
-    :type feature_discovery_settings: dict
+    :type feature_discovery_settings: Iterable[dict]
     :param max_wait_sec: For some settings, an asynchronous task must be run to analyze the
             dataset.  max_wait governs the maximum time (in seconds) to wait before giving up.
     :type max_wait_sec: int, optional
@@ -144,7 +154,7 @@ class RelationshipsConfigurationOperator(BaseOperator):
         *,
         dataset_definitions: Iterable[dict],
         relationships: Iterable[dict],
-        feature_discovery_settings: Optional[dict] = None,
+        feature_discovery_settings: Optional[Iterable[dict]] = None,
         max_wait_sec: int = DATAROBOT_MAX_WAIT,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
