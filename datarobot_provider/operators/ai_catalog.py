@@ -599,9 +599,6 @@ class CreateWranglingRecipeOperator(BaseOperator):
                 "You can set it either explicitly or via the context variable *use_case_id*"
             )
 
-        if not self.dataset_id and not self.data_store_id:
-            raise AirflowException("Specify either dataset_id or data_store_id to wrangle.")
-
         if self.dataset_id and self.data_store_id:
             raise AirflowException(
                 "You have to specify either dataset_id or data_store_id. Not both."
@@ -617,11 +614,20 @@ class CreateWranglingRecipeOperator(BaseOperator):
                 use_case, dataset, dialect=dr.enums.DataWranglingDialect(self.dialect)
             )
 
-        else:
+        elif self.data_store_id:
+            if not self.table_name:
+                raise AirflowException(
+                    "*table_name* parameter must be specified "
+                    "when working with a data store (db connection)."
+                )
+
             self.log.info("Working with data_store_id=%s", self.data_store_id)
+            data_store = dr.DataStore.get(self.data_store_id)
+            if not (data_store.type and data_store.type in dr.enums.DataWranglingDataSourceTypes):
+                raise AirflowException(f"Unexpected data store type: {data_store.type}")
+
             data_source_canonical_name = self._generate_data_source_canonical_name()
 
-            data_store = dr.DataStore.get(self.data_store_id)
             recipe = dr.models.Recipe.from_data_store(
                 use_case,
                 data_store,
@@ -635,6 +641,9 @@ class CreateWranglingRecipeOperator(BaseOperator):
                     )
                 ],
             )
+
+        else:
+            raise AirflowException("Specify either dataset_id or data_store_id to wrangle.")
 
         logging.info(
             '%s recipe id=%s created in use case "%s". Configuring...',
@@ -669,7 +678,7 @@ class CreateWranglingRecipeOperator(BaseOperator):
         logging.info("Recipe id=%s is ready.", recipe.id)
         return recipe.id
 
-    def _generate_data_source_canonical_name(self):
+    def _generate_data_source_canonical_name(self) -> str:
         base_name = f"{self.table_name}-{datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')}"
 
         if self.table_schema:
