@@ -20,6 +20,9 @@ from datarobot_provider.hooks.datarobot import DataRobotHook
 
 class GetOrCreateDataStoreOperator(BaseOperator):
     """
+    Deprected.
+    Please, manage database connections via DataRobot rather than Airflow and use *GetDataStoreOperator* instead.
+
     Fetching DataStore by connection name or creating if it does not exist
     and return DataStore ID.
 
@@ -73,6 +76,16 @@ class GetOrCreateDataStoreOperator(BaseOperator):
 
 
 class GetDataStoreOperator(BaseOperator):
+    """Get a DataRobot data store id by data connection name.
+    You have to create a DataRobot data connection in advance at /account/data-connections page.
+
+    :param datarobot_connection_name: unique, case sensitive data connection name.
+    You can set it either explicitly or via context parameters.
+    :type datarobot_connection_name: str
+    :return: Data store ID.
+    :rtype: str
+    """
+
     template_fields: Sequence[str] = ["datarobot_connection_name"]
     ui_color = "#f4a460"
 
