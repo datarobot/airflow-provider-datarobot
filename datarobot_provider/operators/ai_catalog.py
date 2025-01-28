@@ -603,12 +603,14 @@ class CreateWranglingRecipeOperator(BaseOperator):
             raise AirflowException("Specify either dataset_id or data_store_id to wrangle.")
 
         if self.dataset_id and self.data_store_id:
-            raise AirflowException("You have to specify either dataset_id or data_store_id. Not both.")
+            raise AirflowException(
+                "You have to specify either dataset_id or data_store_id. Not both."
+            )
 
         use_case = dr.UseCase.get(self.use_case_id)
 
         if self.dataset_id:
-            self.log.info('Working with dataset_id=%s', self.dataset_id)
+            self.log.info("Working with dataset_id=%s", self.dataset_id)
 
             dataset = dr.Dataset.get(self.dataset_id)
             recipe = dr.models.Recipe.from_dataset(
@@ -616,7 +618,7 @@ class CreateWranglingRecipeOperator(BaseOperator):
             )
 
         else:
-            self.log.info('Working with data_store_id=%s', self.data_store_id)
+            self.log.info("Working with data_store_id=%s", self.data_store_id)
             data_source_canonical_name = self._generate_data_source_canonical_name()
 
             data_store = dr.DataStore.get(self.data_store_id)
@@ -659,18 +661,18 @@ class CreateWranglingRecipeOperator(BaseOperator):
         if self.recipe_name or self.recipe_description:
             data = {"description": self.recipe_description}
             if self.recipe_name:
-                data['name'] = self.recipe_name
+                data["name"] = self.recipe_name
 
-            dr.client.get_client().patch(f"recipes/{recipe.id}/",json=data)
+            dr.client.get_client().patch(f"recipes/{recipe.id}/", json=data)
             logging.info("Recipe name/description set.")
 
         logging.info("Recipe id=%s is ready.", recipe.id)
         return recipe.id
 
     def _generate_data_source_canonical_name(self):
-        base_name = f'{self.table_name}-{datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")}'
+        base_name = f"{self.table_name}-{datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')}"
 
         if self.table_schema:
-            base_name = f'{self.table_schema}-{base_name}'
+            base_name = f"{self.table_schema}-{base_name}"
 
-        return f'Airflow:{base_name}'
+        return f"Airflow:{base_name}"

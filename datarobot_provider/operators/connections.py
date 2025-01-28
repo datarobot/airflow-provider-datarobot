@@ -100,6 +100,6 @@ class GetDataStoreOperator(BaseOperator):
                 break
 
         else:
-            raise AirflowException(f'Connection {self.datarobot_connection_name} was not found.')
+            raise AirflowException(f"Connection {self.datarobot_connection_name} was not found.")
 
         return datastore.id
