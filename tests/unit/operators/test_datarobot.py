@@ -178,7 +178,7 @@ def test_operator_create_project_from_recipe_id(mocker):
     project_id = operator.execute(context={"params": {"project_name": "test project"}})
 
     get_client_mock.assert_called_once()
-    mock_client.post.assert_called_once_with('/projects/', data={'recipeId': 'recipe-id'})
+    mock_client.post.assert_called_once_with("/projects/", data={"recipeId": "recipe-id"})
 
     assert project_id == "new-project-id"
 
