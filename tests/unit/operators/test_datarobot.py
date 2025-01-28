@@ -164,6 +164,25 @@ def test_operator_create_project_from_dataset_id_and_version_id(mocker):
     )
 
 
+def test_operator_create_project_from_recipe_id(mocker):
+    mock_client_response = mocker.Mock(status_code=202)
+    mock_client_response.json.return_value = {"pid": "new-project-id"}
+    mock_client = mocker.Mock()
+    mock_client.post.return_value = mock_client_response
+    get_client_mock = mocker.patch.object(dr.client, "get_client", return_value=mock_client)
+
+    operator = CreateProjectOperator(
+        task_id="create_project_from_recipe_id",
+        recipe_id="recipe-id",
+    )
+    project_id = operator.execute(context={"params": {"project_name": "test project"}})
+
+    get_client_mock.assert_called_once()
+    mock_client.post.assert_called_once_with('/projects/', data={'recipeId': 'recipe-id'})
+
+    assert project_id == "new-project-id"
+
+
 def test_operator_create_project_fails_when_no_datasetid_or_training_data():
     operator = CreateProjectOperator(task_id="create_project_no_dataset_id")
 

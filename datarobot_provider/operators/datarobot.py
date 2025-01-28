@@ -152,7 +152,7 @@ class CreateProjectOperator(BaseOperator):
             return project.id  # type: ignore[attr-defined, unused-ignore]
 
         elif self.recipe_id is not None:
-            response = dr.client.get_client().post("/projects/", json={"recipeId": self.recipe_id})
+            response = dr.client.get_client().post("/projects/", data={"recipeId": self.recipe_id})
 
             if response.status_code != 202:
                 e_msg = "Server unexpectedly returned status code {}"
