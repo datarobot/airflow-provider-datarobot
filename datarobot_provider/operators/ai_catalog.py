@@ -5,16 +5,14 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-import logging
-from collections.abc import Sequence
 from typing import Any
-from typing import List
-from typing import Optional
+from typing import Dict
+from typing import Iterable
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
+from airflow.exceptions import AirflowFailException
 from airflow.models import BaseOperator
-from airflow.utils.context import Context
 
 from datarobot_provider.hooks.connections import JDBCDataSourceHook
 from datarobot_provider.hooks.datarobot import DataRobotHook
@@ -37,18 +35,18 @@ class UploadDatasetOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = [
+    template_fields: Iterable[str] = [
         "file_path",
         "file_path_param",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Iterable[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
-        file_path: Optional[str] = None,
+        file_path: str = None,
         file_path_param: str = "dataset_file_path",
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
@@ -62,7 +60,7 @@ class UploadDatasetOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Context) -> str:
+    def execute(self, context: Dict[str, Any]) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -71,7 +69,7 @@ class UploadDatasetOperator(BaseOperator):
         if self.file_path is None:
             self.file_path = context["params"][self.file_path_param]
 
-        ai_catalog_dataset: dr.Dataset = dr.Dataset.create_from_file(
+        ai_catalog_dataset = dr.Dataset.create_from_file(
             file_path=self.file_path,
             max_wait=DATAROBOT_MAX_WAIT_SEC,
         )
@@ -100,22 +98,22 @@ class UpdateDatasetFromFileOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = [
+    template_fields: Iterable[str] = [
         "dataset_id",
         "dataset_id_param",
         "file_path",
         "file_path_param",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Iterable[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
-        dataset_id: Optional[str] = None,
+        dataset_id: str = None,
         dataset_id_param: str = "training_dataset_id",
-        file_path: Optional[str] = None,
+        file_path: str = None,
         file_path_param: str = "dataset_file_path",
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
@@ -131,7 +129,7 @@ class UpdateDatasetFromFileOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Context) -> str:
+    def execute(self, context: Dict[str, Any]) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -173,9 +171,9 @@ class CreateDatasetFromDataStoreOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = []
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
+    template_fields: Iterable[str] = []
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Iterable[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -191,7 +189,7 @@ class CreateDatasetFromDataStoreOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Context) -> str:
+    def execute(self, context: Dict[str, Any]) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -238,7 +236,7 @@ class CreateDatasetFromDataStoreOperator(BaseOperator):
             self.log.info(f"DataSource:{dataset_name} successfully updated, id={data_source.id}")
 
         self.log.info(f"Creating Dataset from DataSource: {dataset_name}")
-        ai_catalog_dataset: dr.Dataset = dr.Dataset.create_from_data_source(
+        ai_catalog_dataset = dr.Dataset.create_from_data_source(
             data_source_id=data_source.id,
             credential_data=credential_data,
             persist_data_after_ingestion=context["params"]["persist_data_after_ingestion"],
@@ -247,120 +245,6 @@ class CreateDatasetFromDataStoreOperator(BaseOperator):
         )
         self.log.info(f"Dataset created: dataset_id={ai_catalog_dataset.id}")
         return ai_catalog_dataset.id
-
-
-class CreateDatasetFromRecipeOperator(BaseOperator):
-    """Create a dataset based on a wrangling recipe.
-    The dataset can be dynamic or a snapshot depending on the mandatory *do_snapshot* parameter.
-    The dataset is added into the Use Case if use_case_id is specified
-    in the context parameters.
-
-    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
-    :type datarobot_conn_id: str, optional
-    :param recipe_id: Wrangling or Feature Discovery Recipe Id
-    :type recipe_id: str
-    :param do_snapshot: *True* to download and store whole dataframe into DataRobot AI Catalog. *False* to create a dynamic dataset.
-    :type do_snapshot: bool
-    :param dataset_name_param: Name of the parameter in the configuration to use as dataset_name
-    :type dataset_name_param: str
-    :param materialization_catalog_param: Name of the parameter in the configuration to use as materialization_catalog
-    :type materialization_catalog_param: str
-    :param materialization_schema_param: Name of the parameter in the configuration to use as materialization_schema
-    :type materialization_schema_param: str
-    :param materialization_table_param: Name of the parameter in the configuration to use as materialization_table
-    :type materialization_table_param: str
-    :return: DataRobot AI Catalog dataset ID
-    :rtype: str
-    """
-
-    template_fields = ["recipe_id"]
-    ui_color = "#f4a460"
-
-    def __init__(
-        self,
-        *,
-        datarobot_conn_id: str = "datarobot_default",
-        recipe_id: str,
-        do_snapshot: bool,
-        dataset_name_param: str = "dataset_name",
-        materialization_catalog_param: str = "materialization_catalog",
-        materialization_schema_param: str = "materialization_schema",
-        materialization_table_param: str = "materialization_table",
-        **kwargs: Any,
-    ) -> None:
-        super().__init__(**kwargs)
-        self.datarobot_conn_id = datarobot_conn_id
-        self.recipe_id = recipe_id
-        self.do_snapshot = do_snapshot
-
-        self.dataset_name_param = dataset_name_param
-        self.materialization_catalog_param = materialization_catalog_param
-        self.materialization_schema_param = materialization_schema_param
-        self.materialization_table_param = materialization_table_param
-
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
-
-    def _get_materialization_destination(
-        self, context: Context
-    ) -> Optional[dr.models.dataset.MaterializationDestination]:
-        if context["params"].get(self.materialization_table_param):
-            return dr.models.dataset.MaterializationDestination(
-                catalog=context["params"].get(self.materialization_catalog_param),  # type: ignore[typeddict-item]
-                schema=context["params"].get(self.materialization_schema_param),  # type: ignore[typeddict-item]
-                table=context["params"].get(self.materialization_table_param),  # type: ignore[typeddict-item]
-            )
-
-        return None
-
-    def _get_dataset_name(
-        self,
-        context: Context,
-        materialization_destination: Optional[dr.models.dataset.MaterializationDestination],
-    ):
-        return context["params"].get(self.dataset_name_param) or (
-            materialization_destination and materialization_destination["table"]
-        )
-
-    def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
-        recipe = dr.models.Recipe.get(self.recipe_id)
-        if recipe.dialect == dr.enums.DataWranglingDialect.SPARK and not self.do_snapshot:
-            raise AirflowException(
-                "Dynamic datasets are not suitable for 'spark' recipes. "
-                "Please, either specify do_snapshot=True for the operator or use another recipe."
-            )
-
-        materialization_destination = self._get_materialization_destination(context)
-        dataset_name = self._get_dataset_name(context, materialization_destination)
-
-        dataset: dr.Dataset = dr.Dataset.create_from_recipe(
-            recipe,
-            name=dataset_name,
-            do_snapshot=self.do_snapshot,
-            persist_data_after_ingestion=True,
-            materialization_destination=materialization_destination,
-        )
-
-        logging.info(
-            '%s dataset "%s" created.',
-            "Snapshot" if self.do_snapshot else "Dynamic",
-            dataset.name,
-        )
-
-        if context["params"].get("use_case_id"):
-            use_case = dr.UseCase.get(use_case_id=context["params"]["use_case_id"])
-            use_case.add(dataset)
-            logging.info('The dataset is added into use case "%s".', use_case.name)
-
-        else:
-            logging.info("New Dataset won't belong to any use case.")
-
-        return dataset.id
 
 
 class CreateDatasetVersionOperator(BaseOperator):
@@ -380,9 +264,9 @@ class CreateDatasetVersionOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = ["dataset_id", "datasource_id", "credential_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
+    template_fields: Iterable[str] = ["dataset_id", "datasource_id", "credential_id"]
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Iterable[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -404,7 +288,7 @@ class CreateDatasetVersionOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Context) -> str:
+    def execute(self, context: Dict[str, Any]) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -429,6 +313,54 @@ class CreateDatasetVersionOperator(BaseOperator):
         return ai_catalog_dataset.version_id
 
 
+class CreateDatasetFromProjectOperator(BaseOperator):
+    """
+    Create a new AI Catalog Dataset from existing project data.
+
+    :param project_id: DataRobot project ID
+    :type project_id: str
+    :param datasource_id: existing DataRobot datasource ID
+    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
+    :type datarobot_conn_id: str, optional
+    :return: DataRobot AI Catalog dataset ID
+    :rtype: str
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Iterable[str] = ["project_id"]
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Iterable[str] = ()
+    ui_color = "#f4a460"
+
+    def __init__(
+        self,
+        *,
+        project_id: str = None,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.project_id = project_id
+        self.datarobot_conn_id = datarobot_conn_id
+        if kwargs.get("xcom_push") is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Dict[str, Any]) -> str:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        response = dr.client.get_client().post('/datasets/fromProject', json={'projectId': self.project_id})
+        if response.status_code != 202:
+            e_msg = "Server unexpectedly returned status code {}"
+            raise AirflowFailException(e_msg.format(response.status_code))
+
+        dataset_id = response.json()['catalogId']
+        self.log.info(f"Dataset created: dataset_id={dataset_id}")
+        return dataset_id
+
+
 class CreateOrUpdateDataSourceOperator(BaseOperator):
     """
     Creates the data source or updates it if its already exist and return data source ID.
@@ -442,9 +374,9 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = ["data_store_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
+    template_fields: Iterable[str] = ["data_store_id"]
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Iterable[str] = ()
     ui_color = "#f4a460"
 
     def __init__(
@@ -462,7 +394,7 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
 
-    def execute(self, context: Context) -> Optional[str]:
+    def execute(self, context: Dict[str, Any]) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
@@ -507,119 +439,3 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
             self.log.info(f"DataSource:{dataset_name} successfully created, id={data_source.id}")
 
         return data_source.id
-
-
-class CreateWranglingRecipeOperator(BaseOperator):
-    """Create a Wrangling Recipe
-
-    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
-    :param use_case_id: Use Case ID to create the recipe in.
-    :param dataset_id: The dataset to wrangle
-    :param dialect: SQL dialect to apply while wrangling.
-    :param recipe_name: New recipe name.
-    :param recipe_description: New recipe description.
-    :param operations: Wrangling operations to apply.
-    :param downsampling_directive: Downsampling method to apply. *None* for non downsampling.
-    :param downsampling_arguments_param: Downsampling arguments.
-
-    """
-
-    template_fields: Sequence[str] = [
-        "use_case_id",
-        "dataset_id",
-        "dialect",
-        "recipe_name",
-        "recipe_description",
-        "operations",
-        "downsampling_directive",
-        "downsampling_arguments",
-    ]
-    template_fields_renderers: dict[str, str] = {
-        "use_case_id": "string",
-        "dataset_id": "string",
-        "dialect": "string",
-        "recipe_name": "string",
-        "recipe_description": "string",
-        "operations": "json",
-        "downsampling_directive": "string",
-        "downsampling_arguments": "json",
-    }
-    ui_color = "#f4a460"
-
-    def __init__(
-        self,
-        *,
-        datarobot_conn_id: str = "datarobot_default",
-        use_case_id: str = '{{ params.get("use_case_id", "") }}',
-        dataset_id: str,
-        dialect: dr.enums.DataWranglingDialect,
-        recipe_name: Optional[str] = None,
-        recipe_description: Optional[str] = "Created with Apache-Airflow",
-        operations: Optional[List[dict]] = None,
-        downsampling_directive: Optional[dr.enums.DownsamplingOperations] = None,
-        downsampling_arguments: Optional[dict] = None,
-        **kwargs,
-    ):
-        super().__init__(**kwargs)
-        self.datarobot_conn_id = datarobot_conn_id
-        self.use_case_id = use_case_id
-        self.dataset_id = dataset_id
-        self.dialect = dialect
-        self.recipe_name = recipe_name
-        self.recipe_description = recipe_description
-        self.operations = operations
-        self.downsampling_directive = downsampling_directive
-        self.downsampling_arguments = downsampling_arguments
-
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
-
-    def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
-        if not self.use_case_id:
-            raise AirflowException(
-                "*use_case_id* is a mandatory parameter. "
-                "You can set it either explicitly or via the context variable *use_case_id*"
-            )
-
-        use_case = dr.UseCase.get(self.use_case_id)
-        dataset = dr.Dataset.get(self.dataset_id)
-
-        recipe = dr.models.Recipe.from_dataset(
-            use_case, dataset, dialect=dr.enums.DataWranglingDialect(self.dialect)
-        )
-        logging.info(
-            '%s recipe id=%s created in use case "%s". Configuring...',
-            self.dialect,
-            recipe.id,
-            use_case.name,
-        )
-
-        if self.operations:
-            client_operations = [
-                dr.models.recipe.WranglingOperation.from_data(x) for x in self.operations
-            ]
-            dr.models.Recipe.set_operations(recipe.id, client_operations)
-            logging.info("%d operations set.", len(client_operations))
-
-        if self.downsampling_directive is not None:
-            client_downsampling = dr.models.recipe.DownsamplingOperation(
-                directive=dr.enums.DownsamplingOperations(self.downsampling_directive),
-                arguments=self.downsampling_arguments,
-            )
-            dr.models.Recipe.update_downsampling(recipe.id, client_downsampling)
-            logging.info("%s dowsnsampling set.", self.downsampling_directive)
-
-        if self.recipe_name or self.recipe_description:
-            dr.client.get_client().patch(
-                f"recipes/{recipe.id}/",
-                json={"name": self.recipe_name, "description": self.recipe_description},
-            )
-            logging.info("Recipe name/description set.")
-
-        logging.info("Recipe id=%s is ready.", recipe.id)
-        return recipe.id
