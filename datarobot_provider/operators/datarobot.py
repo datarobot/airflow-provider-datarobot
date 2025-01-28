@@ -99,7 +99,7 @@ class CreateProjectOperator(BaseOperator):
         dataset_version_id: Optional[str] = None,
         credential_id: Optional[str] = None,
         datarobot_conn_id: str = "datarobot_default",
-        recipe_id: str = None,
+        recipe_id: Optional[str] = None,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
