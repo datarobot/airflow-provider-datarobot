@@ -5,6 +5,7 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+import datetime
 import logging
 from collections.abc import Sequence
 from typing import Any
@@ -527,6 +528,9 @@ class CreateWranglingRecipeOperator(BaseOperator):
     template_fields: Sequence[str] = [
         "use_case_id",
         "dataset_id",
+        "data_store_id",
+        "table_schema",
+        "table_name",
         "dialect",
         "recipe_name",
         "recipe_description",
@@ -537,6 +541,9 @@ class CreateWranglingRecipeOperator(BaseOperator):
     template_fields_renderers: dict[str, str] = {
         "use_case_id": "string",
         "dataset_id": "string",
+        "data_store_id": "string",
+        "table_schema": "string",
+        "table_name": "string",
         "dialect": "string",
         "recipe_name": "string",
         "recipe_description": "string",
@@ -551,7 +558,10 @@ class CreateWranglingRecipeOperator(BaseOperator):
         *,
         datarobot_conn_id: str = "datarobot_default",
         use_case_id: str = '{{ params.get("use_case_id", "") }}',
-        dataset_id: str,
+        dataset_id: Optional[str] = None,
+        data_store_id: Optional[str] = None,
+        table_schema: Optional[str] = "{{ params.get('table_schema', '') }}",
+        table_name: Optional[str] = "{{ params.get('table_name', '') }}",
         dialect: dr.enums.DataWranglingDialect,
         recipe_name: Optional[str] = None,
         recipe_description: Optional[str] = "Created with Apache-Airflow",
@@ -564,6 +574,9 @@ class CreateWranglingRecipeOperator(BaseOperator):
         self.datarobot_conn_id = datarobot_conn_id
         self.use_case_id = use_case_id
         self.dataset_id = dataset_id
+        self.data_store_id = data_store_id
+        self.table_schema = table_schema
+        self.table_name = table_name
         self.dialect = dialect
         self.recipe_name = recipe_name
         self.recipe_description = recipe_description
@@ -586,12 +599,41 @@ class CreateWranglingRecipeOperator(BaseOperator):
                 "You can set it either explicitly or via the context variable *use_case_id*"
             )
 
-        use_case = dr.UseCase.get(self.use_case_id)
-        dataset = dr.Dataset.get(self.dataset_id)
+        if not self.dataset_id and not self.data_store_id:
+            raise AirflowException("Specify either dataset_id or data_store_id to wrangle.")
 
-        recipe = dr.models.Recipe.from_dataset(
-            use_case, dataset, dialect=dr.enums.DataWranglingDialect(self.dialect)
-        )
+        if self.dataset_id and self.data_store_id:
+            raise AirflowException("You have to specify either dataset_id or data_store_id. Not both.")
+
+        use_case = dr.UseCase.get(self.use_case_id)
+
+        if self.dataset_id:
+            self.log.info('Working with dataset_id=%s', self.dataset_id)
+
+            dataset = dr.Dataset.get(self.dataset_id)
+            recipe = dr.models.Recipe.from_dataset(
+                use_case, dataset, dialect=dr.enums.DataWranglingDialect(self.dialect)
+            )
+
+        else:
+            self.log.info('Working with data_store_id=%s', self.data_store_id)
+            data_source_canonical_name = self._generate_data_source_canonical_name()
+
+            data_store = dr.DataStore.get(self.data_store_id)
+            recipe = dr.models.Recipe.from_data_store(
+                use_case,
+                data_store,
+                data_source_type=dr.enums.DataWranglingDataSourceTypes(data_store.type),
+                dialect=dr.enums.DataWranglingDialect(self.dialect),
+                data_source_inputs=[
+                    dr.models.DataSourceInput(
+                        canonical_name=data_source_canonical_name,
+                        schema=self.table_schema,
+                        table=self.table_name,
+                    )
+                ],
+            )
+
         logging.info(
             '%s recipe id=%s created in use case "%s". Configuring...',
             self.dialect,
@@ -615,11 +657,20 @@ class CreateWranglingRecipeOperator(BaseOperator):
             logging.info("%s dowsnsampling set.", self.downsampling_directive)
 
         if self.recipe_name or self.recipe_description:
-            dr.client.get_client().patch(
-                f"recipes/{recipe.id}/",
-                json={"name": self.recipe_name, "description": self.recipe_description},
-            )
+            data = {"description": self.recipe_description}
+            if self.recipe_name:
+                data['name'] = self.recipe_name
+
+            dr.client.get_client().patch(f"recipes/{recipe.id}/",json=data)
             logging.info("Recipe name/description set.")
 
         logging.info("Recipe id=%s is ready.", recipe.id)
         return recipe.id
+
+    def _generate_data_source_canonical_name(self):
+        base_name = f'{self.table_name}-{datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")}'
+
+        if self.table_schema:
+            base_name = f'{self.table_schema}-{base_name}'
+
+        return f'Airflow:{base_name}'

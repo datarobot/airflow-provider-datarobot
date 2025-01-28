@@ -8,6 +8,7 @@
 from collections.abc import Sequence
 from typing import Any
 
+import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.exceptions import AirflowNotFoundException
 from airflow.models import BaseOperator
@@ -69,3 +70,36 @@ class GetOrCreateDataStoreOperator(BaseOperator):
             self.log.info(f"Found preconfigured jdbc connection: {connection_name}")
 
         return data_store.id
+
+
+class GetDataStoreOperator(BaseOperator):
+    template_fields: Sequence[str] = ["datarobot_connection_name"]
+    ui_color = "#f4a460"
+
+    def __init__(
+        self,
+        *,
+        datarobot_connection_name: str = "{{ params.datarobot_connection_name }}",
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.datarobot_conn_id = datarobot_conn_id
+        self.datarobot_connection_name = datarobot_connection_name
+        if kwargs.get("xcom_push") is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Context) -> Any:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        for datastore in dr.DataStore.list(name=self.datarobot_connection_name):
+            if datastore.canonical_name == self.datarobot_connection_name:
+                break
+
+        else:
+            raise AirflowException(f'Connection {self.datarobot_connection_name} was not found.')
+
+        return datastore.id
