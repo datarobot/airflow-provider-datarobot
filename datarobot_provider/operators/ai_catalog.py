@@ -15,7 +15,6 @@ from typing import Optional
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
-from airflow.exceptions import AirflowFailException
 from airflow.models import BaseOperator
 from airflow.utils.context import Context
 
@@ -430,54 +429,6 @@ class CreateDatasetVersionOperator(BaseOperator):
         )
 
         return ai_catalog_dataset.version_id
-
-
-class CreateDatasetFromProjectOperator(BaseOperator):
-    """
-    Create a new AI Catalog Dataset from existing project data.
-
-    :param project_id: DataRobot project ID
-    :type project_id: str
-    :param datasource_id: existing DataRobot datasource ID
-    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
-    :type datarobot_conn_id: str, optional
-    :return: DataRobot AI Catalog dataset ID
-    :rtype: str
-    """
-
-    # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Iterable[str] = ["project_id"]
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Iterable[str] = ()
-    ui_color = "#f4a460"
-
-    def __init__(
-        self,
-        *,
-        project_id: str = None,
-        datarobot_conn_id: str = "datarobot_default",
-        **kwargs: Any,
-    ) -> None:
-        super().__init__(**kwargs)
-        self.project_id = project_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
-
-    def execute(self, context: Dict[str, Any]) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
-        response = dr.client.get_client().post('/datasets/fromProject', json={'projectId': self.project_id})
-        if response.status_code != 202:
-            e_msg = "Server unexpectedly returned status code {}"
-            raise AirflowFailException(e_msg.format(response.status_code))
-
-        dataset_id = response.json()['catalogId']
-        self.log.info(f"Dataset created: dataset_id={dataset_id}")
-        return dataset_id
 
 
 class CreateOrUpdateDataSourceOperator(BaseOperator):
