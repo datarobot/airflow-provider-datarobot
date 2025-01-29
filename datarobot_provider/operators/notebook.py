@@ -76,6 +76,9 @@ class NotebookRunOperator(BaseOperator):
         # Fetch the notebook
         notebook = Notebook.get(notebook_id=self.notebook_id)
 
+        if not notebook.use_case_id:
+            raise AirflowException("Notebook should have use_case_id")
+
         # Run the notebook
         manual_run = notebook.run(
             notebook_path=self.notebook_path,
