@@ -72,7 +72,7 @@ def update_custom_model_pipeline(
         else:
             return ["model_replacement_fail"]
 
-    branching = BranchPythonOperator(
+    if_tests_succeed = BranchPythonOperator(
         task_id="if_tests_succeed",
         python_callable=choose_branch,
         op_args=[
@@ -80,7 +80,7 @@ def update_custom_model_pipeline(
         ],
     )
 
-    handle_model_replacement_fail_op = EmptyOperator(
+    model_replacement_fail = EmptyOperator(
         task_id="model_replacement_fail",
     )
 
@@ -95,10 +95,10 @@ def update_custom_model_pipeline(
         create_custom_model_version_op
         >> custom_model_test_op
         >> custom_model_test_overall_status_op
-        >> branching
+        >> if_tests_succeed
         >> [
             replace_deployment_model_op,
-            handle_model_replacement_fail_op,
+            model_replacement_fail,
         ]
     )
 

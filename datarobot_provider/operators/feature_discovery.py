@@ -7,11 +7,13 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from collections.abc import Sequence
 from typing import Any
+from typing import Dict
 from typing import Iterable
 from typing import Optional
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
+from airflow.exceptions import AirflowFailException
 from airflow.models import BaseOperator
 from airflow.utils.context import Context
 from datarobot import SNAPSHOT_POLICY
@@ -19,6 +21,99 @@ from datarobot import SNAPSHOT_POLICY
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
 DATAROBOT_MAX_WAIT = 600
+
+
+class CreateFeatureDiscoveryRecipeOperator(BaseOperator):
+    """
+    Create a Feature Discovery recipe.
+
+    :param dataset_id: DataRobot Dataset Catalog ID to use as the primary dataset
+    :type dataset_id: str
+    :param use_case_id: ID of the use case to add the recipe to
+    :type use_case_id: str
+    :param dataset_definitions: list of dataset definitions
+        Each element is a dict retrieved from DatasetDefinitionOperator operator
+    :type dataset_definitions: Iterable[dict]
+    :param relationships: list of relationships
+        Each element is a dict retrieved from DatasetRelationshipOperator operator
+    :type relationships: Iterable[dict]
+    :param feature_discovery_settings: list of feature discovery settings, optional
+        If not provided, it will be retrieved from DAG configuration params otherwise default
+        settings will be used.
+    :type feature_discovery_settings: Iterable[dict]
+    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
+    :type datarobot_conn_id: str, optional
+    :return: DataRobot Recipe ID
+    :rtype: str
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Sequence[str] = [
+        "dataset_id",
+        "use_case_id",
+        "dataset_definitions",
+        "relationships",
+        "feature_discovery_settings",
+    ]
+    template_fields_renderers: Dict[str, str] = {}
+    template_ext: Sequence[str] = ()
+    ui_color = "#f4a460"
+
+    def __init__(
+        self,
+        *,
+        dataset_id: str,
+        use_case_id: str,
+        dataset_definitions: Iterable[dict],
+        relationships: Iterable[dict],
+        feature_discovery_settings: Optional[Iterable[dict]] = None,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.dataset_id = dataset_id
+        self.use_case_id = use_case_id
+        self.dataset_definitions = dataset_definitions
+        self.relationships = relationships
+        self.feature_discovery_settings = feature_discovery_settings
+        self.datarobot_conn_id = datarobot_conn_id
+
+        if kwargs.get("xcom_push") is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Context) -> None:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        response = dr.client.get_client().post(
+            "/recipes/fromDataset/",
+            data={
+                "useCaseId": self.use_case_id,
+                "status": "draft",
+                "datasetId": self.dataset_id,
+                "recipeType": "FEATURE_DISCOVERY",
+            },
+        )
+        if response.status_code != 201:
+            e_msg = "Server unexpectedly returned status code {}"
+            raise AirflowFailException(e_msg.format(response.status_code))
+
+        recipe = response.json()
+        recipe_id = recipe["id"]
+        recipe_config_id = recipe["settings"]["relationshipsConfigurationId"]
+
+        # Add secondary dataset configuration information into the Recipe config
+        dr.RelationshipsConfiguration(recipe_config_id).replace(
+            self.dataset_definitions,
+            self.relationships,
+            self.feature_discovery_settings,
+        )
+
+        self.log.info(f"Feature Discovery recipe created: recipe_id={recipe_id}")
+
+        return recipe_id
 
 
 class RelationshipsConfigurationOperator(BaseOperator):
@@ -32,10 +127,11 @@ class RelationshipsConfigurationOperator(BaseOperator):
         Each element is a dict retrieved from DatasetRelationshipOperator operator
     :type relationships: Iterable[dict]
     :param feature_discovery_settings: list of feature discovery settings, optional
-        If not provided, it will be retrieved from DAG configuration params otherwise default settings will be used.
-    :type feature_discovery_settings: dict
-    :param max_wait_sec: For some settings, an asynchronous task must be run to analyze the dataset.  max_wait
-            governs the maximum time (in seconds) to wait before giving up.
+        If not provided, it will be retrieved from DAG configuration params otherwise default
+        settings will be used.
+    :type feature_discovery_settings: Iterable[dict]
+    :param max_wait_sec: For some settings, an asynchronous task must be run to analyze the
+            dataset.  max_wait governs the maximum time (in seconds) to wait before giving up.
     :type max_wait_sec: int, optional
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
@@ -58,7 +154,7 @@ class RelationshipsConfigurationOperator(BaseOperator):
         *,
         dataset_definitions: Iterable[dict],
         relationships: Iterable[dict],
-        feature_discovery_settings: Optional[dict] = None,
+        feature_discovery_settings: Optional[Iterable[dict]] = None,
         max_wait_sec: int = DATAROBOT_MAX_WAIT,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
@@ -79,7 +175,7 @@ class RelationshipsConfigurationOperator(BaseOperator):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
-        # if feature_discovery_settings not provided, trying to get it from DAG configuration params:
+        # if feature_discovery_settings not provided, try to get it from DAG configuration params:
         if self.feature_discovery_settings is None:
             self.feature_discovery_settings = context["params"].get(
                 "feature_discovery_settings", None
@@ -100,7 +196,8 @@ class DatasetDefinitionOperator(BaseOperator):
     """
     Dataset definition for the Feature Discovery
 
-    :param dataset_identifier: Alias of the dataset (used directly as part of the generated feature names)
+    :param dataset_identifier: Alias of the dataset (used directly as part of the
+            generated feature names)
     :type dataset_identifier: str
     :param dataset_id: Identifier of the dataset in DataRobot AI Catalog
     :type dataset_id: str
@@ -220,7 +317,8 @@ class DatasetRelationshipOperator(BaseOperator):
         if present.Only applicable when dataset1_identifier is not provided.
     :type prediction_point_rounding: list[dict], optional
     :param prediction_point_rounding_time_unit: Time unit of the prediction point rounding.
-        One of ``datarobot.enums.AllowedTimeUnitsSAFER`` Only applicable when dataset1_identifier is not provided.
+        One of ``datarobot.enums.AllowedTimeUnitsSAFER`` Only applicable when dataset1_identifier
+        is not provided.
     :type prediction_point_rounding_time_unit:  str, optional
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
