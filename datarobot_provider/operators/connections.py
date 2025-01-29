@@ -20,8 +20,7 @@ from datarobot_provider.hooks.datarobot import DataRobotHook
 
 class GetOrCreateDataStoreOperator(BaseOperator):
     """
-    Deprected.
-    Please, manage database connections via DataRobot rather than Airflow and use *GetDataStoreOperator* instead.
+    !! Please, manage database connections via DataRobot rather than Airflow and use *GetDataStoreOperator* instead. !!
 
     Fetching DataStore by connection name or creating if it does not exist
     and return DataStore ID.
@@ -79,26 +78,25 @@ class GetDataStoreOperator(BaseOperator):
     """Get a DataRobot data store id by data connection name.
     You have to create a DataRobot data connection in advance at /account/data-connections page.
 
-    :param datarobot_connection_name: unique, case sensitive data connection name.
-    You can set it either explicitly or via context parameters.
-    :type datarobot_connection_name: str
+    :param data_connection: unique, case-sensitive data connection name as you can see it at DataRobot.
+    :type data_connection: str
     :return: Data store ID.
     :rtype: str
     """
 
-    template_fields: Sequence[str] = ["datarobot_connection_name"]
+    template_fields: Sequence[str] = ["data_connection"]
     ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
-        datarobot_connection_name: str = "{{ params.datarobot_connection_name }}",
+        data_connection: str = "{{ params.data_connection }}",
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.datarobot_conn_id = datarobot_conn_id
-        self.datarobot_connection_name = datarobot_connection_name
+        self.data_connection = data_connection
         if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
@@ -108,11 +106,11 @@ class GetDataStoreOperator(BaseOperator):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
-        for datastore in dr.DataStore.list(name=self.datarobot_connection_name):
-            if datastore.canonical_name == self.datarobot_connection_name:
+        for datastore in dr.DataStore.list(name=self.data_connection):
+            if datastore.canonical_name == self.data_connection:
                 break
 
         else:
-            raise AirflowException(f"Connection {self.datarobot_connection_name} was not found.")
+            raise AirflowException(f"Connection {self.data_connection} was not found.")
 
         return datastore.id
