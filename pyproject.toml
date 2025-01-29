@@ -22,7 +22,8 @@ classifiers = [
 ]
 dependencies = [
     "apache-airflow>=2.3.0",
-    "datarobot>=3.7.0b0"
+    "datarobot>=3.7.0b0",  # TODO: Use early access version below? Currently iterating on PySDK additions relying on artifactory versions
+    # "datarobot-early-access>=3.7.0.2025.1.28"
 ]
 
 [project.optional-dependencies]
