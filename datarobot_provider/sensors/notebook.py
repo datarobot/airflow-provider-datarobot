@@ -52,9 +52,16 @@ class NotebookRunCompleteSensor(BaseSensorOperator):
 
         self.hook = DataRobotHook(datarobot_conn_id)
 
+    def _construct_results_url(self, domain: str, use_case_id: str, revision_id: str) -> str:
+        return (
+            f"{domain}/usecases/{use_case_id}/overview/notebooks/run-history"
+            f"?notebookId={self.notebook_id}"
+            f"&revisionId={revision_id}"
+        )
+
     def poke(self, context: Context) -> bool:
         # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+        dr_client = DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
         self.log.info("Checking if notebook execution is complete.")
         notebook = Notebook.get(self.notebook_id)
@@ -70,6 +77,11 @@ class NotebookRunCompleteSensor(BaseSensorOperator):
 
         if manual_run and manual_run.status in ScheduledRunStatus.terminal_statuses():
             self.log.info(f"Notebook job no longer running - status: {manual_run.status}")
+            if manual_run.revision and manual_run.revision.id:
+                results_url = self._construct_results_url(
+                    dr_client.domain, notebook.use_case_id, manual_run.revision.id
+                )
+                self.log.info(f"To view results please visit: {results_url}")
             return True
 
         status_message = f" - status: {manual_run.status}" if manual_run else ""
