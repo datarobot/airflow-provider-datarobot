@@ -44,6 +44,7 @@ dev = [
     "black==24.10.0",
     "pyyaml>=6.0.2",
     "types-PyYAML>=6.0.12",
+    "freezegun>=1.5.1",
 ]
 
 [project.entry-points."apache_airflow_provider"]

@@ -670,7 +670,9 @@ class CreateWranglingRecipeOperator(BaseOperator):
 
             self.log.info("Working with data_store_id=%s", self.data_store_id)
             data_store = dr.DataStore.get(self.data_store_id)
-            if not (data_store.type and data_store.type in dr.enums.DataWranglingDataSourceTypes):
+            if not (
+                data_store.type and data_store.type in iter(dr.enums.DataWranglingDataSourceTypes)
+            ):
                 raise AirflowException(f"Unexpected data store type: {data_store.type}")
 
             data_source_canonical_name = self._generate_data_source_canonical_name()

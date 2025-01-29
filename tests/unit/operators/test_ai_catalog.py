@@ -5,8 +5,10 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+from unittest.mock import ANY
 
 import datarobot as dr
+import freezegun
 import pytest
 
 from datarobot_provider.operators.ai_catalog import CreateDatasetFromDataStoreOperator
@@ -112,7 +114,7 @@ def test_operator_create_dataset_from_jdbc(mocker, mock_airflow_connection_datar
     )
 
 
-def test_operator_create_wrangling_recipe(mocker):
+def test_operator_create_wrangling_recipe_from_dataset(mocker):
     get_dataset_mock = mocker.patch.object(dr.Dataset, "get")
     get_exp_container_mock = mocker.patch.object(dr.UseCase, "get")
     client_mock = mocker.patch(
@@ -163,6 +165,69 @@ def test_operator_create_wrangling_recipe(mocker):
         == dr.enums.DownsamplingOperations.RANDOM_SAMPLE
     )
     assert recipe_mock.update_downsampling.call_args.args[1].arguments == {"value": 100, "seed": 25}
+
+
+@freezegun.freeze_time("2022-01-01 14:32:16")
+def test_operator_create_wrangling_recipe_from_db_table(mocker):
+    get_datastore_mock = mocker.patch.object(
+        dr.DataStore, "get", return_value=dr.DataStore(data_store_type="jdbc")
+    )
+    get_exp_container_mock = mocker.patch.object(dr.UseCase, "get")
+    client_mock = mocker.patch(
+        "datarobot_provider.operators.ai_catalog.dr.client.get_client"
+    ).return_value
+    recipe_mock = mocker.patch("datarobot_provider.operators.ai_catalog.dr.models.Recipe")
+    recipe_mock.from_data_store.return_value.id = "test-recipe-id"
+    context = {
+        "params": {
+            "use_case_id": "test-use-case-id",
+            "table_schema": "PUBLIC",
+            "table_name": "TestTable",
+        }
+    }
+
+    operator = CreateWranglingRecipeOperator(
+        task_id="create_recipe",
+        recipe_name="Test name",
+        data_store_id="test-data-store-id",
+        dialect=dr.enums.DataWranglingDialect.SNOWFLAKE,
+        operations=[
+            {
+                "directive": "drop-columns",
+                "arguments": {"columns": ["test-feature-1", "test-feature-2"]},
+            }
+        ],
+        downsampling_directive=dr.enums.DownsamplingOperations.RANDOM_SAMPLE,
+        downsampling_arguments={"value": 100, "seed": 25},
+    )
+    operator.render_template_fields(context)
+
+    recipe_id = operator.execute(context=context)
+
+    assert recipe_id == "test-recipe-id"
+    get_datastore_mock.assert_called_once_with("test-data-store-id")
+    get_exp_container_mock.assert_called_once_with("test-use-case-id")
+    client_mock.patch.assert_called_once_with(
+        "recipes/test-recipe-id/",
+        json={"name": "Test name", "description": "Created with Apache-Airflow"},
+    )
+    recipe_mock.from_data_store.assert_called_once_with(
+        get_exp_container_mock.return_value,
+        get_datastore_mock.return_value,
+        data_source_type=dr.enums.DataWranglingDataSourceTypes.JDBC,
+        dialect=dr.enums.DataWranglingDialect.SNOWFLAKE,
+        data_source_inputs=ANY,
+    )
+    assert (
+        recipe_mock.from_data_store.call_args.kwargs["data_source_inputs"][0].canonical_name
+        == "Airflow:PUBLIC-TestTable-2022-01-01T14:32:16"
+    )
+    assert recipe_mock.from_data_store.call_args.kwargs["data_source_inputs"][0].schema == "PUBLIC"
+    assert (
+        recipe_mock.from_data_store.call_args.kwargs["data_source_inputs"][0].table == "TestTable"
+    )
+    recipe_mock.set_operations.assert_called_once()
+    recipe_mock.update_downsampling.assert_called_once()
 
 
 @pytest.mark.parametrize(
