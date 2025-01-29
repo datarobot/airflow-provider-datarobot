@@ -434,7 +434,7 @@ class CreateDatasetVersionOperator(BaseOperator):
 class CreateOrUpdateDataSourceOperator(BaseOperator):
     """
     Get an existing data source by name and update it if any of *table_schema*, *table_name*, *query* are specified.
-    Create a new data source or update a data source and return data source ID.
+    Create a new data source if there is no existing one with the specified name.
 
     :param data_store_id: DataRobot data store ID
     :type data_store_id: str
