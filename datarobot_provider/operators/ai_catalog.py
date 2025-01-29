@@ -8,10 +8,10 @@
 import datetime
 import logging
 from collections.abc import Sequence
+from hashlib import sha256
 from typing import Any
 from typing import List
 from typing import Optional
-from hashlib import sha256
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
@@ -455,7 +455,11 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = [
-        "data_store_id", "dataset_name", "table_name", "table_schema", "query"
+        "data_store_id",
+        "dataset_name",
+        "table_name",
+        "table_schema",
+        "query",
     ]
     ui_color = "#f4a460"
 
@@ -493,7 +497,7 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
 
         if not self.dataset_name:
             self.dataset_name = self._get_default_data_source_name(data_store.id)
-            self.log.info('Use default name for the data source: %s', self.dataset_name)
+            self.log.info("Use default name for the data source: %s", self.dataset_name)
 
         # Creating DataSourceParameters:
         if self.query:
@@ -520,11 +524,11 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
                     )
                 break
         else:
-            if not (self.query or self.table_name):
+            if params is None:
                 raise AirflowException(
-                    f'{self.dataset_name} data source was not found. '
-                    'Set *table_schema* and *table_name* or a *query* parameter '
-                    'to create a new one instead.'
+                    f"{self.dataset_name} data source was not found. "
+                    "Set *table_schema* and *table_name* or a *query* parameter "
+                    "to create a new one instead."
                 )
 
             # Adding data_store_id to params (required for DataSource creation):
@@ -534,21 +538,23 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
             data_source = dr.DataSource.create(
                 data_source_type="jdbc", canonical_name=self.dataset_name, params=params
             )
-            self.log.info(f"DataSource:{self.dataset_name} successfully created, id={data_source.id}")
+            self.log.info(
+                f"DataSource:{self.dataset_name} successfully created, id={data_source.id}"
+            )
 
         return data_source.id
 
     def _get_default_data_source_name(self, data_store_id) -> str:
         """Build default name based on the data source params."""
-        parts = ['Airflow', data_store_id]
+        parts = ["Airflow", data_store_id]
 
         if self.query:
-            parts += ['q', sha256(self.query.encode()).hexdigest()]
+            parts += ["q", sha256(self.query.encode()).hexdigest()]
 
         else:
-            parts += ['t', self.table_schema, self.table_name]
+            parts += ["t", self.table_schema, self.table_name]
 
-        return '-'.join(parts)
+        return "-".join(parts)
 
 
 class CreateWranglingRecipeOperator(BaseOperator):

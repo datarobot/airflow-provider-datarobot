@@ -299,7 +299,7 @@ def test_operator_create_datasource_operator(mocker):
 def test_operator_update_datasource_operator(mocker):
     data_store_id = "test-data-store-id"
     new_query = 'SELECT * FROM "integration_demo"."test_table22"'
-    canonical_name = 'Airflow-test-data-store-id-q-fcd91844f7cf2132d6a98e7692d0dae808f77d800880870963be31ec00ac8ba8'
+    canonical_name = "Airflow-test-data-store-id-q-fcd91844f7cf2132d6a98e7692d0dae808f77d800880870963be31ec00ac8ba8"
 
     context = {"params": {"db_query": new_query}}
 
@@ -318,9 +318,7 @@ def test_operator_update_datasource_operator(mocker):
     create_datasource_mock = mocker.patch.object(dr.DataSource, "create")
 
     operator = CreateOrUpdateDataSourceOperator(
-        task_id="create_dataset_version",
-        data_store_id=data_store_id,
-        query='{{ params.db_query }}'
+        task_id="create_dataset_version", data_store_id=data_store_id, query="{{ params.db_query }}"
     )
     operator.render_template_fields(context)
     data_source_id = operator.execute(context)
@@ -330,6 +328,6 @@ def test_operator_update_datasource_operator(mocker):
 
     datasource_mock.update.assert_called_once_with(
         canonical_name=canonical_name,
-        params=dr.DataSourceParameters(data_store_id=data_store_id, query=new_query)
+        params=dr.DataSourceParameters(data_store_id=data_store_id, query=new_query),
     )
     create_datasource_mock.assert_not_called()
