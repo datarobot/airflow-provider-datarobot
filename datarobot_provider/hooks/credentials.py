@@ -114,7 +114,7 @@ class CredentialsBaseHook(BaseHook):
     def test_connection(self):
         """Test that we can create DataRobot Credentials without errors"""
         try:
-            credential, credential_data = self.run()
+            credential, _ = self.run()
             credential = Credential.get(credential.credential_id)
             self.log.info(
                 f"Test credential {credential.name} id={credential.credential_id} created"

@@ -63,9 +63,7 @@ class GetOrCreateDataStoreOperator(BaseOperator):
         connection_name = context["params"][self.connection_param_name]
 
         # Fetch stored JDBC Connection with credentials
-        credential, credential_data, data_store = JDBCDataSourceHook(
-            datarobot_credentials_conn_id=connection_name
-        ).run()
+        _, _, data_store = JDBCDataSourceHook(datarobot_credentials_conn_id=connection_name).run()
 
         if data_store is not None:
             self.log.info(f"Found preconfigured jdbc connection: {connection_name}")
