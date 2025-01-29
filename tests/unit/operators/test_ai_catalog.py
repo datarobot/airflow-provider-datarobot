@@ -298,47 +298,38 @@ def test_operator_create_datasource_operator(mocker):
 
 def test_operator_update_datasource_operator(mocker):
     data_store_id = "test-data-store-id"
+    new_query = 'SELECT * FROM "integration_demo"."test_table22"'
+    canonical_name = 'Airflow-test-data-store-id-q-fcd91844f7cf2132d6a98e7692d0dae808f77d800880870963be31ec00ac8ba8'
 
-    test_params = {
-        "datarobot_jdbc_connection": "datarobot_test_connection_jdbc_test",
-        "dataset_name": "test_dataset_name",
-        "table_schema": "integration_demo",
-        "table_name": "test_table",
-        "query": 'SELECT * FROM "integration_demo"."test_table22"',
-        "persist_data_after_ingestion": True,
-        "do_snapshot": True,
-        "max_wait": 3600,
-    }
+    context = {"params": {"db_query": new_query}}
 
     datastore_mock = mocker.Mock()
-    datastore_mock.version_id = data_store_id
+    datastore_mock.id = data_store_id
 
     datasource_mock = mocker.Mock()
     datasource_mock.id = "test-datasource-id"
-    datasource_mock.canonical_name = test_params["dataset_name"]
+    datasource_mock.canonical_name = canonical_name
     datasource_mock.params = dr.DataSourceParameters(
         query='SELECT * FROM "integration_demo"."test_table"'
     )
     datastore_get_mock = mocker.patch.object(dr.DataStore, "get", return_value=datastore_mock)
     mocker.patch.object(dr.DataSource, "list", return_value=[datasource_mock])
-    mocker.patch.object(dr.DataSource, "create", return_value=datasource_mock)
 
-    datasource_update_mock = mocker.patch.object(datasource_mock, "update")
-
-    create_dataset_mock = mocker.patch.object(dr.DataSource, "create", return_value=datasource_mock)
+    create_datasource_mock = mocker.patch.object(dr.DataSource, "create")
 
     operator = CreateOrUpdateDataSourceOperator(
         task_id="create_dataset_version",
         data_store_id=data_store_id,
+        query='{{ params.db_query }}'
     )
-    data_source_id = operator.execute(
-        context={
-            "params": test_params,
-        }
-    )
+    operator.render_template_fields(context)
+    data_source_id = operator.execute(context)
 
     assert data_source_id == "test-datasource-id"
     datastore_get_mock.assert_called_with(data_store_id=data_store_id)
 
-    datasource_update_mock.assert_called()
-    create_dataset_mock.assert_not_called()
+    datasource_mock.update.assert_called_once_with(
+        canonical_name=canonical_name,
+        params=dr.DataSourceParameters(data_store_id=data_store_id, query=new_query)
+    )
+    create_datasource_mock.assert_not_called()

@@ -11,6 +11,7 @@ from collections.abc import Sequence
 from typing import Any
 from typing import List
 from typing import Optional
+from hashlib import sha256
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
@@ -432,10 +433,20 @@ class CreateDatasetVersionOperator(BaseOperator):
 
 class CreateOrUpdateDataSourceOperator(BaseOperator):
     """
-    Creates the data source or updates it if its already exist and return data source ID.
+    Get an existing data source by name and update it if any of *table_schema*, *table_name*, *query* are specified.
+    Create a new data source or update a data source and return data source ID.
 
     :param data_store_id: DataRobot data store ID
     :type data_store_id: str
+    :param dataset_name: Data source canonical name to create or update.
+    :type dataset_name: Optional[str]
+    :param table_schema: Database schema name.
+    :type table_schema: Optional[str]
+    :param table_name: Database table name.
+    :type table_name: Optional[str]
+    :param query: Database table name.
+    :type query: Optional[str]
+
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
     :return: DataRobot AI Catalog data source ID
@@ -443,9 +454,9 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = ["data_store_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
+    template_fields: Sequence[str] = [
+        "data_store_id", "dataset_name", "table_name", "table_schema", "query"
+    ]
     ui_color = "#f4a460"
 
     def __init__(
@@ -453,11 +464,20 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
         *,
         data_store_id: str,
         datarobot_conn_id: str = "datarobot_default",
+        dataset_name: Optional[str] = "{{ params.get('dataset_name', '') }}",
+        table_schema: Optional[str] = "{{ params.get('table_schema', '') }}",
+        table_name: Optional[str] = "{{ params.get('table_name', '') }}",
+        query: Optional[str] = "{{ params.get('query', '') }}",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.data_store_id = data_store_id
         self.datarobot_conn_id = datarobot_conn_id
+        self.dataset_name = dataset_name
+        self.table_schema = table_schema
+        self.table_name = table_name
+        self.query = query
+
         if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
@@ -471,43 +491,64 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
         data_store = dr.DataStore.get(data_store_id=self.data_store_id)
         self.log.debug(f"Found existing DataStore: {data_store.canonical_name}, id={data_store.id}")
 
-        dataset_name = context["params"]["dataset_name"]
+        if not self.dataset_name:
+            self.dataset_name = self._get_default_data_source_name(data_store.id)
+            self.log.info('Use default name for the data source: %s', self.dataset_name)
 
         # Creating DataSourceParameters:
-        if "query" in context["params"] and context["params"]["query"]:
+        if self.query:
             # using sql statement if provided:
-            params = dr.DataSourceParameters(query=context["params"]["query"])
-        else:
+            params = dr.DataSourceParameters(query=self.query)
+        elif self.table_name:
             # otherwise using schema and table:
-            params = dr.DataSourceParameters(
-                schema=context["params"]["table_schema"], table=context["params"]["table_name"]
-            )
+            params = dr.DataSourceParameters(schema=self.table_schema, table=self.table_name)
 
-        self.log.debug(f"Trying to get existing DataSource by name={dataset_name}")
-        for dr_source_item in dr.DataSource.list():
-            if dr_source_item.canonical_name == dataset_name:
-                data_source = dr_source_item
-                self.log.info(f"Found existing DataSource:{dataset_name}, id={data_source.id}")
-                # Checking if there are any changes in params:
-                if params != data_source.params:
+        else:
+            # or only search by name.
+            params = None
+
+        self.log.debug(f"Trying to get existing DataSource by name={self.dataset_name}")
+        for data_source in dr.DataSource.list():
+            if data_source.canonical_name == self.dataset_name:
+                self.log.info(f"Found existing DataSource:{self.dataset_name}, id={data_source.id}")
+                if params is not None and params != data_source.params:
                     # If params in changed, updating data source:
-                    self.log.info(f"Updating DataSource:{dataset_name} with new params")
-                    data_source.update(canonical_name=dataset_name, params=params)
+                    self.log.info(f"Updating DataSource:{self.dataset_name} with new params")
+                    data_source.update(canonical_name=self.dataset_name, params=params)
                     self.log.info(
-                        f"DataSource:{dataset_name} successfully updated, id={data_source.id}"
+                        f"DataSource:{self.dataset_name} successfully updated, id={data_source.id}"
                     )
                 break
         else:
+            if not (self.query or self.table_name):
+                raise AirflowException(
+                    f'{self.dataset_name} data source was not found. '
+                    'Set *table_schema* and *table_name* or a *query* parameter '
+                    'to create a new one instead.'
+                )
+
             # Adding data_store_id to params (required for DataSource creation):
             params.data_store_id = data_store.id
             # Creating DataSource using params with data_store_id
-            self.log.info(f"Creating DataSource: {dataset_name}")
+            self.log.info(f"Creating DataSource: {self.dataset_name}")
             data_source = dr.DataSource.create(
-                data_source_type="jdbc", canonical_name=dataset_name, params=params
+                data_source_type="jdbc", canonical_name=self.dataset_name, params=params
             )
-            self.log.info(f"DataSource:{dataset_name} successfully created, id={data_source.id}")
+            self.log.info(f"DataSource:{self.dataset_name} successfully created, id={data_source.id}")
 
         return data_source.id
+
+    def _get_default_data_source_name(self, data_store_id) -> str:
+        """Build default name based on the data source params."""
+        parts = ['Airflow', data_store_id]
+
+        if self.query:
+            parts += ['q', sha256(self.query.encode()).hexdigest()]
+
+        else:
+            parts += ['t', self.table_schema, self.table_name]
+
+        return '-'.join(parts)
 
 
 class CreateWranglingRecipeOperator(BaseOperator):
