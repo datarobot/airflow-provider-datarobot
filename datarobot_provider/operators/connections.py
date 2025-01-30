@@ -8,6 +8,7 @@
 from collections.abc import Sequence
 from typing import Any
 
+import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.exceptions import AirflowNotFoundException
 from airflow.models import BaseOperator
@@ -19,6 +20,8 @@ from datarobot_provider.hooks.datarobot import DataRobotHook
 
 class GetOrCreateDataStoreOperator(BaseOperator):
     """
+    !! Please, manage database connections via DataRobot rather than Airflow and use *GetDataStoreOperator* instead. !!
+
     Fetching DataStore by connection name or creating if it does not exist
     and return DataStore ID.
 
@@ -69,3 +72,45 @@ class GetOrCreateDataStoreOperator(BaseOperator):
             self.log.info(f"Found preconfigured jdbc connection: {connection_name}")
 
         return data_store.id
+
+
+class GetDataStoreOperator(BaseOperator):
+    """Get a DataRobot data store id by data connection name.
+    You have to create a DataRobot data connection in advance at /account/data-connections page.
+
+    :param data_connection: unique, case-sensitive data connection name as you can see it at DataRobot.
+    :type data_connection: str
+    :return: Data store ID.
+    :rtype: str
+    """
+
+    template_fields: Sequence[str] = ["data_connection"]
+    ui_color = "#f4a460"
+
+    def __init__(
+        self,
+        *,
+        data_connection: str = "{{ params.data_connection }}",
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.datarobot_conn_id = datarobot_conn_id
+        self.data_connection = data_connection
+        if kwargs.get("xcom_push") is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Context) -> Any:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        for datastore in dr.DataStore.list(name=self.data_connection):
+            if datastore.canonical_name == self.data_connection:
+                break
+
+        else:
+            raise AirflowException(f"Connection {self.data_connection} was not found.")
+
+        return datastore.id

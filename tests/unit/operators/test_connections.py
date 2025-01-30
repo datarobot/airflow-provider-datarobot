@@ -6,9 +6,11 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 
+import datarobot as dr
 import pytest
 from airflow.exceptions import AirflowNotFoundException
 
+from datarobot_provider.operators.connections import GetDataStoreOperator
 from datarobot_provider.operators.connections import GetOrCreateDataStoreOperator
 
 
@@ -46,3 +48,20 @@ def test_operator_get_or_create_dataset_not_found(mock_airflow_connection_dataro
                 },
             }
         )
+
+
+def test_operator_get_data_store(mocker):
+    mocker.patch.object(
+        dr.DataStore,
+        "list",
+        return_value=[
+            dr.DataStore(data_store_id="0", canonical_name="the connection"),
+            dr.DataStore(data_store_id="1", canonical_name="The connection"),
+            dr.DataStore(data_store_id="2", canonical_name="The connection."),
+        ],
+    )
+
+    operator = GetDataStoreOperator(task_id="test", data_connection="The connection")
+    data_store_id = operator.execute({})
+
+    assert data_store_id == "1"
