@@ -9,44 +9,76 @@ from datetime import datetime
 
 from airflow.decorators import dag
 
-from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
+import datarobot as dr
+
+from datarobot_provider.operators.ai_catalog import UploadDatasetOperator, \
+    CreateWranglingRecipeOperator, CreateDatasetFromRecipeOperator
 from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
 from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
 
 
 @dag(
-    schedule=None,
-    start_date=datetime(2022, 1, 1),
     tags=["example"],
     params={
         "dataset_file_path": "/path/to/10k_diabetes.csv",
         "project_name": "hospital-readmissions-example",
-        "unsupervised_mode": False,
-        "use_feature_discovery": False,
         "autopilot_settings": {"target": "readmitted", "mode": "quick", "max_wait": 3600},
     },
 )
 def hospital_readmissions_example():
-    dataset_uploading_op = UploadDatasetOperator(
-        task_id="dataset_uploading",
+    dataset_uploading = UploadDatasetOperator(task_id="dataset_uploading")
+
+    # get_connection = GetDataStoreOperator(task_id="get_connection")
+
+    create_recipe = CreateWranglingRecipeOperator(
+        task_id="create_recipe",
+        dataset_id=dataset_uploading.output,
+        dialect=dr.enums.DataWranglingDialect.SPARK,
+        operations=[
+            {
+              "directive": "drop-columns",
+              "arguments": {
+                "columns": [
+                  "citoglipton",
+                  "glipizide_metformin",
+                  "glimepiride_pioglitazone",
+                  "metformin_rosiglitazone",
+                  "metformin_pioglitazone"
+                ]
+              }
+            },
+            {
+              "directive": "replace",
+              "arguments": {
+                "origin": "admission_type_id",
+                "searchFor": "",
+                "replacement": "Not Available",
+                "matchMode": "exact",
+              }
+            }
+          ],
     )
 
-    create_project_op = CreateProjectOperator(
-        task_id="create_project", dataset_id=str(dataset_uploading_op.output)
+    publish_recipe = CreateDatasetFromRecipeOperator(
+        task_id="publish_recipe", recipe_id=create_recipe.output, do_snapshot=True
     )
 
-    train_models_op = TrainModelsOperator(
+    create_project = CreateProjectOperator(
+        task_id="create_project", dataset_id=str(publish_recipe.output)
+    )
+
+    train_models = TrainModelsOperator(
         task_id="train_models",
-        project_id=str(create_project_op.output),
+        project_id=str(create_project.output),
     )
 
     autopilot_complete_sensor = AutopilotCompleteSensor(
         task_id="check_autopilot_complete",
-        project_id=str(create_project_op.output),
+        project_id=str(create_project.output),
     )
 
-    (dataset_uploading_op >> create_project_op >> train_models_op >> autopilot_complete_sensor)
+    (dataset_uploading >> create_project >> train_models >> autopilot_complete_sensor)
 
 
-hospital_readmissions_example = hospital_readmissions_example()  # type: ignore[assignment]
+hospital_readmissions_example()
