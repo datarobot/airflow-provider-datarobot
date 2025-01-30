@@ -6,6 +6,9 @@
 - Introduce `CreateWranglingRecipeOperator <datarobot_provider.operators.ai_catalog.CreateWranglingRecipeOperator>` 
 and `CreateDatasetFromRecipeOperator <datarobot_provider.operators.ai_catalog.CreateDatasetFromRecipeOperator>` 
 to create a wrangling recipe and publish it as a dataset into an existing use case.
+- Add `GetDataStoreOperator <datarobot_provider.operators.connections.GetDataStoreOperator>` to work directly with existing DataRobot data connections.
+- Make `CreateOrUpdateDataSourceOperator <datarobot_provider.operators.ai_catalog.CreateOrUpdateDataSourceOperator>` `dataset_name` parameter optional.
+- Make `CreateOrUpdateDataSourceOperator <datarobot_provider.operators.ai_catalog.CreateOrUpdateDataSourceOperator>` parameters use templates.
 
 ### Bugfixes
 
