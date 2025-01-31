@@ -24,7 +24,7 @@ DATETIME_FORMAT = "%Y-%m-%d %H:%M:%s"
 
 class CreateUseCaseOperator(BaseOperator):
     """
-    Creates DataRobot project.
+    Creates a DataRobot Use Case.
 
     Parameters
     ----------
@@ -33,11 +33,11 @@ class CreateUseCaseOperator(BaseOperator):
 
     Returns
     -------
-    str: DataRobot project ID
+    str: DataRobot UseCase ID
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = ["dataset_id", "dataset_version_id", "credential_id"]
+    template_fields: Sequence[str] = ["credential_id"]
     template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
