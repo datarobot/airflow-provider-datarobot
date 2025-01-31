@@ -13,38 +13,46 @@ import datarobot as dr
 
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator, \
     CreateWranglingRecipeOperator, CreateDatasetFromRecipeOperator
+from datarobot_provider.operators.connections import GetDataStoreOperator
 from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
 from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
 
 
 @dag(
+    schedule=None,
     tags=["example"],
     params={
-        "dataset_file_path": "/path/to/10k_diabetes.csv",
+        # "dataset_file_path": "/path/to/10k_diabetes.csv",
+        "data_connection": "<YOUR DATAROBOT DATA CONNECTION NAME>",
+        "table_schema": "<DB_SCHEMA>",
+        "table_name": "<DB_TABLE>",
         "project_name": "hospital-readmissions-example",
         "autopilot_settings": {"target": "readmitted", "mode": "quick", "max_wait": 3600},
+        "use_case_id": "<EXISTING USE CASE ID>",
     },
 )
 def hospital_readmissions_example():
-    dataset_uploading = UploadDatasetOperator(task_id="dataset_uploading")
-
-    # get_connection = GetDataStoreOperator(task_id="get_connection")
+    # upload_dataset = UploadDatasetOperator(task_id="upload_dataset")
+    get_connection = GetDataStoreOperator(task_id="get_connection")
 
     create_recipe = CreateWranglingRecipeOperator(
         task_id="create_recipe",
-        dataset_id=dataset_uploading.output,
-        dialect=dr.enums.DataWranglingDialect.SPARK,
+
+        # Database data preparation.
+        data_store_id=get_connection.output,
+        dialect=dr.enums.DataWranglingDialect.SNOWFLAKE,
+
+        # CSV data preparation.
+        # dataset_id=upload_dataset.output,
+        # dialect=dr.enums.DataWranglingDialect.SPARK,
+
         operations=[
             {
               "directive": "drop-columns",
               "arguments": {
                 "columns": [
                   "citoglipton",
-                  "glipizide_metformin",
-                  "glimepiride_pioglitazone",
-                  "metformin_rosiglitazone",
-                  "metformin_pioglitazone"
                 ]
               }
             },
@@ -78,7 +86,7 @@ def hospital_readmissions_example():
         project_id=str(create_project.output),
     )
 
-    (dataset_uploading >> create_project >> train_models >> autopilot_complete_sensor)
+    get_connection >> create_recipe >> publish_recipe >> create_project >> train_models >> autopilot_complete_sensor
 
 
 hospital_readmissions_example()
