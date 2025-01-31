@@ -22,6 +22,55 @@ DATAROBOT_AUTOPILOT_TIMEOUT = 86400
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%s"
 
 
+class CreateUseCaseOperator(BaseOperator):
+    """
+    Creates a DataRobot Use Case.
+
+    Parameters
+    ----------
+    datarobot_conn_id: str
+        Connection ID, defaults to `datarobot_default`
+
+    Returns
+    -------
+    str: DataRobot UseCase ID
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Sequence[str] = ["credential_id"]
+    template_fields_renderers: dict[str, str] = {}
+    template_ext: Sequence[str] = ()
+    ui_color = "#f4a460"
+
+    def __init__(
+        self,
+        *,
+        credential_id: Optional[str] = None,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.datarobot_conn_id = datarobot_conn_id
+        self.credential_id = credential_id
+        if kwargs.get("xcom_push") is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Context) -> Optional[str]:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        # Create DataRobot project
+        self.log.info("Creating DataRobot Use Case")
+        use_case: dr.UseCase = dr.UseCase.create(
+            name=context["params"].get("use_case_name"),
+            description=context["params"].get("use_case_description"),
+        )
+        self.log.info(f"Use case created: use_case_id={use_case.id} from local file")
+        return use_case.id
+
+
 class CreateProjectOperator(BaseOperator):
     """
     Creates DataRobot project.
