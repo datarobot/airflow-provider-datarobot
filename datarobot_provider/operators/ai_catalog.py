@@ -9,7 +9,6 @@ import datetime
 import logging
 from collections.abc import Sequence
 from hashlib import sha256
-from packaging.version import Version
 from typing import Any
 from typing import List
 from typing import Optional
@@ -18,6 +17,7 @@ import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 from airflow.utils.context import Context
+from packaging.version import Version
 
 from datarobot_provider.hooks.connections import JDBCDataSourceHook
 from datarobot_provider.hooks.datarobot import DataRobotHook
@@ -600,7 +600,7 @@ class CreateWranglingRecipeOperator(BaseOperator):
         "downsampling_arguments": "json",
     }
     ui_color = "#f4a460"
-    min_version = '3.6.1'
+    min_version = "3.6.1"
 
     def __init__(
         self,
@@ -644,8 +644,8 @@ class CreateWranglingRecipeOperator(BaseOperator):
 
         if Version(dr.__version__) < Version(self.min_version):
             raise AirflowException(
-                f'{self.__class__.__name__} requires datarobot>={self.min_version} '
-                f'Please install it with: pip install datarobot>={self.min_version}'
+                f"{self.__class__.__name__} requires datarobot>={self.min_version} "
+                f"Please install it with: pip install datarobot>={self.min_version}"
             )
 
         if not self.use_case_id:
