@@ -36,7 +36,12 @@ class CreateProjectOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = ["dataset_id", "dataset_version_id", "credential_id", "use_case_id"]
+    template_fields: Sequence[str] = [
+        "dataset_id",
+        "dataset_version_id",
+        "credential_id",
+        "use_case_id",
+    ]
     template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
@@ -77,7 +82,9 @@ class CreateProjectOperator(BaseOperator):
         if self.dataset_id is None and "training_data" in context["params"]:
             # training_data may be a pre-signed URL to a file on S3 or a path to a local file
             project: dr.Project = dr.Project.create(
-                context["params"]["training_data"], context["params"]["project_name"], use_case=use_case
+                context["params"]["training_data"],
+                context["params"]["project_name"],
+                use_case=use_case,
             )
             self.log.info(f"Project created: project_id={project.id} from local file")
             project.unsupervised_mode = context["params"].get("unsupervised_mode")

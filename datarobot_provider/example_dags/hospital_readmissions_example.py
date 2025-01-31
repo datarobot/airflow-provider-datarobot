@@ -5,14 +5,12 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from datetime import datetime
-
-from airflow.decorators import dag
 
 import datarobot as dr
+from airflow.decorators import dag
 
-from datarobot_provider.operators.ai_catalog import UploadDatasetOperator, \
-    CreateWranglingRecipeOperator, CreateDatasetFromRecipeOperator
+from datarobot_provider.operators.ai_catalog import CreateDatasetFromRecipeOperator
+from datarobot_provider.operators.ai_catalog import CreateWranglingRecipeOperator
 from datarobot_provider.operators.connections import GetDataStoreOperator
 from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
@@ -38,34 +36,31 @@ def hospital_readmissions_example():
 
     create_recipe = CreateWranglingRecipeOperator(
         task_id="create_recipe",
-
         # Database data preparation.
         data_store_id=get_connection.output,
         dialect=dr.enums.DataWranglingDialect.SNOWFLAKE,
-
         # CSV data preparation.
         # dataset_id=upload_dataset.output,
         # dialect=dr.enums.DataWranglingDialect.SPARK,
-
         operations=[
             {
-              "directive": "drop-columns",
-              "arguments": {
-                "columns": [
-                  "citoglipton",
-                ]
-              }
+                "directive": "drop-columns",
+                "arguments": {
+                    "columns": [
+                        "citoglipton",
+                    ]
+                },
             },
             {
-              "directive": "replace",
-              "arguments": {
-                "origin": "admission_type_id",
-                "searchFor": "",
-                "replacement": "Not Available",
-                "matchMode": "exact",
-              }
-            }
-          ],
+                "directive": "replace",
+                "arguments": {
+                    "origin": "admission_type_id",
+                    "searchFor": "",
+                    "replacement": "Not Available",
+                    "matchMode": "exact",
+                },
+            },
+        ],
     )
 
     publish_recipe = CreateDatasetFromRecipeOperator(
@@ -86,7 +81,14 @@ def hospital_readmissions_example():
         project_id=str(create_project.output),
     )
 
-    get_connection >> create_recipe >> publish_recipe >> create_project >> train_models >> autopilot_complete_sensor
+    (
+        get_connection
+        >> create_recipe
+        >> publish_recipe
+        >> create_project
+        >> train_models
+        >> autopilot_complete_sensor
+    )
 
 
 hospital_readmissions_example()
