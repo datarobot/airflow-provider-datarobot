@@ -9,6 +9,9 @@ from datetime import datetime
 
 import datarobot as dr
 import pytest
+
+from unittest.mock import patch
+
 from airflow.exceptions import AirflowFailException
 from datarobot.models.deployment.data_drift import FeatureDrift
 from datarobot.models.deployment.data_drift import TargetDrift
@@ -164,8 +167,9 @@ def test_operator_create_project_from_dataset_id_and_version_id(mocker):
     )
 
 
-def test_operator_create_project_from_recipe_id(mocker):
-    mock_client_response = mocker.Mock(status_code=202)
+@patch("datarobot_provider.operators.datarobot.wait_for_async_resolution")
+def test_operator_create_project_from_recipe_id(mock_wait_async, mocker):
+    mock_client_response = mocker.Mock(status_code=202, headers={"Location": "loc"})
     mock_client_response.json.return_value = {"pid": "new-project-id"}
     mock_client = mocker.Mock()
     mock_client.post.return_value = mock_client_response
@@ -178,6 +182,7 @@ def test_operator_create_project_from_recipe_id(mocker):
     project_id = operator.execute(context={"params": {"project_name": "test project"}})
 
     get_client_mock.assert_called_once()
+    mock_wait_async.assert_called_once()
     mock_client.post.assert_called_once_with("/projects/", data={"recipeId": "recipe-id"})
 
     assert project_id == "new-project-id"

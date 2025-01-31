@@ -15,6 +15,7 @@ from airflow.exceptions import AirflowFailException
 from airflow.models import BaseOperator
 from airflow.utils.context import Context
 
+from datarobot.utils.waiters import wait_for_async_resolution
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
 DATAROBOT_MAX_WAIT = 3600
@@ -152,11 +153,13 @@ class CreateProjectOperator(BaseOperator):
             return project.id  # type: ignore[attr-defined, unused-ignore]
 
         elif self.recipe_id is not None:
-            response = dr.client.get_client().post("/projects/", data={"recipeId": self.recipe_id})
+            dr_client = dr.client.get_client()
+            response = dr_client.post("/projects/", data={"recipeId": self.recipe_id})
 
             if response.status_code != 202:
                 e_msg = "Server unexpectedly returned status code {}"
                 raise AirflowFailException(e_msg.format(response.status_code))
+            wait_for_async_resolution(dr_client, response.headers["Location"])
 
             project_id = response.json()["pid"]
             self.log.info(
