@@ -6,12 +6,14 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from unittest.mock import ANY
+from unittest.mock import patch
 
 import datarobot as dr
 import freezegun
 import pytest
 
 from datarobot_provider.operators.ai_catalog import CreateDatasetFromDataStoreOperator
+from datarobot_provider.operators.ai_catalog import CreateDatasetFromProjectOperator
 from datarobot_provider.operators.ai_catalog import CreateDatasetFromRecipeOperator
 from datarobot_provider.operators.ai_catalog import CreateDatasetVersionOperator
 from datarobot_provider.operators.ai_catalog import CreateOrUpdateDataSourceOperator
@@ -276,6 +278,29 @@ def test_operator_create_dataset_from_recipe(
         materialization_destination=expected_mat_destination,
     )
     get_recipe_mock.assert_called_once_with("test-recipe-id")
+
+
+@patch("datarobot_provider.operators.ai_catalog.wait_for_async_resolution")
+def test_operator_create_dataset_from_project(mock_wait_async, mocker):
+    mock_client_response = mocker.Mock(status_code=202, headers={"Location": "loc"})
+    mock_client_response.json.return_value = {"catalogId": "dataset-id"}
+    mock_client = mocker.Mock()
+    mock_client.post.return_value = mock_client_response
+    get_client_mock = mocker.patch.object(dr.client, "get_client", return_value=mock_client)
+
+    operator = CreateDatasetFromProjectOperator(
+        task_id="create_project_from_project_id",
+        project_id="project-id",
+    )
+
+    dataset_id = operator.execute(context={})
+
+    get_client_mock.assert_called_once()
+    mock_client.post.assert_called_once_with(
+        "/datasets/fromProject", json={"projectId": "project-id"}
+    )
+    mock_wait_async.assert_called_once()
+    assert dataset_id == "dataset-id"
 
 
 def test_operator_create_dataset_version(mocker):
