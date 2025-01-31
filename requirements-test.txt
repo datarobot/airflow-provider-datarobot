@@ -1,0 +1,6 @@
+-r requirements.txt
+pytest>=7.0.0
+pytest-mock>=3.7.0
+pytest-helpers-namespace>=2021.12.29
+freezegun
+datarobot==3.6.1
