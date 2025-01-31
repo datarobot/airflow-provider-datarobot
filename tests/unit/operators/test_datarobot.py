@@ -14,6 +14,7 @@ from datarobot.models.deployment.data_drift import FeatureDrift
 from datarobot.models.deployment.data_drift import TargetDrift
 
 from datarobot_provider.operators.datarobot import CreateProjectOperator
+from datarobot_provider.operators.datarobot import CreateUseCaseOperator
 from datarobot_provider.operators.datarobot import DeployModelOperator
 from datarobot_provider.operators.datarobot import DeployRecommendedModelOperator
 from datarobot_provider.operators.datarobot import GetFeatureDriftOperator
@@ -21,6 +22,37 @@ from datarobot_provider.operators.datarobot import GetTargetDriftOperator
 from datarobot_provider.operators.datarobot import ScorePredictionsOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
 from datarobot_provider.operators.datarobot import _serialize_drift
+
+
+@pytest.mark.parametrize(
+    "name, description",
+    [
+        (None, None),
+        ("use-case-name", None),
+        (None, "use-case-description"),
+        ("use-case-name", "use-case-description"),
+    ],
+)
+def test_operator_create_use_case(mocker, name, description):
+    use_case_mock = mocker.Mock()
+    use_case_mock.id = "use-case-id"
+    create_use_case_mock = mocker.patch.object(dr.UseCase, "create", return_value=use_case_mock)
+
+    operator = CreateUseCaseOperator(task_id="create_project")
+    params = {}
+    if name:
+        params["use_case_name"] = name
+    if description:
+        params["use_case_description"] = description
+
+    use_case_id = operator.execute(
+        context={
+            "params": params,
+        }
+    )
+
+    assert use_case_id == "use-case-id"
+    create_use_case_mock.assert_called_with(name=name, description=description)
 
 
 def test_operator_create_project(mocker):
