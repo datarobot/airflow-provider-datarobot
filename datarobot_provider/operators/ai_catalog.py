@@ -9,6 +9,7 @@ import datetime
 import logging
 from collections.abc import Sequence
 from hashlib import sha256
+from packaging.version import Version
 from typing import Any
 from typing import List
 from typing import Optional
@@ -599,6 +600,7 @@ class CreateWranglingRecipeOperator(BaseOperator):
         "downsampling_arguments": "json",
     }
     ui_color = "#f4a460"
+    min_version = '3.6.1'
 
     def __init__(
         self,
@@ -639,6 +641,12 @@ class CreateWranglingRecipeOperator(BaseOperator):
     def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+
+        if Version(dr.__version__) < Version(self.min_version):
+            raise AirflowException(
+                f'{self.__class__.__name__} requires datarobot>={self.min_version} '
+                f'Please install it with: pip install datarobot>={self.min_version}'
+            )
 
         if not self.use_case_id:
             raise AirflowException(
