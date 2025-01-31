@@ -6,12 +6,10 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from datetime import datetime
+from unittest.mock import patch
 
 import datarobot as dr
 import pytest
-
-from unittest.mock import patch
-
 from airflow.exceptions import AirflowFailException
 from datarobot.models.deployment.data_drift import FeatureDrift
 from datarobot.models.deployment.data_drift import TargetDrift
