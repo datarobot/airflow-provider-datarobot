@@ -469,17 +469,9 @@ class CreateDatasetFromProjectOperator(BaseOperator):
     def execute(self, context: Context) -> str:
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
-        dr_client = dr.client.get_client()
-        response = dr_client.post("/datasets/fromProject", json={"projectId": self.project_id})
-        if response.status_code != 202:
-            e_msg = "Server unexpectedly returned status code {}"
-            raise AirflowFailException(e_msg.format(response.status_code))
-        wait_for_async_resolution(dr_client, response.headers["Location"])
-
-        dataset_id = response.json()["catalogId"]
-        self.log.info(f"Dataset created: dataset_id={dataset_id}")
-        return dataset_id
+        dataset: dr.Dataset = dr.Dataset.create_from_project(project_id=self.project_id)
+        self.log.info(f"Dataset created: dataset_id={dataset.id}")
+        return dataset.id
 
 
 class CreateOrUpdateDataSourceOperator(BaseOperator):

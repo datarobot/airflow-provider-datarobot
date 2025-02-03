@@ -280,13 +280,11 @@ def test_operator_create_dataset_from_recipe(
     get_recipe_mock.assert_called_once_with("test-recipe-id")
 
 
-@patch("datarobot_provider.operators.ai_catalog.wait_for_async_resolution")
-def test_operator_create_dataset_from_project(mock_wait_async, mocker):
-    mock_client_response = mocker.Mock(status_code=202, headers={"Location": "loc"})
-    mock_client_response.json.return_value = {"catalogId": "dataset-id"}
-    mock_client = mocker.Mock()
-    mock_client.post.return_value = mock_client_response
-    get_client_mock = mocker.patch.object(dr.client, "get_client", return_value=mock_client)
+def test_operator_create_dataset_from_project(mocker):
+    dataset_mock = mocker.Mock(id="dataset-id")
+    create_dataset_from_project_mock = mocker.patch.object(
+        dr.Dataset, "create_from_project", return_value=dataset_mock
+    )
 
     operator = CreateDatasetFromProjectOperator(
         task_id="create_project_from_project_id",
@@ -295,12 +293,8 @@ def test_operator_create_dataset_from_project(mock_wait_async, mocker):
 
     dataset_id = operator.execute(context={})
 
-    get_client_mock.assert_called_once()
-    mock_client.post.assert_called_once_with(
-        "/datasets/fromProject", json={"projectId": "project-id"}
-    )
-    mock_wait_async.assert_called_once()
     assert dataset_id == "dataset-id"
+    create_dataset_from_project_mock.assert_called_once_with(project_id="project-id")
 
 
 def test_operator_create_dataset_version(mocker):
