@@ -164,6 +164,23 @@ def test_operator_create_project_from_dataset_id_and_version_id(mocker):
     )
 
 
+def test_operator_create_project_from_recipe_id(mocker):
+    project_mock = mocker.Mock()
+    project_mock.id = "project-id"
+    create_project_mock = mocker.patch.object(
+        dr.Project, "create_from_recipe", return_value=project_mock
+    )
+
+    operator = CreateProjectOperator(
+        task_id="create_project_from_recipe_id",
+        recipe_id="recipe-id",
+    )
+    project_id = operator.execute(context={"params": {"project_name": "test project"}})
+
+    assert project_id == "project-id"
+    create_project_mock.assert_called_with(recipe_id="recipe-id", project_name="test project")
+
+
 def test_operator_create_project_fails_when_no_datasetid_or_training_data():
     operator = CreateProjectOperator(task_id="create_project_no_dataset_id")
 
