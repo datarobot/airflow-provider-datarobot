@@ -9,6 +9,7 @@
 from typing import Any, Callable, Iterable
 from typing import Optional
 
+import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 from airflow.utils.context import Context
@@ -46,6 +47,7 @@ class BaseDatarobotOperator(BaseOperator):
 class DatarobotMethodOperator(BaseDatarobotOperator):
     method: Callable
     return_field = 'id'
+    required_params: List[str]
 
     @classmethod
     def __init_subclass__(cls):
@@ -59,12 +61,54 @@ class DatarobotMethodOperator(BaseDatarobotOperator):
     def method_params(self) -> Iterable[str]:
         return self.method.__annotations__.keys()
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    @classmethod
+    def get_non_default_params(cls) -> List[str]:
+        return [
+            param.name
+            for param in
+            inspect.signature(cls.method).parameters.values()
+            if param.default is inspect.Parameter.empty
+        ]
+
+    @classmethod
+    def get_not_none_params(cls) -> List[str]:
+        if hasattr(cls, 'required_params'):
+            return cls.required_params
+
+        return [
+            param.name
+            for param in
+            inspect.signature(cls.method).parameters.values()
+            if (
+                param.default is inspect.Parameter.empty
+                and not (
+                    get_origin(param.annotation) is Union
+                    and None in get_args(param.annotation)
+                )
+            )
+        ]
+
+    def __init__(self, task_id: str, **kwargs):
+        super().__init__(task_id=task_id, **kwargs)
 
         for param in self.method_params:
             if param in kwargs:
                 setattr(self, param, kwargs[param])
+
+        if missing := self._get_missing_params():
+            raise AirflowException(
+                'Following parameters are missing in the task '
+                f'"{task_id}" <{self.__class__.__name__}>: [{",".join(missing)}]'
+            )
+
+    def _get_missing_params(self) -> List[str]:
+        """Get required params not defined in the operator."""
+        return [param for param in self.get_non_default_params() if not hasattr(self, param)]
+
+    def validate(self):
+        for required_param in self.get_not_none_params():
+            if getattr(self, required_param) is None or getattr(self, required_param) == '':
+                raise AirflowException(f"{required_param} can't be None.")
 
     def execute(self, context: Context):
         return self.post_process(
