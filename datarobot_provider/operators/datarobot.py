@@ -80,6 +80,8 @@ class CreateProjectOperator(BaseOperator):
     :type dataset_version_id: str, optional
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
+    :param recipe_id: DataRobot Recipe ID
+    :type recipe_id: str, optional
     :return: DataRobot project ID
     :rtype: str
     """
@@ -103,6 +105,7 @@ class CreateProjectOperator(BaseOperator):
         credential_id: Optional[str] = None,
         use_case_id: Optional[str] = "{{ params.use_case_id|default('') }}",
         datarobot_conn_id: str = "datarobot_default",
+        recipe_id: Optional[str] = None,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -110,6 +113,7 @@ class CreateProjectOperator(BaseOperator):
         self.dataset_version_id = dataset_version_id
         self.datarobot_conn_id = datarobot_conn_id
         self.credential_id = credential_id
+        self.recipe_id = recipe_id
         self.use_case_id = use_case_id
         if kwargs.get("xcom_push") is not None:
             raise AirflowException(
@@ -140,7 +144,6 @@ class CreateProjectOperator(BaseOperator):
             project.use_feature_discovery = context["params"].get("use_feature_discovery")
             project.unlock_holdout()
             return project.id
-
         elif self.dataset_id is not None or "training_dataset_id" in context["params"]:
             # training_dataset_id may be provided via params
             # or dataset_id should be returned from previous operator
@@ -163,9 +166,19 @@ class CreateProjectOperator(BaseOperator):
             )
             return project.id  # type: ignore[attr-defined, unused-ignore]
 
+        elif self.recipe_id is not None:
+            project = dr.Project.create_from_recipe(
+                recipe_id=self.recipe_id, project_name=context["params"]["project_name"]
+            )
+            self.log.info(
+                f"Project created: project_id={project.id} from recipe: recipe_id={self.recipe_id}"  # type: ignore[attr-defined, unused-ignore]
+            )
+            return project.id  # type: ignore[attr-defined, unused-ignore]
+
         else:
             raise AirflowFailException(
-                "For Project creation training_data or training_dataset_id must be provided"
+                "For Project creation one of training_data, training_dataset_id or "
+                "recipe_id must be provided"
             )
 
 
