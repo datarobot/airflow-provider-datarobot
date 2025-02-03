@@ -6,7 +6,7 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 
-from typing import Any
+from typing import Any, Callable, Iterable
 from typing import Optional
 
 from airflow.exceptions import AirflowException
@@ -41,3 +41,45 @@ class BaseDatarobotOperator(BaseOperator):
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
+
+
+class DatarobotMethodOperator(BaseDatarobotOperator):
+    method: Callable
+    return_field = 'id'
+
+    @classmethod
+    def __init_subclass__(cls):
+        super().__init_subclass__(cls)
+        if not hasattr(cls, 'method'):
+            raise ValueError(f'*method* field must be defined in {cls.__name__}')
+
+        cls.__doc__ = cls.method.__doc__
+
+    @property
+    def method_params(self) -> Iterable[str]:
+        return self.method.__annotations__.keys()
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        for param in self.method_params:
+            if param in kwargs:
+                setattr(self, param, kwargs[param])
+
+    def execute(self, context: Context):
+        return self.post_process(
+            self.method(**self._get_kwargs())
+        )
+
+    def _get_kwargs(self) -> dict:
+        return {
+            x: getattr(self, x)
+            for x in self.method_params
+            if hasattr(self, x)
+        }
+
+    def post_process(self, method_output):
+        if self.return_field is None:
+            return method_output
+
+        return getattr(method_output, self.return_field)
