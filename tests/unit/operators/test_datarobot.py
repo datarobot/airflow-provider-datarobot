@@ -59,21 +59,19 @@ def test_operator_create_project(mocker):
     project_mock = mocker.Mock()
     project_mock.id = "project-id"
     create_project_mock = mocker.patch.object(dr.Project, "create", return_value=project_mock)
+    context = {
+        "params": {"training_data": "/path/to/s3/or/local/file", "project_name": "test project"},
+    }
 
     operator = CreateProjectOperator(task_id="create_project")
-    project_id = operator.execute(
-        context={
-            "params": {
-                "training_data": "/path/to/s3/or/local/file",
-                "project_name": "test project",
-                "unsupervised_mode": False,
-                "use_feature_discovery": False,
-            },
-        }
-    )
+    operator.render_template_fields(context)
+
+    project_id = operator.execute(context)
 
     assert project_id == "project-id"
-    create_project_mock.assert_called_with("/path/to/s3/or/local/file", "test project")
+    create_project_mock.assert_called_with(
+        "/path/to/s3/or/local/file", "test project", use_case=None
+    )
 
 
 def test_operator_create_project_from_dataset(mocker):
@@ -82,18 +80,13 @@ def test_operator_create_project_from_dataset(mocker):
     create_project_mock = mocker.patch.object(
         dr.Project, "create_from_dataset", return_value=project_mock
     )
+    context = {
+        "params": {"training_dataset_id": "some_dataset_id", "project_name": "test project"},
+    }
 
     operator = CreateProjectOperator(task_id="create_project_from_dataset")
-    project_id = operator.execute(
-        context={
-            "params": {
-                "training_dataset_id": "some_dataset_id",
-                "project_name": "test project",
-                "unsupervised_mode": False,
-                "use_feature_discovery": False,
-            },
-        }
-    )
+    operator.render_template_fields(context)
+    project_id = operator.execute(context)
 
     assert project_id == "project-id"
     create_project_mock.assert_called_with(
@@ -101,6 +94,7 @@ def test_operator_create_project_from_dataset(mocker):
         dataset_version_id=None,
         project_name="test project",
         credential_id=None,
+        use_case=None,
     )
 
 
@@ -110,19 +104,13 @@ def test_operator_create_project_from_dataset_id(mocker):
     create_project_mock = mocker.patch.object(
         dr.Project, "create_from_dataset", return_value=project_mock
     )
+    context = {"params": {"project_name": "test project"}}
 
     operator = CreateProjectOperator(
         task_id="create_project_from_dataset_id", dataset_id="some_dataset_id"
     )
-    project_id = operator.execute(
-        context={
-            "params": {
-                "project_name": "test project",
-                "unsupervised_mode": False,
-                "use_feature_discovery": False,
-            },
-        }
-    )
+    operator.render_template_fields(context)
+    project_id = operator.execute(context)
 
     assert project_id == "project-id"
     create_project_mock.assert_called_with(
@@ -130,30 +118,27 @@ def test_operator_create_project_from_dataset_id(mocker):
         dataset_version_id=None,
         project_name="test project",
         credential_id=None,
+        use_case=None,
     )
 
 
-def test_operator_create_project_from_dataset_id_and_version_id(mocker):
+def test_operator_create_project_from_dataset_id_and_version_id_in_use_case(mocker):
     project_mock = mocker.Mock()
     project_mock.id = "project-id"
     create_project_mock = mocker.patch.object(
         dr.Project, "create_from_dataset", return_value=project_mock
     )
+    use_case_get_mock = mocker.patch.object(dr.UseCase, "get")
+    context = {"params": {"project_name": "test project"}}
 
     operator = CreateProjectOperator(
         task_id="create_project_from_dataset_id_version_id",
         dataset_id="some_dataset_id",
         dataset_version_id="some_dataset_version_id",
+        use_case_id="test-use-case-id",
     )
-    project_id = operator.execute(
-        context={
-            "params": {
-                "project_name": "test project",
-                "unsupervised_mode": False,
-                "use_feature_discovery": False,
-            },
-        }
-    )
+    operator.render_template_fields(context)
+    project_id = operator.execute(context)
 
     assert project_id == "project-id"
     create_project_mock.assert_called_with(
@@ -161,7 +146,9 @@ def test_operator_create_project_from_dataset_id_and_version_id(mocker):
         dataset_version_id="some_dataset_version_id",
         project_name="test project",
         credential_id=None,
+        use_case=use_case_get_mock.return_value,
     )
+    use_case_get_mock.assert_called_once_with("test-use-case-id")
 
 
 def test_operator_create_project_from_recipe_id(mocker):
@@ -170,32 +157,28 @@ def test_operator_create_project_from_recipe_id(mocker):
     create_project_mock = mocker.patch.object(
         dr.Project, "create_from_recipe", return_value=project_mock
     )
+    context = {"params": {"project_name": "test project"}}
 
     operator = CreateProjectOperator(
         task_id="create_project_from_recipe_id",
         recipe_id="recipe-id",
     )
-    project_id = operator.execute(context={"params": {"project_name": "test project"}})
+    operator.render_template_fields(context)
+    project_id = operator.execute(context)
 
     assert project_id == "project-id"
     create_project_mock.assert_called_with(recipe_id="recipe-id", project_name="test project")
 
 
 def test_operator_create_project_fails_when_no_datasetid_or_training_data():
+    context = {"params": {"project_name": "test project"}}
     operator = CreateProjectOperator(task_id="create_project_no_dataset_id")
+    operator.render_template_fields(context)
 
     # should raise AirflowFailException if no "training_data" or "training_dataset_id"
     # or dataset_id provided
     with pytest.raises(AirflowFailException):
-        operator.execute(
-            context={
-                "params": {
-                    "project_name": "test project",
-                    "unsupervised_mode": False,
-                    "use_feature_discovery": False,
-                },
-            }
-        )
+        operator.execute(context)
 
 
 def test_operator_train_models(mocker):

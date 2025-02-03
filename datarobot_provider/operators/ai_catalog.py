@@ -692,7 +692,7 @@ class CreateWranglingRecipeOperator(BaseOperator):
             )
 
         else:
-            raise AirflowException("Specify either dataset_id or data_store_id to wrangle.")
+            raise AirflowException("Please specify either dataset_id or data_store_id to wrangle.")
 
         logging.info(
             '%s recipe id=%s created in use case "%s". Configuring...',
