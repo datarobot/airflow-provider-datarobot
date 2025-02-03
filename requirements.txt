@@ -17,4 +17,4 @@ myst-parser==3.0.1
 black==24.10.0
 pyyaml>=6.0.2
 types-PyYAML>=6.0.12
-freezegun
+freezegun>=1.5.1
