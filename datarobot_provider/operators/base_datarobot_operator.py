@@ -1,3 +1,11 @@
+# Copyright 2025 DataRobot, Inc. and its affiliates.
+#
+# All rights reserved.
+#
+# This is proprietary source code of DataRobot, Inc. and its affiliates.
+#
+# Released under the terms of DataRobot Tool and Utility Agreement.
+
 from typing import Optional, Any
 
 import datarobot as dr
@@ -8,7 +16,7 @@ from packaging.version import Version
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
 
-class BaseDataRobotOperator(BaseOperator):
+class BaseDatarobotOperator(BaseOperator):
     ui_color = "#f4a460"
 
     dr_hook: DataRobotHook

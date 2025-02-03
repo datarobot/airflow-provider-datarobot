@@ -13,14 +13,14 @@ import datarobot as dr
 from airflow.exceptions import AirflowFailException
 from airflow.utils.context import Context
 
-from datarobot_provider.operators.base_datarobot_operator import BaseDataRobotOperator
+from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 DATAROBOT_MAX_WAIT = 3600
 DATAROBOT_AUTOPILOT_TIMEOUT = 86400
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%s"
 
 
-class CreateUseCaseOperator(BaseDataRobotOperator):
+class CreateUseCaseOperator(BaseDatarobotOperator):
     """
     Creates a DataRobot Use Case.
 
@@ -58,7 +58,7 @@ class CreateUseCaseOperator(BaseDataRobotOperator):
         return use_case.id
 
 
-class CreateProjectOperator(BaseDataRobotOperator):
+class CreateProjectOperator(BaseDatarobotOperator):
     """
     Creates DataRobot project.
     :param dataset_id: DataRobot AI Catalog dataset ID
@@ -142,7 +142,7 @@ class CreateProjectOperator(BaseDataRobotOperator):
             )
 
 
-class TrainModelsOperator(BaseDataRobotOperator):
+class TrainModelsOperator(BaseDatarobotOperator):
     """
     Triggers DataRobot Autopilot to train models.
 
@@ -195,7 +195,7 @@ class DeployModelMixin:
         return deployment
 
 
-class DeployModelOperator(BaseDataRobotOperator, DeployModelMixin):
+class DeployModelOperator(BaseDatarobotOperator, DeployModelMixin):
     """
     Deploys the specified model to production.
 
@@ -229,7 +229,7 @@ class DeployModelOperator(BaseDataRobotOperator, DeployModelMixin):
         return deployment.id
 
 
-class DeployRecommendedModelOperator(BaseDataRobotOperator, DeployModelMixin):
+class DeployRecommendedModelOperator(BaseDatarobotOperator, DeployModelMixin):
     """
     Deploys a recommended model to production.
 
@@ -273,7 +273,7 @@ class DeployRecommendedModelOperator(BaseDataRobotOperator, DeployModelMixin):
         return deployment.id
 
 
-class ScorePredictionsOperator(BaseDataRobotOperator):
+class ScorePredictionsOperator(BaseDatarobotOperator):
     """
     Creates a batch prediction job in DataRobot, scores the data and saves prediction to the output.
     :param deployment_id: DataRobot deployment ID
@@ -372,7 +372,7 @@ class ScorePredictionsOperator(BaseDataRobotOperator):
         return job.id
 
 
-class GetTargetDriftOperator(BaseDataRobotOperator):
+class GetTargetDriftOperator(BaseDatarobotOperator):
     """
     Gets target drift measurements from a deployment.
 
@@ -404,7 +404,7 @@ class GetTargetDriftOperator(BaseDataRobotOperator):
         return _serialize_drift(drift)
 
 
-class GetFeatureDriftOperator(BaseDataRobotOperator):
+class GetFeatureDriftOperator(BaseDatarobotOperator):
     """
     Gets feature drift measurements from a deployment.
 
