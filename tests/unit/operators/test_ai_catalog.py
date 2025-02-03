@@ -6,7 +6,6 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from unittest.mock import ANY
-from unittest.mock import patch
 
 import datarobot as dr
 import freezegun

@@ -15,10 +15,8 @@ from typing import Optional
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
-from airflow.exceptions import AirflowFailException
 from airflow.models import BaseOperator
 from airflow.utils.context import Context
-from datarobot.utils.waiters import wait_for_async_resolution
 
 from datarobot_provider.hooks.connections import JDBCDataSourceHook
 from datarobot_provider.hooks.datarobot import DataRobotHook
