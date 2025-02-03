@@ -7,7 +7,9 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 import pytest
 
-from datarobot_provider._experimental.example_dags import create_project_from_aicatalog
+from datarobot_provider._experimental.example_dags.datarobot_create_project_from_ai_catalog_dag import (
+    create_project_from_aicatalog,
+)
 
 
 def test_dag_loaded(dagbag):
