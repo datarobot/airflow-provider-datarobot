@@ -14,7 +14,6 @@ from airflow.exceptions import AirflowNotFoundException
 from airflow.utils.context import Context
 
 from datarobot_provider.hooks.connections import JDBCDataSourceHook
-from datarobot_provider.hooks.datarobot import DataRobotHook
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 

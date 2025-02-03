@@ -243,6 +243,7 @@ class DeployRecommendedModelOperator(BaseDatarobotOperator, DeployModelMixin):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["project_id"]
+
     def __init__(
         self,
         *,

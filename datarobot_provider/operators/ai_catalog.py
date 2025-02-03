@@ -20,7 +20,6 @@ from airflow.utils.context import Context
 from datarobot_provider.hooks.connections import JDBCDataSourceHook
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
-
 # Time in seconds after which dataset uploading is considered unsuccessful.
 DATAROBOT_MAX_WAIT_SEC = 3600
 

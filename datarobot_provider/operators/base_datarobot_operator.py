@@ -6,7 +6,8 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 
-from typing import Optional, Any
+from typing import Any
+from typing import Optional
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
@@ -33,14 +34,17 @@ class BaseDatarobotOperator(BaseOperator):
         self.validate()
 
     def check_dr_client_version(self):
-        if self.requires_early_access and not hasattr(dr, '_experimental'):
-            package_to_install = 'datarobot-early-access'
+        """Specific operators may require *datarobot-early-access*
+        or a specific *datarobot* client version.
+        Declare it with *requires_early_access* and/or *min_version* fields in your operator."""
+        if self.requires_early_access and not hasattr(dr, "_experimental"):
+            package_to_install = "datarobot-early-access"
             if self.min_version:
-                package_to_install = f'{package_to_install}>={self.min_version}'
+                package_to_install = f"{package_to_install}>={self.min_version}"
 
             raise AirflowException(
-                f'{self.__class__.__name__} requires datarobot-early-access package to run. '
-                f'Please install it with: pip install {package_to_install}'
+                f"{self.__class__.__name__} requires datarobot-early-access package to run. "
+                f"Please install it with: pip install {package_to_install}"
             )
 
         if self.min_version and Version(dr.__version__) < Version(self.min_version):
