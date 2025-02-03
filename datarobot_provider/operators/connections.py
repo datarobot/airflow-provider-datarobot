@@ -11,14 +11,14 @@ from typing import Any
 import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.exceptions import AirflowNotFoundException
-from airflow.models import BaseOperator
 from airflow.utils.context import Context
 
 from datarobot_provider.hooks.connections import JDBCDataSourceHook
 from datarobot_provider.hooks.datarobot import DataRobotHook
+from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 
-class GetOrCreateDataStoreOperator(BaseOperator):
+class GetOrCreateDataStoreOperator(BaseDatarobotOperator):
     """
     !! Please, manage database connections via DataRobot rather than Airflow and use *GetDataStoreOperator* instead. !!
 
@@ -33,31 +33,16 @@ class GetOrCreateDataStoreOperator(BaseOperator):
     :rtype: str
     """
 
-    # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = []
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
-
     def __init__(
         self,
         *,
         connection_param_name: str = "datarobot_connection_name",
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
-        self.datarobot_conn_id = datarobot_conn_id
         self.connection_param_name = connection_param_name
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         if self.connection_param_name not in context["params"]:
             raise AirflowNotFoundException(
                 f"Attribute: {self.connection_param_name} not present in config"
@@ -74,7 +59,7 @@ class GetOrCreateDataStoreOperator(BaseOperator):
         return data_store.id
 
 
-class GetDataStoreOperator(BaseOperator):
+class GetDataStoreOperator(BaseDatarobotOperator):
     """Get a DataRobot data store id by data connection name.
     You have to create a DataRobot data connection in advance at /account/data-connections page.
 
@@ -85,27 +70,17 @@ class GetDataStoreOperator(BaseOperator):
     """
 
     template_fields: Sequence[str] = ["data_connection"]
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         data_connection: str = "{{ params.data_connection }}",
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
-        self.datarobot_conn_id = datarobot_conn_id
         self.data_connection = data_connection
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> Any:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         for datastore in dr.DataStore.list(name=self.data_connection):
             if datastore.canonical_name == self.data_connection:
                 break
