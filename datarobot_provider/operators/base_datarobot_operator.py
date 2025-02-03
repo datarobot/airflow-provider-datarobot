@@ -51,7 +51,7 @@ class DatarobotMethodOperator(BaseDatarobotOperator):
 
     @classmethod
     def __init_subclass__(cls):
-        super().__init_subclass__(cls)
+        super().__init_subclass__()
         if not hasattr(cls, 'method'):
             raise ValueError(f'*method* field must be defined in {cls.__name__}')
 
