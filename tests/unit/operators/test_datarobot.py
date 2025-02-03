@@ -165,13 +165,12 @@ def test_operator_create_project_from_dataset_id_and_version_id(mocker):
     )
 
 
-@patch("datarobot_provider.operators.datarobot.wait_for_async_resolution")
-def test_operator_create_project_from_recipe_id(mock_wait_async, mocker):
-    mock_client_response = mocker.Mock(status_code=202, headers={"Location": "loc"})
-    mock_client_response.json.return_value = {"pid": "new-project-id"}
-    mock_client = mocker.Mock()
-    mock_client.post.return_value = mock_client_response
-    get_client_mock = mocker.patch.object(dr.client, "get_client", return_value=mock_client)
+def test_operator_create_project_from_recipe_id( mocker):
+    project_mock = mocker.Mock()
+    project_mock.id = "project-id"
+    create_project_mock = mocker.patch.object(
+        dr.Project, "create_from_recipe", return_value=project_mock
+    )
 
     operator = CreateProjectOperator(
         task_id="create_project_from_recipe_id",
@@ -179,11 +178,8 @@ def test_operator_create_project_from_recipe_id(mock_wait_async, mocker):
     )
     project_id = operator.execute(context={"params": {"project_name": "test project"}})
 
-    get_client_mock.assert_called_once()
-    mock_wait_async.assert_called_once()
-    mock_client.post.assert_called_once_with("/projects/", data={"recipeId": "recipe-id"})
-
-    assert project_id == "new-project-id"
+    assert project_id == "project-id"
+    create_project_mock.assert_called_with(recipe_id="recipe-id", project_name="test project")
 
 
 def test_operator_create_project_fails_when_no_datasetid_or_training_data():

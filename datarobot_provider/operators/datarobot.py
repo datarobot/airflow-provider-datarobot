@@ -153,19 +153,13 @@ class CreateProjectOperator(BaseOperator):
             return project.id  # type: ignore[attr-defined, unused-ignore]
 
         elif self.recipe_id is not None:
-            dr_client = dr.client.get_client()
-            response = dr_client.post("/projects/", data={"recipeId": self.recipe_id})
-
-            if response.status_code != 202:
-                e_msg = "Server unexpectedly returned status code {}"
-                raise AirflowFailException(e_msg.format(response.status_code))
-            wait_for_async_resolution(dr_client, response.headers["Location"])
-
-            project_id = response.json()["pid"]
-            self.log.info(
-                f"Project created: project_id={project_id} from recipe: recipe_id={self.recipe_id}"
+            project = dr.Project.create_from_recipe(
+                recipe_id=self.recipe_id, project_name=context["params"]["project_name"]
             )
-            return project_id
+            self.log.info(
+                f"Project created: project_id={project.id} from recipe: recipe_id={self.recipe_id}"
+            )
+            return project.id  # type: ignore[attr-defined, unused-ignore]
 
         else:
             raise AirflowFailException(
