@@ -156,9 +156,9 @@ class CreateProjectOperator(BaseOperator):
                 recipe_id=self.recipe_id, project_name=context["params"]["project_name"]
             )
             self.log.info(
-                f"Project created: project_id={project.id} from recipe: recipe_id={self.recipe_id}"
+                f"Project created: project_id={project.id} from recipe: recipe_id={self.recipe_id}"  # type: ignore[attr-defined, unused-ignore]
             )
-            return project.id
+            return project.id  # type: ignore[attr-defined, unused-ignore]
 
         else:
             raise AirflowFailException(
