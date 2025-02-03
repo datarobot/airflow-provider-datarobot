@@ -157,12 +157,14 @@ def test_operator_create_project_from_recipe_id(mocker):
     create_project_mock = mocker.patch.object(
         dr.Project, "create_from_recipe", return_value=project_mock
     )
+    context = {"params": {"project_name": "test project"}}
 
     operator = CreateProjectOperator(
         task_id="create_project_from_recipe_id",
         recipe_id="recipe-id",
     )
-    project_id = operator.execute(context={"params": {"project_name": "test project"}})
+    operator.render_template_fields(context)
+    project_id = operator.execute(context)
 
     assert project_id == "project-id"
     create_project_mock.assert_called_with(recipe_id="recipe-id", project_name="test project")
