@@ -14,7 +14,6 @@ from airflow.exceptions import AirflowException
 from airflow.exceptions import AirflowFailException
 from airflow.models import BaseOperator
 from airflow.utils.context import Context
-from datarobot.utils.waiters import wait_for_async_resolution
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
@@ -159,7 +158,7 @@ class CreateProjectOperator(BaseOperator):
             self.log.info(
                 f"Project created: project_id={project.id} from recipe: recipe_id={self.recipe_id}"
             )
-            return project.id  # type: ignore[attr-defined, unused-ignore]
+            return project.id
 
         else:
             raise AirflowFailException(
