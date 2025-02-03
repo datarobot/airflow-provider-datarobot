@@ -164,7 +164,7 @@ def test_operator_create_project_from_dataset_id_and_version_id(mocker):
     )
 
 
-def test_operator_create_project_from_recipe_id( mocker):
+def test_operator_create_project_from_recipe_id(mocker):
     project_mock = mocker.Mock()
     project_mock.id = "project-id"
     create_project_mock = mocker.patch.object(
