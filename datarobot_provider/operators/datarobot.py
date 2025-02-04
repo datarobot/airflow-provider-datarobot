@@ -5,6 +5,7 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+import enum
 from collections.abc import Sequence
 from typing import Any
 from typing import Optional
@@ -30,14 +31,27 @@ class CreateUseCaseOperator(BaseOperator):
     ----------
     datarobot_conn_id: str
         Connection ID, defaults to `datarobot_default`
+    name: str
+        Use Case name
+    description: Optional[str]
+        Use Case description
+    reuse_by_name: bool
+        Don't create a Use Case if there is an existing one with exactly same **name**.
+        Return `id` of that Use Case instead.
 
     Returns
     -------
     str: DataRobot UseCase ID
     """
 
+    class ReusePolicy(enum.StrEnum):
+        EXACT = 'EXACT'
+        SEARCH_BY_NAME_UPDATE_DESCRIPTION = 'SEARCH_BY_NAME_UPDATE_DESCRIPTION'
+        SEARCH_BY_NAME_IGNORE_DESCRIPTION = 'SEARCH_BY_NAME_IGNORE_DESCRIPTION'
+        NO_REUSE = 'NO_REUSE'
+
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = ["credential_id"]
+    template_fields: Sequence[str] = ["name", "description"]
     template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
@@ -45,13 +59,17 @@ class CreateUseCaseOperator(BaseOperator):
     def __init__(
         self,
         *,
-        credential_id: Optional[str] = None,
+        name: str = "{{ params.use_case_name | default('Airflow') }}",
+        description: Optional[str] = "{{ params.use_case_description | default('') }}",
+        reuse_policy: ReusePolicy = ReusePolicy.EXACT,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
+        self.name = name
+        self.description = description
+        self.reuse_policy = reuse_policy
         self.datarobot_conn_id = datarobot_conn_id
-        self.credential_id = credential_id
         if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
@@ -61,14 +79,42 @@ class CreateUseCaseOperator(BaseOperator):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
-        # Create DataRobot project
-        self.log.info("Creating DataRobot Use Case")
-        use_case: dr.UseCase = dr.UseCase.create(
-            name=context["params"].get("use_case_name"),
-            description=context["params"].get("use_case_description"),
-        )
-        self.log.info(f"Use case created: use_case_id={use_case.id} from local file")
+        use_case = None
+
+        if self.reuse_policy != self.ReusePolicy.NO_REUSE:
+            use_case = self._search_for_existing_use_case()
+
+        if use_case is None:
+            self.log.info("Creating DataRobot Use Case")
+            use_case = dr.UseCase.create(name=self.name, description=self.description)
+            self.log.info(f"Use case created: use_case_id={use_case.id}")
+
         return use_case.id
+
+    def _search_for_existing_use_case(self) -> Optional[dr.UseCase]:
+        for use_case in dr.UseCase.list(search_params={'search': self.name}):
+            if use_case.name == self.name:
+                if (
+                    self.reuse_policy == self.ReusePolicy.EXACT
+                    and self.description
+                    and use_case.description != self.description
+                ):
+                    continue
+
+                self.log.info('Use an existing Use Case id=%s', use_case.id)
+
+                if (
+                        self.reuse_policy == self.ReusePolicy.SEARCH_BY_NAME_UPDATE_DESCRIPTION
+                        and use_case.description != self.description
+                ):
+                    self.log.info(
+                        'Update Use Case description from "%s" to "%s"',
+                        use_case.description,
+                        self.description,
+                    )
+                    use_case.update(self.name, self.description)
+
+                return use_case
 
 
 class CreateProjectOperator(BaseOperator):

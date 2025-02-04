@@ -271,11 +271,13 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
     :type materialization_schema_param: str
     :param materialization_table_param: Name of the parameter in the configuration to use as materialization_table
     :type materialization_table_param: str
+    :param use_case_id: ID of the use case to add the dataset into.
+    :type use_case_id: str or None
     :return: DataRobot AI Catalog dataset ID
     :rtype: str
     """
 
-    template_fields = ["recipe_id"]
+    template_fields = ["recipe_id", "use_case_id"]
     ui_color = "#f4a460"
 
     def __init__(
@@ -288,6 +290,7 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
         materialization_catalog_param: str = "materialization_catalog",
         materialization_schema_param: str = "materialization_schema",
         materialization_table_param: str = "materialization_table",
+        use_case_id: Optional[str] = "{{ params.use_case_id | default('') }}",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -299,6 +302,7 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
         self.materialization_catalog_param = materialization_catalog_param
         self.materialization_schema_param = materialization_schema_param
         self.materialization_table_param = materialization_table_param
+        self.use_case_id = use_case_id
 
         if kwargs.get("xcom_push") is not None:
             raise AirflowException(
@@ -354,7 +358,7 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
             dataset.name,
         )
 
-        if context["params"].get("use_case_id"):
+        if self.use_case_id:
             use_case = dr.UseCase.get(use_case_id=context["params"]["use_case_id"])
             use_case.add(dataset)
             logging.info('The dataset is added into use case "%s".', use_case.name)

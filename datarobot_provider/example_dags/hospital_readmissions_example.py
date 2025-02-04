@@ -13,6 +13,7 @@ from datarobot_provider.operators.ai_catalog import CreateDatasetFromRecipeOpera
 from datarobot_provider.operators.ai_catalog import CreateWranglingRecipeOperator
 from datarobot_provider.operators.connections import GetDataStoreOperator
 from datarobot_provider.operators.datarobot import CreateProjectOperator
+from datarobot_provider.operators.datarobot import CreateUseCaseOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
 from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
 
@@ -27,10 +28,11 @@ from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
         "table_name": "<DB_TABLE>",
         "project_name": "hospital-readmissions-example",
         "autopilot_settings": {"target": "readmitted", "mode": "quick", "max_wait": 3600},
-        "use_case_id": "<EXISTING USE CASE ID>",
     },
 )
 def hospital_readmissions_example():
+    create_use_case = CreateUseCaseOperator(task_id="create_use_case")
+
     # upload_dataset = UploadDatasetOperator(task_id="upload_dataset")
     get_connection = GetDataStoreOperator(task_id="get_connection")
 
@@ -61,14 +63,20 @@ def hospital_readmissions_example():
                 },
             },
         ],
+        use_case_id=create_use_case.output,
     )
 
     publish_recipe = CreateDatasetFromRecipeOperator(
-        task_id="publish_recipe", recipe_id=create_recipe.output, do_snapshot=True
+        task_id="publish_recipe",
+        recipe_id=create_recipe.output,
+        do_snapshot=True,
+        use_case_id=create_use_case.output,
     )
 
     create_project = CreateProjectOperator(
-        task_id="create_project", dataset_id=str(publish_recipe.output)
+        task_id="create_project",
+        dataset_id=str(publish_recipe.output),
+        use_case_id=create_use_case.output,
     )
 
     train_models = TrainModelsOperator(
@@ -82,7 +90,7 @@ def hospital_readmissions_example():
     )
 
     (
-        get_connection
+        [create_use_case, get_connection]
         >> create_recipe
         >> publish_recipe
         >> create_project
