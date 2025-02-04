@@ -17,6 +17,7 @@ import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 from airflow.utils.context import Context
+from datarobot.models.recipe_operation import RandomSamplingOperation
 
 from datarobot_provider.hooks.connections import JDBCDataSourceHook
 from datarobot_provider.hooks.datarobot import DataRobotHook
@@ -359,7 +360,7 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
         )
 
         if self.use_case_id:
-            use_case = dr.UseCase.get(use_case_id=context["params"]["use_case_id"])
+            use_case = dr.UseCase.get(self.use_case_id)
             use_case.add(dataset)
             logging.info('The dataset is added into use case "%s".', use_case.name)
 
@@ -732,6 +733,7 @@ class CreateWranglingRecipeOperator(BaseOperator):
                         canonical_name=data_source_canonical_name,
                         schema=self.table_schema,
                         table=self.table_name,
+                        sampling=RandomSamplingOperation(1000, 0),
                     )
                 ],
             )

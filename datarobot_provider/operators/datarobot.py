@@ -5,7 +5,6 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-import enum
 from collections.abc import Sequence
 from typing import Any
 from typing import Optional
@@ -15,6 +14,7 @@ from airflow.exceptions import AirflowException
 from airflow.exceptions import AirflowFailException
 from airflow.models import BaseOperator
 from airflow.utils.context import Context
+from strenum import StrEnum
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
@@ -44,11 +44,11 @@ class CreateUseCaseOperator(BaseOperator):
     str: DataRobot UseCase ID
     """
 
-    class ReusePolicy(enum.StrEnum):
-        EXACT = 'EXACT'
-        SEARCH_BY_NAME_UPDATE_DESCRIPTION = 'SEARCH_BY_NAME_UPDATE_DESCRIPTION'
-        SEARCH_BY_NAME_IGNORE_DESCRIPTION = 'SEARCH_BY_NAME_IGNORE_DESCRIPTION'
-        NO_REUSE = 'NO_REUSE'
+    class ReusePolicy(StrEnum):
+        EXACT = "EXACT"
+        SEARCH_BY_NAME_UPDATE_DESCRIPTION = "SEARCH_BY_NAME_UPDATE_DESCRIPTION"
+        SEARCH_BY_NAME_IGNORE_DESCRIPTION = "SEARCH_BY_NAME_IGNORE_DESCRIPTION"
+        NO_REUSE = "NO_REUSE"
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["name", "description"]
@@ -92,7 +92,7 @@ class CreateUseCaseOperator(BaseOperator):
         return use_case.id
 
     def _search_for_existing_use_case(self) -> Optional[dr.UseCase]:
-        for use_case in dr.UseCase.list(search_params={'search': self.name}):
+        for use_case in dr.UseCase.list(search_params={"search": self.name}):
             if use_case.name == self.name:
                 if (
                     self.reuse_policy == self.ReusePolicy.EXACT
@@ -101,11 +101,11 @@ class CreateUseCaseOperator(BaseOperator):
                 ):
                     continue
 
-                self.log.info('Use an existing Use Case id=%s', use_case.id)
+                self.log.info("Use an existing Use Case id=%s", use_case.id)
 
                 if (
-                        self.reuse_policy == self.ReusePolicy.SEARCH_BY_NAME_UPDATE_DESCRIPTION
-                        and use_case.description != self.description
+                    self.reuse_policy == self.ReusePolicy.SEARCH_BY_NAME_UPDATE_DESCRIPTION
+                    and use_case.description != self.description
                 ):
                     self.log.info(
                         'Update Use Case description from "%s" to "%s"',

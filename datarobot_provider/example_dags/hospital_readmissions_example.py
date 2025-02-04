@@ -46,20 +46,51 @@ def hospital_readmissions_example():
         # dialect=dr.enums.DataWranglingDialect.SPARK,
         operations=[
             {
-                "directive": "drop-columns",
+                "directive": "rename-columns",
                 "arguments": {
-                    "columns": [
-                        "citoglipton",
+                    "columnMappings": [
+                        {"originalName": "admission_type_id", "newName": "AdmissionType"},
+                        {
+                            "originalName": "discharge_disposition_id",
+                            "newName": "DischargeDisposition",
+                        },
+                        {"originalName": "admission_source_id", "newName": "AdmissionSource"},
                     ]
                 },
             },
             {
                 "directive": "replace",
                 "arguments": {
-                    "origin": "admission_type_id",
+                    "origin": "AdmissionType",
                     "searchFor": "",
                     "replacement": "Not Available",
                     "matchMode": "exact",
+                },
+            },
+            {
+                "directive": "replace",
+                "arguments": {
+                    "origin": "age",
+                    "searchFor": r"\[(\d+).*",
+                    "replacement": r"\1",
+                    "matchMode": "regex",
+                },
+            },
+            {
+                "directive": "compute-new",
+                "arguments": {"expression": 'CAST("age" AS Integer)', "newFeatureName": "int-age"},
+            },
+            {
+                "directive": "drop-columns",
+                "arguments": {
+                    "columns": [
+                        "citoglipton",
+                        "acetohexamide",
+                        "miglitol",
+                        "troglitazone",
+                        "examide",
+                        "age",
+                    ]
                 },
             },
         ],
