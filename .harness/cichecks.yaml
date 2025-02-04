@@ -14,7 +14,7 @@ pipeline:
     - parallel:
         - stage:
             name: Lint and MyPy
-            identifier: lint_and_mypy
+            identifier: lint
             description: ""
             type: CI
             spec:
@@ -68,7 +68,7 @@ pipeline:
                               make typecheck
         - stage:
             name: Unit tests
-            identifier: test_unit_tests
+            identifier: test_unit
             description: ""
             type: CI
             spec:
