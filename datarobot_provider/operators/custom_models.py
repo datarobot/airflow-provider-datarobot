@@ -298,13 +298,7 @@ class CreateCustomModelVersionOperator(BaseDatarobotOperator):
         self.create_from_previous = create_from_previous
         self.max_wait_sec = max_wait_sec
 
-    def execute(self, context: Context) -> str:
-        folder_path = (
-            context["params"].get("custom_model_folder", None)
-            if self.custom_model_folder is None
-            else self.custom_model_folder
-        )
-
+    def validate(self):
         if self.custom_model_id is None:
             raise ValueError(
                 "custom_model_id is required attribute for CreateCustomModelVersionOperator"
@@ -314,6 +308,13 @@ class CreateCustomModelVersionOperator(BaseDatarobotOperator):
             raise ValueError(
                 "base_environment_id is required attribute for CreateCustomModelVersionOperator"
             )
+
+    def execute(self, context: Context) -> str:
+        folder_path = (
+            context["params"].get("custom_model_folder", None)
+            if self.custom_model_folder is None
+            else self.custom_model_folder
+        )
 
         if self.create_from_previous:
             custom_model_version = dr.CustomModelVersion.create_from_previous(

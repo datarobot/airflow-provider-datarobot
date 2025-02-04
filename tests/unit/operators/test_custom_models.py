@@ -233,7 +233,7 @@ def test_operator_create_custom_model_version_no_custom_model_id_op(mocker, cust
     )
 
     with pytest.raises(ValueError):
-        operator.execute(context={"params": custom_model_params})
+        operator.validate()
 
 
 def test_operator_create_custom_model_test_op(mocker, custom_model_params):
@@ -288,7 +288,7 @@ def test_operator_create_custom_model_test_no_custom_model_id_op():
     )
 
     with pytest.raises(ValueError):
-        operator.execute(context={"params": custom_model_params})
+        operator.validate()
 
 
 def test_operator_create_custom_model_test_no_custom_model_version_id_op():
@@ -306,7 +306,7 @@ def test_operator_create_custom_model_test_no_custom_model_version_id_op():
     )
 
     with pytest.raises(ValueError):
-        operator.execute(context={"params": custom_model_params})
+        operator.validate()
 
 
 def test_operator_create_custom_model_test_status_op(mocker, custom_model_params):

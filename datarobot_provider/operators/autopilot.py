@@ -10,10 +10,8 @@ from typing import Any
 from typing import Optional
 
 import datarobot as dr
-from airflow.exceptions import AirflowException
 from airflow.utils.context import Context
 
-from datarobot_provider.hooks.datarobot import DataRobotHook
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 DATAROBOT_MAX_WAIT = 600

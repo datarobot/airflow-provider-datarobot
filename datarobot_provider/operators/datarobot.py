@@ -99,13 +99,13 @@ class CreateProjectOperator(BaseDatarobotOperator):
         self.recipe_id = recipe_id
 
     def execute(self, context: Context) -> Optional[str]:
-        # Create DataRobot project
-        self.log.info("Creating DataRobot project")
-
         use_case = None
 
         if self.use_case_id:
             use_case = dr.models.UseCase.get(self.use_case_id)
+
+        # Create DataRobot project
+        self.log.info("Creating DataRobot project")
 
         if self.dataset_id is None and "training_data" in context["params"]:
             # training_data may be a pre-signed URL to a file on S3 or a path to a local file
