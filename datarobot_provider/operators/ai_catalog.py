@@ -31,8 +31,10 @@ class UploadDatasetOperator(BaseOperator):
     Uploading local file to DataRobot AI Catalog and return Dataset ID.
     :param file_path: The path to the file.
     :type file_path: str, optional
-    :param file_path_param: Name of the parameter in the configuration to use as file_path, defaults to `dataset_file_path`
+    :param file_path_param: DEPRECATED. Name of the parameter in the configuration to use as file_path, defaults to `dataset_file_path`
     :type file_path_param: str, optional
+    :param use_case_id: ID of the use case to add the dataset into.
+    :type use_case_id: str, optional
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
     :return: DataRobot AI Catalog dataset ID
@@ -49,7 +51,7 @@ class UploadDatasetOperator(BaseOperator):
         self,
         *,
         file_path: str = "{{ params.dataset_file_path | default('') }}",  # Don't use any *default* after *dataset_file_path* is finally removed.
-        file_path_param: Optional[str] = None,  # deprecated. Use airflow-jinja template instead.
+        file_path_param: Optional[str] = None,
         use_case_id: Optional[str] = "{{ params.use_case_id | default('') }}",
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,

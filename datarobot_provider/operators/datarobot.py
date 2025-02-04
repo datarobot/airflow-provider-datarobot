@@ -35,9 +35,18 @@ class CreateUseCaseOperator(BaseOperator):
         Use Case name
     description: Optional[str]
         Use Case description
-    reuse_by_name: bool
-        Don't create a Use Case if there is an existing one with exactly same **name**.
-        Return `id` of that Use Case instead.
+    reuse_policy: CreateUseCaseOperator.ReusePolicy
+        Should the operator reuse an existing Use Case with the same *name*?
+        EXACT:
+            Reuse the Use Case if it has exactly the same *name* and *description*.
+        SEARCH_BY_NAME_UPDATE_DESCRIPTION:
+            Reuse the Use Case if it has exactly the same *name*. Update *description* if it's different.
+        SEARCH_BY_NAME_IGNORE_DESCRIPTION:
+            Reuse the Use Case if it has exactly the same *name*. Don't compare or modify *description*.
+        NO_REUSE:
+            Always create a new Use Case.
+
+        default: EXACT
 
     Returns
     -------
