@@ -1,0 +1,14 @@
+inputSet:
+  name: branch_ci_checks_input_set
+  identifier: branch_ci_checks_input_set
+  orgIdentifier: AGENTS
+  projectIdentifier: airflowproviderdatarobot
+  pipeline:
+    identifier: cichecks
+    properties:
+      ci:
+        codebase:
+          build:
+            type: branch
+            spec:
+              branch: <+trigger.branch>
