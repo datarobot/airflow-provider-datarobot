@@ -1,6 +1,6 @@
 trigger:
-  name: ci_checks_merge_trigger
-  identifier: ci_checks_merge_trigger
+  name: ci_checks_main_trigger
+  identifier: ci_checks_main_trigger
   enabled: true
   stagesToExecute: []
   description: ""
