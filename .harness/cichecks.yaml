@@ -136,8 +136,8 @@ pipeline:
                 steps:
                   - step:
                       type: Run
-                      name: run unit tests
-                      identifier: run_unit_tests
+                      name: run build docs test
+                      identifier: run_build_docs_tests
                       spec:
                         connectorRef: account.dockerhub_datarobot_read
                         image: python:<+matrix.python_version>
