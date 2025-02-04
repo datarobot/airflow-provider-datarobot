@@ -46,7 +46,6 @@ dev = [
     "types-PyYAML>=6.0.12",
     "freezegun>=1.5.1",
 ]
-docs = []
 
 [project.entry-points."apache_airflow_provider"]
 provider_info = "datarobot_provider.__init__:get_provider_info"
