@@ -11,6 +11,7 @@ from typing import Optional
 
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
+from airflow.utils.context import Context
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
@@ -22,7 +23,7 @@ class BaseDatarobotOperator(BaseOperator):
     min_version: Optional[str] = None
     requires_early_access = False
 
-    def pre_execute(self, context: Any):
+    def pre_execute(self, context: Context):
         super().pre_execute(context)
 
         self.dr_hook = DataRobotHook(datarobot_conn_id=self.datarobot_conn_id)
