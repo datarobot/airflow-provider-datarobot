@@ -375,6 +375,7 @@ class CreateDatasetFromProjectOperator(BaseDatarobotOperator):
     """
 
     template_fields: Sequence[str] = ["project_id"]
+
     def __init__(
         self,
         *,
@@ -390,7 +391,7 @@ class CreateDatasetFromProjectOperator(BaseDatarobotOperator):
         return dataset.id
 
 
-class CreateOrUpdateDataSourceOperator(BaseOperator):
+class CreateOrUpdateDataSourceOperator(BaseDatarobotOperator):
     """
     Get an existing data source by name and update it if any of *table_schema*, *table_name*, *query* are specified.
     Create a new data source if there is no existing one with the specified name.
