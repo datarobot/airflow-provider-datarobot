@@ -1,0 +1,28 @@
+trigger:
+  name: ci_checks_merge_trigger
+  identifier: ci_checks_merge_trigger
+  enabled: true
+  stagesToExecute: []
+  description: ""
+  tags: {}
+  encryptedWebhookSecretIdentifier: ""
+  orgIdentifier: AGENTS
+  projectIdentifier: airflowproviderdatarobot
+  pipelineIdentifier: cichecks
+  source:
+    type: Webhook
+    spec:
+      type: Github
+      spec:
+        type: Push
+        spec:
+          connectorRef: account.svc_harness_git1
+          autoAbortPreviousExecutions: false
+          payloadConditions:
+            - key: targetBranch
+              operator: Equals
+              value: main
+          headerConditions: []
+          repoName: airflow-provider-datarobot
+          actions: []
+  pipelineBranchName: <+trigger.branch>
