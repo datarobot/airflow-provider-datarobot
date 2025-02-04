@@ -164,8 +164,5 @@ pipeline:
                       strategy:
                         matrix:
                           python_version:
-                            - "3.9"
-                            - "3.10"
-                            - "3.11"
                             - "3.12"
                           nodeName: <+matrix.python_version>
