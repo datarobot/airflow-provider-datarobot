@@ -96,12 +96,10 @@ pipeline:
                         shell: Bash
                         command: |-
                           set -exuo pipefail
-                          pip install apache-airflow
-                          pip install -r requirements.txt
-                          pip install airflow-provider-datarobot freezegun
+                          make req-dev
                           airflow db init
                           airflow db check
-                          pytest -vv tests/unit/ --junit-xml=unit_test_report.xml
+                          make test-harness
                         reports:
                           type: JUnit
                           spec:
@@ -146,11 +144,10 @@ pipeline:
                         shell: Bash
                         command: |-
                           set -exuo pipefail
-                          pip install apache-airflow
                           make req-dev
                           airflow db init
                           airflow db check
-                          pytest -vv tests/unit/ --junit-xml=unit_test_report.xml
+                          make test-docs-harness
                         reports:
                           type: JUnit
                           spec:
