@@ -7,23 +7,20 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from collections.abc import Sequence
 from typing import Any
-from typing import Dict
 from typing import Iterable
 from typing import Optional
 
 import datarobot as dr
-from airflow.exceptions import AirflowException
 from airflow.exceptions import AirflowFailException
-from airflow.models import BaseOperator
 from airflow.utils.context import Context
 from datarobot import SNAPSHOT_POLICY
 
-from datarobot_provider.hooks.datarobot import DataRobotHook
+from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 DATAROBOT_MAX_WAIT = 600
 
 
-class CreateFeatureDiscoveryRecipeOperator(BaseOperator):
+class CreateFeatureDiscoveryRecipeOperator(BaseDatarobotOperator):
     """
     Create a Feature Discovery recipe.
 
@@ -55,9 +52,6 @@ class CreateFeatureDiscoveryRecipeOperator(BaseOperator):
         "relationships",
         "feature_discovery_settings",
     ]
-    template_fields_renderers: Dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -67,7 +61,6 @@ class CreateFeatureDiscoveryRecipeOperator(BaseOperator):
         dataset_definitions: Iterable[dict],
         relationships: Iterable[dict],
         feature_discovery_settings: Optional[Iterable[dict]] = None,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -76,17 +69,8 @@ class CreateFeatureDiscoveryRecipeOperator(BaseOperator):
         self.dataset_definitions = dataset_definitions
         self.relationships = relationships
         self.feature_discovery_settings = feature_discovery_settings
-        self.datarobot_conn_id = datarobot_conn_id
-
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> None:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         response = dr.client.get_client().post(
             "/recipes/fromDataset/",
             data={
@@ -116,7 +100,7 @@ class CreateFeatureDiscoveryRecipeOperator(BaseOperator):
         return recipe_id
 
 
-class RelationshipsConfigurationOperator(BaseOperator):
+class RelationshipsConfigurationOperator(BaseDatarobotOperator):
     """
     Create a Relationships Configuration.
 
@@ -156,7 +140,6 @@ class RelationshipsConfigurationOperator(BaseOperator):
         relationships: Iterable[dict],
         feature_discovery_settings: Optional[Iterable[dict]] = None,
         max_wait_sec: int = DATAROBOT_MAX_WAIT,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -164,17 +147,8 @@ class RelationshipsConfigurationOperator(BaseOperator):
         self.relationships = relationships
         self.feature_discovery_settings = feature_discovery_settings
         self.max_wait_sec = max_wait_sec
-        self.datarobot_conn_id = datarobot_conn_id
-
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> None:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         # if feature_discovery_settings not provided, try to get it from DAG configuration params:
         if self.feature_discovery_settings is None:
             self.feature_discovery_settings = context["params"].get(
@@ -192,7 +166,7 @@ class RelationshipsConfigurationOperator(BaseOperator):
         return relationship_config.id
 
 
-class DatasetDefinitionOperator(BaseOperator):
+class DatasetDefinitionOperator(BaseDatarobotOperator):
     """
     Dataset definition for the Feature Discovery
 
@@ -229,9 +203,6 @@ class DatasetDefinitionOperator(BaseOperator):
         "feature_list_id",
         "snapshot_policy",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -243,7 +214,6 @@ class DatasetDefinitionOperator(BaseOperator):
         feature_list_id: Optional[str] = None,
         primary_temporal_key: Optional[str] = None,
         max_wait_sec: int = DATAROBOT_MAX_WAIT,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -254,12 +224,6 @@ class DatasetDefinitionOperator(BaseOperator):
         self.feature_list_id = feature_list_id
         self.primary_temporal_key = primary_temporal_key
         self.max_wait_sec = max_wait_sec
-        self.datarobot_conn_id = datarobot_conn_id
-
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> dict:
         dataset_definition = dr.DatasetDefinition(
@@ -274,7 +238,7 @@ class DatasetDefinitionOperator(BaseOperator):
         return dataset_definition.to_payload()
 
 
-class DatasetRelationshipOperator(BaseOperator):
+class DatasetRelationshipOperator(BaseDatarobotOperator):
     """
     Relationship between dataset defined in DatasetDefinition
 
@@ -339,9 +303,6 @@ class DatasetRelationshipOperator(BaseOperator):
         "prediction_point_rounding",
         "prediction_point_rounding_time_unit",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -357,7 +318,6 @@ class DatasetRelationshipOperator(BaseOperator):
         prediction_point_rounding: Optional[int] = None,
         prediction_point_rounding_time_unit: Optional[str] = None,
         max_wait_sec: int = DATAROBOT_MAX_WAIT,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -372,12 +332,6 @@ class DatasetRelationshipOperator(BaseOperator):
         self.prediction_point_rounding = prediction_point_rounding
         self.prediction_point_rounding_time_unit = prediction_point_rounding_time_unit
         self.max_wait_sec = max_wait_sec
-        self.datarobot_conn_id = datarobot_conn_id
-
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> dict:
         relationship = dr.Relationship(
