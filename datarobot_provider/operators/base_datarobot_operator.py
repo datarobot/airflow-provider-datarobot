@@ -9,10 +9,8 @@
 from typing import Any
 from typing import Optional
 
-import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
-from packaging.version import Version
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
@@ -27,31 +25,10 @@ class BaseDatarobotOperator(BaseOperator):
     def pre_execute(self, context: Any):
         super().pre_execute(context)
 
-        self.check_dr_client_version()
         self.dr_hook = DataRobotHook(datarobot_conn_id=self.datarobot_conn_id)
         self.dr_hook.run()
 
         self.validate()
-
-    def check_dr_client_version(self):
-        """Specific operators may require *datarobot-early-access*
-        or a specific *datarobot* client version.
-        Declare it with *requires_early_access* and/or *min_version* fields in your operator."""
-        if self.requires_early_access and not hasattr(dr, "_experimental"):
-            package_to_install = "datarobot-early-access"
-            if self.min_version:
-                package_to_install = f"{package_to_install}>={self.min_version}"
-
-            raise AirflowException(
-                f"{self.__class__.__name__} requires datarobot-early-access package to run. "
-                f"Please install it with: pip install {package_to_install}"
-            )
-
-        if self.min_version and Version(dr.__version__) < Version(self.min_version):
-            raise AirflowException(
-                f"{self.__class__.__name__} requires datarobot>={self.min_version} "
-                f"Please install it with: pip install datarobot>={self.min_version}"
-            )
 
     def validate(self):
         """Implement your validation of rendered operator fields here."""

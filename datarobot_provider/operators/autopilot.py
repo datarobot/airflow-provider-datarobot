@@ -11,15 +11,15 @@ from typing import Optional
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
-from airflow.models import BaseOperator
 from airflow.utils.context import Context
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
+from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 DATAROBOT_MAX_WAIT = 600
 
 
-class StartAutopilotOperator(BaseOperator):
+class StartAutopilotOperator(BaseDatarobotOperator):
     """
     Triggers DataRobot Autopilot to train set of models.
 
@@ -46,9 +46,6 @@ class StartAutopilotOperator(BaseOperator):
         "relationships_configuration_id",
         "segmentation_task_id",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -58,7 +55,6 @@ class StartAutopilotOperator(BaseOperator):
         relationships_configuration_id: Optional[str] = None,
         segmentation_task_id: Optional[str] = None,
         max_wait_sec: int = DATAROBOT_MAX_WAIT,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -67,16 +63,8 @@ class StartAutopilotOperator(BaseOperator):
         self.relationships_configuration_id = relationships_configuration_id
         self.segmentation_task_id = segmentation_task_id
         self.max_wait_sec = max_wait_sec
-        self.datarobot_conn_id = datarobot_conn_id
-
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> None:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
         # Train models
         project = dr.Project.get(self.project_id)
         if project.target:

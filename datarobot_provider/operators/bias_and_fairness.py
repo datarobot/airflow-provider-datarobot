@@ -11,17 +11,15 @@ from typing import Any
 from typing import Optional
 
 import datarobot as dr
-from airflow.exceptions import AirflowException
-from airflow.models import BaseOperator
 from airflow.utils.context import Context
 
-from datarobot_provider.hooks.datarobot import DataRobotHook
+from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 if TYPE_CHECKING:
     from datarobot.models.deployment.deployment import BiasAndFairnessSettings
 
 
-class GetBiasAndFairnessSettingsOperator(BaseOperator):
+class GetBiasAndFairnessSettingsOperator(BaseDatarobotOperator):
     """
     Get Bias And Fairness settings for deployment.
 
@@ -33,29 +31,17 @@ class GetBiasAndFairnessSettingsOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["deployment_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         deployment_id: str,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.deployment_id = deployment_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> Optional["BiasAndFairnessSettings"]:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         self.log.info(f"Get Deployment for deployment_id={self.deployment_id}")
         deployment = dr.Deployment.get(deployment_id=self.deployment_id)
 
@@ -64,7 +50,7 @@ class GetBiasAndFairnessSettingsOperator(BaseOperator):
         return bias_and_fairness_settings
 
 
-class UpdateBiasAndFairnessSettingsOperator(BaseOperator):
+class UpdateBiasAndFairnessSettingsOperator(BaseDatarobotOperator):
     """
     Update Bias And Fairness settings for deployment.
 
@@ -76,29 +62,17 @@ class UpdateBiasAndFairnessSettingsOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["deployment_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         deployment_id: str,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.deployment_id = deployment_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> None:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         self.log.info(f"Getting Deployment for deployment_id={self.deployment_id}")
         deployment = dr.Deployment.get(deployment_id=self.deployment_id)
 

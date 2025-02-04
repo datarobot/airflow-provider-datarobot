@@ -5,20 +5,17 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from collections.abc import Sequence
 from typing import Any
 from typing import Optional
 
-from airflow.exceptions import AirflowException
-from airflow.models import BaseOperator
 from airflow.utils.context import Context
 from datarobot import Credential
 
 from datarobot_provider.hooks.credentials import CredentialsBaseHook
-from datarobot_provider.hooks.datarobot import DataRobotHook
+from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 
-class GetOrCreateCredentialOperator(BaseOperator):
+class GetOrCreateCredentialOperator(BaseDatarobotOperator):
     """
     Fetching credentials by Credential name and return Credentials ID.
 
@@ -28,30 +25,16 @@ class GetOrCreateCredentialOperator(BaseOperator):
     :rtype: str
     """
 
-    # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = []
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
-
     def __init__(
         self,
         *,
         credentials_param_name: str = "datarobot_credentials_name",
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
-        self.datarobot_conn_id = datarobot_conn_id
         self.credentials_param_name = credentials_param_name
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> Optional[str]:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
         credential_name = context["params"][self.credentials_param_name]
         # Trying to find a credential associated with provided credential name:
         for credential in Credential.list():
