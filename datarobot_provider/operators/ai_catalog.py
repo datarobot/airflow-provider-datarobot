@@ -45,6 +45,7 @@ class UploadDatasetOperator(BaseDatarobotOperator):
         *,
         file_path: Optional[str] = None,
         file_path_param: str = "dataset_file_path",
+        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -361,7 +362,35 @@ class CreateDatasetVersionOperator(BaseDatarobotOperator):
         return ai_catalog_dataset.version_id
 
 
-class CreateOrUpdateDataSourceOperator(BaseDatarobotOperator):
+class CreateDatasetFromProjectOperator(BaseDatarobotOperator):
+    """
+    Create a new AI Catalog Dataset from existing project data.
+    :param project_id: DataRobot project ID
+    :type project_id: str
+    :param datasource_id: existing DataRobot datasource ID
+    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
+    :type datarobot_conn_id: str, optional
+    :return: DataRobot AI Catalog dataset ID
+    :rtype: str
+    """
+
+    template_fields: Sequence[str] = ["project_id"]
+    def __init__(
+        self,
+        *,
+        project_id: str,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.project_id = project_id
+
+    def execute(self, context: Context) -> str:
+        dataset: dr.Dataset = dr.Dataset.create_from_project(project_id=self.project_id)
+        self.log.info(f"Dataset created: dataset_id={dataset.id}")
+        return dataset.id
+
+
+class CreateOrUpdateDataSourceOperator(BaseOperator):
     """
     Get an existing data source by name and update it if any of *table_schema*, *table_name*, *query* are specified.
     Create a new data source if there is no existing one with the specified name.
@@ -601,7 +630,7 @@ class CreateWranglingRecipeOperator(BaseDatarobotOperator):
             )
 
         else:
-            raise AirflowException("Specify either dataset_id or data_store_id to wrangle.")
+            raise AirflowException("Please specify either dataset_id or data_store_id to wrangle.")
 
         logging.info(
             '%s recipe id=%s created in use case "%s". Configuring...',

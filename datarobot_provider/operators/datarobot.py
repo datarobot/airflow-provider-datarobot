@@ -74,7 +74,12 @@ class CreateProjectOperator(BaseDatarobotOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = ["dataset_id", "dataset_version_id", "credential_id"]
+    template_fields: Sequence[str] = [
+        "dataset_id",
+        "dataset_version_id",
+        "credential_id",
+        "use_case_id",
+    ]
 
     def __init__(
         self,
@@ -82,6 +87,7 @@ class CreateProjectOperator(BaseDatarobotOperator):
         dataset_id: Optional[str] = None,
         dataset_version_id: Optional[str] = None,
         credential_id: Optional[str] = None,
+        use_case_id: Optional[str] = "{{ params.use_case_id|default('') }}",
         recipe_id: Optional[str] = None,
         **kwargs: Any,
     ) -> None:
@@ -98,7 +104,9 @@ class CreateProjectOperator(BaseDatarobotOperator):
         if self.dataset_id is None and "training_data" in context["params"]:
             # training_data may be a pre-signed URL to a file on S3 or a path to a local file
             project: dr.Project = dr.Project.create(
-                context["params"]["training_data"], context["params"]["project_name"]
+                context["params"]["training_data"],
+                context["params"]["project_name"],
+                use_case=use_case,
             )
             self.log.info(f"Project created: project_id={project.id} from local file")
             project.unsupervised_mode = context["params"].get("unsupervised_mode")
@@ -119,6 +127,7 @@ class CreateProjectOperator(BaseDatarobotOperator):
                 dataset_version_id=self.dataset_version_id,
                 credential_id=self.credential_id,
                 project_name=context["params"]["project_name"],
+                use_case=use_case,
             )
             # Some weird problem with mypy: it passes here locally, but fails in CI
             self.log.info(
