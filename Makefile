@@ -19,6 +19,10 @@ req-dev:
 	pip install --upgrade pip setuptools
 	pip install -e ".[dev]"
 
+req-dev-docs:
+	pip install --upgrade pip setuptools
+	pip install -e ".[dev,docs]"
+
 lint:
 	ruff check .
 
@@ -31,6 +35,9 @@ format:
 format-no-fix:
 	ruff format . --check
 
+test-harness:
+	pytest -vv tests/unit/ --junit-xml=unit_test_report.xml
+
 unit-tests:
 	pytest -vv tests/unit/
 
@@ -39,6 +46,9 @@ typecheck:
 
 test-docs:
 	cd docs && $(MAKE) doctest
+
+test-docs-harness:
+	$(MAKE) test-docs
 
 # Copyright Notices are handled by the next two targets
 # See .licenserc.yaml for configuration
