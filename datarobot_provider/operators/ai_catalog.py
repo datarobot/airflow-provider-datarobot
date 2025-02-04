@@ -431,6 +431,47 @@ class CreateDatasetVersionOperator(BaseOperator):
         return ai_catalog_dataset.version_id
 
 
+class CreateDatasetFromProjectOperator(BaseOperator):
+    """
+    Create a new AI Catalog Dataset from existing project data.
+    :param project_id: DataRobot project ID
+    :type project_id: str
+    :param datasource_id: existing DataRobot datasource ID
+    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
+    :type datarobot_conn_id: str, optional
+    :return: DataRobot AI Catalog dataset ID
+    :rtype: str
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Sequence[str] = ["project_id"]
+    template_fields_renderers: dict[str, str] = {}
+    template_ext: Sequence[str] = ()
+    ui_color = "#f4a460"
+
+    def __init__(
+        self,
+        *,
+        project_id: str,
+        datarobot_conn_id: str = "datarobot_default",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.project_id = project_id
+        self.datarobot_conn_id = datarobot_conn_id
+        if kwargs.get("xcom_push") is not None:
+            raise AirflowException(
+                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
+            )
+
+    def execute(self, context: Context) -> str:
+        # Initialize DataRobot client
+        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
+        dataset: dr.Dataset = dr.Dataset.create_from_project(project_id=self.project_id)
+        self.log.info(f"Dataset created: dataset_id={dataset.id}")
+        return dataset.id
+
+
 class CreateOrUpdateDataSourceOperator(BaseOperator):
     """
     Get an existing data source by name and update it if any of *table_schema*, *table_name*, *query* are specified.

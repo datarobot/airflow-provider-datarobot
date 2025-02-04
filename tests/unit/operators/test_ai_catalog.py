@@ -12,6 +12,7 @@ import freezegun
 import pytest
 
 from datarobot_provider.operators.ai_catalog import CreateDatasetFromDataStoreOperator
+from datarobot_provider.operators.ai_catalog import CreateDatasetFromProjectOperator
 from datarobot_provider.operators.ai_catalog import CreateDatasetFromRecipeOperator
 from datarobot_provider.operators.ai_catalog import CreateDatasetVersionOperator
 from datarobot_provider.operators.ai_catalog import CreateOrUpdateDataSourceOperator
@@ -276,6 +277,23 @@ def test_operator_create_dataset_from_recipe(
         materialization_destination=expected_mat_destination,
     )
     get_recipe_mock.assert_called_once_with("test-recipe-id")
+
+
+def test_operator_create_dataset_from_project(mocker):
+    dataset_mock = mocker.Mock(id="dataset-id")
+    create_dataset_from_project_mock = mocker.patch.object(
+        dr.Dataset, "create_from_project", return_value=dataset_mock
+    )
+
+    operator = CreateDatasetFromProjectOperator(
+        task_id="create_project_from_project_id",
+        project_id="project-id",
+    )
+
+    dataset_id = operator.execute(context={})
+
+    assert dataset_id == "dataset-id"
+    create_dataset_from_project_mock.assert_called_once_with(project_id="project-id")
 
 
 def test_operator_create_dataset_version(mocker):
