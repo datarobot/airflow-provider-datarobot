@@ -119,3 +119,53 @@ pipeline:
                             - "3.11"
                             - "3.12"
                           nodeName: <+matrix.python_version>
+        - stage:
+            name: Docs tests
+            identifier: test_docs
+            description: ""
+            type: CI
+            spec:
+              cloneCodebase: true
+              infrastructure:
+                type: KubernetesDirect
+                spec:
+                  connectorRef: account.cigeneral
+                  namespace: harness-delegate-ng
+                  automountServiceAccountToken: true
+                  nodeSelector: {}
+                  os: Linux
+              execution:
+                steps:
+                  - step:
+                      type: Run
+                      name: run unit tests
+                      identifier: run_unit_tests
+                      spec:
+                        connectorRef: account.dockerhub_datarobot_read
+                        image: python:<+matrix.python_version>
+                        shell: Bash
+                        command: |-
+                          set -exuo pipefail
+                          pip install apache-airflow
+                          pip install -r requirements.txt
+                          pip install airflow-provider-datarobot freezegun
+                          airflow db init
+                          airflow db check
+                          pytest -vv tests/unit/ --junit-xml=unit_test_report.xml
+                        reports:
+                          type: JUnit
+                          spec:
+                            paths:
+                              - /harness/unit_test_report.xml
+                        resources:
+                          limits:
+                            memory: 1Gi
+                            cpu: "1.5"
+                      strategy:
+                        matrix:
+                          python_version:
+                            - "3.9"
+                            - "3.10"
+                            - "3.11"
+                            - "3.12"
+                          nodeName: <+matrix.python_version>
