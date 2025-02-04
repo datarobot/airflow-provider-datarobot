@@ -116,6 +116,8 @@ class CreateUseCaseOperator(BaseOperator):
 
                 return use_case
 
+        return None
+
 
 class CreateProjectOperator(BaseOperator):
     """

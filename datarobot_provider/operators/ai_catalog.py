@@ -40,10 +40,7 @@ class UploadDatasetOperator(BaseOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = [
-        "file_path",
-        "file_path_param",
-    ]
+    template_fields: Sequence[str] = ["file_path", "file_path_param", "use_case_id"]
     template_fields_renderers: dict[str, str] = {}
     template_ext: Sequence[str] = ()
     ui_color = "#f4a460"
@@ -51,19 +48,24 @@ class UploadDatasetOperator(BaseOperator):
     def __init__(
         self,
         *,
-        file_path: Optional[str] = None,
-        file_path_param: str = "dataset_file_path",
+        file_path: str = "{{ params.dataset_file_path | default('') }}",  # Don't use any *default* after *dataset_file_path* is finally removed.
+        file_path_param: Optional[str] = None,  # deprecated. Use airflow-jinja template instead.
+        use_case_id: Optional[str] = "{{ params.use_case_id | default('') }}",
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.file_path = file_path
         self.file_path_param = file_path_param
+        self.use_case_id = use_case_id
         self.datarobot_conn_id = datarobot_conn_id
         if kwargs.get("xcom_push") is not None:
             raise AirflowException(
                 "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
             )
+
+        if self.file_path_param is not None:
+            self._file_path_param_is_deprecated()
 
     def execute(self, context: Context) -> str:
         # Initialize DataRobot client
@@ -71,16 +73,25 @@ class UploadDatasetOperator(BaseOperator):
 
         # Upload Dataset to AI Catalog
         self.log.info("Upload Dataset to AI Catalog")
-        if self.file_path is None:
+        if not self.file_path and self.file_path_param:
+            self._file_path_param_is_deprecated()
             self.file_path = context["params"][self.file_path_param]
 
-        ai_catalog_dataset: dr.Dataset = dr.Dataset.create_from_file(
-            file_path=self.file_path,
-            max_wait=DATAROBOT_MAX_WAIT_SEC,
-        )
-
+        ai_catalog_dataset: dr.Dataset = dr.Dataset.upload(source=self.file_path)
         self.log.info(f"Dataset created: dataset_id={ai_catalog_dataset.id}")
+
+        if self.use_case_id:
+            use_case = dr.UseCase.get(self.use_case_id)
+            use_case.add(ai_catalog_dataset)
+            self.log.info(f'The dataset is added into use case "{use_case.name}"')
+
         return ai_catalog_dataset.id
+
+    def _file_path_param_is_deprecated(self):
+        self.log.warning(
+            "**file_path_param** is deprecated. "
+            f"Use `file_path={{{{ params.{self.file_path_param} }}}}` instead."
+        )
 
 
 class UpdateDatasetFromFileOperator(BaseOperator):
