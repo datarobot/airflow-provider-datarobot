@@ -14,10 +14,11 @@ pipeline:
     - parallel:
         - stage:
             name: Lint and MyPy
-            identifier: lint
+            identifier: lint_and_mypy
             description: ""
             type: CI
             spec:
+              cloneCodebase: true
               infrastructure:
                 type: KubernetesDirect
                 spec:
@@ -26,22 +27,20 @@ pipeline:
                   automountServiceAccountToken: true
                   nodeSelector: {}
                   os: Linux
-              cloneCodebase: true
               execution:
                 steps:
                   - parallel:
                       - step:
                           type: Run
                           name: lint check step
-                          identifier: run_lint
+                          identifier: run_lint_and_mypy
                           spec:
                             connectorRef: account.dockerhub_datarobot_read
                             image: python:3.12
                             shell: Bash
                             command: |-
                               set -exuo pipefail
-                              pip install -U pip
-                              pip install -r requirements.txt
+                              make req-dev
                               make lint
                       - step:
                           type: Run
@@ -53,8 +52,7 @@ pipeline:
                             shell: Bash
                             command: |-
                               set -exuo pipefail
-                              pip install -U pip
-                              pip install -r requirements.txt
+                              make req-dev
                               make format-no-fix
                       - step:
                           type: Run
@@ -66,12 +64,11 @@ pipeline:
                             shell: Bash
                             command: |-
                               set -exuo pipefail
-                              pip install -U pip
-                              pip install -r requirements.txt
+                              make req-dev
                               make typecheck
         - stage:
             name: Unit tests
-            identifier: test_unit
+            identifier: test_unit_tests
             description: ""
             type: CI
             spec:
@@ -118,8 +115,8 @@ pipeline:
                             - "3.12"
                           nodeName: <+matrix.python_version>
         - stage:
-            name: Docs tests
-            identifier: test_docs
+            name: Build docs tests
+            identifier: test_build_docs
             description: ""
             type: CI
             spec:
@@ -135,30 +132,28 @@ pipeline:
               execution:
                 steps:
                   - step:
+                      spec:
+                        connectorRef: account.dockerhub_datarobot_read
+                        image: python:3.12
+                        shell: Bash
+                        command: |-
+                          set -exuo pipefail
+                          pip install -U pip
+                          pip install -r requirements.txt
+                          make lint
+                  - step:
                       type: Run
                       name: run build docs test
                       identifier: run_build_docs_tests
                       spec:
                         connectorRef: account.dockerhub_datarobot_read
-                        image: python:<+matrix.python_version>
+                        image: python:3.12
                         shell: Bash
                         command: |-
                           set -exuo pipefail
                           make req-dev
-                          airflow db init
-                          airflow db check
                           make test-docs-harness
-                        reports:
-                          type: JUnit
-                          spec:
-                            paths:
-                              - /harness/unit_test_report.xml
                         resources:
                           limits:
                             memory: 1Gi
                             cpu: "1.5"
-                      strategy:
-                        matrix:
-                          python_version:
-                            - "3.12"
-                          nodeName: <+matrix.python_version>
