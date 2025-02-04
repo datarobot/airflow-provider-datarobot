@@ -1,0 +1,31 @@
+trigger:
+  name: ci_checks_trigger
+  identifier: ci_checks_trigger
+  enabled: true
+  stagesToExecute: []
+  description: ""
+  tags: {}
+  encryptedWebhookSecretIdentifier: ""
+  orgIdentifier: AGENTS
+  projectIdentifier: airflowproviderdatarobot
+  pipelineIdentifier: cichecks
+  source:
+    type: Webhook
+    spec:
+      type: Github
+      spec:
+        type: PullRequest
+        spec:
+          connectorRef: account.svc_harness_git1
+          autoAbortPreviousExecutions: true
+          payloadConditions:
+            - key: <+eventPayload.pull_request.head.repo.full_name>
+              operator: Equals
+              value: datarobot/airflow-provider-datarobot
+          headerConditions: []
+          repoName: airflow-provider-datarobot
+          actions:
+            - Open
+            - Reopen
+            - Synchronize
+  pipelineBranchName: <+trigger.branch>
