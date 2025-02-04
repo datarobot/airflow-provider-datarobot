@@ -19,6 +19,10 @@ req-dev:
 	pip install --upgrade pip setuptools
 	pip install -e ".[dev]"
 
+req-dev-docs:
+	pip install --upgrade pip setuptools
+	pip install -e ".[dev,docs]"
+
 lint:
 	ruff check .
 

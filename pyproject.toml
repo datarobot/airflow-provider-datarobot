@@ -33,6 +33,12 @@ dev = [
     "pytest>=7.0.0",
     "pytest-mock>=3.7.0",
     "pytest-helpers-namespace>=2021.12.29",
+    "black==24.10.0",
+    "pyyaml>=6.0.2",
+    "types-PyYAML>=6.0.12",
+    "freezegun>=1.5.1",
+]
+docs = [
     "Sphinx>=7.4.7",
     "sphinx_rtd_theme>=3.0",
     "numpydoc>=1.7.0,<1.8.0",
@@ -41,10 +47,6 @@ dev = [
     "sphinx-copybutton",
     "sphinx-markdown-builder",
     "myst-parser==3.0.1",
-    "black==24.10.0",
-    "pyyaml>=6.0.2",
-    "types-PyYAML>=6.0.12",
-    "freezegun>=1.5.1",
 ]
 
 [project.entry-points."apache_airflow_provider"]
