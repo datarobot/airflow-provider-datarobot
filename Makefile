@@ -105,8 +105,10 @@ clean:  ## Clean up misc files like pytest and mypy cache for example
 
 .PHONY: build-release
 build-release: clean  ## Make release build
+	pip3 install --no-cache-dir --upgrade pip setuptools wheel twine
 	python setup.py sdist bdist_wheel
 
 .PHONY: build-early-access
 build-early-access: clean  ## Make early access build
+	pip3 install --no-cache-dir --upgrade pip setuptools wheel twine
 	python setup_early_access.py sdist bdist_wheel

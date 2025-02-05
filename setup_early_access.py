@@ -11,16 +11,13 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from datetime import datetime
 
-from setuptools import find_packages
 from setuptools import setup
 
-from datarobot_provider._setup import DESCRIPTION_TEMPLATE
-from datarobot_provider._setup import common_setup_kwargs
-from datarobot_provider._setup import version
+from setup import DESCRIPTION_TEMPLATE
+from setup import common_setup_kwargs
+from setup import version
 
 version += datetime.today().strftime(".%Y.%m.%d")
-
-python_versions = ">= 3.9"
 
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -37,24 +34,24 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 
+# RELEASE SETUP
+package_name = "airflow_provider_datarobot_early_access"
+
 description = DESCRIPTION_TEMPLATE.format(
-    package_name="airflow_provider_datarobot_early_access",
+    package_name=package_name,
     pypi_url_target="https://pypi.python.org/pypi/airflow-provider-datarobot-early-access/",
     extra_desc=(
         'This package is the "early access" version of the client. **Do NOT use this package'
         " in production--you will expose yourself to risk of breaking changes and bugs.** For"
         " the most stable version, see https://pypi.org/project/airflow-provider-datarobot/."
     ),
-    python_versions=python_versions,
-    pip_package_name="airflow_provider_datarobot_early_access",
+    pip_package_name=package_name,
 )
 
-packages = find_packages(exclude=["tests*"])
-
 common_setup_kwargs.update(
-    name="airflow_provider_datarobot_early_access",
+    name=package_name,
     version=version,
-    packages=packages,
+    packages=["datarobot_provider"],
     long_description=description,
     classifiers=classifiers,
     install_requires=["apache-airflow>=2.3.0", "datarobot-early-access"],
