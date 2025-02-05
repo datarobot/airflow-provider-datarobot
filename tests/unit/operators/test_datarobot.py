@@ -25,34 +25,33 @@ from datarobot_provider.operators.datarobot import _serialize_drift
 
 
 @pytest.mark.parametrize(
-    "name, description",
+    "params, expected_name, expected_description",
     [
-        (None, None),
-        ("use-case-name", None),
-        (None, "use-case-description"),
-        ("use-case-name", "use-case-description"),
+        ({}, "Airflow", ""),
+        ({"use_case_name": "test-name"}, "test-name", ""),
+        ({"use_case_description": "test-description"}, "Airflow", "test-description"),
+        (
+            {"use_case_name": "test-name", "use_case_description": "test-description"},
+            "test-name",
+            "test-description",
+        ),
     ],
 )
-def test_operator_create_use_case(mocker, name, description):
+def test_operator_create_use_case(mocker, params, expected_name, expected_description):
     use_case_mock = mocker.Mock()
     use_case_mock.id = "use-case-id"
     create_use_case_mock = mocker.patch.object(dr.UseCase, "create", return_value=use_case_mock)
 
-    operator = CreateUseCaseOperator(task_id="create_project")
-    params = {}
-    if name:
-        params["use_case_name"] = name
-    if description:
-        params["use_case_description"] = description
-
-    use_case_id = operator.execute(
-        context={
-            "params": params,
-        }
+    context = {"params": params}
+    operator = CreateUseCaseOperator(
+        task_id="create_project", reuse_policy=CreateUseCaseOperator.ReusePolicy.NO_REUSE
     )
 
+    operator.render_template_fields(context)
+    use_case_id = operator.execute(context)
+
     assert use_case_id == "use-case-id"
-    create_use_case_mock.assert_called_with(name=name, description=description)
+    create_use_case_mock.assert_called_with(name=expected_name, description=expected_description)
 
 
 def test_operator_create_project(mocker):

@@ -24,17 +24,15 @@ from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 def test_operator_upload_dataset(mocker):
     dataset_mock = mocker.Mock()
     dataset_mock.id = "dataset-id"
-    upload_dataset_mock = mocker.patch.object(
-        dr.Dataset, "create_from_file", return_value=dataset_mock
-    )
-    context = {"params": {"dataset_file_path": "/path/to/local/file.csv"}}
+    upload_dataset_mock = mocker.patch.object(dr.Dataset, "upload", return_value=dataset_mock)
+    context = {"params": {"dataset_file_path": "/path/to/local/file"}}
 
     operator = UploadDatasetOperator(task_id="upload_dataset")
     operator.render_template_fields(context)
     dataset_id = operator.execute(context=context)
 
     assert dataset_id == "dataset-id"
-    upload_dataset_mock.assert_called_with(file_path="/path/to/local/file", max_wait=3600)
+    upload_dataset_mock.assert_called_with(source="/path/to/local/file")
 
 
 def test_operator_update_dataset_from_file(mocker):
@@ -255,14 +253,17 @@ def test_operator_create_dataset_from_recipe(
         dr.Dataset, "create_from_recipe", return_value=dataset_mock
     )
     get_recipe_mock = mocker.patch.object(dr.models.Recipe, "get", return_value=recipe_mock)
+
+    context = {"params": test_params}
     operator = CreateDatasetFromRecipeOperator(
         task_id="create_from_recipe",
         recipe_id="test-recipe-id",
         dataset_name_param="dataset1_name",
         do_snapshot=do_snapshot,
     )
+    operator.render_template_fields(context)
 
-    dataset_id = operator.execute(context={"params": test_params})
+    dataset_id = operator.execute(context=context)
 
     assert dataset_id == "dataset-id"
     create_dataset_from_recipe_mock.assert_called_once_with(
