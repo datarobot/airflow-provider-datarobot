@@ -1,0 +1,112 @@
+template:
+  name: Publish to Pypi or TestPypi
+  identifier: publish_to_pypi_or_testPypi
+  versionLabel: "1"
+  type: Stage
+  projectIdentifier: airflowproviderdatarobot
+  orgIdentifier: AGENTS
+  tags: {}
+  spec:
+    type: CI
+    spec:
+      cloneCodebase: true
+      caching:
+        enabled: true
+      buildIntelligence:
+        enabled: true
+      infrastructure:
+        type: KubernetesDirect
+        spec:
+          connectorRef: account.cigeneral
+          namespace: harness-delegate-ng
+          automountServiceAccountToken: true
+          nodeSelector: {}
+          os: Linux
+      execution:
+        steps:
+          - step:
+              type: Run
+              name: PyPi Publish
+              identifier: PyPi_Publish
+              spec:
+                connectorRef: account.dockerhub_datarobot_read
+                image: python:3.12
+                shell: Bash
+                command: |-
+                  #!/bin/bash
+
+                  configure_git() {
+                      echo "configuring git"
+                      cat <<EOF > ${HOME}/.netrc
+                  machine ${DRONE_NETRC_MACHINE}
+                  login ${DRONE_NETRC_USERNAME}
+                  password ${DRONE_NETRC_PASSWORD}
+                  EOF
+                  }
+
+                  install_dependencies() {
+                      pip3 install --no-cache-dir --upgrade pip setuptools wheel six twine
+                  }
+
+                  set_build_variables() {
+                      export SETUPTOOLS_SCM_PRETEND_VERSION='<+trigger.tag>'
+                      BUILD_TYPE='<+stage.variables.BUILD_TYPE>'
+                      REPO_URL='https://test.pypi.org/legacy/'
+                      UPLOAD_SECRET='<+secrets.getValue("org.test_pypi_token")>'
+                      VERSION=$(python3 setup_weekly.py --version)
+
+                      if [ "$BUILD_TYPE" != "test" ]; then
+                          REPO_URL='https://upload.pypi.org/legacy/'
+                          UPLOAD_SECRET='<+secrets.getValue("org.pypi_token")>'
+                      fi
+                  }
+
+                  prepare_slack_message() {
+                      echo "*Step:* Publish to Pypi" > SLACK_MESSAGE.md
+                      echo "================================="
+                      echo "Building weekly dist for ${BUILD_TYPE} PyPi"
+                      echo "Version: $VERSION"
+                      echo "================================="
+
+                      if [ "$BUILD_TYPE" == "test" ]; then
+                          REPO_LINK="https://test.pypi.org/project/datarobot-early-access/$VERSION/"
+                      else
+                          REPO_LINK="https://pypi.org/project/datarobot-early-access/$VERSION/"
+                      fi
+
+                      echo "Building weekly dist for *${BUILD_TYPE} PyPi*" >> SLACK_MESSAGE.md
+                      echo "Version: <${REPO_LINK}|${VERSION}>" >> SLACK_MESSAGE.md
+                  }
+
+                  build_and_upload() {
+                      make build-weekly
+
+                      echo "[TWINE CHECK]"
+                      twine check dist/*
+
+                      echo "[TWINE UPLOAD]"
+                      twine upload \
+                          --repository-url "$REPO_URL" \
+                          --username '__token__' \
+                          --password "$UPLOAD_SECRET" \
+                          dist/*
+                  }
+
+                  push_tags() {
+                      if [ "$BUILD_TYPE" != "test" ]; then
+                          echo '[PUSHING EARLY ACCESS TAGS]'
+                          git tag -f early-access && git push -f origin early-access
+                      fi
+                  }
+
+                  main() {
+                      configure_git
+                      install_dependencies
+                      set_build_variables
+                      prepare_slack_message
+                      build_and_upload
+                      push_tags
+                      cat ./SLACK_MESSAGE.md
+                  }
+
+                  main "$@"
