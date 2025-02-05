@@ -46,10 +46,10 @@ class ComputeFeatureImpactOperator(BaseDatarobotOperator):
         self.model_id = model_id
 
     def validate(self):
-        if self.project_id is None:
+        if not self.project_id:
             raise ValueError("project_id is required to compute Feature Impact.")
 
-        if self.model_id is None:
+        if not self.model_id:
             raise ValueError("model_id is required to compute Feature Impact.")
 
     def execute(self, context: Context) -> str:
@@ -93,10 +93,10 @@ class ComputeFeatureEffectsOperator(BaseDatarobotOperator):
         self.model_id = model_id
 
     def validate(self):
-        if self.project_id is None:
+        if not self.project_id:
             raise ValueError("project_id is required to compute Feature Effects.")
 
-        if self.model_id is None:
+        if not self.model_id:
             raise ValueError("model_id is required to compute Feature Effects.")
 
     def execute(self, context: Context) -> str:

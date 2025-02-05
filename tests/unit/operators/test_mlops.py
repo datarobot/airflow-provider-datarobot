@@ -69,17 +69,14 @@ def test_operator_submit_actuals_deployment_is_none(mocker, submit_actuals_from_
         return_value=StatusCheckJob(job_id=status_check_job_id),
     )
 
+    operator = SubmitActualsFromCatalogOperator(
+        task_id="submit_actuals_form_catalog",
+        deployment_id=deployment_id,
+        dataset_id=dataset_id,
+    )
+
     with pytest.raises(ValueError):
-        operator = SubmitActualsFromCatalogOperator(
-            task_id="submit_actuals_form_catalog",
-            deployment_id=deployment_id,
-            dataset_id=dataset_id,
-        )
-        operator.execute(
-            context={
-                "params": submit_actuals_from_catalog_settings,
-            }
-        )
+        operator.validate()
 
 
 def test_operator_submit_actuals_dataset_is_none(mocker, submit_actuals_from_catalog_settings):
@@ -93,14 +90,11 @@ def test_operator_submit_actuals_dataset_is_none(mocker, submit_actuals_from_cat
         return_value=StatusCheckJob(job_id=status_check_job_id),
     )
 
+    operator = SubmitActualsFromCatalogOperator(
+        task_id="submit_actuals_form_catalog",
+        deployment_id=deployment_id,
+        dataset_id=dataset_id,
+    )
+
     with pytest.raises(ValueError):
-        operator = SubmitActualsFromCatalogOperator(
-            task_id="submit_actuals_form_catalog",
-            deployment_id=deployment_id,
-            dataset_id=dataset_id,
-        )
-        operator.execute(
-            context={
-                "params": submit_actuals_from_catalog_settings,
-            }
-        )
+        operator.validate()
