@@ -14,9 +14,9 @@ from datetime import datetime
 from setuptools import find_packages
 from setuptools import setup
 
-from setup_common import DESCRIPTION_TEMPLATE
-from setup_common import common_setup_kwargs
-from setup_common import version
+from datarobot_provider._setup import DESCRIPTION_TEMPLATE
+from datarobot_provider._setup import common_setup_kwargs
+from datarobot_provider._setup import version
 
 version += datetime.today().strftime(".%Y.%m.%d")
 
