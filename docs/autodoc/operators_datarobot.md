@@ -10,6 +10,7 @@
 
 ```{eval-rst}
 .. autoclass:: datarobot_provider.operators.model_training.ModelJobGetOperator
+    :members:
 
 ```
 

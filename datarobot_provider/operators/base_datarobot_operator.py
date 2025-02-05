@@ -57,10 +57,15 @@ class DatarobotFunctionOperator(BaseDatarobotOperator):
     @classmethod
     def __init_subclass__(cls):
         super().__init_subclass__()
-        if not hasattr(cls, "method"):
-            raise ValueError(f"*method* field must be defined in {cls.__name__}")
+        if not hasattr(cls, "function"):
+            raise ValueError(f"*function* field must be defined in {cls.__name__}")
 
-        cls.__doc__ = cls.function.__doc__
+        if cls.return_field:
+            cls.__doc__ = f"Make a call to the **function** " \
+                          f"and return the **{cls.return_field}** field of its result."
+
+        else:
+            cls.__doc__ = "Make a call to the **function**"
 
     @property
     def method_params(self) -> Iterable[str]:
