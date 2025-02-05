@@ -69,7 +69,7 @@ def test_create_registered_model_version_external(mocker):
 
     mocker.patch.object(DataRobotHook, "run", return_value=None)
     mock_version = mocker.Mock()
-    mock_version.id = "version-123"
+    mock_version.id = "version-1234"
 
     create_mock = mocker.patch.object(
         dr.RegisteredModelVersion, "create_for_external", return_value=mock_version
@@ -85,4 +85,4 @@ def test_create_registered_model_version_external(mocker):
     create_mock.assert_called_with(
         name="External Model", target="classification", registered_model_id="123456"
     )
-    assert result == "version-123"
+    assert result == "version-1234"
