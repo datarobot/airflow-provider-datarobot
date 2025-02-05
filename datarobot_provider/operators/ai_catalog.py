@@ -16,6 +16,7 @@ from typing import Optional
 import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.utils.context import Context
+from datarobot.models.recipe_operation import RandomSamplingOperation
 
 from datarobot_provider.hooks.connections import JDBCDataSourceHook
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
@@ -45,15 +46,18 @@ class UploadDatasetOperator(BaseDatarobotOperator):
     def __init__(
         self,
         *,
-        file_path: Optional[str] = None,
-        file_path_param: str = "dataset_file_path",
-        datarobot_conn_id: str = "datarobot_default",
+        file_path: str = "{{ params.dataset_file_path | default('') }}",  # Don't use any *default* after *dataset_file_path* is finally removed.
+        file_path_param: Optional[str] = None,
+        use_case_id: Optional[str] = "{{ params.use_case_id | default('') }}",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.file_path = file_path
         self.file_path_param = file_path_param
         self.use_case_id = use_case_id
+
+        if self.file_path_param is not None:
+            self._file_path_param_is_deprecated()
 
     def execute(self, context: Context) -> str:
         # Upload Dataset to AI Catalog

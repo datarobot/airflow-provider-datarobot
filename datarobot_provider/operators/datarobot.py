@@ -12,6 +12,7 @@ from typing import Optional
 import datarobot as dr
 from airflow.exceptions import AirflowFailException
 from airflow.utils.context import Context
+from strenum import StrEnum
 
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
