@@ -53,7 +53,7 @@ template:
                       BUILD_TYPE='<+stage.variables.BUILD_TYPE>'
                       REPO_URL='https://test.pypi.org/legacy/'
                       UPLOAD_SECRET='<+secrets.getValue("org.test_pypi_token")>'
-                      VERSION=$(python3 setup_weekly.py --version)
+                      VERSION=$(python3 setup_early_access.py.py --version)
 
                       if [ "$BUILD_TYPE" != "test" ]; then
                           REPO_URL='https://upload.pypi.org/legacy/'
