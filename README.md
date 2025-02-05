@@ -1395,6 +1395,58 @@ Example of DAG config params:
 For more [prediction-explanations](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=PredictionExplanationsInitialization#prediction-explanations), see the DataRobot documentation.
 
 ---
+#### `CreateRegisteredModelVersionOperator`
+
+ Dynamically creates a registered model version using one of three methods:
+    - Leaderboard Model
+    - Custom Model Version
+    - External Model
+
+Parameters:
+
+| Parameter             | Type | Description                    |
+|-----------------------|------|--------------------------------|
+| `model_type`          | str  | Type of model version to create (leaderboard, custom, or external).|
+| `name`            | str  | Name of the registered model version.|
+| `model_id` | str  | (Required for leaderboard) The ID of the leaderboard model.  |
+| `registered_model_name` | str  | (Required for leaderboard) Name of the registered model.  |
+| `custom_model_version_id` | str  | (Required for custom) The ID of the custom model version. |
+| `registered_model_id` | str  | (Required for external) The ID of the registered model.  |
+| `target` | str  | (Required for external) The target for the external model. |
+
+Example of DAG config params:
+
+Leaderboard Model
+```
+{
+    "model_type": "leaderboard",
+    "name": "My Registered Model",
+    "model_id": "123456789",
+    "registered_model_name": "My Model Registry"
+}
+```
+
+Custom Model
+```
+{
+    "model_type": "custom",
+    "name": "Custom Model Version",
+    "custom_model_version_id": "987654321"
+}
+```
+
+External Model
+```
+{
+    "model_type": "external",
+    "name": "External Model Version",
+    "registered_model_id": "1234567891011",
+    "target": "prediction"
+}
+```
+For more [Model Registry](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/mlops/model_registry.html#create-registered-model-version), see the DataRobot documentation.
+
+---
 
 ### [Sensors](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/sensors/datarobot.py)
 
