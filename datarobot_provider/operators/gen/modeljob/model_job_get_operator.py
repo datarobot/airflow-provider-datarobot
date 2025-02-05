@@ -1,7 +1,7 @@
 from datarobot import ModelJob
 
-from datarobot_provider.operators.base_datarobot_operator import DatarobotMethodOperator
+from datarobot_provider.operators.base_datarobot_operator import DatarobotFunctionOperator
 
 
-class ModelJobGetOperator(DatarobotMethodOperator):
-    method = ModelJob.get
+class ModelJobGetOperator(DatarobotFunctionOperator):
+    function = ModelJob.get

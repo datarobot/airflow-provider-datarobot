@@ -5,11 +5,16 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-
-from typing import Any, Callable, Iterable
+import inspect
+from typing import Any
+from typing import Callable
+from typing import Iterable
+from typing import List
 from typing import Optional
+from typing import Union
+from typing import get_args
+from typing import get_origin
 
-import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 from airflow.utils.context import Context
@@ -44,46 +49,43 @@ class BaseDatarobotOperator(BaseOperator):
             )
 
 
-class DatarobotMethodOperator(BaseDatarobotOperator):
-    method: Callable
-    return_field = 'id'
+class DatarobotFunctionOperator(BaseDatarobotOperator):
+    function: Callable
+    return_field = "id"
     required_params: List[str]
 
     @classmethod
     def __init_subclass__(cls):
         super().__init_subclass__()
-        if not hasattr(cls, 'method'):
-            raise ValueError(f'*method* field must be defined in {cls.__name__}')
+        if not hasattr(cls, "method"):
+            raise ValueError(f"*method* field must be defined in {cls.__name__}")
 
-        cls.__doc__ = cls.method.__doc__
+        cls.__doc__ = cls.function.__doc__
 
     @property
     def method_params(self) -> Iterable[str]:
-        return self.method.__annotations__.keys()
+        return self.function.__annotations__.keys()
 
     @classmethod
     def get_non_default_params(cls) -> List[str]:
         return [
             param.name
-            for param in
-            inspect.signature(cls.method).parameters.values()
+            for param in inspect.signature(cls.function).parameters.values()
             if param.default is inspect.Parameter.empty
         ]
 
     @classmethod
     def get_not_none_params(cls) -> List[str]:
-        if hasattr(cls, 'required_params'):
+        if hasattr(cls, "required_params"):
             return cls.required_params
 
         return [
             param.name
-            for param in
-            inspect.signature(cls.method).parameters.values()
+            for param in inspect.signature(cls.function).parameters.values()
             if (
                 param.default is inspect.Parameter.empty
                 and not (
-                    get_origin(param.annotation) is Union
-                    and None in get_args(param.annotation)
+                    get_origin(param.annotation) is Union and None in get_args(param.annotation)
                 )
             )
         ]
@@ -97,7 +99,7 @@ class DatarobotMethodOperator(BaseDatarobotOperator):
 
         if missing := self._get_missing_params():
             raise AirflowException(
-                'Following parameters are missing in the task '
+                "Following parameters are missing in the task "
                 f'"{task_id}" <{self.__class__.__name__}>: [{",".join(missing)}]'
             )
 
@@ -107,20 +109,14 @@ class DatarobotMethodOperator(BaseDatarobotOperator):
 
     def validate(self):
         for required_param in self.get_not_none_params():
-            if getattr(self, required_param) is None or getattr(self, required_param) == '':
+            if getattr(self, required_param) is None or getattr(self, required_param) == "":
                 raise AirflowException(f"{required_param} can't be None.")
 
     def execute(self, context: Context):
-        return self.post_process(
-            self.method(**self._get_kwargs())
-        )
+        return self.post_process(self.function(**self._get_kwargs()))
 
     def _get_kwargs(self) -> dict:
-        return {
-            x: getattr(self, x)
-            for x in self.method_params
-            if hasattr(self, x)
-        }
+        return {x: getattr(self, x) for x in self.method_params if hasattr(self, x)}
 
     def post_process(self, method_output):
         if self.return_field is None:
