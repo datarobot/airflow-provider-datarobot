@@ -27,15 +27,11 @@ def test_operator_upload_dataset(mocker):
     upload_dataset_mock = mocker.patch.object(
         dr.Dataset, "create_from_file", return_value=dataset_mock
     )
+    context = {"params": {"dataset_file_path": "/path/to/local/file.csv"}}
 
     operator = UploadDatasetOperator(task_id="upload_dataset")
-    dataset_id = operator.execute(
-        context={
-            "params": {
-                "dataset_file_path": "/path/to/local/file",
-            },
-        }
-    )
+    operator.render_template_fields(context)
+    dataset_id = operator.execute(context=context)
 
     assert dataset_id == "dataset-id"
     upload_dataset_mock.assert_called_with(file_path="/path/to/local/file", max_wait=3600)
