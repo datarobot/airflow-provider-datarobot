@@ -13,8 +13,10 @@ import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 from airflow.utils.context import Context
+from datarobot import ModelJob
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
+from datarobot_provider.operators.base_datarobot_operator import DatarobotFunctionOperator
 
 
 class TrainModelOperator(BaseOperator):
@@ -164,3 +166,7 @@ class RetrainModelOperator(BaseOperator):
         self.log.info(f"Model Retraining Job submitted job_id={job_id}")
 
         return job_id
+
+
+class ModelJobGetOperator(DatarobotFunctionOperator):
+    function = ModelJob.get

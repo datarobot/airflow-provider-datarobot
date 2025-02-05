@@ -9,7 +9,7 @@
 
 
 ```{eval-rst}
-.. autoclass:: datarobot_provider.operators.gen.modeljob.model_job_get_operator.ModelJobGetOperator
+.. autoclass:: datarobot_provider.operators.model_training.ModelJobGetOperator
 
 ```
 

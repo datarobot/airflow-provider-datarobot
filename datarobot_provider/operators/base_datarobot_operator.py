@@ -110,12 +110,12 @@ class DatarobotFunctionOperator(BaseDatarobotOperator):
     def validate(self):
         for required_param in self.get_not_none_params():
             if getattr(self, required_param) is None or getattr(self, required_param) == "":
-                raise AirflowException(f"{required_param} can't be None.")
+                raise AirflowException(f"{required_param} is a required param.")
 
     def execute(self, context: Context):
-        return self.post_process(self.function(**self._get_kwargs()))
+        return self.post_process(self.function(**self._get_runtime_kwargs()))
 
-    def _get_kwargs(self) -> dict:
+    def _get_runtime_kwargs(self) -> dict:
         return {x: getattr(self, x) for x in self.method_params if hasattr(self, x)}
 
     def post_process(self, method_output):
