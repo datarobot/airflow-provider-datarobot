@@ -97,8 +97,6 @@ can be found on our `Legal`_ page, along with our privacy policy and more.
 
 Installation
 =========================
-The DataRobot provider for Apache Airflow requires an environment with the following dependencies installed:
-
 You must have a datarobot account.
 
 ::
