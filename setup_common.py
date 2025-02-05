@@ -45,9 +45,8 @@ About {package_name}
 .. image:: https://img.shields.io/pypi/pyversions/{package_name}.svg
 .. image:: https://img.shields.io/pypi/status/{package_name}.svg
 
-This package provides operators, sensors, and a hook to integrate [DataRobot](https://www.datarobot.com) into Apache Airflow.
-Using these components, you should be able to build the essential DataRobot pipeline - create a project, train models, deploy a model,
-and score predictions against the model deployment. {extra_desc}
+This package provides operators, sensors, and a hook to integrate [DataRobot](https://www.datarobot.com)
+into Apache Airflow. {extra_desc}
 
 This package is released under the terms of the DataRobot Tool and Utility Agreement, which
 can be found on our `Legal`_ page, along with our privacy policy and more.
