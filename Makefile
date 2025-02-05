@@ -93,3 +93,20 @@ copy-examples-astro-dev:
 
 autogen-operators:
 	python ./datarobot_provider/autogen/generate_operator.py --whitelist ./datarobot_provider/autogen/whitelist.yaml --output_folder ./datarobot_provider/operators/gen
+
+.PHONY: clean
+clean:  ## Clean up misc files like pytest and mypy cache for example
+	rm -f dist/*
+	rm -rf .mypy_cache
+	find . -type f \( -name '*.py[co]' -o -name '*~' -o -name '@*' -o -name '#*#' -o -name '*.orig' -o -name '*.rej' -o -name '.chunk_*' -o -name 'tmp*' \) -delete
+	find . -type d -name __pycache__ -delete
+	rm -rf build/* && rm -rf airflow_provider_datarobot.egg-info
+	rm -rf build/* && rm -rf airflow_provider_datarobot_early_access.egg-info
+
+.PHONY: build-release
+build-release: clean  ## Make release build
+	python setup.py sdist bdist_wheel
+
+.PHONY: build-early-access
+build-early-access: clean  ## Make early access build
+	python setup_early_access.py sdist bdist_wheel
