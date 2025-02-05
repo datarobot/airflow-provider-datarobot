@@ -1,5 +1,5 @@
 #
-# Copyright 2021 DataRobot, Inc. and its affiliates.
+# Copyright 2021-2025 DataRobot, Inc. and its affiliates.
 #
 # All rights reserved.
 #
@@ -18,7 +18,6 @@ from setup_common import common_setup_kwargs
 from setup_common import version
 
 python_versions = ">= 3.9"
-
 
 description = DESCRIPTION_TEMPLATE.format(
     package_name="airflow_provider_datarobot",

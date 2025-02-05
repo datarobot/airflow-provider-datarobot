@@ -18,10 +18,6 @@ from setup_common import DESCRIPTION_TEMPLATE
 from setup_common import common_setup_kwargs
 from setup_common import version
 
-# remove the "b" from the version number
-# as PyPi does not support version naming with "a","b", "rc" in it
-# PyPI disallows 'b' unless followed by [.postN][.devN]
-version = version.split("b")[0]
 version += datetime.today().strftime(".%Y.%m.%d")
 
 python_versions = ">= 3.9"
