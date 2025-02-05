@@ -18,6 +18,7 @@ common_setup_kwargs = dict(
     package_data={"airflow_provider_datarobot": ["py.typed"]},
     python_requires=">=3.9",
     long_description=None,
+    long_description_content_type="text/markdown",
     classifiers=None,
     install_requires=["apache-airflow>=2.3.0", "datarobot>=3.6.1"],
     extras_require={
@@ -63,7 +64,7 @@ classifiers = [
 
 DESCRIPTION_TEMPLATE = """
 About {package_name}
-============================
+=============================================
 .. image:: https://img.shields.io/pypi/v/{package_name}.svg
    :target: {pypi_url_target}
 .. image:: https://img.shields.io/pypi/pyversions/{package_name}.svg
