@@ -15,18 +15,16 @@ from typing import Optional
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
-from airflow.models import BaseOperator
 from airflow.utils.context import Context
-from datarobot.models.recipe_operation import RandomSamplingOperation
 
 from datarobot_provider.hooks.connections import JDBCDataSourceHook
-from datarobot_provider.hooks.datarobot import DataRobotHook
+from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 # Time in seconds after which dataset uploading is considered unsuccessful.
 DATAROBOT_MAX_WAIT_SEC = 3600
 
 
-class UploadDatasetOperator(BaseOperator):
+class UploadDatasetOperator(BaseDatarobotOperator):
     """
     Uploading local file to DataRobot AI Catalog and return Dataset ID.
     :param file_path: The path to the file.
@@ -43,16 +41,12 @@ class UploadDatasetOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["file_path", "file_path_param", "use_case_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
-        file_path: str = "{{ params.dataset_file_path | default('') }}",  # Don't use any *default* after *dataset_file_path* is finally removed.
-        file_path_param: Optional[str] = None,
-        use_case_id: Optional[str] = "{{ params.use_case_id | default('') }}",
+        file_path: Optional[str] = None,
+        file_path_param: str = "dataset_file_path",
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
@@ -60,19 +54,8 @@ class UploadDatasetOperator(BaseOperator):
         self.file_path = file_path
         self.file_path_param = file_path_param
         self.use_case_id = use_case_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
-
-        if self.file_path_param is not None:
-            self._file_path_param_is_deprecated()
 
     def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         # Upload Dataset to AI Catalog
         self.log.info("Upload Dataset to AI Catalog")
         if not self.file_path and self.file_path_param:
@@ -96,7 +79,7 @@ class UploadDatasetOperator(BaseOperator):
         )
 
 
-class UpdateDatasetFromFileOperator(BaseOperator):
+class UpdateDatasetFromFileOperator(BaseDatarobotOperator):
     """
     Operator that creates a new Dataset version from a file.
     Returns when the new dataset version has been successfully uploaded.
@@ -122,9 +105,6 @@ class UpdateDatasetFromFileOperator(BaseOperator):
         "file_path",
         "file_path_param",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -133,7 +113,6 @@ class UpdateDatasetFromFileOperator(BaseOperator):
         dataset_id_param: str = "training_dataset_id",
         file_path: Optional[str] = None,
         file_path_param: str = "dataset_file_path",
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -141,16 +120,8 @@ class UpdateDatasetFromFileOperator(BaseOperator):
         self.dataset_id_param = dataset_id_param
         self.file_path = file_path
         self.file_path_param = file_path_param
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         # If dataset_id not provided in constructor, then using dataset_id_param from json config
         dataset_id = (
             self.dataset_id
@@ -178,7 +149,7 @@ class UpdateDatasetFromFileOperator(BaseOperator):
         return ai_catalog_dataset.version_id
 
 
-class CreateDatasetFromDataStoreOperator(BaseOperator):
+class CreateDatasetFromDataStoreOperator(BaseDatarobotOperator):
     """
     Loading dataset from JDBC Connection to DataRobot AI Catalog and return Dataset ID.
 
@@ -190,27 +161,8 @@ class CreateDatasetFromDataStoreOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = []
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
-
-    def __init__(
-        self,
-        *,
-        datarobot_conn_id: str = "datarobot_default",
-        **kwargs: Any,
-    ) -> None:
-        super().__init__(**kwargs)
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         # Fetch stored JDBC Connection with credentials
         _, credential_data, data_store = JDBCDataSourceHook(
             datarobot_credentials_conn_id=context["params"]["datarobot_jdbc_connection"]
@@ -265,7 +217,7 @@ class CreateDatasetFromDataStoreOperator(BaseOperator):
         return ai_catalog_dataset.id
 
 
-class CreateDatasetFromRecipeOperator(BaseOperator):
+class CreateDatasetFromRecipeOperator(BaseDatarobotOperator):
     """Create a dataset based on a wrangling recipe.
     The dataset can be dynamic or a snapshot depending on the mandatory *do_snapshot* parameter.
     The dataset is added into the Use Case if use_case_id is specified
@@ -292,12 +244,10 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
     """
 
     template_fields = ["recipe_id", "use_case_id"]
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
-        datarobot_conn_id: str = "datarobot_default",
         recipe_id: str,
         do_snapshot: bool,
         dataset_name_param: str = "dataset_name",
@@ -308,7 +258,6 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
-        self.datarobot_conn_id = datarobot_conn_id
         self.recipe_id = recipe_id
         self.do_snapshot = do_snapshot
 
@@ -317,11 +266,6 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
         self.materialization_schema_param = materialization_schema_param
         self.materialization_table_param = materialization_table_param
         self.use_case_id = use_case_id
-
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def _get_materialization_destination(
         self, context: Context
@@ -345,9 +289,6 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
         )
 
     def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         recipe = dr.models.Recipe.get(self.recipe_id)
         if recipe.dialect == dr.enums.DataWranglingDialect.SPARK and not self.do_snapshot:
             raise AirflowException(
@@ -383,7 +324,7 @@ class CreateDatasetFromRecipeOperator(BaseOperator):
         return dataset.id
 
 
-class CreateDatasetVersionOperator(BaseOperator):
+class CreateDatasetVersionOperator(BaseDatarobotOperator):
     """
     Creating new version of existing dataset in AI Catalog and return dataset version ID.
 
@@ -401,9 +342,6 @@ class CreateDatasetVersionOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["dataset_id", "datasource_id", "credential_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -411,23 +349,14 @@ class CreateDatasetVersionOperator(BaseOperator):
         dataset_id: str,
         datasource_id: str,
         credential_id: str,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.dataset_id = dataset_id
         self.datasource_id = datasource_id
         self.credential_id = credential_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         self.log.debug(
             f"Creation new version of dataset: dataset_id={self.dataset_id}, "
             f"using datasource: datasource_id={self.datasource_id}, "
@@ -449,7 +378,7 @@ class CreateDatasetVersionOperator(BaseOperator):
         return ai_catalog_dataset.version_id
 
 
-class CreateDatasetFromProjectOperator(BaseOperator):
+class CreateDatasetFromProjectOperator(BaseDatarobotOperator):
     """
     Create a new AI Catalog Dataset from existing project data.
     :param project_id: DataRobot project ID
@@ -461,36 +390,24 @@ class CreateDatasetFromProjectOperator(BaseOperator):
     :rtype: str
     """
 
-    # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["project_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         project_id: str,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.project_id = project_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
         dataset: dr.Dataset = dr.Dataset.create_from_project(project_id=self.project_id)
         self.log.info(f"Dataset created: dataset_id={dataset.id}")
         return dataset.id
 
 
-class CreateOrUpdateDataSourceOperator(BaseOperator):
+class CreateOrUpdateDataSourceOperator(BaseDatarobotOperator):
     """
     Get an existing data source by name and update it if any of *table_schema*, *table_name*, *query* are specified.
     Create a new data source if there is no existing one with the specified name.
@@ -520,13 +437,11 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
         "table_schema",
         "query",
     ]
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         data_store_id: str,
-        datarobot_conn_id: str = "datarobot_default",
         dataset_name: Optional[str] = "{{ params.get('dataset_name', '') }}",
         table_schema: Optional[str] = "{{ params.get('table_schema', '') }}",
         table_name: Optional[str] = "{{ params.get('table_name', '') }}",
@@ -535,21 +450,12 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
     ) -> None:
         super().__init__(**kwargs)
         self.data_store_id = data_store_id
-        self.datarobot_conn_id = datarobot_conn_id
         self.dataset_name = dataset_name
         self.table_schema = table_schema
         self.table_name = table_name
         self.query = query
 
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
-
     def execute(self, context: Context) -> Optional[str]:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         self.log.debug(f"Trying to get existing DataStore by data_store_id={self.data_store_id}")
         data_store = dr.DataStore.get(data_store_id=self.data_store_id)
         self.log.debug(f"Found existing DataStore: {data_store.canonical_name}, id={data_store.id}")
@@ -616,7 +522,7 @@ class CreateOrUpdateDataSourceOperator(BaseOperator):
         return "-".join(parts)
 
 
-class CreateWranglingRecipeOperator(BaseOperator):
+class CreateWranglingRecipeOperator(BaseDatarobotOperator):
     """Create a Wrangling Recipe
 
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
@@ -657,12 +563,10 @@ class CreateWranglingRecipeOperator(BaseOperator):
         "downsampling_directive": "string",
         "downsampling_arguments": "json",
     }
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
-        datarobot_conn_id: str = "datarobot_default",
         use_case_id: str = '{{ params.get("use_case_id", "") }}',
         dataset_id: Optional[str] = None,
         data_store_id: Optional[str] = None,
@@ -677,7 +581,6 @@ class CreateWranglingRecipeOperator(BaseOperator):
         **kwargs,
     ):
         super().__init__(**kwargs)
-        self.datarobot_conn_id = datarobot_conn_id
         self.use_case_id = use_case_id
         self.dataset_id = dataset_id
         self.data_store_id = data_store_id
@@ -690,15 +593,7 @@ class CreateWranglingRecipeOperator(BaseOperator):
         self.downsampling_directive = downsampling_directive
         self.downsampling_arguments = downsampling_arguments
 
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
-
-    def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
+    def validate(self):
         if not self.use_case_id:
             raise AirflowException(
                 "*use_case_id* is a mandatory parameter. "
@@ -710,6 +605,7 @@ class CreateWranglingRecipeOperator(BaseOperator):
                 "You have to specify either dataset_id or data_store_id. Not both."
             )
 
+    def execute(self, context: Context) -> str:
         use_case = dr.UseCase.get(self.use_case_id)
 
         if self.dataset_id:

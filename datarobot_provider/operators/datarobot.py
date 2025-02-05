@@ -10,20 +10,17 @@ from typing import Any
 from typing import Optional
 
 import datarobot as dr
-from airflow.exceptions import AirflowException
 from airflow.exceptions import AirflowFailException
-from airflow.models import BaseOperator
 from airflow.utils.context import Context
-from strenum import StrEnum
 
-from datarobot_provider.hooks.datarobot import DataRobotHook
+from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 DATAROBOT_MAX_WAIT = 3600
 DATAROBOT_AUTOPILOT_TIMEOUT = 86400
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%s"
 
 
-class CreateUseCaseOperator(BaseOperator):
+class CreateUseCaseOperator(BaseDatarobotOperator):
     """
     Creates a DataRobot Use Case.
 
@@ -61,9 +58,6 @@ class CreateUseCaseOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["name", "description"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -71,23 +65,14 @@ class CreateUseCaseOperator(BaseOperator):
         name: str = "{{ params.use_case_name | default('Airflow') }}",
         description: Optional[str] = "{{ params.use_case_description | default('') }}",
         reuse_policy: ReusePolicy = ReusePolicy.EXACT,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.name = name
         self.description = description
         self.reuse_policy = reuse_policy
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> Optional[str]:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         use_case = None
 
         if self.reuse_policy != self.ReusePolicy.NO_REUSE:
@@ -128,7 +113,7 @@ class CreateUseCaseOperator(BaseOperator):
         return None
 
 
-class CreateProjectOperator(BaseOperator):
+class CreateProjectOperator(BaseDatarobotOperator):
     """
     Creates DataRobot project.
     :param dataset_id: DataRobot AI Catalog dataset ID
@@ -150,9 +135,6 @@ class CreateProjectOperator(BaseOperator):
         "credential_id",
         "use_case_id",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -161,26 +143,17 @@ class CreateProjectOperator(BaseOperator):
         dataset_version_id: Optional[str] = None,
         credential_id: Optional[str] = None,
         use_case_id: Optional[str] = "{{ params.use_case_id|default('') }}",
-        datarobot_conn_id: str = "datarobot_default",
         recipe_id: Optional[str] = None,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.dataset_id = dataset_id
         self.dataset_version_id = dataset_version_id
-        self.datarobot_conn_id = datarobot_conn_id
         self.credential_id = credential_id
-        self.recipe_id = recipe_id
         self.use_case_id = use_case_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
+        self.recipe_id = recipe_id
 
     def execute(self, context: Context) -> Optional[str]:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         use_case = None
 
         if self.use_case_id:
@@ -239,7 +212,7 @@ class CreateProjectOperator(BaseOperator):
             )
 
 
-class TrainModelsOperator(BaseOperator):
+class TrainModelsOperator(BaseDatarobotOperator):
     """
     Triggers DataRobot Autopilot to train models.
 
@@ -251,29 +224,17 @@ class TrainModelsOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["project_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         project_id: str,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.project_id = project_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> None:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         # Train models
         project = dr.Project.get(self.project_id)
         if project.target:
@@ -304,7 +265,7 @@ class DeployModelMixin:
         return deployment
 
 
-class DeployModelOperator(BaseOperator, DeployModelMixin):
+class DeployModelOperator(BaseDatarobotOperator, DeployModelMixin):
     """
     Deploys the specified model to production.
 
@@ -318,29 +279,17 @@ class DeployModelOperator(BaseOperator, DeployModelMixin):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["model_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         model_id: str,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.model_id = model_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         # Deploy the model
         deployment = self.deploy_model(
             self.model_id,
@@ -350,7 +299,7 @@ class DeployModelOperator(BaseOperator, DeployModelMixin):
         return deployment.id
 
 
-class DeployRecommendedModelOperator(BaseOperator, DeployModelMixin):
+class DeployRecommendedModelOperator(BaseDatarobotOperator, DeployModelMixin):
     """
     Deploys a recommended model to production.
 
@@ -364,24 +313,15 @@ class DeployRecommendedModelOperator(BaseOperator, DeployModelMixin):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["project_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         project_id: str,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.project_id = project_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def deploy_recommended_model(
         self, project_id: str, label: str, description: Optional[str] = None
@@ -395,9 +335,6 @@ class DeployRecommendedModelOperator(BaseOperator, DeployModelMixin):
         return self.deploy_model(model.id, label, description)
 
     def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         # Deploy the recommended model
         deployment = self.deploy_recommended_model(
             self.project_id,
@@ -407,7 +344,7 @@ class DeployRecommendedModelOperator(BaseOperator, DeployModelMixin):
         return deployment.id
 
 
-class ScorePredictionsOperator(BaseOperator):
+class ScorePredictionsOperator(BaseDatarobotOperator):
     """
     Creates a batch prediction job in DataRobot, scores the data and saves prediction to the output.
     :param deployment_id: DataRobot deployment ID
@@ -435,9 +372,6 @@ class ScorePredictionsOperator(BaseOperator):
         "output_credential_id",
         "score_settings",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -448,7 +382,6 @@ class ScorePredictionsOperator(BaseOperator):
         output_datastore_id: Optional[str] = None,
         output_credential_id: Optional[str] = None,
         score_settings: Optional[dict] = None,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -458,16 +391,8 @@ class ScorePredictionsOperator(BaseOperator):
         self.output_datastore_id = output_datastore_id
         self.output_credential_id = output_credential_id
         self.score_settings = score_settings
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         if self.score_settings is None:
             self.score_settings = context["params"]["score_settings"]
 
@@ -518,7 +443,7 @@ class ScorePredictionsOperator(BaseOperator):
         return job.id
 
 
-class GetTargetDriftOperator(BaseOperator):
+class GetTargetDriftOperator(BaseDatarobotOperator):
     """
     Gets target drift measurements from a deployment.
 
@@ -532,29 +457,17 @@ class GetTargetDriftOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["deployment_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         deployment_id: str,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.deployment_id = deployment_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> dict[str, Any]:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         self.log.info(f"Getting target drift for deployment_id={self.deployment_id}")
         deployment = dr.Deployment.get(self.deployment_id)
         target_drift_params = context["params"].get("target_drift", {})
@@ -562,7 +475,7 @@ class GetTargetDriftOperator(BaseOperator):
         return _serialize_drift(drift)
 
 
-class GetFeatureDriftOperator(BaseOperator):
+class GetFeatureDriftOperator(BaseDatarobotOperator):
     """
     Gets feature drift measurements from a deployment.
 
@@ -576,29 +489,17 @@ class GetFeatureDriftOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["deployment_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         deployment_id: str,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.deployment_id = deployment_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> list[dict]:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         self.log.info(f"Getting feature drift for deployment_id={self.deployment_id}")
         deployment = dr.Deployment.get(self.deployment_id)
         feature_drift_params = context["params"].get("feature_drift", {})

@@ -10,17 +10,15 @@ from typing import Any
 from typing import Optional
 
 import datarobot as dr
-from airflow.exceptions import AirflowException
-from airflow.models import BaseOperator
 from airflow.utils.context import Context
 from datarobot.models.execution_environment import RequiredMetadataKey
 
-from datarobot_provider.hooks.datarobot import DataRobotHook
+from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 DEFAULT_MAX_WAIT_SEC = 3600  # 1 hour timeout by default
 
 
-class CreateExecutionEnvironmentOperator(BaseOperator):
+class CreateExecutionEnvironmentOperator(BaseDatarobotOperator):
     """
     Create an execution environment.
     :param name: execution environment name
@@ -40,9 +38,6 @@ class CreateExecutionEnvironmentOperator(BaseOperator):
         "description",
         "programming_language",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -50,23 +45,14 @@ class CreateExecutionEnvironmentOperator(BaseOperator):
         name: Optional[str] = None,
         description: Optional[str] = None,
         programming_language: Optional[str] = None,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.name = name
         self.description = description
         self.programming_language = programming_language
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         required_metadata_keys = context["params"].get("required_metadata_keys", None)
         metadata_keys = []
         if required_metadata_keys:
@@ -105,7 +91,7 @@ class CreateExecutionEnvironmentOperator(BaseOperator):
         return execution_environment.id
 
 
-class CreateExecutionEnvironmentVersionOperator(BaseOperator):
+class CreateExecutionEnvironmentVersionOperator(BaseDatarobotOperator):
     """
     Create an execution environment version.
     :param execution_environment_id: the id of the execution environment
@@ -130,9 +116,6 @@ class CreateExecutionEnvironmentVersionOperator(BaseOperator):
         "environment_version_label",
         "environment_version_description",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -142,7 +125,6 @@ class CreateExecutionEnvironmentVersionOperator(BaseOperator):
         environment_version_label: Optional[str] = None,
         environment_version_description: Optional[str] = None,
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -151,16 +133,8 @@ class CreateExecutionEnvironmentVersionOperator(BaseOperator):
         self.environment_version_label = environment_version_label
         self.environment_version_description = environment_version_description
         self.max_wait_sec = max_wait_sec
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         docker_context_path = (
             context["params"].get("docker_context_path", None)
             if self.docker_context_path is None
@@ -192,7 +166,7 @@ class CreateExecutionEnvironmentVersionOperator(BaseOperator):
         return environment_version.id
 
 
-class CreateCustomInferenceModelOperator(BaseOperator):
+class CreateCustomInferenceModelOperator(BaseDatarobotOperator):
     """
     Create a custom inference model.
     :param name: Name of the custom model.
@@ -208,31 +182,19 @@ class CreateCustomInferenceModelOperator(BaseOperator):
         "name",
         "description",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         name: Optional[str] = None,
         description: Optional[str] = None,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.name = name
         self.description = description
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         custom_model_name = (
             context["params"].get("custom_model_name", None) if self.name is None else self.name
         )
@@ -279,7 +241,7 @@ class CreateCustomInferenceModelOperator(BaseOperator):
         return custom_model.id
 
 
-class CreateCustomModelVersionOperator(BaseOperator):
+class CreateCustomModelVersionOperator(BaseDatarobotOperator):
     """
     Create a custom model version.
 
@@ -314,9 +276,6 @@ class CreateCustomModelVersionOperator(BaseOperator):
         "custom_model_folder",
         "create_from_previous",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -328,7 +287,6 @@ class CreateCustomModelVersionOperator(BaseOperator):
         custom_model_folder: Optional[str] = None,
         create_from_previous: bool = False,
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -339,22 +297,8 @@ class CreateCustomModelVersionOperator(BaseOperator):
         self.custom_model_folder = custom_model_folder
         self.create_from_previous = create_from_previous
         self.max_wait_sec = max_wait_sec
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
-    def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
-        folder_path = (
-            context["params"].get("custom_model_folder", None)
-            if self.custom_model_folder is None
-            else self.custom_model_folder
-        )
-
+    def validate(self):
         if self.custom_model_id is None:
             raise ValueError(
                 "custom_model_id is required attribute for CreateCustomModelVersionOperator"
@@ -364,6 +308,13 @@ class CreateCustomModelVersionOperator(BaseOperator):
             raise ValueError(
                 "base_environment_id is required attribute for CreateCustomModelVersionOperator"
             )
+
+    def execute(self, context: Context) -> str:
+        folder_path = (
+            context["params"].get("custom_model_folder", None)
+            if self.custom_model_folder is None
+            else self.custom_model_folder
+        )
 
         if self.create_from_previous:
             custom_model_version = dr.CustomModelVersion.create_from_previous(
@@ -412,7 +363,7 @@ class CreateCustomModelVersionOperator(BaseOperator):
         return custom_model_version.id
 
 
-class CustomModelTestOperator(BaseOperator):
+class CustomModelTestOperator(BaseDatarobotOperator):
     """
     Create and start a custom model test.
 
@@ -431,9 +382,6 @@ class CustomModelTestOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["custom_model_id", "custom_model_version_id", "dataset_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -442,7 +390,6 @@ class CustomModelTestOperator(BaseOperator):
         custom_model_version_id: str,
         dataset_id: Optional[str] = None,
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -450,22 +397,15 @@ class CustomModelTestOperator(BaseOperator):
         self.custom_model_version_id = custom_model_version_id
         self.dataset_id = dataset_id
         self.max_wait_sec = max_wait_sec
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
-    def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
+    def validate(self):
         if self.custom_model_id is None:
             raise ValueError("custom_model_id is required attribute")
 
         if self.custom_model_version_id is None:
             raise ValueError("custom_model_version_id is required attribute")
 
+    def execute(self, context: Context) -> str:
         # Perform custom model tests
         custom_model_test = dr.CustomModelTest.create(
             custom_model_id=self.custom_model_id,
@@ -482,7 +422,7 @@ class CustomModelTestOperator(BaseOperator):
         return custom_model_test.id
 
 
-class GetCustomModelTestOverallStatusOperator(BaseOperator):
+class GetCustomModelTestOverallStatusOperator(BaseDatarobotOperator):
     """
     Get a custom model testing overall status.
 
@@ -494,32 +434,21 @@ class GetCustomModelTestOverallStatusOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["custom_model_test_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         custom_model_test_id: str,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.custom_model_test_id = custom_model_test_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
-    def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
+    def validate(self):
         if self.custom_model_test_id is None:
             raise ValueError("custom_model_test_id is required attribute")
 
+    def execute(self, context: Context) -> str:
         custom_model_test = dr.CustomModelTest.get(custom_model_test_id=self.custom_model_test_id)
 
         self.log.info(f"Overall testing status: {custom_model_test.overall_status}")
@@ -527,7 +456,7 @@ class GetCustomModelTestOverallStatusOperator(BaseOperator):
         return custom_model_test.overall_status
 
 
-class CreateCustomModelDeploymentOperator(BaseOperator):
+class CreateCustomModelDeploymentOperator(BaseDatarobotOperator):
     """
     Create a deployment from a DataRobot custom model image.
 
@@ -556,9 +485,6 @@ class CreateCustomModelDeploymentOperator(BaseOperator):
         "deployment_name",
         "prediction_server_id",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -569,7 +495,6 @@ class CreateCustomModelDeploymentOperator(BaseOperator):
         description: Optional[str] = None,
         importance: Optional[str] = None,
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -579,22 +504,15 @@ class CreateCustomModelDeploymentOperator(BaseOperator):
         self.description = description
         self.importance = importance
         self.max_wait_sec = max_wait_sec
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
-    def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
+    def validate(self):
         if self.custom_model_version_id is None:
             raise ValueError("Invalid or missing `custom_model_version_id` value")
 
         if self.deployment_name is None:
             raise ValueError("Invalid or missing `deployment_name` value")
 
+    def execute(self, context: Context) -> str:
         deployment = dr.Deployment.create_from_custom_model_version(
             custom_model_version_id=self.custom_model_version_id,
             label=self.deployment_name,
