@@ -25,6 +25,11 @@ to create datasets from project data.
 
 ### Documentation changes
 
+### Experimental changes
+
+- Introduce `NotebookRunOperator <datarobot_provider._experimental.operators.notebook.NotebookRunOperator>`
+and `NotebookRunCompleteSensor <datarobot_provider._experimental.sensors.notebook.NotebookRunCompleteSensor>`
+
 ## 0.0.12
 
 ### New features
