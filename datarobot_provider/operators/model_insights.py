@@ -37,8 +37,8 @@ class ComputeFeatureImpactOperator(BaseDatarobotOperator):
     def __init__(
         self,
         *,
-        project_id: Optional[str] = None,
-        model_id: Optional[str] = None,
+        project_id: str,
+        model_id: str,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -84,8 +84,8 @@ class ComputeFeatureEffectsOperator(BaseDatarobotOperator):
     def __init__(
         self,
         *,
-        project_id: Optional[str] = None,
-        model_id: Optional[str] = None,
+        project_id: str,
+        model_id: str,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)

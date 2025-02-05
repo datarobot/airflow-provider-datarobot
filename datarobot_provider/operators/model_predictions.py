@@ -108,9 +108,9 @@ class RequestModelPredictionsOperator(BaseDatarobotOperator):
     def __init__(
         self,
         *,
-        project_id: Optional[str] = None,
-        model_id: Optional[str] = None,
-        external_dataset_id: Optional[str] = None,
+        project_id: str,
+        model_id: str,
+        external_dataset_id: str,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)

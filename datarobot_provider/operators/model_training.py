@@ -46,8 +46,8 @@ class TrainModelOperator(BaseDatarobotOperator):
     def __init__(
         self,
         *,
-        project_id: Optional[str] = None,
-        blueprint_id: Optional[str] = None,
+        project_id: str,
+        blueprint_id: str,
         featurelist_id: Optional[str] = None,
         source_project_id: Optional[str] = None,
         **kwargs: Any,
@@ -110,8 +110,8 @@ class RetrainModelOperator(BaseDatarobotOperator):
     def __init__(
         self,
         *,
-        project_id: Optional[str] = None,
-        model_id: Optional[str] = None,
+        project_id: str,
+        model_id: str,
         featurelist_id: Optional[str] = None,
         **kwargs: Any,
     ) -> None:
