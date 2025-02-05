@@ -69,9 +69,9 @@ template:
                       echo "================================="
 
                       if [ "$BUILD_TYPE" == "test" ]; then
-                          REPO_LINK="https://test.pypi.org/project/datarobot-early-access/$VERSION/"
+                          REPO_LINK="https://test.pypi.org/project/airflow-provider-datarobot-early-access/$VERSION/"
                       else
-                          REPO_LINK="https://pypi.org/project/datarobot-early-access/$VERSION/"
+                          REPO_LINK="https://pypi.org/project/airflow-provider-datarobot-early-access/$VERSION/"
                       fi
 
                       echo "Building weekly dist for *${BUILD_TYPE} PyPi*" >> SLACK_MESSAGE.md
