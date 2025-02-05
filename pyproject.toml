@@ -2,9 +2,6 @@
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
-#[project.entry-points."apache_airflow_provider"]
-#provider_info = "datarobot_provider.__init__:get_provider_info"
-
 [tool.ruff]
 # General settings
 line-length = 100
