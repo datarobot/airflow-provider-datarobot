@@ -1398,9 +1398,9 @@ For more [prediction-explanations](https://datarobot-public-api-client.readthedo
 #### `CreateRegisteredModelVersionOperator`
 
  Dynamically creates a registered model version using one of three methods:
-    - Leaderboard Model
-    - Custom Model Version
-    - External Model
+ - Leaderboard Model
+ - Custom Model
+ - External Model
 
 Parameters:
 
