@@ -20,6 +20,30 @@ common_setup_kwargs = dict(
     long_description=None,
     classifiers=None,
     install_requires=["apache-airflow>=2.3.0", "datarobot>=3.6.1"],
+    extras_require={
+        "dev": [
+            "pre-commit>=4.0.1",
+            "ruff>=0.9.2",
+            "mypy>=0.931",
+            "pytest>=7.0.0",
+            "pytest-mock>=3.7.0",
+            "pytest-helpers-namespace>=2021.12.29",
+            "numpydoc>=1.7.0,<1.8.0",
+            "black==24.10.0",
+            "pyyaml>=6.0.2",
+            "types-PyYAML>=6.0.12",
+            "freezegun>=1.5.1",
+        ],
+        "docs": [
+            "Sphinx>=8.1.3",
+            "sphinx_rtd_theme>=3.0",
+            "sphinx-autodoc-typehints>=2",
+            "pyenchant==3.2.2",
+            "sphinx-copybutton",
+            "sphinx-markdown-builder",
+            "myst-parser==4.0.0",
+        ],
+    },
 )
 
 classifiers = [
