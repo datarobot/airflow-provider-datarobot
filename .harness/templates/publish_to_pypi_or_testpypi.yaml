@@ -1,5 +1,5 @@
 template:
-  name: Publish to Pypi or TestPypi
+  name: Publish Early Access to Pypi or TestPypi
   identifier: publish_to_pypi_or_testPypi
   versionLabel: "1"
   type: Stage
@@ -44,42 +44,22 @@ template:
                   EOF
                   }
 
-                  install_dependencies() {
-                      pip3 install --no-cache-dir --upgrade pip setuptools wheel six twine
-                  }
-
                   set_build_variables() {
                       export SETUPTOOLS_SCM_PRETEND_VERSION='<+trigger.tag>'
                       BUILD_TYPE='<+stage.variables.BUILD_TYPE>'
                       REPO_URL='https://test.pypi.org/legacy/'
                       UPLOAD_SECRET='<+secrets.getValue("org.test_pypi_token")>'
-                      VERSION=$(python3 setup_early_access.py.py --version)
+                      VERSION=$(python3 setup_early_access.py --version)
 
-                      if [ "$BUILD_TYPE" != "test" ]; then
+                      if [ "$BUILD_TYPE" == "pypi" ]; then
                           REPO_URL='https://upload.pypi.org/legacy/'
                           UPLOAD_SECRET='<+secrets.getValue("org.pypi_token")>'
                       fi
                   }
 
-                  prepare_slack_message() {
-                      echo "*Step:* Publish to Pypi" > SLACK_MESSAGE.md
-                      echo "================================="
-                      echo "Building weekly dist for ${BUILD_TYPE} PyPi"
-                      echo "Version: $VERSION"
-                      echo "================================="
-
-                      if [ "$BUILD_TYPE" == "test" ]; then
-                          REPO_LINK="https://test.pypi.org/project/airflow-provider-datarobot-early-access/$VERSION/"
-                      else
-                          REPO_LINK="https://pypi.org/project/airflow-provider-datarobot-early-access/$VERSION/"
-                      fi
-
-                      echo "Building weekly dist for *${BUILD_TYPE} PyPi*" >> SLACK_MESSAGE.md
-                      echo "Version: <${REPO_LINK}|${VERSION}>" >> SLACK_MESSAGE.md
-                  }
-
                   build_and_upload() {
-                      make build-weekly
+                      echo "[BUILD PACKAGE]"
+                      make build-early-access
 
                       echo "[TWINE CHECK]"
                       twine check dist/*
@@ -93,7 +73,7 @@ template:
                   }
 
                   push_tags() {
-                      if [ "$BUILD_TYPE" != "test" ]; then
+                      if [ "$BUILD_TYPE" == "pypi" ]; then
                           echo '[PUSHING EARLY ACCESS TAGS]'
                           git tag -f early-access && git push -f origin early-access
                       fi
@@ -101,12 +81,9 @@ template:
 
                   main() {
                       configure_git
-                      install_dependencies
                       set_build_variables
-                      prepare_slack_message
                       build_and_upload
                       push_tags
-                      cat ./SLACK_MESSAGE.md
                   }
 
                   main "$@"
