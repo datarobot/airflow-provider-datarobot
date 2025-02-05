@@ -10,18 +10,16 @@ from typing import Any
 from typing import Optional
 
 import datarobot as dr
-from airflow.exceptions import AirflowException
 from airflow.exceptions import AirflowFailException
-from airflow.models import BaseOperator
 from airflow.utils.context import Context
 from datarobot.utils.waiters import wait_for_async_resolution
 
-from datarobot_provider.hooks.datarobot import DataRobotHook
+from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 DEFAULT_MAX_WAIT_SEC = 600
 
 
-class CreateExternalModelPackageOperator(BaseOperator):
+class CreateExternalModelPackageOperator(BaseDatarobotOperator):
     """
     Create an external model package in DataRobot MLOps from JSON configuration
 
@@ -35,24 +33,15 @@ class CreateExternalModelPackageOperator(BaseOperator):
     template_fields: Sequence[str] = [
         "model_package_json",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         model_package_json: Optional[dict[str, Any]] = None,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.model_package_json = model_package_json
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     # Utility method to support old Model Registry API
     def create_model_package_from_json(self) -> str:
@@ -68,9 +57,6 @@ class CreateExternalModelPackageOperator(BaseOperator):
             raise AirflowFailException(e_msg.format(response.status_code))
 
     def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         if self.model_package_json is None:
             # If model_package_json not provided, trying to get it from DAG params:
             self.model_package_json = context["params"].get("model_package_json")
@@ -85,7 +71,7 @@ class CreateExternalModelPackageOperator(BaseOperator):
         return model_package_id
 
 
-class DeployModelPackageOperator(BaseOperator):
+class DeployModelPackageOperator(BaseDatarobotOperator):
     """
     Create a deployment from a DataRobot model package.
     :deployment_name: A human readable label of the deployment.
@@ -123,9 +109,6 @@ class DeployModelPackageOperator(BaseOperator):
         "user_provided_id",
         "additional_metadata",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -139,7 +122,6 @@ class DeployModelPackageOperator(BaseOperator):
         user_provided_id: Optional[str] = None,
         additional_metadata: Optional[dict[str, str]] = None,
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -152,11 +134,6 @@ class DeployModelPackageOperator(BaseOperator):
         self.user_provided_id = user_provided_id
         self.additional_metadata = additional_metadata
         self.max_wait_sec = max_wait_sec
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     # Utility method to support creating Deployment from Model Package
     # Will be refactored after release 3.3 of DataRobot public python client
@@ -205,16 +182,14 @@ class DeployModelPackageOperator(BaseOperator):
             e_msg = "Server unexpectedly returned status code {}"
             raise AirflowFailException(e_msg.format(response.status_code))
 
-    def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
+    def validate(self):
         if self.deployment_name is None:
             raise ValueError("deployment_name is required.")
 
         if self.model_package_id is None:
             raise ValueError("model_package_id is required.")
 
+    def execute(self, context: Context) -> str:
         if self.additional_metadata is None:
             # If additional_metadata not provided, trying to get it from DAG params:
             self.additional_metadata = context["params"].get("additional_metadata")

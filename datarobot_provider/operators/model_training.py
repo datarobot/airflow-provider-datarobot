@@ -10,14 +10,12 @@ from typing import Any
 from typing import Optional
 
 import datarobot as dr
-from airflow.exceptions import AirflowException
-from airflow.models import BaseOperator
 from airflow.utils.context import Context
 
-from datarobot_provider.hooks.datarobot import DataRobotHook
+from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 
-class TrainModelOperator(BaseOperator):
+class TrainModelOperator(BaseDatarobotOperator):
     """
     Submit a job to the queue to train a model from specific blueprint.
     :param project_id: DataRobot project ID
@@ -44,9 +42,6 @@ class TrainModelOperator(BaseOperator):
         "featurelist_id",
         "source_project_id",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -55,7 +50,6 @@ class TrainModelOperator(BaseOperator):
         blueprint_id: Optional[str] = None,
         featurelist_id: Optional[str] = None,
         source_project_id: Optional[str] = None,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -63,22 +57,15 @@ class TrainModelOperator(BaseOperator):
         self.blueprint_id = blueprint_id
         self.featurelist_id = featurelist_id
         self.source_project_id = source_project_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
-    def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
+    def validate(self):
         if not self.project_id:
             raise ValueError("project_id is required.")
 
         if not self.blueprint_id:
             raise ValueError("blueprint_id is required.")
 
+    def execute(self, context: Context) -> str:
         project: dr.Project = dr.Project.get(self.project_id)
         blueprint = dr.Blueprint.get(self.project_id, self.blueprint_id)
 
@@ -97,7 +84,7 @@ class TrainModelOperator(BaseOperator):
         return job_id
 
 
-class RetrainModelOperator(BaseOperator):
+class RetrainModelOperator(BaseDatarobotOperator):
     """
     Submit a job to the queue to retrain a model on a specific sample size and/or custom featurelist
     :param project_id: DataRobot project ID
@@ -119,9 +106,6 @@ class RetrainModelOperator(BaseOperator):
         "model_id",
         "featurelist_id",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -129,29 +113,21 @@ class RetrainModelOperator(BaseOperator):
         project_id: Optional[str] = None,
         model_id: Optional[str] = None,
         featurelist_id: Optional[str] = None,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.project_id = project_id
         self.model_id = model_id
         self.featurelist_id = featurelist_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
-    def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
+    def validate(self):
         if self.project_id is None:
             raise ValueError("project_id is required.")
 
         if self.model_id is None:
             raise ValueError("model_id is required.")
 
+    def execute(self, context: Context) -> str:
         model = dr.Model.get(self.project_id, self.model_id)
 
         job_id = model.train(
