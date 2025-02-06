@@ -38,7 +38,7 @@ pipeline:
                       make lint
     - stage:
         name: Publish to Pypi
-        identifier: Publish_to_TestPypi
+        identifier: Publish_to_Pypi
         template:
           templateRef: publish_early_access_to_pypi_or_testpypi
           versionLabel: "1"
