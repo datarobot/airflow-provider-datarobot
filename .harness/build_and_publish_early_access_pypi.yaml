@@ -17,4 +17,4 @@ pipeline:
               - name: BUILD_TYPE
                 type: String
                 default: test
-                value: <+input>.default(test).allowedValues(test,early-access,pypi)
+                value: test
