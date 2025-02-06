@@ -12,13 +12,12 @@ from typing import Optional
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
-from airflow.models import BaseOperator
 from airflow.utils.context import Context
 
-from datarobot_provider.hooks.datarobot import DataRobotHook
+from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 
-class DownloadDeploymentScoringCodeOperator(BaseOperator):
+class DownloadDeploymentScoringCodeOperator(BaseDatarobotOperator):
     """
     Downloads scoring code from a deployment.
 
@@ -34,31 +33,19 @@ class DownloadDeploymentScoringCodeOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["deployment_id", "base_path"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         deployment_id: str,
         base_path: Optional[str] = None,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.deployment_id = deployment_id
         self.base_path = base_path
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         self.log.info(f"Getting model scoring code for deployment_id={self.deployment_id}")
         deployment = dr.Deployment.get(self.deployment_id)
         # in case if params provided
@@ -99,7 +86,7 @@ class DownloadDeploymentScoringCodeOperator(BaseOperator):
         return scoring_code_path
 
 
-class DownloadModelScoringCodeOperator(BaseOperator):
+class DownloadModelScoringCodeOperator(BaseDatarobotOperator):
     """
     Downloads scoring code from a model.
 
@@ -117,9 +104,6 @@ class DownloadModelScoringCodeOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["project_id", "model_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -127,23 +111,14 @@ class DownloadModelScoringCodeOperator(BaseOperator):
         project_id: str,
         model_id: str,
         base_path: Optional[str] = None,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.project_id = project_id
         self.model_id = model_id
         self.base_path = base_path
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         # in case if params provided
         self.base_path = context["params"].get("scoring_code_filepath", self.base_path)
         if self.base_path is None or not os.path.exists(self.base_path):

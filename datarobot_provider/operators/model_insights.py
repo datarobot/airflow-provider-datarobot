@@ -10,14 +10,12 @@ from typing import Any
 from typing import Optional
 
 import datarobot as dr
-from airflow.exceptions import AirflowException
-from airflow.models import BaseOperator
 from airflow.utils.context import Context
 
-from datarobot_provider.hooks.datarobot import DataRobotHook
+from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 
-class ComputeFeatureImpactOperator(BaseOperator):
+class ComputeFeatureImpactOperator(BaseDatarobotOperator):
     """
     Creates Feature Impact job in DataRobot.
     :param project_id: DataRobot project ID
@@ -35,37 +33,26 @@ class ComputeFeatureImpactOperator(BaseOperator):
         "project_id",
         "model_id",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
-        project_id: Optional[str] = None,
-        model_id: Optional[str] = None,
-        datarobot_conn_id: str = "datarobot_default",
+        project_id: str,
+        model_id: str,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.project_id = project_id
         self.model_id = model_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
-    def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
-        if self.project_id is None:
+    def validate(self):
+        if not self.project_id:
             raise ValueError("project_id is required to compute Feature Impact.")
 
-        if self.model_id is None:
+        if not self.model_id:
             raise ValueError("model_id is required to compute Feature Impact.")
 
+    def execute(self, context: Context) -> str:
         model = dr.models.Model.get(self.project_id, self.model_id)
 
         job = model.request_feature_impact()
@@ -75,7 +62,7 @@ class ComputeFeatureImpactOperator(BaseOperator):
         return job.id
 
 
-class ComputeFeatureEffectsOperator(BaseOperator):
+class ComputeFeatureEffectsOperator(BaseDatarobotOperator):
     """
     Submit request to compute Feature Effects for the model.
     :param project_id: DataRobot project ID
@@ -93,37 +80,26 @@ class ComputeFeatureEffectsOperator(BaseOperator):
         "project_id",
         "model_id",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
-        project_id: Optional[str] = None,
-        model_id: Optional[str] = None,
-        datarobot_conn_id: str = "datarobot_default",
+        project_id: str,
+        model_id: str,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.project_id = project_id
         self.model_id = model_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
-    def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
-        if self.project_id is None:
+    def validate(self):
+        if not self.project_id:
             raise ValueError("project_id is required to compute Feature Effects.")
 
-        if self.model_id is None:
+        if not self.model_id:
             raise ValueError("model_id is required to compute Feature Effects.")
 
+    def execute(self, context: Context) -> str:
         model = dr.models.Model.get(self.project_id, self.model_id)
 
         job = model.request_feature_effect()
@@ -133,7 +109,7 @@ class ComputeFeatureEffectsOperator(BaseOperator):
         return job.id
 
 
-class ComputeShapOperator(BaseOperator):
+class ComputeShapOperator(BaseDatarobotOperator):
     """
     Creates SHAP impact job in DataRobot.
     :param project_id: DataRobot project ID
@@ -151,37 +127,26 @@ class ComputeShapOperator(BaseOperator):
         "project_id",
         "model_id",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         project_id: Optional[str] = None,
         model_id: Optional[str] = None,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.project_id = project_id
         self.model_id = model_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
-    def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
+    def validate(self):
         if self.project_id is None:
             raise ValueError("project_id is required to compute SHAP impact.")
 
         if self.model_id is None:
             raise ValueError("model_id is required to compute SHAP impact.")
 
+    def execute(self, context: Context) -> str:
         shap_impact_job = dr.ShapImpact.create(project_id=self.project_id, model_id=self.model_id)
 
         self.log.info(f"Compute SHAP impact Job submitted, job_id={shap_impact_job.id}")
