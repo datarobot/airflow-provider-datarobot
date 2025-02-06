@@ -67,6 +67,7 @@ template:
 
                       echo "[TWINE UPLOAD]"
                       twine upload \
+                          --verbose \
                           --repository-url "$REPO_URL" \
                           --username '__token__' \
                           --password "$UPLOAD_SECRET" \
