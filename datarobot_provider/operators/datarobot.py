@@ -76,6 +76,18 @@ class CreateUseCaseOperator(BaseDatarobotOperator):
         if self.reuse_policy != self.ReusePolicy.NO_REUSE:
             use_case = self._search_for_existing_use_case()
 
+            if (
+                use_case is not None
+                and self.reuse_policy == self.ReusePolicy.SEARCH_BY_NAME_UPDATE_DESCRIPTION
+                and use_case.description != self.description
+            ):
+                self.log.info(
+                    'Update Use Case description from "%s" to "%s"',
+                    use_case.description,
+                    self.description,
+                )
+                use_case.update(self.name, self.description)
+
         if use_case is None:
             self.log.info("Creating DataRobot Use Case")
             use_case = dr.UseCase.create(name=self.name, description=self.description)
@@ -84,6 +96,8 @@ class CreateUseCaseOperator(BaseDatarobotOperator):
         return use_case.id
 
     def _search_for_existing_use_case(self) -> Optional[dr.UseCase]:
+        candidates = []
+
         for use_case in dr.UseCase.list(search_params={"search": self.name}):
             if use_case.name == self.name:
                 if (
@@ -95,20 +109,12 @@ class CreateUseCaseOperator(BaseDatarobotOperator):
 
                 self.log.info("Use an existing Use Case id=%s", use_case.id)
 
-                if (
-                    self.reuse_policy == self.ReusePolicy.SEARCH_BY_NAME_UPDATE_DESCRIPTION
-                    and use_case.description != self.description
-                ):
-                    self.log.info(
-                        'Update Use Case description from "%s" to "%s"',
-                        use_case.description,
-                        self.description,
-                    )
-                    use_case.update(self.name, self.description)
+                candidates.append(use_case)
 
-                return use_case
+        if len(candidates) == 0:
+            return None
 
-        return None
+        return max(candidates, key=lambda x: x.created_at)
 
 
 class CreateProjectOperator(BaseDatarobotOperator):

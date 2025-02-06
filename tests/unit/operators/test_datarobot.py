@@ -24,6 +24,31 @@ from datarobot_provider.operators.datarobot import TrainModelsOperator
 from datarobot_provider.operators.datarobot import _serialize_drift
 
 
+@pytest.fixture
+def new_use_case():
+    def _inner(data):
+        mandatory_fields = {
+            "id": '',
+            "name": '',
+            "created_at": '2023-01-01',
+            "created": {'id': 'test-id'},
+            "updated_at": '2023-01-01',
+            "updated": {'id': 'test-id'},
+            "models_count": 0,
+            "projects_count": 0,
+            "datasets_count": 0,
+            "notebooks_count": 0,
+            "applications_count": 0,
+            "members": [],
+        }
+
+        the_copy = mandatory_fields.copy()
+        the_copy.update(data)
+        return dr.UseCase.from_data(the_copy)
+
+    return _inner
+
+
 @pytest.mark.parametrize(
     "params, expected_name, expected_description",
     [
@@ -37,7 +62,7 @@ from datarobot_provider.operators.datarobot import _serialize_drift
         ),
     ],
 )
-def test_operator_create_use_case(mocker, params, expected_name, expected_description):
+def test_operator_create_use_case_no_reuse(mocker, params, expected_name, expected_description):
     use_case_mock = mocker.Mock()
     use_case_mock.id = "use-case-id"
     create_use_case_mock = mocker.patch.object(dr.UseCase, "create", return_value=use_case_mock)
@@ -52,6 +77,42 @@ def test_operator_create_use_case(mocker, params, expected_name, expected_descri
 
     assert use_case_id == "use-case-id"
     create_use_case_mock.assert_called_with(name=expected_name, description=expected_description)
+
+
+@pytest.mark.parametrize(
+    "reuse_policy, expected_use_case_id, is_updated, is_created",
+    [
+        (CreateUseCaseOperator.ReusePolicy.EXACT, 'created-id', False, True),
+        (CreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_UPDATE_DESCRIPTION, 'no-description-later-id', True, False),
+        (CreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_IGNORE_DESCRIPTION, 'no-description-later-id', False, False),
+        (CreateUseCaseOperator.ReusePolicy.NO_REUSE, 'created-id', False, True),
+    ],
+)
+def test_operator_create_use_case_no_exact_match(mocker, new_use_case, reuse_policy, expected_use_case_id, is_updated, is_created):
+    mocked_create = mocker.patch.object(dr.UseCase, "create", return_value=mocker.Mock(id="created-id"))
+    mocked_update = mocker.patch.object(dr.UseCase, "update")
+
+    mocker.patch.object(dr.UseCase, "list", return_value=[
+        new_use_case({"id": "wrong-name-id", "name": 'Test Name', "description": 'Test description'}),
+        new_use_case({
+            "id": "no-description-earlier-id", "name": 'Test name', "description": '', "created_at": '2024-01-01'
+        }),
+        new_use_case({"id": "no-description-later-id", "name": 'Test name', "description": '',
+                    "created_at": '2025-01-01'}),
+    ])
+
+    operator = CreateUseCaseOperator(
+        task_id="create_project",
+        reuse_policy=reuse_policy,
+        name='Test name',
+        description='Test description',
+    )
+    operator.render_template_fields({})
+    use_case_id = operator.execute({})
+
+    assert use_case_id == expected_use_case_id
+    assert mocked_create.called is is_created
+    assert mocked_update.called is is_updated
 
 
 def test_operator_create_project(mocker):
