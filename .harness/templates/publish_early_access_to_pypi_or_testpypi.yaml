@@ -1,0 +1,89 @@
+template:
+  name: Publish Early Access to Pypi or TestPypi
+  identifier: publish_early_access_to_pypi_or_testpypi
+  versionLabel: "1"
+  type: Stage
+  projectIdentifier: airflowproviderdatarobot
+  orgIdentifier: AGENTS
+  tags: {}
+  spec:
+    type: CI
+    spec:
+      cloneCodebase: true
+      caching:
+        enabled: true
+      buildIntelligence:
+        enabled: true
+      infrastructure:
+        type: KubernetesDirect
+        spec:
+          connectorRef: account.cigeneral
+          namespace: harness-delegate-ng
+          automountServiceAccountToken: true
+          nodeSelector: {}
+          os: Linux
+      execution:
+        steps:
+          - step:
+              type: Run
+              name: PyPi Publish
+              identifier: PyPi_Publish
+              spec:
+                connectorRef: account.dockerhub_datarobot_read
+                image: python:3.12
+                shell: Bash
+                command: |-
+                  #!/bin/bash
+
+                  configure_git() {
+                      echo "configuring git"
+                      cat <<EOF > ${HOME}/.netrc
+                  machine ${DRONE_NETRC_MACHINE}
+                  login ${DRONE_NETRC_USERNAME}
+                  password ${DRONE_NETRC_PASSWORD}
+                  EOF
+                  }
+
+                  set_build_variables() {
+                      export SETUPTOOLS_SCM_PRETEND_VERSION='<+trigger.tag>'
+                      BUILD_TYPE='<+stage.variables.BUILD_TYPE>'
+                      REPO_URL='https://test.pypi.org/legacy/'
+                      UPLOAD_SECRET='<+secrets.getValue("org.test_pypi_token")>'
+                      VERSION=$(python3 setup_early_access.py --version)
+
+                      if [ "$BUILD_TYPE" == "pypi" ]; then
+                          REPO_URL='https://upload.pypi.org/legacy/'
+                          UPLOAD_SECRET='<+secrets.getValue("org.pypi_token")>'
+                      fi
+                  }
+
+                  build_and_upload() {
+                      echo "[BUILD PACKAGE]"
+                      make build-early-access
+
+                      echo "[TWINE CHECK]"
+                      twine check dist/*
+
+                      echo "[TWINE UPLOAD]"
+                      twine upload \
+                          --repository-url "$REPO_URL" \
+                          --username '__token__' \
+                          --password "$UPLOAD_SECRET" \
+                          dist/*
+                  }
+
+                  push_tags() {
+                      if [ "$BUILD_TYPE" == "pypi" ]; then
+                          echo '[PUSHING EARLY ACCESS TAGS]'
+                          git tag -f early-access && git push -f origin early-access
+                      fi
+                  }
+
+                  main() {
+                      configure_git
+                      set_build_variables
+                      build_and_upload
+                      push_tags
+                  }
+
+                  main "$@"
