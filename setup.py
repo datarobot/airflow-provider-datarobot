@@ -84,32 +84,27 @@ classifiers = [
 DESCRIPTION_TEMPLATE = """
 About {package_name}
 =============================================
-.. image:: https://img.shields.io/pypi/v/{package_name}.svg
-   :target: {pypi_url_target}
-.. image:: https://img.shields.io/pypi/pyversions/{package_name}.svg
-.. image:: https://img.shields.io/pypi/status/{package_name}.svg
+![package](https://img.shields.io/pypi/v/{package_name}.svg)
+![versions](https://img.shields.io/pypi/pyversions/{package_name}.svg)
+![status](https://img.shields.io/pypi/status/{package_name}.svg)
 
 This package provides operators, sensors, and a hook to integrate [DataRobot](https://www.datarobot.com)
 into Apache Airflow. {extra_desc}
 
 This package is released under the terms of the DataRobot Tool and Utility Agreement, which
-can be found on our `Legal`_ page, along with our privacy policy and more.
+can be found on our [Legal](https://www.datarobot.com/legal/) page, along with our privacy policy and more.
 
 Installation
 =========================
 You must have a datarobot account.
 
-::
-
-   $ pip install {pip_package_name}
+```
+$ pip install {pip_package_name}
+```
 
 Bug Reporting and Q&A
 =========================
-To report issues or ask questions, send email to `the team <api-maintainer@datarobot.com>`_.
-
-.. _datarobot: https://datarobot.com
-.. _documentation: https://github.com/datarobot/airflow-provider-datarobot
-.. _legal: https://www.datarobot.com/legal/
+To report issues or ask questions, send email to [the team](mailto:api-maintainer@datarobot.com).
 """
 
 with open("datarobot_provider/_version.py") as fd:
