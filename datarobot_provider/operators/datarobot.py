@@ -12,6 +12,7 @@ from typing import Optional
 import datarobot as dr
 from airflow.exceptions import AirflowFailException
 from airflow.utils.context import Context
+from strenum import StrEnum
 
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
@@ -28,34 +29,99 @@ class CreateUseCaseOperator(BaseDatarobotOperator):
     ----------
     datarobot_conn_id: str
         Connection ID, defaults to `datarobot_default`
+    name: str
+        Use Case name
+    description: Optional[str]
+        Use Case description
+    reuse_policy: CreateUseCaseOperator.ReusePolicy
+        Should the operator reuse an existing Use Case with the same *name*?
+
+        EXACT: Reuse the Use Case if it has exactly the same *name* and *description*.
+        SEARCH_BY_NAME_UPDATE_DESCRIPTION: Reuse the Use Case if it has exactly the same *name*. Update *description* if it's different.
+        SEARCH_BY_NAME_PRESERVE_DESCRIPTION: Reuse the Use Case if it has exactly the same *name*. Don't modify *description*.
+        NO_REUSE: Always create a new Use Case.
+
+        default: EXACT
 
     Returns
     -------
     str: DataRobot UseCase ID
     """
 
+    class ReusePolicy(StrEnum):
+        EXACT = "EXACT"
+        SEARCH_BY_NAME_UPDATE_DESCRIPTION = "SEARCH_BY_NAME_UPDATE_DESCRIPTION"
+        SEARCH_BY_NAME_PRESERVE_DESCRIPTION = "SEARCH_BY_NAME_PRESERVE_DESCRIPTION"
+        NO_REUSE = "NO_REUSE"
+
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = ["credential_id"]
+    template_fields: Sequence[str] = ["name", "description"]
 
     def __init__(
         self,
         *,
-        credential_id: Optional[str] = None,
+        name: str = "{{ params.use_case_name | default('Airflow') }}",
+        description: Optional[str] = "{{ params.use_case_description | default('') }}",
+        reuse_policy: ReusePolicy = ReusePolicy.EXACT,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
-
-        self.credential_id = credential_id
+        self.name = name
+        self.description = description
+        self.reuse_policy = reuse_policy
 
     def execute(self, context: Context) -> Optional[str]:
-        # Create DataRobot project
-        self.log.info("Creating DataRobot Use Case")
-        use_case: dr.UseCase = dr.UseCase.create(
-            name=context["params"].get("use_case_name"),
-            description=context["params"].get("use_case_description"),
-        )
-        self.log.info(f"Use case created: use_case_id={use_case.id} from local file")
+        use_case = None
+
+        if self.reuse_policy != self.ReusePolicy.NO_REUSE:
+            use_case = self._search_for_existing_use_case()
+
+            if (
+                use_case is not None
+                and self.reuse_policy == self.ReusePolicy.SEARCH_BY_NAME_UPDATE_DESCRIPTION
+                and use_case.description != self.description
+            ):
+                self.log.info(
+                    'Update Use Case description from "%s" to "%s"',
+                    use_case.description,
+                    self.description,
+                )
+                use_case.update(self.name, self.description)
+
+        if use_case is None:
+            self.log.info("Creating DataRobot Use Case")
+            use_case = dr.UseCase.create(name=self.name, description=self.description)
+            self.log.info(f"Use case created: use_case_id={use_case.id}")
+
         return use_case.id
+
+    def _search_for_existing_use_case(self) -> Optional[dr.UseCase]:
+        candidates = []
+
+        for use_case in dr.UseCase.list(search_params={"search": self.name}):
+            if use_case.name == self.name:
+                if (
+                    self.reuse_policy == self.ReusePolicy.EXACT
+                    and self.description
+                    and use_case.description != self.description
+                ):
+                    continue
+
+                self.log.info("Use an existing Use Case id=%s", use_case.id)
+
+                candidates.append(use_case)
+
+        if len(candidates) == 0:
+            return None
+
+        if (
+            len(candidates) > 1
+            and self.description
+            and any(x.description == self.description for x in candidates)
+        ):
+            candidates = [x for x in candidates if x.description == self.description]
+
+        return max(candidates, key=lambda x: x.created_at)
 
 
 class CreateProjectOperator(BaseDatarobotOperator):
