@@ -71,7 +71,7 @@ template:
                           --repository-url "$REPO_URL" \
                           --username '__token__' \
                           --password "$UPLOAD_SECRET" \
-                          dist/*
+                          dist/*early_access*
                   }
 
                   push_tags() {
