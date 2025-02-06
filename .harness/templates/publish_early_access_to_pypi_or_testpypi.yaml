@@ -11,9 +11,10 @@ template:
     spec:
       cloneCodebase: true
       caching:
-        enabled: true
+        enabled: false
+        paths: []
       buildIntelligence:
-        enabled: true
+        enabled: false
       infrastructure:
         type: KubernetesDirect
         spec:
@@ -48,12 +49,12 @@ template:
                       export SETUPTOOLS_SCM_PRETEND_VERSION='<+trigger.tag>'
                       BUILD_TYPE='<+stage.variables.BUILD_TYPE>'
                       REPO_URL='https://test.pypi.org/legacy/'
-                      UPLOAD_SECRET='<+secrets.getValue("org.test_pypi_token")>'
+                      UPLOAD_SECRET='<+secrets.getValue("testpypi_token")>'
                       VERSION=$(python3 setup_early_access.py --version)
 
                       if [ "$BUILD_TYPE" == "pypi" ]; then
                           REPO_URL='https://upload.pypi.org/legacy/'
-                          UPLOAD_SECRET='<+secrets.getValue("org.pypi_token")>'
+                          UPLOAD_SECRET='<+secrets.getValue("PyPI_token_for_airflow-provider-datarobot")>'
                       fi
                   }
 
@@ -66,10 +67,11 @@ template:
 
                       echo "[TWINE UPLOAD]"
                       twine upload \
+                          --verbose \
                           --repository-url "$REPO_URL" \
                           --username '__token__' \
                           --password "$UPLOAD_SECRET" \
-                          dist/*
+                          dist/*early_access*
                   }
 
                   push_tags() {
@@ -81,9 +83,17 @@ template:
 
                   main() {
                       configure_git
+                      pip3 install --no-cache-dir --upgrade pip setuptools wheel six twine
                       set_build_variables
                       build_and_upload
                       push_tags
                   }
 
                   main "$@"
+    variables:
+      - name: BUILD_TYPE
+        type: String
+        default: test
+        description: ""
+        required: true
+        value: <+input>.default(test).allowedValues(test,early-access,pypi)

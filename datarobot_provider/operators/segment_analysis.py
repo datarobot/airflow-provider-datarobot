@@ -10,17 +10,15 @@ from typing import TYPE_CHECKING
 from typing import Any
 
 import datarobot as dr
-from airflow.exceptions import AirflowException
-from airflow.models import BaseOperator
 from airflow.utils.context import Context
 
-from datarobot_provider.hooks.datarobot import DataRobotHook
+from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 if TYPE_CHECKING:
     from datarobot.models.deployment.deployment import SegmentAnalysisSettings
 
 
-class GetSegmentAnalysisSettingsOperator(BaseOperator):
+class GetSegmentAnalysisSettingsOperator(BaseDatarobotOperator):
     """
     Get segment analysis settings for a deployment.
 
@@ -32,29 +30,17 @@ class GetSegmentAnalysisSettingsOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["deployment_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         deployment_id: str,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.deployment_id = deployment_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> "SegmentAnalysisSettings":
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         self.log.info(f"Get Deployment for deployment_id={self.deployment_id}")
         deployment = dr.Deployment.get(deployment_id=self.deployment_id)
 
@@ -63,7 +49,7 @@ class GetSegmentAnalysisSettingsOperator(BaseOperator):
         return segment_analysis_settings
 
 
-class UpdateSegmentAnalysisSettingsOperator(BaseOperator):
+class UpdateSegmentAnalysisSettingsOperator(BaseDatarobotOperator):
     """
     Updates segment analysis settings for a deployment.
 
@@ -75,29 +61,17 @@ class UpdateSegmentAnalysisSettingsOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["deployment_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         deployment_id: str,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.deployment_id = deployment_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> None:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         self.log.info(f"Getting Deployment for deployment_id={self.deployment_id}")
         deployment = dr.Deployment.get(deployment_id=self.deployment_id)
 

@@ -10,16 +10,14 @@ from typing import Any
 from typing import Optional
 
 import datarobot as dr
-from airflow.exceptions import AirflowException
-from airflow.models import BaseOperator
 from airflow.utils.context import Context
 
-from datarobot_provider.hooks.datarobot import DataRobotHook
+from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 DEFAULT_MAX_WAIT_SEC = 600
 
 
-class PredictionExplanationsInitializationOperator(BaseOperator):
+class PredictionExplanationsInitializationOperator(BaseDatarobotOperator):
     """
     Triggering a prediction explanations initialization of a model.
     :param project_id: DataRobot project ID
@@ -37,31 +35,19 @@ class PredictionExplanationsInitializationOperator(BaseOperator):
         "project_id",
         "model_id",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         project_id: Optional[str] = None,
         model_id: Optional[str] = None,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.project_id = project_id
         self.model_id = model_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
-    def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
+    def validate(self):
         if self.project_id is None:
             raise ValueError(
                 "project_id is required to trigger a prediction explanations initialization."
@@ -72,6 +58,7 @@ class PredictionExplanationsInitializationOperator(BaseOperator):
                 "model_id is required to trigger a prediction explanations initialization."
             )
 
+    def execute(self, context: Context) -> str:
         # Initialize prediction explanations
         pei_job = dr.PredictionExplanationsInitialization.create(self.project_id, self.model_id)
 
@@ -82,7 +69,7 @@ class PredictionExplanationsInitializationOperator(BaseOperator):
         return pei_job.id
 
 
-class ComputePredictionExplanationsOperator(BaseOperator):
+class ComputePredictionExplanationsOperator(BaseDatarobotOperator):
     """
     Create prediction explanations for the specified dataset.
     :param project_id: DataRobot project ID
@@ -103,9 +90,6 @@ class ComputePredictionExplanationsOperator(BaseOperator):
         "model_id",
         "external_dataset_id",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -113,23 +97,14 @@ class ComputePredictionExplanationsOperator(BaseOperator):
         project_id: Optional[str] = None,
         model_id: Optional[str] = None,
         external_dataset_id: Optional[str] = None,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.project_id = project_id
         self.model_id = model_id
         self.external_dataset_id = external_dataset_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
-    def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
+    def validate(self):
         if self.project_id is None:
             raise ValueError("project_id is required to compute prediction explanations.")
 
@@ -139,6 +114,7 @@ class ComputePredictionExplanationsOperator(BaseOperator):
         if self.external_dataset_id is None:
             raise ValueError("external_dataset_id is required to compute prediction explanations.")
 
+    def execute(self, context: Context) -> str:
         # Creating compute prediction explanations job:
         pe_job = dr.PredictionExplanations.create(
             self.project_id,

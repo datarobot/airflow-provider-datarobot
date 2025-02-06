@@ -51,10 +51,12 @@ def test_operator_compute_feature_impact_no_project_id(mocker):
     model_mock.id = model_id
     model_mock.project_id = project_id
 
-    operator = ComputeFeatureImpactOperator(task_id="compute_feature_impact", model_id=model_id)
+    operator = ComputeFeatureImpactOperator(
+        task_id="compute_feature_impact", model_id=model_id, project_id=""
+    )
 
     with pytest.raises(ValueError):
-        operator.execute(context={"params": {}})
+        operator.validate()
 
 
 def test_operator_compute_feature_impact_no_model_id(mocker):
@@ -65,10 +67,12 @@ def test_operator_compute_feature_impact_no_model_id(mocker):
     model_mock.id = model_id
     model_mock.project_id = project_id
 
-    operator = ComputeFeatureImpactOperator(task_id="compute_feature_impact", project_id=project_id)
+    operator = ComputeFeatureImpactOperator(
+        task_id="compute_feature_impact", model_id="", project_id=project_id
+    )
 
     with pytest.raises(ValueError):
-        operator.execute(context={"params": {}})
+        operator.validate()
 
 
 def test_operator_compute_feature_effects(mocker):
@@ -108,10 +112,12 @@ def test_operator_compute_feature_effects_no_project_id(mocker):
     model_mock.id = model_id
     model_mock.project_id = project_id
 
-    operator = ComputeFeatureEffectsOperator(task_id="compute_feature_effects", model_id=model_id)
+    operator = ComputeFeatureEffectsOperator(
+        task_id="compute_feature_effects", project_id="", model_id=model_id
+    )
 
     with pytest.raises(ValueError):
-        operator.execute(context={"params": {}})
+        operator.validate()
 
 
 def test_operator_compute_feature_effects_no_model_id(mocker):
@@ -123,11 +129,11 @@ def test_operator_compute_feature_effects_no_model_id(mocker):
     model_mock.project_id = project_id
 
     operator = ComputeFeatureEffectsOperator(
-        task_id="compute_feature_effects", project_id=project_id
+        task_id="compute_feature_effects", project_id=project_id, model_id=""
     )
 
     with pytest.raises(ValueError):
-        operator.execute(context={"params": {}})
+        operator.validate()
 
 
 def test_operator_compute_shap(mocker):
