@@ -224,8 +224,7 @@ class CreateDatasetFromDataStoreOperator(BaseDatarobotOperator):
 class CreateDatasetFromRecipeOperator(BaseDatarobotOperator):
     """Create a dataset based on a wrangling recipe.
     The dataset can be dynamic or a snapshot depending on the mandatory *do_snapshot* parameter.
-    The dataset is added into the Use Case if use_case_id is specified
-    in the context parameters.
+    The dataset is added into the Use Case if use_case_id is specified.
 
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
@@ -233,62 +232,69 @@ class CreateDatasetFromRecipeOperator(BaseDatarobotOperator):
     :type recipe_id: str
     :param do_snapshot: *True* to download and store whole dataframe into DataRobot AI Catalog. *False* to create a dynamic dataset.
     :type do_snapshot: bool
-    :param dataset_name_param: Name of the parameter in the configuration to use as dataset_name
-    :type dataset_name_param: str
-    :param materialization_catalog_param: Name of the parameter in the configuration to use as materialization_catalog
-    :type materialization_catalog_param: str
-    :param materialization_schema_param: Name of the parameter in the configuration to use as materialization_schema
-    :type materialization_schema_param: str
-    :param materialization_table_param: Name of the parameter in the configuration to use as materialization_table
-    :type materialization_table_param: str
+    :param dataset_name: Name of the new dataset.
+    :type dataset_name: str
+    :param materialization_catalog: Data store catalog (database) to upload the wrangled data into.
+    :type materialization_catalog: str
+    :param materialization_schema: The database schema to upload the wrangled data into.
+    :type materialization_schema: str
+    :param materialization_table: The database table to upload the wrangled data into.
+    :type materialization_table: str
     :param use_case_id: ID of the use case to add the dataset into.
     :type use_case_id: str or None
     :return: DataRobot AI Catalog dataset ID
     :rtype: str
     """
 
-    template_fields = ["recipe_id", "use_case_id"]
+    template_fields = [
+        "recipe_id",
+        "use_case_id",
+        "dataset_name",
+        "materialization_catalog",
+        "materialization_schema",
+        "materialization_table",
+    ]
 
     def __init__(
         self,
         *,
         recipe_id: str,
         do_snapshot: bool,
-        dataset_name_param: str = "dataset_name",
-        materialization_catalog_param: str = "materialization_catalog",
-        materialization_schema_param: str = "materialization_schema",
-        materialization_table_param: str = "materialization_table",
+        dataset_name: Optional[str] = "{{ params.dataset_name | default('') }}",
+        materialization_catalog: Optional[
+            str
+        ] = "{{ params.materialization_catalog | default('') }}",
+        materialization_schema: Optional[str] = "{{ params.materialization_schema | default('') }}",
+        materialization_table: Optional[str] = "{{ params.materialization_table | default('') }}",
         use_case_id: Optional[str] = "{{ params.use_case_id | default('') }}",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.recipe_id = recipe_id
         self.do_snapshot = do_snapshot
-
-        self.dataset_name_param = dataset_name_param
-        self.materialization_catalog_param = materialization_catalog_param
-        self.materialization_schema_param = materialization_schema_param
-        self.materialization_table_param = materialization_table_param
+        self.dataset_name = dataset_name
+        self.materialization_catalog = materialization_catalog
+        self.materialization_schema = materialization_schema
+        self.materialization_table = materialization_table
         self.use_case_id = use_case_id
 
     def _get_materialization_destination(
-        self, context: Context
+        self,
     ) -> Optional[dr.models.dataset.MaterializationDestination]:
-        if context["params"].get(self.materialization_table_param):
+        if self.materialization_table:
             return dr.models.dataset.MaterializationDestination(
-                catalog=context["params"].get(self.materialization_catalog_param),  # type: ignore[typeddict-item]
-                schema=context["params"].get(self.materialization_schema_param),  # type: ignore[typeddict-item]
-                table=context["params"].get(self.materialization_table_param),  # type: ignore[typeddict-item]
+                catalog=self.materialization_catalog,  # type: ignore[typeddict-item]
+                schema=self.materialization_schema,  # type: ignore[typeddict-item]
+                table=self.materialization_table,
             )
 
         return None
 
     def _get_dataset_name(
         self,
-        context: Context,
         materialization_destination: Optional[dr.models.dataset.MaterializationDestination],
     ):
-        return context["params"].get(self.dataset_name_param) or (
+        return self.dataset_name or (
             materialization_destination and materialization_destination["table"]
         )
 
@@ -300,8 +306,8 @@ class CreateDatasetFromRecipeOperator(BaseDatarobotOperator):
                 "Please, either specify do_snapshot=True for the operator or use another recipe."
             )
 
-        materialization_destination = self._get_materialization_destination(context)
-        dataset_name = self._get_dataset_name(context, materialization_destination)
+        materialization_destination = self._get_materialization_destination()
+        dataset_name = self._get_dataset_name(materialization_destination)
 
         dataset: dr.Dataset = dr.Dataset.create_from_recipe(
             recipe,

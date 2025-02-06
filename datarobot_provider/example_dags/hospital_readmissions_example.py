@@ -12,40 +12,47 @@ from airflow.decorators import dag
 from datarobot_provider.operators.ai_catalog import CreateDatasetFromRecipeOperator
 from datarobot_provider.operators.ai_catalog import CreateWranglingRecipeOperator
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
-
-# from datarobot_provider.operators.connections import GetDataStoreOperator
 from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.operators.datarobot import CreateUseCaseOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
 from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
 
+"""
+Example of Aiflow DAG for DataRobot data preparation and model training.
+Configurable parameters for this dag:
+* dataset_file_path - URL or a local path for a csv/parquet/xlsx file.
+* project_name - name of the project as displayed in DataRobot UI.
+* autopilot_settings - a dictionary with the modelling project autopilot settings.
+"""
+
 
 @dag(
     schedule=None,
-    tags=["example"],
+    tags=["example", "csv", "wrangling", "modeling"],
     params={
-        # "data_connection": "<YOUR DATAROBOT DATA CONNECTION NAME>",  # SNOWFLAKE (and any other database)
-        # "table_schema": "<DB_SCHEMA>",  # SNOWFLAKE
-        # "table_name": "<DB_TABLE>",  # SNOWFLAKE
-        "dataset_file_path": "https://s3.amazonaws.com/datarobot_public_datasets/10k_diabetes.csv",  # CSV
+        "dataset_file_path": "https://s3.amazonaws.com/datarobot_public_datasets/10k_diabetes.csv",
         "project_name": "hospital-readmissions-example",
         "autopilot_settings": {"target": "readmitted", "mode": "quick", "max_wait": 3600},
     },
 )
 def hospital_readmissions_example():
+    # Create a Use Case to keep all subsequent assets. Default name is "Airflow"
     create_use_case = CreateUseCaseOperator(task_id="create_use_case")
 
-    # get_connection = GetDataStoreOperator(task_id="get_connection")  # SNOWFLAKE
-    upload_dataset = UploadDatasetOperator(  # CSV
+    # Upload the data into Data Registry.
+    upload_dataset = UploadDatasetOperator(
         task_id="upload_dataset", use_case_id=create_use_case.output
     )
 
+    # Define data preparation.
     create_recipe = CreateWranglingRecipeOperator(
         task_id="create_recipe",
-        # data_store_id=get_connection.output,  # SNOWFLAKE
-        # dialect=dr.enums.DataWranglingDialect.SNOWFLAKE,  # SNOWFLAKE
-        dataset_id=upload_dataset.output,  # CSV
-        dialect=dr.enums.DataWranglingDialect.SPARK,  # CSV
+        dataset_id=upload_dataset.output,
+        dialect=dr.enums.DataWranglingDialect.SPARK,
+        # See the list of available *operation* options in the DtaRobot API documentation:
+        # https://docs.datarobot.com/en/docs/api/reference/public-api/data_wrangling.html#schemaoneofdirective
+        # General *operation* structure is:
+        # {"directive": <One of dr.enums.WranglingOperations>, "arguments": <dictionary>}
         operations=[
             {
                 "directive": "rename-columns",
@@ -72,10 +79,8 @@ def hospital_readmissions_example():
             {
                 "directive": "replace",
                 "arguments": {
-                    # "searchFor": r"\[(\d+).*",  # SNOWFLAKE
-                    # "replacement": r"\1",  # SNOWFLAKE
-                    "searchFor": r"\\[(\\d+).*",  # CSV
-                    "replacement": r"$1",  # CSV
+                    "searchFor": r"\\[(\\d+).*",
+                    "replacement": r"$1",
                     "origin": "age",
                     "matchMode": "regex",
                 },
@@ -83,8 +88,7 @@ def hospital_readmissions_example():
             {
                 "directive": "compute-new",
                 "arguments": {
-                    # "expression": 'CAST("age" AS Integer)',  # SNOWFLAKE
-                    "expression": "CAST(`age` AS Integer)",  # CSV
+                    "expression": "CAST(`age` AS Integer)",
                     "newFeatureName": "int-age",
                 },
             },
@@ -105,6 +109,7 @@ def hospital_readmissions_example():
         use_case_id=create_use_case.output,
     )
 
+    # Apply data preparation and save the modified data in the Data Registry.
     publish_recipe = CreateDatasetFromRecipeOperator(
         task_id="publish_recipe",
         recipe_id=create_recipe.output,
@@ -112,26 +117,25 @@ def hospital_readmissions_example():
         use_case_id=create_use_case.output,
     )
 
+    # Create a new Project.
     create_project = CreateProjectOperator(
         task_id="create_project",
-        dataset_id=str(publish_recipe.output),
+        dataset_id=publish_recipe.output,
         use_case_id=create_use_case.output,
     )
 
-    train_models = TrainModelsOperator(
-        task_id="train_models",
-        project_id=str(create_project.output),
-    )
+    # Launch modeling autopilot.
+    train_models = TrainModelsOperator(task_id="train_models", project_id=create_project.output)
 
+    # Wait for the autopilot completion.
     autopilot_complete_sensor = AutopilotCompleteSensor(
         task_id="check_autopilot_complete",
-        project_id=str(create_project.output),
+        project_id=create_project.output,
     )
 
     (
-        # [create_use_case, get_connection]  # SNOWFLAKE
-        create_use_case  # CSV
-        >> upload_dataset  # CSV
+        create_use_case
+        >> upload_dataset
         >> create_recipe
         >> publish_recipe
         >> create_project
