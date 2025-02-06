@@ -20,7 +20,7 @@ from setup import version
 version += datetime.today().strftime(".%Y.%m.%d")
 
 classifiers = [
-    "Development Status :: 4 - Preview",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "License :: Other/Proprietary License",
