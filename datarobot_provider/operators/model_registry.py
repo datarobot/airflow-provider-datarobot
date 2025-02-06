@@ -5,10 +5,10 @@ from typing import Sequence
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
-from airflow.models import BaseOperator
 from airflow.utils.context import Context
 
 from datarobot_provider.hooks.datarobot import DataRobotHook
+from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 
 class ModelType(Enum):
@@ -17,7 +17,7 @@ class ModelType(Enum):
     EXTERNAL = "external"
 
 
-class CreateRegisteredModelVersionOperator(BaseOperator):
+class CreateRegisteredModelVersionOperator(BaseDatarobotOperator):
     """
     Dynamically creates a registered model version using one of three methods:
     - Leaderboard Model
@@ -47,9 +47,7 @@ class CreateRegisteredModelVersionOperator(BaseOperator):
     def execute(self, context: Context) -> str:
         """Executes the operator to create a registered model version."""
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         model_type = self.model_version_params.get("model_type")
-        model_name = self.model_version_params.get("name")
 
         if not model_type:
             raise ValueError("'model_type' must be specified in model_version_params.")
@@ -69,29 +67,26 @@ class CreateRegisteredModelVersionOperator(BaseOperator):
         if not create_method:
             raise AirflowException(f"Unsupported model_type: {model_type}")
 
-        version = create_method(model_name)
+        extra_params = {k: v for k, v in self.model_version_params.items() if k != "model_type"}
+        version = create_method(**extra_params)
+
         self.log.info(f"Successfully created model version: {version.id}")
         return version.id
 
-    def create_for_leaderboard(self, model_name):
+    def create_for_leaderboard(self, **kwargs):
         """Creates a registered model version from a leaderboard model."""
         return dr.RegisteredModelVersion.create_for_leaderboard_item(
-            model_id=self.model_version_params["model_id"],
-            name=model_name,
-            registered_model_name=self.model_version_params["registered_model_name"],
+            model_id=kwargs.pop("model_id"), **kwargs
         )
 
-    def create_for_custom(self, model_name):
+    def create_for_custom(self, **kwargs):
         """Creates a registered model version for a custom model."""
         return dr.RegisteredModelVersion.create_for_custom_model_version(
-            custom_model_version_id=self.model_version_params["custom_model_version_id"],
-            name=model_name,
+            custom_model_version_id=kwargs.pop("custom_model_version_id"), **kwargs
         )
 
-    def create_for_external(self, model_name):
+    def create_for_external(self, **kwargs):
         """Creates a registered model version for an external model."""
         return dr.RegisteredModelVersion.create_for_external(
-            name=model_name,
-            target=self.model_version_params["target"],
-            registered_model_id=self.model_version_params["registered_model_id"],
+            target=kwargs.pop("target"), name=kwargs.pop("name"), **kwargs
         )
