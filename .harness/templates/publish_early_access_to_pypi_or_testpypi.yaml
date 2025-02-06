@@ -87,3 +87,10 @@ template:
                   }
 
                   main "$@"
+    variables:
+      - name: BUILD_TYPE
+        type: String
+        default: test
+        description: ""
+        required: true
+        value: <+input>.default(test).allowedValues(test,early-access,pypi)
