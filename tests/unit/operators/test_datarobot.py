@@ -28,12 +28,12 @@ from datarobot_provider.operators.datarobot import _serialize_drift
 def new_use_case():
     def _inner(data):
         mandatory_fields = {
-            "id": '',
-            "name": '',
-            "created_at": '2023-01-01',
-            "created": {'id': 'test-id'},
-            "updated_at": '2023-01-01',
-            "updated": {'id': 'test-id'},
+            "id": "",
+            "name": "",
+            "created_at": "2023-01-01",
+            "created": {"id": "test-id"},
+            "updated_at": "2023-01-01",
+            "updated": {"id": "test-id"},
             "models_count": 0,
             "projects_count": 0,
             "datasets_count": 0,
@@ -80,32 +80,89 @@ def test_operator_create_use_case_no_reuse(mocker, params, expected_name, expect
 
 
 @pytest.mark.parametrize(
-    "reuse_policy, expected_use_case_id, is_updated, is_created",
+    "reuse_policy, description, expected_use_case_id, is_updated, is_created",
     [
-        (CreateUseCaseOperator.ReusePolicy.EXACT, 'created-id', False, True),
-        (CreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_UPDATE_DESCRIPTION, 'no-description-later-id', True, False),
-        (CreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_IGNORE_DESCRIPTION, 'no-description-later-id', False, False),
-        (CreateUseCaseOperator.ReusePolicy.NO_REUSE, 'created-id', False, True),
+        # No exact match * 4.
+        (CreateUseCaseOperator.ReusePolicy.EXACT, "Test description", "created-id", False, True),
+        (
+            CreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_UPDATE_DESCRIPTION,
+            "Test description",
+            "no-description-later-id",
+            True,
+            False,
+        ),
+        (
+            CreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_PRESERVE_DESCRIPTION,
+            "Test description",
+            "no-description-later-id",
+            False,
+            False,
+        ),
+        (CreateUseCaseOperator.ReusePolicy.NO_REUSE, "Test description", "created-id", False, True),
+        # With exact match * 4.
+        (
+            CreateUseCaseOperator.ReusePolicy.EXACT,
+            "Another",
+            "another-description-earlier-id",
+            False,
+            False,
+        ),
+        (
+            CreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_UPDATE_DESCRIPTION,
+            "Another",
+            "another-description-earlier-id",
+            False,
+            False,
+        ),
+        (
+            CreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_PRESERVE_DESCRIPTION,
+            "Another",
+            "another-description-earlier-id",
+            False,
+            False,
+        ),
+        (CreateUseCaseOperator.ReusePolicy.NO_REUSE, "Another", "created-id", False, True),
     ],
 )
-def test_operator_create_use_case_no_exact_match(mocker, new_use_case, reuse_policy, expected_use_case_id, is_updated, is_created):
-    mocked_create = mocker.patch.object(dr.UseCase, "create", return_value=mocker.Mock(id="created-id"))
+def test_operator_create_use_case_reuse(
+    mocker, new_use_case, reuse_policy, description, expected_use_case_id, is_updated, is_created
+):
+    mocked_create = mocker.patch.object(
+        dr.UseCase, "create", return_value=mocker.Mock(id="created-id")
+    )
     mocked_update = mocker.patch.object(dr.UseCase, "update")
 
-    mocker.patch.object(dr.UseCase, "list", return_value=[
-        new_use_case({"id": "wrong-name-id", "name": 'Test Name', "description": 'Test description'}),
-        new_use_case({
-            "id": "no-description-earlier-id", "name": 'Test name', "description": '', "created_at": '2024-01-01'
-        }),
-        new_use_case({"id": "no-description-later-id", "name": 'Test name', "description": '',
-                    "created_at": '2025-01-01'}),
-    ])
+    mocker.patch.object(
+        dr.UseCase,
+        "list",
+        return_value=[
+            new_use_case(
+                {"id": "wrong-name-id", "name": "Test Name", "description": "Test description"}
+            ),
+            new_use_case(
+                {
+                    "id": "another-description-earlier-id",
+                    "name": "Test name",
+                    "description": "Another",
+                    "created_at": "2024-01-01",
+                }
+            ),
+            new_use_case(
+                {
+                    "id": "no-description-later-id",
+                    "name": "Test name",
+                    "description": "",
+                    "created_at": "2025-01-01",
+                }
+            ),
+        ],
+    )
 
     operator = CreateUseCaseOperator(
         task_id="create_project",
         reuse_policy=reuse_policy,
-        name='Test name',
-        description='Test description',
+        name="Test name",
+        description=description,
     )
     operator.render_template_fields({})
     use_case_id = operator.execute({})

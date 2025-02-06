@@ -38,7 +38,7 @@ class CreateUseCaseOperator(BaseDatarobotOperator):
 
         EXACT: Reuse the Use Case if it has exactly the same *name* and *description*.
         SEARCH_BY_NAME_UPDATE_DESCRIPTION: Reuse the Use Case if it has exactly the same *name*. Update *description* if it's different.
-        SEARCH_BY_NAME_IGNORE_DESCRIPTION: Reuse the Use Case if it has exactly the same *name*. Don't compare or modify *description*.
+        SEARCH_BY_NAME_PRESERVE_DESCRIPTION: Reuse the Use Case if it has exactly the same *name*. Don't modify *description*.
         NO_REUSE: Always create a new Use Case.
 
         default: EXACT
@@ -51,7 +51,7 @@ class CreateUseCaseOperator(BaseDatarobotOperator):
     class ReusePolicy(StrEnum):
         EXACT = "EXACT"
         SEARCH_BY_NAME_UPDATE_DESCRIPTION = "SEARCH_BY_NAME_UPDATE_DESCRIPTION"
-        SEARCH_BY_NAME_IGNORE_DESCRIPTION = "SEARCH_BY_NAME_IGNORE_DESCRIPTION"
+        SEARCH_BY_NAME_PRESERVE_DESCRIPTION = "SEARCH_BY_NAME_PRESERVE_DESCRIPTION"
         NO_REUSE = "NO_REUSE"
 
     # Specify the arguments that are allowed to parse with jinja templating
@@ -113,6 +113,13 @@ class CreateUseCaseOperator(BaseDatarobotOperator):
 
         if len(candidates) == 0:
             return None
+
+        if (
+            len(candidates) > 1
+            and self.description
+            and any(x.description == self.description for x in candidates)
+        ):
+            candidates = [x for x in candidates if x.description == self.description]
 
         return max(candidates, key=lambda x: x.created_at)
 
