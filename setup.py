@@ -84,9 +84,9 @@ classifiers = [
 DESCRIPTION_TEMPLATE = """
 About {package_name}
 =============================================
-![package](https://img.shields.io/pypi/v/{package_name}.svg)]
-![versions](https://img.shields.io/pypi/pyversions/{package_name}.svg)]
-![status](https://img.shields.io/pypi/status/{package_name}.svg)]
+![package](https://img.shields.io/pypi/v/{package_name}.svg)
+![versions](https://img.shields.io/pypi/pyversions/{package_name}.svg)
+![status](https://img.shields.io/pypi/status/{package_name}.svg)
 
 This package provides operators, sensors, and a hook to integrate [DataRobot](https://www.datarobot.com)
 into Apache Airflow. {extra_desc}
