@@ -24,15 +24,17 @@ from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 def test_operator_upload_dataset(mocker):
     dataset_mock = mocker.Mock()
     dataset_mock.id = "dataset-id"
-    upload_dataset_mock = mocker.patch.object(dr.Dataset, "upload", return_value=dataset_mock)
-    context = {"params": {"dataset_file_path": "/path/to/local/file"}}
+    upload_dataset_mock = mocker.patch.object(
+        dr.Dataset, "create_from_url", return_value=dataset_mock
+    )
+    context = {"params": {"dataset_file_path": "https://path.to/remote/file.csv"}}
 
     operator = UploadDatasetOperator(task_id="upload_dataset")
     operator.render_template_fields(context)
     dataset_id = operator.execute(context=context)
 
     assert dataset_id == "dataset-id"
-    upload_dataset_mock.assert_called_with(source="/path/to/local/file")
+    upload_dataset_mock.assert_called_with(url="https://path.to/remote/file.csv", max_wait=3600)
 
 
 def test_operator_update_dataset_from_file(mocker):

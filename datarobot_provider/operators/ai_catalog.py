@@ -16,7 +16,9 @@ from typing import Optional
 import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.utils.context import Context
+from datarobot.enums import FileLocationType
 from datarobot.models.recipe_operation import RandomSamplingOperation
+from datarobot.utils.source import parse_source_type
 
 from datarobot_provider.hooks.connections import JDBCDataSourceHook
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
@@ -66,7 +68,20 @@ class UploadDatasetOperator(BaseDatarobotOperator):
             self._file_path_param_is_deprecated()
             self.file_path = context["params"][self.file_path_param]
 
-        ai_catalog_dataset: dr.Dataset = dr.Dataset.upload(source=self.file_path)
+        source_type = parse_source_type(self.file_path)
+        if source_type == FileLocationType.URL:
+            ai_catalog_dataset: dr.Dataset = dr.Dataset.create_from_url(
+                url=self.file_path, max_wait=DATAROBOT_MAX_WAIT_SEC
+            )
+
+        elif source_type == FileLocationType.PATH:
+            ai_catalog_dataset = dr.Dataset.create_from_file(
+                file_path=self.file_path, max_wait=DATAROBOT_MAX_WAIT_SEC
+            )
+
+        else:
+            raise AirflowException(f"Unexpected file_path type: {source_type}")
+
         self.log.info(f"Dataset created: dataset_id={ai_catalog_dataset.id}")
 
         if self.use_case_id:
