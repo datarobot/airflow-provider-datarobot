@@ -6,6 +6,39 @@ pipeline:
   tags: {}
   stages:
     - stage:
+        name: Lint
+        identifier: Lint
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          caching:
+            enabled: true
+          buildIntelligence:
+            enabled: true
+          infrastructure:
+            type: KubernetesDirect
+            spec:
+              connectorRef: account.cigeneral
+              namespace: harness-delegate-ng
+              automountServiceAccountToken: true
+              nodeSelector: {}
+              os: Linux
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: lint check step
+                  identifier: lint_check_step
+                  spec:
+                    connectorRef: account.dockerhub_datarobot_read
+                    image: python:3.12
+                    shell: Bash
+                    command: |-
+                      set -exuo pipefail
+                      make req-dev
+                      make lint
+    - stage:
         name: Publish to TestPypi
         identifier: Publish_to_TestPypi
         template:
@@ -18,3 +51,9 @@ pipeline:
                 type: String
                 default: test
                 value: test
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.svc_harness_git1
+        repoName: airflow-provider-datarobot
+        build: <+input>
