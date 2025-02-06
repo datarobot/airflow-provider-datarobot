@@ -17,7 +17,7 @@ from setup import DESCRIPTION_TEMPLATE
 from setup import common_setup_kwargs
 from setup import version
 
-version += datetime.today().strftime(".%Y.%m.%d")
+version += datetime.today().strftime(".%Y%m%d%M")
 
 classifiers = [
     "Development Status :: 4 - Beta",
