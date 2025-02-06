@@ -283,8 +283,8 @@ class CreateDatasetFromRecipeOperator(BaseDatarobotOperator):
     ) -> Optional[dr.models.dataset.MaterializationDestination]:
         if self.materialization_table:
             return dr.models.dataset.MaterializationDestination(
-                catalog=self.materialization_catalog,  # type: ignore[typeddict-item]
-                schema=self.materialization_schema,  # type: ignore[typeddict-item]
+                catalog=self.materialization_catalog or None,  # type: ignore[typeddict-item]
+                schema=self.materialization_schema or None,  # type: ignore[typeddict-item]
                 table=self.materialization_table,
             )
 

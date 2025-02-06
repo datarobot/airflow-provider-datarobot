@@ -258,7 +258,7 @@ def test_operator_create_dataset_from_recipe(
     operator = CreateDatasetFromRecipeOperator(
         task_id="create_from_recipe",
         recipe_id="test-recipe-id",
-        dataset_name_param="dataset1_name",
+        dataset_name="{{ params.dataset1_name }}",
         do_snapshot=do_snapshot,
     )
     operator.render_template_fields(context)
