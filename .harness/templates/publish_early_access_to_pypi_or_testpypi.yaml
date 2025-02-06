@@ -11,9 +11,10 @@ template:
     spec:
       cloneCodebase: true
       caching:
-        enabled: true
+        enabled: false
+        paths: []
       buildIntelligence:
-        enabled: true
+        enabled: false
       infrastructure:
         type: KubernetesDirect
         spec:
