@@ -37,7 +37,7 @@ pipeline:
                       make req-dev
                       make lint
     - stage:
-        name: Publish to TestPypi
+        name: Publish to Pypi
         identifier: Publish_to_TestPypi
         template:
           templateRef: publish_early_access_to_pypi_or_testpypi
@@ -48,7 +48,7 @@ pipeline:
               - name: BUILD_TYPE
                 type: String
                 default: test
-                value: test
+                value: pypi
   properties:
     ci:
       codebase:
