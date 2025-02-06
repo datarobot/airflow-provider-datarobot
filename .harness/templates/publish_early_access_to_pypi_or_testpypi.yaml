@@ -48,12 +48,12 @@ template:
                       export SETUPTOOLS_SCM_PRETEND_VERSION='<+trigger.tag>'
                       BUILD_TYPE='<+stage.variables.BUILD_TYPE>'
                       REPO_URL='https://test.pypi.org/legacy/'
-                      UPLOAD_SECRET='<+secrets.getValue("org.test_pypi_token")>'
+                      UPLOAD_SECRET='<+secrets.getValue("testpypi_token")>'
                       VERSION=$(python3 setup_early_access.py --version)
 
                       if [ "$BUILD_TYPE" == "pypi" ]; then
                           REPO_URL='https://upload.pypi.org/legacy/'
-                          UPLOAD_SECRET='<+secrets.getValue("org.pypi_token")>'
+                          UPLOAD_SECRET='<+secrets.getValue("PyPI_token_for_airflow-provider-datarobot")>'
                       fi
                   }
 
