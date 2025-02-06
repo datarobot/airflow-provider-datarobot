@@ -20,7 +20,7 @@ from setup import version
 version += datetime.today().strftime(".%Y.%m.%d")
 
 classifiers = [
-    "Development Status :: 4 - Preview",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "License :: Other/Proprietary License",
@@ -36,6 +36,7 @@ classifiers = [
 
 # RELEASE SETUP
 package_name = "airflow_provider_datarobot_early_access"
+pip_package_name = "airflow-provider-datarobot-early-access"
 
 description = DESCRIPTION_TEMPLATE.format(
     package_name=package_name,
@@ -45,7 +46,7 @@ description = DESCRIPTION_TEMPLATE.format(
         " in production--you will expose yourself to risk of breaking changes and bugs.** For"
         " the most stable version, see https://pypi.org/project/airflow-provider-datarobot/."
     ),
-    pip_package_name=package_name,
+    pip_package_name=pip_package_name,
 )
 
 common_setup_kwargs.update(
