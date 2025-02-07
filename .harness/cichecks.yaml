@@ -13,6 +13,34 @@ pipeline:
   stages:
     - parallel:
         - stage:
+            name: CopyrightCheck
+            identifier: CopyrightCheck
+            description: ""
+            type: CI
+            spec:
+              cloneCodebase: true
+              infrastructure:
+                type: KubernetesDirect
+                spec:
+                  connectorRef: account.cigeneral
+                  namespace: harness-delegate-ng
+                  automountServiceAccountToken: true
+                  nodeSelector: {}
+                  os: Linux
+              execution:
+                steps:
+                  - step:
+                      type: Run
+                      name: Copyright Check
+                      identifier: Copyright_Check
+                      spec:
+                        connectorRef: account.dockerhub_datarobot_read
+                        image: apache/skywalking-eyes:0.4.0
+                        shell: Sh
+                        command: /bin/license-eye -c .licenserc.yaml header check
+            when:
+              pipelineStatus: Success
+        - stage:
             name: Lint and MyPy
             identifier: lint
             description: ""
