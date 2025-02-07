@@ -93,7 +93,7 @@ template:
     variables:
       - name: BUILD_TYPE
         type: String
-        default: test
+        default: test-early-access
         description: ""
         required: true
-        value: <+input>.default(test).allowedValues(test,early-access,pypi)
+        value: <+input>.default(test-early-access).allowedValues(test,early-access,pypi,test-early-access)
