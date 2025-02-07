@@ -10,16 +10,14 @@ from typing import Any
 from typing import Optional
 
 import datarobot as dr
-from airflow.exceptions import AirflowException
-from airflow.models import BaseOperator
 from airflow.utils.context import Context
 
-from datarobot_provider.hooks.datarobot import DataRobotHook
+from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 DEFAULT_MAX_WAIT_SEC = 600
 
 
-class AddExternalDatasetOperator(BaseOperator):
+class AddExternalDatasetOperator(BaseDatarobotOperator):
     """
     Upload a new dataset from a catalog dataset to make predictions for a model
     :param project_id: DataRobot project ID
@@ -43,9 +41,6 @@ class AddExternalDatasetOperator(BaseOperator):
         "credential_id",
         "dataset_version_id",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -55,7 +50,6 @@ class AddExternalDatasetOperator(BaseOperator):
         credential_id: Optional[str] = None,
         dataset_version_id: Optional[str] = None,
         max_wait_sec: int = DEFAULT_MAX_WAIT_SEC,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -64,22 +58,15 @@ class AddExternalDatasetOperator(BaseOperator):
         self.credential_id = credential_id
         self.dataset_version_id = dataset_version_id
         self.max_wait_sec = max_wait_sec
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
-    def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
+    def validate(self):
         if self.project_id is None:
             raise ValueError("project_id is required to add external dataset.")
 
         if self.dataset_id is None:
             raise ValueError("dataset_id is required to add external dataset.")
 
+    def execute(self, context: Context) -> str:
         project = dr.Project.get(self.project_id)
 
         external_dataset = project.upload_dataset_from_catalog(
@@ -96,7 +83,7 @@ class AddExternalDatasetOperator(BaseOperator):
         return external_dataset.id
 
 
-class RequestModelPredictionsOperator(BaseOperator):
+class RequestModelPredictionsOperator(BaseDatarobotOperator):
     """
     Requests predictions against a previously uploaded dataset.
     :param project_id: DataRobot project ID
@@ -117,33 +104,21 @@ class RequestModelPredictionsOperator(BaseOperator):
         "model_id",
         "external_dataset_id",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
-        project_id: Optional[str] = None,
-        model_id: Optional[str] = None,
-        external_dataset_id: Optional[str] = None,
-        datarobot_conn_id: str = "datarobot_default",
+        project_id: str,
+        model_id: str,
+        external_dataset_id: str,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.project_id = project_id
         self.model_id = model_id
         self.external_dataset_id = external_dataset_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
-    def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
+    def validate(self):
         if self.project_id is None:
             raise ValueError("project_id is required to compute model predictions.")
 
@@ -153,6 +128,7 @@ class RequestModelPredictionsOperator(BaseOperator):
         if self.external_dataset_id is None:
             raise ValueError("external_dataset_id is required to compute model predictions.")
 
+    def execute(self, context: Context) -> str:
         model = dr.models.Model.get(self.project_id, self.model_id)
 
         predict_job = model.request_predictions(dataset_id=self.external_dataset_id)

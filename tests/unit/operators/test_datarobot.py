@@ -24,35 +24,152 @@ from datarobot_provider.operators.datarobot import TrainModelsOperator
 from datarobot_provider.operators.datarobot import _serialize_drift
 
 
+@pytest.fixture
+def new_use_case():
+    def _inner(data):
+        mandatory_fields = {
+            "id": "",
+            "name": "",
+            "created_at": "2023-01-01",
+            "created": {"id": "test-id"},
+            "updated_at": "2023-01-01",
+            "updated": {"id": "test-id"},
+            "models_count": 0,
+            "projects_count": 0,
+            "datasets_count": 0,
+            "notebooks_count": 0,
+            "applications_count": 0,
+            "members": [],
+        }
+
+        the_copy = mandatory_fields.copy()
+        the_copy.update(data)
+        return dr.UseCase.from_data(the_copy)
+
+    return _inner
+
+
 @pytest.mark.parametrize(
-    "name, description",
+    "params, expected_name, expected_description",
     [
-        (None, None),
-        ("use-case-name", None),
-        (None, "use-case-description"),
-        ("use-case-name", "use-case-description"),
+        ({}, "Airflow", ""),
+        ({"use_case_name": "test-name"}, "test-name", ""),
+        ({"use_case_description": "test-description"}, "Airflow", "test-description"),
+        (
+            {"use_case_name": "test-name", "use_case_description": "test-description"},
+            "test-name",
+            "test-description",
+        ),
     ],
 )
-def test_operator_create_use_case(mocker, name, description):
+def test_operator_create_use_case_no_reuse(mocker, params, expected_name, expected_description):
     use_case_mock = mocker.Mock()
     use_case_mock.id = "use-case-id"
     create_use_case_mock = mocker.patch.object(dr.UseCase, "create", return_value=use_case_mock)
 
-    operator = CreateUseCaseOperator(task_id="create_project")
-    params = {}
-    if name:
-        params["use_case_name"] = name
-    if description:
-        params["use_case_description"] = description
-
-    use_case_id = operator.execute(
-        context={
-            "params": params,
-        }
+    context = {"params": params}
+    operator = CreateUseCaseOperator(
+        task_id="create_project", reuse_policy=CreateUseCaseOperator.ReusePolicy.NO_REUSE
     )
 
+    operator.render_template_fields(context)
+    use_case_id = operator.execute(context)
+
     assert use_case_id == "use-case-id"
-    create_use_case_mock.assert_called_with(name=name, description=description)
+    create_use_case_mock.assert_called_with(name=expected_name, description=expected_description)
+
+
+@pytest.mark.parametrize(
+    "reuse_policy, description, expected_use_case_id, is_updated, is_created",
+    [
+        # No exact match * 4.
+        (CreateUseCaseOperator.ReusePolicy.EXACT, "Test description", "created-id", False, True),
+        (
+            CreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_UPDATE_DESCRIPTION,
+            "Test description",
+            "no-description-later-id",
+            True,
+            False,
+        ),
+        (
+            CreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_PRESERVE_DESCRIPTION,
+            "Test description",
+            "no-description-later-id",
+            False,
+            False,
+        ),
+        (CreateUseCaseOperator.ReusePolicy.NO_REUSE, "Test description", "created-id", False, True),
+        # With exact match * 4.
+        (
+            CreateUseCaseOperator.ReusePolicy.EXACT,
+            "Another",
+            "another-description-earlier-id",
+            False,
+            False,
+        ),
+        (
+            CreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_UPDATE_DESCRIPTION,
+            "Another",
+            "another-description-earlier-id",
+            False,
+            False,
+        ),
+        (
+            CreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_PRESERVE_DESCRIPTION,
+            "Another",
+            "another-description-earlier-id",
+            False,
+            False,
+        ),
+        (CreateUseCaseOperator.ReusePolicy.NO_REUSE, "Another", "created-id", False, True),
+    ],
+)
+def test_operator_create_use_case_reuse(
+    mocker, new_use_case, reuse_policy, description, expected_use_case_id, is_updated, is_created
+):
+    mocked_create = mocker.patch.object(
+        dr.UseCase, "create", return_value=mocker.Mock(id="created-id")
+    )
+    mocked_update = mocker.patch.object(dr.UseCase, "update")
+
+    mocker.patch.object(
+        dr.UseCase,
+        "list",
+        return_value=[
+            new_use_case(
+                {"id": "wrong-name-id", "name": "Test Name", "description": "Test description"}
+            ),
+            new_use_case(
+                {
+                    "id": "another-description-earlier-id",
+                    "name": "Test name",
+                    "description": "Another",
+                    "created_at": "2024-01-01",
+                }
+            ),
+            new_use_case(
+                {
+                    "id": "no-description-later-id",
+                    "name": "Test name",
+                    "description": "",
+                    "created_at": "2025-01-01",
+                }
+            ),
+        ],
+    )
+
+    operator = CreateUseCaseOperator(
+        task_id="create_project",
+        reuse_policy=reuse_policy,
+        name="Test name",
+        description=description,
+    )
+    operator.render_template_fields({})
+    use_case_id = operator.execute({})
+
+    assert use_case_id == expected_use_case_id
+    assert mocked_create.called is is_created
+    assert mocked_update.called is is_updated
 
 
 def test_operator_create_project(mocker):
