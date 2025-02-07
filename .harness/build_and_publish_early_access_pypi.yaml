@@ -22,7 +22,7 @@ pipeline:
             variables:
               - name: BUILD_TYPE
                 type: String
-                default: test
+                default: test-early-access
                 value: test
   properties:
     ci:
