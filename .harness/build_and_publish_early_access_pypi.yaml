@@ -23,7 +23,7 @@ pipeline:
               - name: BUILD_TYPE
                 type: String
                 default: test-early-access
-                value: test
+                value: test-early-access
   properties:
     ci:
       codebase:
