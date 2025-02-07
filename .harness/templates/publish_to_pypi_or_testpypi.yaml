@@ -14,7 +14,7 @@ template:
         enabled: false
         paths: []
       buildIntelligence:
-        enabled: true
+        enabled: false
       infrastructure:
         type: KubernetesDirect
         spec:
@@ -90,3 +90,9 @@ template:
                   }
 
                   main "$@"
+    variables:
+      - name: BUILD_TYPE
+        type: String
+        description: ""
+        required: true
+        value: <+input>.default(test).allowedValues(test,pypi)
