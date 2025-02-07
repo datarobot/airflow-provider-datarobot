@@ -22,15 +22,18 @@ clean:  ## Clean up misc files like pytest and mypy cache for example
 	rm -rf build/* && rm -rf airflow_provider_datarobot_early_access.egg-info
 
 req: clean
-	pip install --upgrade pip setuptools
+	pip install --upgrade setuptools
+	pip install 'pip<24.1'
 	pip install -e .
 
 req-dev: clean
-	pip install --upgrade pip setuptools
+	pip install --upgrade setuptools
+	pip install 'pip<24.1'
 	pip install -e ".[dev]"
 
 req-dev-docs: clean
-	pip install --upgrade pip setuptools
+	pip install --upgrade setuptools
+	pip install 'pip<24.1'
 	pip install -e ".[dev,docs]"
 
 lint:
