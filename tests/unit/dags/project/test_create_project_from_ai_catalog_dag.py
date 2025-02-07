@@ -7,7 +7,7 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 import pytest
 
-from datarobot_provider.example_dags.deprecated.datarobot_create_project_from_ai_catalog_dag import (
+from datarobot_provider.example_dags.deprecated_dags.datarobot_create_project_from_ai_catalog_dag import (
     create_project_from_aicatalog,
 )
 

@@ -314,7 +314,7 @@ class DatasetRelationshipOperator(BaseDatarobotOperator):
         feature_derivation_window_start: Optional[int] = None,
         feature_derivation_window_end: Optional[int] = None,
         feature_derivation_window_time_unit: Optional[int] = None,
-        feature_derivation_windows: Optional[dict] = None,
+        feature_derivation_windows: Optional[list[dict]] = None,
         prediction_point_rounding: Optional[int] = None,
         prediction_point_rounding_time_unit: Optional[str] = None,
         max_wait_sec: int = DATAROBOT_MAX_WAIT,
