@@ -46,17 +46,26 @@ class BaseDatarobotOperator(BaseOperator):
 
 
 class BaseUseCaseEntityOperator(BaseDatarobotOperator):
+    """Base class for all operators which create a Use Case assets,
+    i.e. dataset, recipe, project, deployment, notebook, application, etc.
+
+    It introduces *use_case_id* template parameter and helper methods
+    to use a default Use Case if no Use Case was defined in the operator itself or a DAG context.
+    """
+
+    @classmethod
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        if "use_case_id" not in cls.template_fields:
+            cls.template_fields = (*cls.template_fields, "use_case_id")
+            cls.logger().info(
+                "use_case_id is implicitly added into %s template_fields list.", cls.__name__
+            )
+
     def __init__(
         self, *, use_case_id: Optional[str] = "{{ params.use_case_id | default('') }}", **kwargs
     ):
         super().__init__(**kwargs)
-
-        if "use_case_id" not in self.template_fields:
-            raise AirflowException(
-                f"You must add use_case_id into {self.__class__.__name__} template_fields list "
-                "in order to use BaseUseCaseEntityOperator"
-            )
-
         self.use_case_id = use_case_id
 
     def get_use_case(self, context: Context, required=False) -> Optional[dr.UseCase]:
@@ -71,7 +80,9 @@ class BaseUseCaseEntityOperator(BaseDatarobotOperator):
     def get_use_case_id(self, context: Context, required=False) -> Optional[str]:
         """Get self.use_case_id or a default Use Case id defined at runtime.
         Raises an exception if no Use Case id is defined and required=True"""
-        if use_case_id := (self.use_case_id or self.xcom_pull(context, key=XCOM_DEFAULT_USE_CASE_ID)):
+        if use_case_id := (
+            self.use_case_id or self.xcom_pull(context, key=XCOM_DEFAULT_USE_CASE_ID)
+        ):
             return use_case_id
 
         if required:

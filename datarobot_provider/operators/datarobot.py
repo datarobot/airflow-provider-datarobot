@@ -103,7 +103,7 @@ class GetOrCreateUseCaseOperator(BaseDatarobotOperator):
         if self.set_default:
             self.log.info(
                 'Set "%(name)s" (id=%(use_case_id)s) as a default Use Case.',
-                {'name': use_case.name, 'use_case_id': use_case.id},
+                {"name": use_case.name, "use_case_id": use_case.id},
             )
             self.xcom_push(context, XCOM_DEFAULT_USE_CASE_ID, use_case.id)
 
@@ -218,7 +218,9 @@ class CreateProjectOperator(BaseUseCaseEntityOperator):
 
         elif self.recipe_id is not None:
             project = dr.Project.create_from_recipe(
-                recipe_id=self.recipe_id, project_name=context["params"]["project_name"]
+                recipe_id=self.recipe_id,
+                project_name=context["params"]["project_name"],
+                use_case=use_case,
             )
             self.log.info(
                 f"Project created: project_id={project.id} from recipe: recipe_id={self.recipe_id}"  # type: ignore[attr-defined, unused-ignore]

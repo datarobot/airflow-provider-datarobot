@@ -316,3 +316,9 @@ def mock_airflow_connection_datarobot_jdbc(
         ),
     )
     mocker.patch.dict("os.environ", AIRFLOW_CONN_DATAROBOT_TEST_CONNECTION_JDBC_TEST=conn.get_uri())
+
+
+@pytest.fixture
+def xcom_context(mocker):
+    """A context-like object with xcom_pull patched to return None."""
+    return {"params": {}, "ti": mocker.Mock(xcom_pull=mocker.Mock(return_value=None))}
