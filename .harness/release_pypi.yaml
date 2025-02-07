@@ -20,7 +20,7 @@ pipeline:
             variables:
               - name: BUILD_TYPE
                 type: String
-                value: <+input>.default(test).allowedValues(test,pypi)
+                value: test
   properties:
     ci:
       codebase:
