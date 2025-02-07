@@ -4,6 +4,12 @@ pipeline:
   tags: {}
   stages:
     - stage:
+        name: Lint
+        identifier: Lint
+        template:
+          templateRef: Lint_Repo
+          versionLabel: "1"
+    - stage:
         name: Publish to Pypi
         identifier: Publish_to_Pypi
         template:
@@ -18,3 +24,9 @@ pipeline:
                 value: early-access
   identifier: releaseearlyaccesspypi
   name: release-early-access-pypi
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.svc_harness_git1
+        repoName: airflow-provider-datarobot
+        build: <+input>
