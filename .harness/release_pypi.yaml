@@ -13,13 +13,14 @@ pipeline:
         name: Publish Release to TestPypi
         identifier: Publish_Release_to_TestPypi
         template:
-          templateRef: Publish_to_Pypi_or_TestPypi
+          templateRef: publish_early_access_to_pypi_or_testpypi
           versionLabel: "1"
           templateInputs:
             type: CI
             variables:
               - name: BUILD_TYPE
                 type: String
+                default: test-early-access
                 value: test
     - stage:
         name: Approve Release to Pypi
