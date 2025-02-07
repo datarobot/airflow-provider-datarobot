@@ -59,14 +59,30 @@ class BaseUseCaseEntityOperator(BaseDatarobotOperator):
 
         self.use_case_id = use_case_id
 
-    def get_use_case(self, context: Context) -> Optional[dr.UseCase]:
-        if use_case_id := self.get_use_case_id(context):
+    def get_use_case(self, context: Context, required=False) -> Optional[dr.UseCase]:
+        """Get a `dr.UseCase` entity based on self.use_case_id or a default Use Case defined at runtime.
+        Raises an exception if no Use Case is defined and required=True
+        """
+        if use_case_id := self.get_use_case_id(context, required=required):
             return dr.UseCase.get(use_case_id)
 
         return None
 
-    def get_use_case_id(self, context: Context) -> Optional[str]:
-        return self.use_case_id or self.xcom_pull(context, XCOM_DEFAULT_USE_CASE_ID)
+    def get_use_case_id(self, context: Context, required=False) -> Optional[str]:
+        """Get self.use_case_id or a default Use Case id defined at runtime.
+        Raises an exception if no Use Case id is defined and required=True"""
+        if use_case_id := (self.use_case_id or self.xcom_pull(context, XCOM_DEFAULT_USE_CASE_ID)):
+            return use_case_id
+
+        if required:
+            raise AirflowException(
+                f"{self.__class__.__name__} requires a Use Case. Please define one of:\n"
+                "*use_case_id* parameter in the operator\n"
+                "*use_case_id* DAG context parameter\n"
+                "`GetOrCreateUseCaseOperator(..., set_default=True)` as one of the previous DAG tasks"
+            )
+
+        return None
 
     def add_into_use_case(
         self,
@@ -74,6 +90,7 @@ class BaseUseCaseEntityOperator(BaseDatarobotOperator):
         *,
         context: Context,
     ):
+        """Add an *entity* into Use Case defined as self.use_case_id or a default DAG Use Case."""
         if use_case := self.get_use_case(context):
             use_case.add(entity)
             self.log.info(

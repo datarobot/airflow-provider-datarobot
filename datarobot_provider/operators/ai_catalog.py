@@ -609,13 +609,7 @@ class CreateWranglingRecipeOperator(BaseUseCaseEntityOperator):
             )
 
     def execute(self, context: Context) -> str:
-        if (use_case := self.get_use_case(context)) is None:
-            raise AirflowException(
-                "Recipe must belong to a Use Case. You must define one of:\n"
-                "*use_case_id* parameter in the operator\n"
-                "*use_case_id* DAG context parameter\n"
-                "`GetOrCreateUseCaseOperator(..., set_default=True)` as one of the previous DAG tasks"
-            )
+        use_case: dr.UseCase = self.get_use_case(context, required=True)  # type: ignore[assignment]
 
         if self.dataset_id:
             self.log.info("Working with dataset_id=%s", self.dataset_id)
