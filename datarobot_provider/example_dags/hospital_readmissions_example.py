@@ -37,7 +37,7 @@ Configurable parameters for this dag:
 )
 def hospital_readmissions_example():
     # Create a Use Case to keep all subsequent assets. Default name is "Airflow"
-    create_use_case = GetOrCreateUseCaseOperator(task_id="create_use_case")
+    create_use_case = GetOrCreateUseCaseOperator(task_id="create_use_case", set_default=True)
 
     # Upload the data into Data Registry.
     upload_dataset = UploadDatasetOperator(task_id="upload_dataset")

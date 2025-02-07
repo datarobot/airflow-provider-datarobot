@@ -101,6 +101,10 @@ class GetOrCreateUseCaseOperator(BaseDatarobotOperator):
             self.log.info(f"Use case created: use_case_id={use_case.id}")
 
         if self.set_default:
+            self.log.info(
+                'Set "%(name)s" (id=%(use_case_id)s) as a default Use Case.',
+                {'name': use_case.name, 'use_case_id': use_case.id},
+            )
             self.xcom_push(context, XCOM_DEFAULT_USE_CASE_ID, use_case.id)
 
         return use_case.id

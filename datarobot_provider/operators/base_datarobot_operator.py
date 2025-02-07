@@ -71,7 +71,7 @@ class BaseUseCaseEntityOperator(BaseDatarobotOperator):
     def get_use_case_id(self, context: Context, required=False) -> Optional[str]:
         """Get self.use_case_id or a default Use Case id defined at runtime.
         Raises an exception if no Use Case id is defined and required=True"""
-        if use_case_id := (self.use_case_id or self.xcom_pull(context, XCOM_DEFAULT_USE_CASE_ID)):
+        if use_case_id := (self.use_case_id or self.xcom_pull(context, key=XCOM_DEFAULT_USE_CASE_ID)):
             return use_case_id
 
         if required:
