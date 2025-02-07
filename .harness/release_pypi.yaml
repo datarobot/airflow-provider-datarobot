@@ -21,6 +21,33 @@ pipeline:
               - name: BUILD_TYPE
                 type: String
                 value: test
+    - stage:
+        name: Approve Release to Pypi
+        identifier: Approve_Release
+        description: ""
+        type: Approval
+        spec:
+          execution:
+            steps:
+              - step:
+                  name: Approve Release
+                  identifier: Approve_Release
+                  type: HarnessApproval
+                  timeout: 1d
+                  spec:
+                    approvalMessage: |-
+                      Please review the following information
+                      and approve the pipeline progression
+                    includePipelineExecutionHistory: true
+                    approvers:
+                      minimumCount: 1
+                      disallowPipelineExecutor: false
+                      userGroups:
+                        - _project_all_users
+                        - Admins
+                    isAutoRejectEnabled: false
+                    approverInputs: []
+        tags: {}
   properties:
     ci:
       codebase:
