@@ -9,7 +9,6 @@ pipeline:
         template:
           templateRef: Lint_Repo
           versionLabel: "1"
-          gitBranch: mattn/MLDEV-1211-full-ea-pipeline
     - stage:
         name: Publish to Pypi
         identifier: Publish_to_Pypi
@@ -21,13 +20,13 @@ pipeline:
             variables:
               - name: BUILD_TYPE
                 type: String
-                default: test
-                value: pypi
+                default: test-early-access
+                value: early-access
+  identifier: releaseearlyaccesspypi
+  name: release-early-access-pypi
   properties:
     ci:
       codebase:
         connectorRef: account.svc_harness_git1
         repoName: airflow-provider-datarobot
         build: <+input>
-  identifier: releaseearlyaccesspypi
-  name: release-early-access-pypi

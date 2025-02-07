@@ -1,5 +1,5 @@
 template:
-  name: Publish Early Access to Pypi or TestPypi
+  name: Publish Release or Early Access to Pypi or TestPypi
   identifier: publish_early_access_to_pypi_or_testpypi
   versionLabel: "1"
   type: Stage
@@ -50,32 +50,52 @@ template:
                       BUILD_TYPE='<+stage.variables.BUILD_TYPE>'
                       REPO_URL='https://test.pypi.org/legacy/'
                       UPLOAD_SECRET='<+secrets.getValue("testpypi_token")>'
-                      VERSION=$(python3 setup_early_access.py --version)
 
-                      if [ "$BUILD_TYPE" == "pypi" ]; then
+                      if [ "$BUILD_TYPE" == "test-early-access" ] || [ "$BUILD_TYPE" == "early-access" ]; then
+                          VERSION=$(python3 setup_early_access.py --version)
+                      else
+                          VERSION=$(python3 setup.py --version)  
+                      fi
+
+                      if [ "$BUILD_TYPE" == "pypi" ] || [ "$BUILD_TYPE" == "early-access" ]; then
                           REPO_URL='https://upload.pypi.org/legacy/'
                           UPLOAD_SECRET='<+secrets.getValue("PyPI_token_for_airflow-provider-datarobot")>'
                       fi
                   }
 
                   build_and_upload() {
-                      echo "[BUILD PACKAGE]"
-                      make build-early-access
+                      if [ "$BUILD_TYPE" == "test-early-access" ] || [ "$BUILD_TYPE" == "early-access" ]; then
+                          echo "[BUILD PACKAGE - EARLY ACCESS]"
+                          make build-early-access
+                      else
+                          echo "[BUILD PACKAGE - RELEASE]"
+                          make build-release
+                      fi
 
                       echo "[TWINE CHECK]"
                       twine check dist/*
 
-                      echo "[TWINE UPLOAD]"
-                      twine upload \
-                          --verbose \
-                          --repository-url "$REPO_URL" \
-                          --username '__token__' \
-                          --password "$UPLOAD_SECRET" \
-                          dist/*early_access*
+                      if [ "$BUILD_TYPE" == "test-early-access" ] || [ "$BUILD_TYPE" == "early-access" ]; then
+                          echo "[TWINE UPLOAD - EARLY ACCESS]"
+                          twine upload \
+                              --verbose \
+                              --repository-url "$REPO_URL" \
+                              --username '__token__' \
+                              --password "$UPLOAD_SECRET" \
+                              dist/*early_access*
+                      else
+                          echo "[TWINE UPLOAD - RELEASE]"
+                          twine upload \
+                              --verbose \
+                              --repository-url "$REPO_URL" \
+                              --username '__token__' \
+                              --password "$UPLOAD_SECRET" \
+                              dist/*
+                      fi
                   }
 
                   push_tags() {
-                      if [ "$BUILD_TYPE" == "pypi" ]; then
+                      if [ "$BUILD_TYPE" == "early-access" ]; then
                           echo '[PUSHING EARLY ACCESS TAGS]'
                           git tag -f early-access && git push -f origin early-access
                       fi
@@ -93,7 +113,7 @@ template:
     variables:
       - name: BUILD_TYPE
         type: String
-        default: test
+        default: test-early-access
         description: ""
         required: true
-        value: <+input>.default(test).allowedValues(test,early-access,pypi)
+        value: <+input>.default(test-early-access).allowedValues(test,early-access,pypi,test-early-access)

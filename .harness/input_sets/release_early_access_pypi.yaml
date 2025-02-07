@@ -1,0 +1,14 @@
+inputSet:
+  name: release-early-access-pypi-input-set
+  identifier: releaseearlyaccesspypiinputset
+  orgIdentifier: AGENTS
+  projectIdentifier: airflowproviderdatarobot
+  pipeline:
+    identifier: releaseearlyaccesspypi
+    properties:
+      ci:
+        codebase:
+          build:
+            type: branch
+            spec:
+              branch: main
