@@ -63,6 +63,8 @@ class BaseUseCaseEntityOperator(BaseDatarobotOperator):
         if use_case_id := self.get_use_case_id(context):
             return dr.UseCase.get(use_case_id)
 
+        return None
+
     def get_use_case_id(self, context: Context) -> Optional[str]:
         return self.use_case_id or self.xcom_pull(context, XCOM_DEFAULT_USE_CASE_ID)
 
