@@ -40,9 +40,7 @@ def hospital_readmissions_example():
     create_use_case = GetOrCreateUseCaseOperator(task_id="create_use_case")
 
     # Upload the data into Data Registry.
-    upload_dataset = UploadDatasetOperator(
-        task_id="upload_dataset", use_case_id=create_use_case.output
-    )
+    upload_dataset = UploadDatasetOperator(task_id="upload_dataset")
 
     # Define data preparation.
     create_recipe = CreateWranglingRecipeOperator(
@@ -106,7 +104,6 @@ def hospital_readmissions_example():
                 },
             },
         ],
-        use_case_id=create_use_case.output,
     )
 
     # Apply data preparation and save the modified data in the Data Registry.
@@ -114,14 +111,12 @@ def hospital_readmissions_example():
         task_id="publish_recipe",
         recipe_id=create_recipe.output,
         do_snapshot=True,
-        use_case_id=create_use_case.output,
     )
 
     # Create a new Project.
     create_project = CreateProjectOperator(
         task_id="create_project",
         dataset_id=publish_recipe.output,
-        use_case_id=create_use_case.output,
     )
 
     # Launch modeling autopilot.
