@@ -15,6 +15,12 @@ pipeline:
         template:
           templateRef: Publish_to_Pypi_or_TestPypi
           versionLabel: "1"
+          templateInputs:
+            type: CI
+            variables:
+              - name: BUILD_TYPE
+                type: String
+                value: <+input>.default(test).allowedValues(test,pypi)
   properties:
     ci:
       codebase:
