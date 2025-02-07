@@ -15,6 +15,6 @@ pipeline:
               - name: BUILD_TYPE
                 type: String
                 default: test-early-access
-                value: pypi
+                value: early-access
   identifier: releaseearlyaccesspypi
   name: release-early-access-pypi
