@@ -14,10 +14,10 @@ from datarobot.models.deployment.data_drift import FeatureDrift
 from datarobot.models.deployment.data_drift import TargetDrift
 
 from datarobot_provider.operators.datarobot import CreateProjectOperator
-from datarobot_provider.operators.datarobot import CreateUseCaseOperator
 from datarobot_provider.operators.datarobot import DeployModelOperator
 from datarobot_provider.operators.datarobot import DeployRecommendedModelOperator
 from datarobot_provider.operators.datarobot import GetFeatureDriftOperator
+from datarobot_provider.operators.datarobot import GetOrCreateUseCaseOperator
 from datarobot_provider.operators.datarobot import GetTargetDriftOperator
 from datarobot_provider.operators.datarobot import ScorePredictionsOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
@@ -62,14 +62,16 @@ def new_use_case():
         ),
     ],
 )
-def test_operator_create_use_case_no_reuse(mocker, params, expected_name, expected_description):
+def test_operator_get_or_create_use_case_no_reuse(
+    mocker, params, expected_name, expected_description
+):
     use_case_mock = mocker.Mock()
     use_case_mock.id = "use-case-id"
     create_use_case_mock = mocker.patch.object(dr.UseCase, "create", return_value=use_case_mock)
 
     context = {"params": params}
-    operator = CreateUseCaseOperator(
-        task_id="create_project", reuse_policy=CreateUseCaseOperator.ReusePolicy.NO_REUSE
+    operator = GetOrCreateUseCaseOperator(
+        task_id="create_project", reuse_policy=GetOrCreateUseCaseOperator.ReusePolicy.NO_REUSE
     )
 
     operator.render_template_fields(context)
@@ -83,48 +85,60 @@ def test_operator_create_use_case_no_reuse(mocker, params, expected_name, expect
     "reuse_policy, description, expected_use_case_id, is_updated, is_created",
     [
         # No exact match * 4.
-        (CreateUseCaseOperator.ReusePolicy.EXACT, "Test description", "created-id", False, True),
         (
-            CreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_UPDATE_DESCRIPTION,
+            GetOrCreateUseCaseOperator.ReusePolicy.EXACT,
+            "Test description",
+            "created-id",
+            False,
+            True,
+        ),
+        (
+            GetOrCreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_UPDATE_DESCRIPTION,
             "Test description",
             "no-description-later-id",
             True,
             False,
         ),
         (
-            CreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_PRESERVE_DESCRIPTION,
+            GetOrCreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_PRESERVE_DESCRIPTION,
             "Test description",
             "no-description-later-id",
             False,
             False,
         ),
-        (CreateUseCaseOperator.ReusePolicy.NO_REUSE, "Test description", "created-id", False, True),
+        (
+            GetOrCreateUseCaseOperator.ReusePolicy.NO_REUSE,
+            "Test description",
+            "created-id",
+            False,
+            True,
+        ),
         # With exact match * 4.
         (
-            CreateUseCaseOperator.ReusePolicy.EXACT,
+            GetOrCreateUseCaseOperator.ReusePolicy.EXACT,
             "Another",
             "another-description-earlier-id",
             False,
             False,
         ),
         (
-            CreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_UPDATE_DESCRIPTION,
+            GetOrCreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_UPDATE_DESCRIPTION,
             "Another",
             "another-description-earlier-id",
             False,
             False,
         ),
         (
-            CreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_PRESERVE_DESCRIPTION,
+            GetOrCreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_PRESERVE_DESCRIPTION,
             "Another",
             "another-description-earlier-id",
             False,
             False,
         ),
-        (CreateUseCaseOperator.ReusePolicy.NO_REUSE, "Another", "created-id", False, True),
+        (GetOrCreateUseCaseOperator.ReusePolicy.NO_REUSE, "Another", "created-id", False, True),
     ],
 )
-def test_operator_create_use_case_reuse(
+def test_operator_get_or_create_use_case_reuse(
     mocker, new_use_case, reuse_policy, description, expected_use_case_id, is_updated, is_created
 ):
     mocked_create = mocker.patch.object(
@@ -158,7 +172,7 @@ def test_operator_create_use_case_reuse(
         ],
     )
 
-    operator = CreateUseCaseOperator(
+    operator = GetOrCreateUseCaseOperator(
         task_id="create_project",
         reuse_policy=reuse_policy,
         name="Test name",

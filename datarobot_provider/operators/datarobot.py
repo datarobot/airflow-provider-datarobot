@@ -14,14 +14,16 @@ from airflow.exceptions import AirflowFailException
 from airflow.utils.context import Context
 from strenum import StrEnum
 
+from datarobot_provider.operators.base_datarobot_operator import XCOM_DEFAULT_USE_CASE_ID
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
+from datarobot_provider.operators.base_datarobot_operator import BaseUseCaseEntityOperator
 
 DATAROBOT_MAX_WAIT = 3600
 DATAROBOT_AUTOPILOT_TIMEOUT = 86400
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%s"
 
 
-class CreateUseCaseOperator(BaseDatarobotOperator):
+class GetOrCreateUseCaseOperator(BaseDatarobotOperator):
     """
     Creates a DataRobot Use Case.
 
@@ -43,6 +45,9 @@ class CreateUseCaseOperator(BaseDatarobotOperator):
 
         default: EXACT
 
+    set_default: bool
+        Set this Use Case as a default one for all subsequent tasks in the DAG.
+
     Returns
     -------
     str: DataRobot UseCase ID
@@ -63,12 +68,14 @@ class CreateUseCaseOperator(BaseDatarobotOperator):
         name: str = "{{ params.use_case_name | default('Airflow') }}",
         description: Optional[str] = "{{ params.use_case_description | default('') }}",
         reuse_policy: ReusePolicy = ReusePolicy.EXACT,
+        set_default: bool = False,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.name = name
         self.description = description
         self.reuse_policy = reuse_policy
+        self.set_default = set_default
 
     def execute(self, context: Context) -> Optional[str]:
         use_case = None
@@ -92,6 +99,9 @@ class CreateUseCaseOperator(BaseDatarobotOperator):
             self.log.info("Creating DataRobot Use Case")
             use_case = dr.UseCase.create(name=self.name, description=self.description)
             self.log.info(f"Use case created: use_case_id={use_case.id}")
+
+        if self.set_default:
+            self.xcom_push(context, XCOM_DEFAULT_USE_CASE_ID, use_case.id)
 
         return use_case.id
 
@@ -124,7 +134,7 @@ class CreateUseCaseOperator(BaseDatarobotOperator):
         return max(candidates, key=lambda x: x.created_at)
 
 
-class CreateProjectOperator(BaseDatarobotOperator):
+class CreateProjectOperator(BaseUseCaseEntityOperator):
     """
     Creates DataRobot project.
     :param dataset_id: DataRobot AI Catalog dataset ID
@@ -153,7 +163,6 @@ class CreateProjectOperator(BaseDatarobotOperator):
         dataset_id: Optional[str] = None,
         dataset_version_id: Optional[str] = None,
         credential_id: Optional[str] = None,
-        use_case_id: Optional[str] = "{{ params.use_case_id|default('') }}",
         recipe_id: Optional[str] = None,
         **kwargs: Any,
     ) -> None:
@@ -161,14 +170,10 @@ class CreateProjectOperator(BaseDatarobotOperator):
         self.dataset_id = dataset_id
         self.dataset_version_id = dataset_version_id
         self.credential_id = credential_id
-        self.use_case_id = use_case_id
         self.recipe_id = recipe_id
 
     def execute(self, context: Context) -> Optional[str]:
-        use_case = None
-
-        if self.use_case_id:
-            use_case = dr.models.UseCase.get(self.use_case_id)
+        use_case = self.get_use_case(context)
 
         # Create DataRobot project
         self.log.info("Creating DataRobot project")

@@ -13,7 +13,7 @@ from datarobot_provider.operators.ai_catalog import CreateDatasetFromRecipeOpera
 from datarobot_provider.operators.ai_catalog import CreateWranglingRecipeOperator
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 from datarobot_provider.operators.datarobot import CreateProjectOperator
-from datarobot_provider.operators.datarobot import CreateUseCaseOperator
+from datarobot_provider.operators.datarobot import GetOrCreateUseCaseOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
 from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
 
@@ -37,7 +37,7 @@ Configurable parameters for this dag:
 )
 def hospital_readmissions_example():
     # Create a Use Case to keep all subsequent assets. Default name is "Airflow"
-    create_use_case = CreateUseCaseOperator(task_id="create_use_case")
+    create_use_case = GetOrCreateUseCaseOperator(task_id="create_use_case")
 
     # Upload the data into Data Registry.
     upload_dataset = UploadDatasetOperator(
