@@ -10,18 +10,11 @@ pipeline:
           templateRef: Lint_Repo
           versionLabel: "1"
     - stage:
-        name: Publish to TestPypi
-        identifier: Publish_to_TestPypi
+        name: Publish Release to TestPypi
+        identifier: Publish_Release_to_TestPypi
         template:
-          templateRef: publish_early_access_to_pypi_or_testpypi
+          templateRef: Publish_to_Pypi_or_TestPypi
           versionLabel: "1"
-          templateInputs:
-            type: CI
-            variables:
-              - name: BUILD_TYPE
-                type: String
-                default: test
-                value: test
   properties:
     ci:
       codebase:
