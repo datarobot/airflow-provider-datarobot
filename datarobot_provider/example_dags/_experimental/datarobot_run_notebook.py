@@ -60,7 +60,6 @@ def datarobot_notebook_run(
     poke_interval = 15
     check_notebook_run_complete = NotebookRunCompleteSensor(
         task_id="check_notebook_run_complete",
-        notebook_id=notebook_id,
         job_id=run_notebook.output,
         poke_interval=poke_interval,
         timeout=execution_timeout,

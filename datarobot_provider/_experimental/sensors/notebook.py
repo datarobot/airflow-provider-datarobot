@@ -40,7 +40,7 @@ class NotebookRunCompleteSensor(BaseSensorOperator):
     def __init__(
         self,
         *,
-        notebook_id: str,
+        notebook_id: str = "{{ params.notebook_id }}",
         job_id: str,
         datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
