@@ -1395,6 +1395,96 @@ Example of DAG config params:
 For more [prediction-explanations](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/autodoc/api_reference.html?highlight=PredictionExplanationsInitialization#prediction-explanations), see the DataRobot documentation.
 
 ---
+#### `CreateRegisteredModelVersionOperator`
+
+ Dynamically creates a registered model version using one of three methods:
+ - Leaderboard Model
+ - Custom Model
+ - External Model
+
+Parameters:
+ - **Leaderboard Model**
+
+| Parameter                          | Type                | Description                                                                                                                                                                       |
+|------------------------------------|---------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `model_type`                       | str                 | Type of model version to create (leaderboard, custom, or external).                                                                                                               |
+| `leaderboard_model_id`             | str                 | The ID of the leaderboard model.                                                                                                                                                  |
+| `name`                             | Optional[str]       | Name of the version (model package).                                                                                                                                              |
+| `prediction_threshold`             | Optional[float]     | Threshold used for binary classification in predictions.                                                                                                                          |
+| `distribution_prediction_model_id` | Optional[str]       | ID of the DataRobot distribution prediction model trained on predictions from the DataRobot model.                                                                                |
+| `description`                      | Optional[str]       | Description of the version (model package).                                                                                                                                       |
+| `compute_all_ts_intervals`         | Optional[bool]      | Whether to compute all time series prediction intervals (1-100 percentiles).                                                                                                      |
+| `registered_model_name`            | Optional[str]       | Name of the new registered model that will be created from this model package (version).The model package (version) will be created as version 1 of the created registered model. |
+| `registered_model_id`              | Optional[str]       | Creates a model package (version) as a new version for the provided registered model ID.Mutually exclusive with registeredModelName.                                              |
+| `tags`                             | Optional[List[Tag]] | Tags for the registered model version.                                                                                                                                            |
+| `registered_model_tags`            | Optional[List[Tag]] | Tags for the registered model.                                                                                                                                                    |
+| `registered_model_description`     | Optional[str]       | Description for the registered model.                                                                                                                                             |
+
+- **Custom Model**
+
+| Parameter                          | Type                | Description                                                                                                                                                                        |
+|------------------------------------|---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `model_type`                       | str                 | Type of model version to create (leaderboard, custom, or external).                                                                                                                |
+| `custom_model_id`                  | str                 | ID of the custom model version.                                                                                                                                                    |
+| `name`                             | Optional[str]       | Name of the registered model version.                                                                                                                                              |
+| `description`                      | Optional[str]       | Description of the version (model package).                                                                                                                                        |
+| `registered_model_name`            | Optional[str]       | Name of the new registered model that will be created from this model package (version).The model package (version) will be created as version 1 of the created registered model.  |
+| `registered_model_id`              | Optional[str]       | Creates a model package (version) as a new version for the provided registered model ID.Mutually exclusive with registeredModelName.                                               |
+| `tags`                             | Optional[List[Tag]] | Tags for the registered model version.                                                                                                                                             |
+| `registered_model_tags`            | Optional[List[Tag]] | Tags for the registered model.                                                                                                                                                     |
+| `registered_model_description`     | Optional[str]       | Description for the registered model.                                                                                                                                              |
+
+- **External Model**
+
+| Parameter                         | Type                       | Description                                                                                                                                                                       |
+|-----------------------------------|----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `model_type`                      | str                        | Type of model version to create (leaderboard, custom, or external).                                                                                                               |
+| `name`                            | str                        | Name of the registered model version.                                                                                                                                             |
+| `target`                          | ExternalTarget             | Target information for the registered model version.                                                                                                                              |
+| `model_id`                        | Optional[str]              | Model ID of the registered model version.                                                                                                                                         |
+| `model_description`               | Optional[ModelDescription] | Information about the model.                                                                                                                                                      |
+| `datasets`                        | Optional[ExternalDatasets] | Dataset information for the registered model version.                                                                                                                             |
+| `timeseries`                      | Optional[Timeseries]       | Timeseries properties for the registered model version.                                                                                                                           |
+| `registered_model_name`           | Optional[str]              | Name of the new registered model that will be created from this model package (version).The model package (version) will be created as version 1 of the created registered model. |
+| `registered_model_id`             | Optional[str]              | Creates a model package (version) as a new version for the provided registered model ID.Mutually exclusive with registeredModelName.                                              |
+| `tags`                            | Optional[List[Tag]]        | Tags for the registered model version.                                                                                                                                            |
+| `registered_model_tags`           | Optional[List[Tag]]        | Tags for the registered model.                                                                                                                                                    |
+| `registered_model_description`    | Optional[str]              | Description for the registered model.                                                                                                                                             |
+
+
+Example of DAG config params:
+
+Leaderboard Model
+```
+{
+    "model_type": "leaderboard",
+    "leaderboard_model_id": "123456789",
+    "name": "My Registered Model",
+    "registered_model_name": "My Model Registry"
+}
+```
+
+Custom Model
+```
+{
+    "model_type": "custom",
+    "custom_model_id": "987654321",
+    "name": "Custom Model Version"
+}
+```
+
+External Model
+```
+{
+    "model_type": "external",
+    "name": "External Model Version",
+    "target": {"name": "Target", "type": "Regression"},
+    "registered_model_id": "667c694a772c6e79dd61e6e1",
+}
+```
+For more [Model Registry](https://datarobot-public-api-client.readthedocs-hosted.com/en/latest-release/reference/mlops/model_registry.html#create-registered-model-version), see the DataRobot documentation.
+
+---
 
 ### [Sensors](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/sensors/datarobot.py)
 
