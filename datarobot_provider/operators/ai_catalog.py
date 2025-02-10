@@ -16,21 +16,27 @@ from typing import Optional
 import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.utils.context import Context
+from datarobot.enums import FileLocationType
+from datarobot.models.recipe_operation import RandomSamplingOperation
+from datarobot.utils.source import parse_source_type
 
 from datarobot_provider.hooks.connections import JDBCDataSourceHook
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
+from datarobot_provider.operators.base_datarobot_operator import BaseUseCaseEntityOperator
 
 # Time in seconds after which dataset uploading is considered unsuccessful.
 DATAROBOT_MAX_WAIT_SEC = 3600
 
 
-class UploadDatasetOperator(BaseDatarobotOperator):
+class UploadDatasetOperator(BaseUseCaseEntityOperator):
     """
     Uploading local file to DataRobot AI Catalog and return Dataset ID.
     :param file_path: The path to the file.
     :type file_path: str, optional
-    :param file_path_param: Name of the parameter in the configuration to use as file_path, defaults to `dataset_file_path`
+    :param file_path_param: DEPRECATED. Name of the parameter in the configuration to use as file_path, defaults to `dataset_file_path`
     :type file_path_param: str, optional
+    :param use_case_id: ID of the use case to add the dataset into.
+    :type use_case_id: str, optional
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
     :return: DataRobot AI Catalog dataset ID
@@ -38,33 +44,53 @@ class UploadDatasetOperator(BaseDatarobotOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = ["file_path", "file_path_param"]
+    template_fields: Sequence[str] = ["file_path", "file_path_param", "use_case_id"]
 
     def __init__(
         self,
         *,
-        file_path: Optional[str] = None,
-        file_path_param: str = "dataset_file_path",
-        datarobot_conn_id: str = "datarobot_default",
+        file_path: str = "{{ params.dataset_file_path | default('') }}",  # Don't use any *default* after *dataset_file_path* is finally removed.
+        file_path_param: Optional[str] = None,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.file_path = file_path
         self.file_path_param = file_path_param
 
+        if self.file_path_param is not None:
+            self._file_path_param_is_deprecated()
+
     def execute(self, context: Context) -> str:
         # Upload Dataset to AI Catalog
         self.log.info("Upload Dataset to AI Catalog")
-        if self.file_path is None:
+        if not self.file_path and self.file_path_param:
+            self._file_path_param_is_deprecated()
             self.file_path = context["params"][self.file_path_param]
 
-        ai_catalog_dataset: dr.Dataset = dr.Dataset.create_from_file(
-            file_path=self.file_path,
-            max_wait=DATAROBOT_MAX_WAIT_SEC,
-        )
+        source_type = parse_source_type(self.file_path)
+        if source_type == FileLocationType.URL:
+            ai_catalog_dataset: dr.Dataset = dr.Dataset.create_from_url(
+                url=self.file_path, max_wait=DATAROBOT_MAX_WAIT_SEC
+            )
+
+        elif source_type == FileLocationType.PATH:
+            ai_catalog_dataset = dr.Dataset.create_from_file(
+                file_path=self.file_path, max_wait=DATAROBOT_MAX_WAIT_SEC
+            )
+
+        else:
+            raise AirflowException(f"Unexpected file_path type: {source_type}")
 
         self.log.info(f"Dataset created: dataset_id={ai_catalog_dataset.id}")
+        self.add_into_use_case(ai_catalog_dataset, context=context)
+
         return ai_catalog_dataset.id
+
+    def _file_path_param_is_deprecated(self):
+        self.log.warning(
+            "**file_path_param** is deprecated. "
+            f"Use `file_path={{{{ params.{self.file_path_param} }}}}` instead."
+        )
 
 
 class UpdateDatasetFromFileOperator(BaseDatarobotOperator):
@@ -205,11 +231,10 @@ class CreateDatasetFromDataStoreOperator(BaseDatarobotOperator):
         return ai_catalog_dataset.id
 
 
-class CreateDatasetFromRecipeOperator(BaseDatarobotOperator):
+class CreateDatasetFromRecipeOperator(BaseUseCaseEntityOperator):
     """Create a dataset based on a wrangling recipe.
     The dataset can be dynamic or a snapshot depending on the mandatory *do_snapshot* parameter.
-    The dataset is added into the Use Case if use_case_id is specified
-    in the context parameters.
+    The dataset is added into the Use Case if use_case_id is specified.
 
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
     :type datarobot_conn_id: str, optional
@@ -217,58 +242,67 @@ class CreateDatasetFromRecipeOperator(BaseDatarobotOperator):
     :type recipe_id: str
     :param do_snapshot: *True* to download and store whole dataframe into DataRobot AI Catalog. *False* to create a dynamic dataset.
     :type do_snapshot: bool
-    :param dataset_name_param: Name of the parameter in the configuration to use as dataset_name
-    :type dataset_name_param: str
-    :param materialization_catalog_param: Name of the parameter in the configuration to use as materialization_catalog
-    :type materialization_catalog_param: str
-    :param materialization_schema_param: Name of the parameter in the configuration to use as materialization_schema
-    :type materialization_schema_param: str
-    :param materialization_table_param: Name of the parameter in the configuration to use as materialization_table
-    :type materialization_table_param: str
+    :param dataset_name: Name of the new dataset.
+    :type dataset_name: str
+    :param materialization_catalog: Data store catalog (database) to upload the wrangled data into.
+    :type materialization_catalog: str
+    :param materialization_schema: The database schema to upload the wrangled data into.
+    :type materialization_schema: str
+    :param materialization_table: The database table to upload the wrangled data into.
+    :type materialization_table: str
+    :param use_case_id: ID of the use case to add the dataset into.
+    :type use_case_id: str or None
     :return: DataRobot AI Catalog dataset ID
     :rtype: str
     """
 
-    template_fields = ["recipe_id"]
+    template_fields = [
+        "recipe_id",
+        "use_case_id",
+        "dataset_name",
+        "materialization_catalog",
+        "materialization_schema",
+        "materialization_table",
+    ]
 
     def __init__(
         self,
         *,
         recipe_id: str,
         do_snapshot: bool,
-        dataset_name_param: str = "dataset_name",
-        materialization_catalog_param: str = "materialization_catalog",
-        materialization_schema_param: str = "materialization_schema",
-        materialization_table_param: str = "materialization_table",
+        dataset_name: Optional[str] = "{{ params.dataset_name | default('') }}",
+        materialization_catalog: Optional[
+            str
+        ] = "{{ params.materialization_catalog | default('') }}",
+        materialization_schema: Optional[str] = "{{ params.materialization_schema | default('') }}",
+        materialization_table: Optional[str] = "{{ params.materialization_table | default('') }}",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.recipe_id = recipe_id
         self.do_snapshot = do_snapshot
-
-        self.dataset_name_param = dataset_name_param
-        self.materialization_catalog_param = materialization_catalog_param
-        self.materialization_schema_param = materialization_schema_param
-        self.materialization_table_param = materialization_table_param
+        self.dataset_name = dataset_name
+        self.materialization_catalog = materialization_catalog
+        self.materialization_schema = materialization_schema
+        self.materialization_table = materialization_table
 
     def _get_materialization_destination(
-        self, context: Context
+        self,
     ) -> Optional[dr.models.dataset.MaterializationDestination]:
-        if context["params"].get(self.materialization_table_param):
+        if self.materialization_table:
             return dr.models.dataset.MaterializationDestination(
-                catalog=context["params"].get(self.materialization_catalog_param),  # type: ignore[typeddict-item]
-                schema=context["params"].get(self.materialization_schema_param),  # type: ignore[typeddict-item]
-                table=context["params"].get(self.materialization_table_param),  # type: ignore[typeddict-item]
+                catalog=self.materialization_catalog or None,  # type: ignore[typeddict-item]
+                schema=self.materialization_schema or None,  # type: ignore[typeddict-item]
+                table=self.materialization_table,
             )
 
         return None
 
     def _get_dataset_name(
         self,
-        context: Context,
         materialization_destination: Optional[dr.models.dataset.MaterializationDestination],
     ):
-        return context["params"].get(self.dataset_name_param) or (
+        return self.dataset_name or (
             materialization_destination and materialization_destination["table"]
         )
 
@@ -280,8 +314,8 @@ class CreateDatasetFromRecipeOperator(BaseDatarobotOperator):
                 "Please, either specify do_snapshot=True for the operator or use another recipe."
             )
 
-        materialization_destination = self._get_materialization_destination(context)
-        dataset_name = self._get_dataset_name(context, materialization_destination)
+        materialization_destination = self._get_materialization_destination()
+        dataset_name = self._get_dataset_name(materialization_destination)
 
         dataset: dr.Dataset = dr.Dataset.create_from_recipe(
             recipe,
@@ -296,14 +330,7 @@ class CreateDatasetFromRecipeOperator(BaseDatarobotOperator):
             "Snapshot" if self.do_snapshot else "Dynamic",
             dataset.name,
         )
-
-        if context["params"].get("use_case_id"):
-            use_case = dr.UseCase.get(use_case_id=context["params"]["use_case_id"])
-            use_case.add(dataset)
-            logging.info('The dataset is added into use case "%s".', use_case.name)
-
-        else:
-            logging.info("New Dataset won't belong to any use case.")
+        self.add_into_use_case(dataset, context=context)
 
         return dataset.id
 
@@ -506,7 +533,7 @@ class CreateOrUpdateDataSourceOperator(BaseDatarobotOperator):
         return "-".join(parts)
 
 
-class CreateWranglingRecipeOperator(BaseDatarobotOperator):
+class CreateWranglingRecipeOperator(BaseUseCaseEntityOperator):
     """Create a Wrangling Recipe
 
     :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
@@ -551,7 +578,6 @@ class CreateWranglingRecipeOperator(BaseDatarobotOperator):
     def __init__(
         self,
         *,
-        use_case_id: str = '{{ params.get("use_case_id", "") }}',
         dataset_id: Optional[str] = None,
         data_store_id: Optional[str] = None,
         table_schema: Optional[str] = "{{ params.get('table_schema', '') }}",
@@ -565,7 +591,6 @@ class CreateWranglingRecipeOperator(BaseDatarobotOperator):
         **kwargs,
     ):
         super().__init__(**kwargs)
-        self.use_case_id = use_case_id
         self.dataset_id = dataset_id
         self.data_store_id = data_store_id
         self.table_schema = table_schema
@@ -578,19 +603,13 @@ class CreateWranglingRecipeOperator(BaseDatarobotOperator):
         self.downsampling_arguments = downsampling_arguments
 
     def validate(self):
-        if not self.use_case_id:
-            raise AirflowException(
-                "*use_case_id* is a mandatory parameter. "
-                "You can set it either explicitly or via the context variable *use_case_id*"
-            )
-
         if self.dataset_id and self.data_store_id:
             raise AirflowException(
                 "You have to specify either dataset_id or data_store_id. Not both."
             )
 
     def execute(self, context: Context) -> str:
-        use_case = dr.UseCase.get(self.use_case_id)
+        use_case: dr.UseCase = self.get_use_case(context, required=True)  # type: ignore[assignment]
 
         if self.dataset_id:
             self.log.info("Working with dataset_id=%s", self.dataset_id)
@@ -626,6 +645,7 @@ class CreateWranglingRecipeOperator(BaseDatarobotOperator):
                         canonical_name=data_source_canonical_name,
                         schema=self.table_schema,
                         table=self.table_name,
+                        sampling=RandomSamplingOperation(1000, 0),
                     )
                 ],
             )

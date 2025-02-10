@@ -1,0 +1,119 @@
+template:
+  name: Publish Release or Early Access to Pypi or TestPypi
+  identifier: publish_early_access_to_pypi_or_testpypi
+  versionLabel: "1"
+  type: Stage
+  projectIdentifier: airflowproviderdatarobot
+  orgIdentifier: AGENTS
+  tags: {}
+  spec:
+    type: CI
+    spec:
+      cloneCodebase: true
+      caching:
+        enabled: false
+        paths: []
+      buildIntelligence:
+        enabled: false
+      infrastructure:
+        type: KubernetesDirect
+        spec:
+          connectorRef: account.cigeneral
+          namespace: harness-delegate-ng
+          automountServiceAccountToken: true
+          nodeSelector: {}
+          os: Linux
+      execution:
+        steps:
+          - step:
+              type: Run
+              name: PyPi Publish
+              identifier: PyPi_Publish
+              spec:
+                connectorRef: account.dockerhub_datarobot_read
+                image: python:3.12
+                shell: Bash
+                command: |-
+                  #!/bin/bash
+
+                  configure_git() {
+                      echo "configuring git"
+                      cat <<EOF > ${HOME}/.netrc
+                  machine ${DRONE_NETRC_MACHINE}
+                  login ${DRONE_NETRC_USERNAME}
+                  password ${DRONE_NETRC_PASSWORD}
+                  EOF
+                  }
+
+                  set_build_variables() {
+                      export SETUPTOOLS_SCM_PRETEND_VERSION='<+trigger.tag>'
+                      BUILD_TYPE='<+stage.variables.BUILD_TYPE>'
+                      REPO_URL='https://test.pypi.org/legacy/'
+                      UPLOAD_SECRET='<+secrets.getValue("testpypi_token")>'
+
+                      if [ "$BUILD_TYPE" == "test-early-access" ] || [ "$BUILD_TYPE" == "early-access" ]; then
+                          VERSION=$(python3 setup_early_access.py --version)
+                      else
+                          VERSION=$(python3 setup.py --version)  
+                      fi
+
+                      if [ "$BUILD_TYPE" == "pypi" ] || [ "$BUILD_TYPE" == "early-access" ]; then
+                          REPO_URL='https://upload.pypi.org/legacy/'
+                          UPLOAD_SECRET='<+secrets.getValue("PyPI_token_for_airflow-provider-datarobot")>'
+                      fi
+                  }
+
+                  build_and_upload() {
+                      if [ "$BUILD_TYPE" == "test-early-access" ] || [ "$BUILD_TYPE" == "early-access" ]; then
+                          echo "[BUILD PACKAGE - EARLY ACCESS]"
+                          make build-early-access
+                      else
+                          echo "[BUILD PACKAGE - RELEASE]"
+                          make build-release
+                      fi
+
+                      echo "[TWINE CHECK]"
+                      twine check dist/*
+
+                      if [ "$BUILD_TYPE" == "test-early-access" ] || [ "$BUILD_TYPE" == "early-access" ]; then
+                          echo "[TWINE UPLOAD - EARLY ACCESS]"
+                          twine upload \
+                              --verbose \
+                              --repository-url "$REPO_URL" \
+                              --username '__token__' \
+                              --password "$UPLOAD_SECRET" \
+                              dist/*early_access*
+                      else
+                          echo "[TWINE UPLOAD - RELEASE]"
+                          twine upload \
+                              --verbose \
+                              --repository-url "$REPO_URL" \
+                              --username '__token__' \
+                              --password "$UPLOAD_SECRET" \
+                              dist/*
+                      fi
+                  }
+
+                  push_tags() {
+                      if [ "$BUILD_TYPE" == "early-access" ]; then
+                          echo '[PUSHING EARLY ACCESS TAGS]'
+                          git tag -f early-access && git push -f origin early-access
+                      fi
+                  }
+
+                  main() {
+                      configure_git
+                      pip3 install --no-cache-dir --upgrade pip setuptools wheel six twine
+                      set_build_variables
+                      build_and_upload
+                      push_tags
+                  }
+
+                  main "$@"
+    variables:
+      - name: BUILD_TYPE
+        type: String
+        default: test-early-access
+        description: ""
+        required: true
+        value: <+input>.default(test-early-access).allowedValues(test,early-access,pypi,test-early-access)

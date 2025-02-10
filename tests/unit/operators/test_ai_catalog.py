@@ -21,24 +21,20 @@ from datarobot_provider.operators.ai_catalog import UpdateDatasetFromFileOperato
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 
 
-def test_operator_upload_dataset(mocker):
+def test_operator_upload_dataset(mocker, xcom_context):
     dataset_mock = mocker.Mock()
     dataset_mock.id = "dataset-id"
     upload_dataset_mock = mocker.patch.object(
-        dr.Dataset, "create_from_file", return_value=dataset_mock
+        dr.Dataset, "create_from_url", return_value=dataset_mock
     )
+    xcom_context["params"] = {"dataset_file_path": "https://path.to/remote/file.csv"}
 
     operator = UploadDatasetOperator(task_id="upload_dataset")
-    dataset_id = operator.execute(
-        context={
-            "params": {
-                "dataset_file_path": "/path/to/local/file",
-            },
-        }
-    )
+    operator.render_template_fields(xcom_context)
+    dataset_id = operator.execute(context=xcom_context)
 
     assert dataset_id == "dataset-id"
-    upload_dataset_mock.assert_called_with(file_path="/path/to/local/file", max_wait=3600)
+    upload_dataset_mock.assert_called_with(url="https://path.to/remote/file.csv", max_wait=3600)
 
 
 def test_operator_update_dataset_from_file(mocker):
@@ -250,7 +246,7 @@ def test_operator_create_wrangling_recipe_from_db_table(mocker):
     ],
 )
 def test_operator_create_dataset_from_recipe(
-    mocker, test_params, do_snapshot, expected_name, expected_mat_destination
+    mocker, xcom_context, test_params, do_snapshot, expected_name, expected_mat_destination
 ):
     dataset_mock = mocker.Mock()
     recipe_mock = mocker.Mock(recipe_id="test-recipe-id")
@@ -259,14 +255,17 @@ def test_operator_create_dataset_from_recipe(
         dr.Dataset, "create_from_recipe", return_value=dataset_mock
     )
     get_recipe_mock = mocker.patch.object(dr.models.Recipe, "get", return_value=recipe_mock)
+
+    xcom_context["params"] = test_params
     operator = CreateDatasetFromRecipeOperator(
         task_id="create_from_recipe",
         recipe_id="test-recipe-id",
-        dataset_name_param="dataset1_name",
+        dataset_name="{{ params.dataset1_name }}",
         do_snapshot=do_snapshot,
     )
+    operator.render_template_fields(xcom_context)
 
-    dataset_id = operator.execute(context={"params": test_params})
+    dataset_id = operator.execute(context=xcom_context)
 
     assert dataset_id == "dataset-id"
     create_dataset_from_recipe_mock.assert_called_once_with(

@@ -10,23 +10,18 @@ from typing import Any
 from typing import Optional
 
 import datarobot as dr
-from airflow.exceptions import AirflowException
-from airflow.models import BaseOperator
 from airflow.utils.context import Context
 
-from datarobot_provider.hooks.datarobot import DataRobotHook
+from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 
-class SubmitActualsFromCatalogOperator(BaseOperator):
+class SubmitActualsFromCatalogOperator(BaseDatarobotOperator):
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = [
         "deployment_id",
         "dataset_id",
         "dataset_version_id",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -34,30 +29,22 @@ class SubmitActualsFromCatalogOperator(BaseOperator):
         deployment_id: str,
         dataset_id: str,
         dataset_version_id: Optional[str] = None,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.deployment_id = deployment_id
         self.dataset_id = dataset_id
         self.dataset_version_id = dataset_version_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
-    def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
-        self.log.info("Uploading Actuals from AI Catalog")
-
+    def validate(self):
         if self.deployment_id is None:
             raise ValueError("deployment_id is required to submit actuals.")
 
         if self.dataset_id is None:
             raise ValueError("dataset_id is required to submit actuals.")
+
+    def execute(self, context: Context) -> str:
+        self.log.info("Uploading Actuals from AI Catalog")
 
         deployment = dr.Deployment.get(deployment_id=self.deployment_id)
 

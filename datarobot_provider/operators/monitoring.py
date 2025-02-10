@@ -10,16 +10,14 @@ from typing import Any
 from typing import Optional
 
 import datarobot as dr
-from airflow.exceptions import AirflowException
-from airflow.models import BaseOperator
 from airflow.utils.context import Context
 
-from datarobot_provider.hooks.datarobot import DataRobotHook
+from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%s"
 
 
-class GetServiceStatsOperator(BaseOperator):
+class GetServiceStatsOperator(BaseDatarobotOperator):
     """
     Gets service stats measurements from a deployment.
 
@@ -33,29 +31,17 @@ class GetServiceStatsOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["deployment_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         deployment_id: str,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.deployment_id = deployment_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> list[dict]:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         self.log.info(f"Getting service stats for deployment_id={self.deployment_id}")
         deployment = dr.Deployment.get(self.deployment_id)
         service_stats_params = context["params"].get("service_stats", {})
@@ -72,7 +58,7 @@ def _serialize_metrics(service_stats_obj, date_format=DATETIME_FORMAT):
     return service_stats_dict
 
 
-class GetAccuracyOperator(BaseOperator):
+class GetAccuracyOperator(BaseDatarobotOperator):
     """
     Gets the accuracy of a deployment’s predictions.
 
@@ -86,29 +72,17 @@ class GetAccuracyOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["deployment_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         deployment_id: str,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.deployment_id = deployment_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> list[dict]:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         self.log.info(f"Getting service stats for deployment_id={self.deployment_id}")
         deployment = dr.Deployment.get(self.deployment_id)
         accuracy_params = context["params"].get("accuracy", {})
@@ -116,7 +90,7 @@ class GetAccuracyOperator(BaseOperator):
         return _serialize_metrics(accuracy)
 
 
-class GetMonitoringSettingsOperator(BaseOperator):
+class GetMonitoringSettingsOperator(BaseDatarobotOperator):
     """
     Get monitoring settings for deployment.
 
@@ -128,29 +102,17 @@ class GetMonitoringSettingsOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["deployment_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         deployment_id: str,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.deployment_id = deployment_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> dict:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         self.log.info(f"Get Deployment for deployment_id={self.deployment_id}")
         deployment = dr.Deployment.get(deployment_id=self.deployment_id)
 
@@ -167,7 +129,7 @@ class GetMonitoringSettingsOperator(BaseOperator):
         return monitoring_settings
 
 
-class UpdateMonitoringSettingsOperator(BaseOperator):
+class UpdateMonitoringSettingsOperator(BaseDatarobotOperator):
     """
     Updates monitoring settings for a deployment.
 
@@ -179,31 +141,19 @@ class UpdateMonitoringSettingsOperator(BaseOperator):
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = ["deployment_id"]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
         *,
         deployment_id: str,
         monitoring_settings: Optional[dict] = None,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.deployment_id = deployment_id
         self.monitoring_settings = monitoring_settings
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> None:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         self.log.info(f"Getting Deployment for deployment_id={self.deployment_id}")
         deployment = dr.Deployment.get(deployment_id=self.deployment_id)
 

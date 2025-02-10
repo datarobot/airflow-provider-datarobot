@@ -10,15 +10,13 @@ from typing import Any
 from typing import Optional
 
 import datarobot as dr
-from airflow.exceptions import AirflowException
-from airflow.models import BaseOperator
 from airflow.utils.context import Context
 from datarobot import BatchMonitoringJob
 
-from datarobot_provider.hooks.datarobot import DataRobotHook
+from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 
-class BatchMonitoringOperator(BaseOperator):
+class BatchMonitoringOperator(BaseDatarobotOperator):
     """
     Creates a batch monitoring job in DataRobot.
     :param deployment_id: DataRobot deployment ID
@@ -39,9 +37,6 @@ class BatchMonitoringOperator(BaseOperator):
         "datastore_id",
         "credential_id",
     ]
-    template_fields_renderers: dict[str, str] = {}
-    template_ext: Sequence[str] = ()
-    ui_color = "#f4a460"
 
     def __init__(
         self,
@@ -49,23 +44,14 @@ class BatchMonitoringOperator(BaseOperator):
         deployment_id: Optional[str] = None,
         datastore_id: Optional[str] = None,
         credential_id: Optional[str] = None,
-        datarobot_conn_id: str = "datarobot_default",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.deployment_id = deployment_id
         self.datastore_id = datastore_id
         self.credential_id = credential_id
-        self.datarobot_conn_id = datarobot_conn_id
-        if kwargs.get("xcom_push") is not None:
-            raise AirflowException(
-                "'xcom_push' was deprecated, use 'BaseOperator.do_xcom_push' instead"
-            )
 
     def execute(self, context: Context) -> str:
-        # Initialize DataRobot client
-        DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
-
         monitoring_job_settings = context["params"]["monitoring_settings"]
 
         # in case of deployment_id was not set from operator argument:
