@@ -1,4 +1,4 @@
-# Copyright 2023 DataRobot, Inc. and its affiliates.
+# Copyright 2022 DataRobot, Inc. and its affiliates.
 #
 # All rights reserved.
 #
@@ -7,23 +7,20 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 import pytest
 
-from datarobot_provider.example_dags.deprecated.datarobot_gcp_storage_batch_scoring_dag import (
-    datarobot_gcp_batch_scoring,
-)
+from datarobot_provider._experimental.example_dags.datarobot_score_dag import datarobot_score
 
 
 def test_dag_loaded(dagbag):
-    dag = dagbag.get_dag(dag_id="datarobot_gcp_batch_scoring")
+    dag = dagbag.get_dag(dag_id="datarobot_score")
     assert dagbag.import_errors == {}
     assert dag is not None
-    assert len(dag.tasks) == 3
+    assert len(dag.tasks) == 2
 
 
 def test_dag_structure():
-    dag = datarobot_gcp_batch_scoring()
+    dag = datarobot_score()
     pytest.helpers.assert_dag_dict_equal(
         {
-            "get_gcp_credentials": ["score_predictions"],
             "score_predictions": ["check_scoring_complete"],
             "check_scoring_complete": [],
         },
