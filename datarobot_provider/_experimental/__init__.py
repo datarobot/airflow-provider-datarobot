@@ -11,9 +11,8 @@ logger = logging.getLogger(__package__)
 
 experimental_warning = (
     "You have imported from the _experimental directory.\n"
-    "This directory is used for unreleased datarobot features.\n"
-    "Unless you specifically know better,"
-    " you don't have the access to use this functionality in the app, so this code will not work."
+    "This directory is used for unreleased DataRobot features.\n"
+    "Code from this directory may be untested and may change without warning."
 )
 
 logger.warning(experimental_warning)
