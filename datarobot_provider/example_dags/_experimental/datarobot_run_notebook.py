@@ -6,7 +6,7 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 """
-Config example for this dag:
+Config example for this dag to run a Codespace notebook with notebook parameters:
 {
     "notebook_id": "6798e158cc74377e3ceb4868",
     "notebook_path": "/home/notebooks/storage/test.py"
@@ -15,8 +15,6 @@ Config example for this dag:
     }
 }
 """
-
-from datetime import datetime
 
 from airflow.decorators import dag
 from airflow.models.param import Param
@@ -30,31 +28,21 @@ DEFAULT_NOTEBOOK_EXECUTION_TIMEOUT = 1440
 
 @dag(
     schedule=None,
-    start_date=datetime(2025, 1, 1),
+    description="Run a DataRobot notebook to completion and store a revision after it completes.",
+    dag_display_name="Run DataRobot Notebook",
     tags=["example", "notebook"],
-    # Default json config example:
     params={
         "notebook_id": "put_your_notebook_id_here",
-        "notebook_path": "put_notebook_path_here_if_codespace",
-        "notebook_parameters": Param(
-            {"data": [{"name": "foo", "value": "bar"}]}, type=["object", "null"]
-        ),
+        "notebook_path": Param(None, type=["string", "null"]),
+        "notebook_parameters": Param(None, type=["object", "null"]),
     },
+    render_template_as_native_obj=True,
 )
-def datarobot_notebook_run(
-    notebook_id=None,
-    notebook_path=None,
-    notebook_parameters=None,
-):
+def datarobot_notebook_run():
     # Timeout waiting for complete notebook execution
     execution_timeout = DEFAULT_NOTEBOOK_EXECUTION_TIMEOUT * 60
 
-    run_notebook = NotebookRunOperator(
-        task_id="run_notebook",
-        notebook_id=notebook_id,
-        notebook_path=notebook_path,
-        notebook_parameters=notebook_parameters,
-    )
+    run_notebook = NotebookRunOperator(task_id="run_notebook")
 
     # Status check each 15 sec
     poke_interval = 15

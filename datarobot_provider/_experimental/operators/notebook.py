@@ -5,10 +5,13 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+import json
 from collections.abc import Sequence
+from pathlib import Path
 from typing import Any
 from typing import Optional
 from typing import TypedDict
+from typing import Union
 
 from airflow.exceptions import AirflowException
 from airflow.utils.context import Context
@@ -20,6 +23,9 @@ from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOp
 
 class NotebookParametersData(TypedDict):
     data: list[StartSessionParameters]
+
+
+OperatorParametersType = Union[str, NotebookParametersData, None]
 
 
 class NotebookRunOperator(BaseDatarobotOperator):
@@ -49,19 +55,55 @@ class NotebookRunOperator(BaseDatarobotOperator):
     def __init__(
         self,
         *,
-        notebook_id: str,
-        notebook_path: Optional[str],
-        notebook_parameters: Optional[NotebookParametersData] = None,
+        notebook_id: str = "{{ params.notebook_id }}",
+        notebook_path: Optional[str] = "{{ params.notebook_path }}",
+        notebook_parameters: OperatorParametersType = "{{ params.notebook_parameters }}",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.notebook_id = notebook_id
-        self.notebook_path = notebook_path
+        self.notebook_path = notebook_path if notebook_path else None
         self.notebook_parameters = notebook_parameters
+        self.parameters = None
+
+    def _parse_notebook_parameters(self) -> None:
+        if self.notebook_parameters:
+            if isinstance(self.notebook_parameters, str):
+                parsed_parameters = json.loads(self.notebook_parameters)
+            else:
+                parsed_parameters = self.notebook_parameters
+            # DAGs using Airflow's `Param` model can't seem to take an array/list - it needs to be an object/dict
+            self.parameters = parsed_parameters.get("data")
+
+    def _validate_notebook_path(self) -> None:
+        path_suffix = ".ipynb"
+        if self.notebook_path is not None:
+            path = Path(self.notebook_path)
+            if not path.is_absolute():
+                raise AirflowException(
+                    f"Supplied notebook path ({self.notebook_path}) must be an absolute path."
+                )
+            if path.suffix != path_suffix:
+                raise AirflowException(
+                    f"Supplied notebook path ({self.notebook_path}) must end with '{path_suffix}."
+                )
+
+    def _validate_notebook_parameters(self) -> None:
+        try:
+            self._parse_notebook_parameters()
+        except Exception as exc:
+            self.log.warning(
+                f"Error ({str(exc)}) parsing notebook parameters: {self.notebook_parameters}"
+                f" type={type(self.notebook_parameters)}"
+            )
+            raise AirflowException("Please check the format of your notebook parameters.") from exc
+
+    def validate(self) -> None:
+        self._validate_notebook_path()
+        self._validate_notebook_parameters()
 
     def execute(self, context: Context) -> str:
-        # DAGs using Airflow's `Param` model can't seem to take an array/list - it needs to be an object/dict
-        parameters = self.notebook_parameters.get("data") if self.notebook_parameters else None
+        self._parse_notebook_parameters()
 
         # Fetch the notebook
         notebook = Notebook.get(notebook_id=self.notebook_id)
@@ -72,7 +114,9 @@ class NotebookRunOperator(BaseDatarobotOperator):
         # Run the notebook
         manual_run = notebook.run(
             notebook_path=self.notebook_path,
-            parameters=parameters,
+            parameters=self.parameters,
+            # TODO: [CFX-1400] Once early-access client is updated with this param use it
+            # manual_run_type=ManualRunType.PIPELINE
         )
         self.log.info(f"Notebook triggered. Manual run ID: {manual_run.id}")
 
