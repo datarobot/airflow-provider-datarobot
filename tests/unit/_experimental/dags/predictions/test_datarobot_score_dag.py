@@ -13,8 +13,8 @@ from datarobot_provider._experimental.example_dags.datarobot_score_dag import da
 def test_dag_loaded(dagbag):
     dag = dagbag.get_dag(dag_id="datarobot_score")
     assert dagbag.import_errors == {}
-    assert dag is not None
-    assert len(dag.tasks) == 2
+    # Experimental dags are not loaded
+    assert dag is None
 
 
 def test_dag_structure():
