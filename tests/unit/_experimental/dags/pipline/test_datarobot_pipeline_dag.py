@@ -13,8 +13,8 @@ from datarobot_provider._experimental.example_dags.datarobot_pipeline_dag import
 def test_dag_loaded(dagbag):
     dag = dagbag.get_dag(dag_id="datarobot_pipeline")
     assert dagbag.import_errors == {}
-    # Experimental dags are not loaded
-    assert dag is None
+    assert dag is not None
+    assert len(dag.tasks) == 8
 
 
 def test_dag_structure():

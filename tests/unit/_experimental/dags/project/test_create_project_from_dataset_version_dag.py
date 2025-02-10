@@ -15,8 +15,8 @@ from datarobot_provider._experimental.example_dags.datarobot_create_project_from
 def test_dag_loaded(dagbag):
     dag = dagbag.get_dag(dag_id="create_project_from_dataset_version")
     assert dagbag.import_errors == {}
-    # Experimental dags are not loaded
-    assert dag is None
+    assert dag is not None
+    assert len(dag.tasks) == 2
 
 
 def test_dag_structure():
