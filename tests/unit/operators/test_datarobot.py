@@ -13,11 +13,12 @@ from airflow.exceptions import AirflowFailException
 from datarobot.models.deployment.data_drift import FeatureDrift
 from datarobot.models.deployment.data_drift import TargetDrift
 
+from datarobot_provider.operators.base_datarobot_operator import XCOM_DEFAULT_USE_CASE_ID
 from datarobot_provider.operators.datarobot import CreateProjectOperator
-from datarobot_provider.operators.datarobot import CreateUseCaseOperator
 from datarobot_provider.operators.datarobot import DeployModelOperator
 from datarobot_provider.operators.datarobot import DeployRecommendedModelOperator
 from datarobot_provider.operators.datarobot import GetFeatureDriftOperator
+from datarobot_provider.operators.datarobot import GetOrCreateUseCaseOperator
 from datarobot_provider.operators.datarobot import GetTargetDriftOperator
 from datarobot_provider.operators.datarobot import ScorePredictionsOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
@@ -62,14 +63,16 @@ def new_use_case():
         ),
     ],
 )
-def test_operator_create_use_case_no_reuse(mocker, params, expected_name, expected_description):
+def test_operator_get_or_create_use_case_no_reuse(
+    mocker, params, expected_name, expected_description
+):
     use_case_mock = mocker.Mock()
     use_case_mock.id = "use-case-id"
     create_use_case_mock = mocker.patch.object(dr.UseCase, "create", return_value=use_case_mock)
 
     context = {"params": params}
-    operator = CreateUseCaseOperator(
-        task_id="create_project", reuse_policy=CreateUseCaseOperator.ReusePolicy.NO_REUSE
+    operator = GetOrCreateUseCaseOperator(
+        task_id="create_project", reuse_policy=GetOrCreateUseCaseOperator.ReusePolicy.NO_REUSE
     )
 
     operator.render_template_fields(context)
@@ -83,48 +86,60 @@ def test_operator_create_use_case_no_reuse(mocker, params, expected_name, expect
     "reuse_policy, description, expected_use_case_id, is_updated, is_created",
     [
         # No exact match * 4.
-        (CreateUseCaseOperator.ReusePolicy.EXACT, "Test description", "created-id", False, True),
         (
-            CreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_UPDATE_DESCRIPTION,
+            GetOrCreateUseCaseOperator.ReusePolicy.EXACT,
+            "Test description",
+            "created-id",
+            False,
+            True,
+        ),
+        (
+            GetOrCreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_UPDATE_DESCRIPTION,
             "Test description",
             "no-description-later-id",
             True,
             False,
         ),
         (
-            CreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_PRESERVE_DESCRIPTION,
+            GetOrCreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_PRESERVE_DESCRIPTION,
             "Test description",
             "no-description-later-id",
             False,
             False,
         ),
-        (CreateUseCaseOperator.ReusePolicy.NO_REUSE, "Test description", "created-id", False, True),
+        (
+            GetOrCreateUseCaseOperator.ReusePolicy.NO_REUSE,
+            "Test description",
+            "created-id",
+            False,
+            True,
+        ),
         # With exact match * 4.
         (
-            CreateUseCaseOperator.ReusePolicy.EXACT,
+            GetOrCreateUseCaseOperator.ReusePolicy.EXACT,
             "Another",
             "another-description-earlier-id",
             False,
             False,
         ),
         (
-            CreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_UPDATE_DESCRIPTION,
+            GetOrCreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_UPDATE_DESCRIPTION,
             "Another",
             "another-description-earlier-id",
             False,
             False,
         ),
         (
-            CreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_PRESERVE_DESCRIPTION,
+            GetOrCreateUseCaseOperator.ReusePolicy.SEARCH_BY_NAME_PRESERVE_DESCRIPTION,
             "Another",
             "another-description-earlier-id",
             False,
             False,
         ),
-        (CreateUseCaseOperator.ReusePolicy.NO_REUSE, "Another", "created-id", False, True),
+        (GetOrCreateUseCaseOperator.ReusePolicy.NO_REUSE, "Another", "created-id", False, True),
     ],
 )
-def test_operator_create_use_case_reuse(
+def test_operator_get_or_create_use_case_reuse(
     mocker, new_use_case, reuse_policy, description, expected_use_case_id, is_updated, is_created
 ):
     mocked_create = mocker.patch.object(
@@ -158,7 +173,7 @@ def test_operator_create_use_case_reuse(
         ],
     )
 
-    operator = CreateUseCaseOperator(
+    operator = GetOrCreateUseCaseOperator(
         task_id="create_project",
         reuse_policy=reuse_policy,
         name="Test name",
@@ -172,18 +187,42 @@ def test_operator_create_use_case_reuse(
     assert mocked_update.called is is_updated
 
 
-def test_operator_create_project(mocker):
+@pytest.mark.parametrize("set_default", [True, False])
+def test_operator_get_or_create_use_case_set_default(mocker, xcom_context, set_default):
+    mocker.patch.object(dr.UseCase, "create", return_value=mocker.Mock(id="created-id"))
+    operator = GetOrCreateUseCaseOperator(
+        task_id="create_project",
+        reuse_policy=GetOrCreateUseCaseOperator.ReusePolicy.NO_REUSE,
+        name="Test name",
+        description="Test description",
+        set_default=set_default,
+    )
+
+    use_case_id = operator.execute(xcom_context)
+
+    assert use_case_id == "created-id"
+    if set_default:
+        xcom_context["ti"].xcom_push.assert_called_once_with(
+            key=XCOM_DEFAULT_USE_CASE_ID, value="created-id", execution_date=None
+        )
+
+    else:
+        assert not xcom_context["ti"].xcom_push.called
+
+
+def test_operator_create_project(mocker, xcom_context):
     project_mock = mocker.Mock()
     project_mock.id = "project-id"
     create_project_mock = mocker.patch.object(dr.Project, "create", return_value=project_mock)
-    context = {
-        "params": {"training_data": "/path/to/s3/or/local/file", "project_name": "test project"},
+    xcom_context["params"] = {
+        "training_data": "/path/to/s3/or/local/file",
+        "project_name": "test project",
     }
 
     operator = CreateProjectOperator(task_id="create_project")
-    operator.render_template_fields(context)
+    operator.render_template_fields(xcom_context)
 
-    project_id = operator.execute(context)
+    project_id = operator.execute(xcom_context)
 
     assert project_id == "project-id"
     create_project_mock.assert_called_with(
@@ -191,19 +230,20 @@ def test_operator_create_project(mocker):
     )
 
 
-def test_operator_create_project_from_dataset(mocker):
+def test_operator_create_project_from_dataset(mocker, xcom_context):
     project_mock = mocker.Mock()
     project_mock.id = "project-id"
     create_project_mock = mocker.patch.object(
         dr.Project, "create_from_dataset", return_value=project_mock
     )
-    context = {
-        "params": {"training_dataset_id": "some_dataset_id", "project_name": "test project"},
+    xcom_context["params"] = {
+        "training_dataset_id": "some_dataset_id",
+        "project_name": "test project",
     }
 
     operator = CreateProjectOperator(task_id="create_project_from_dataset")
-    operator.render_template_fields(context)
-    project_id = operator.execute(context)
+    operator.render_template_fields(xcom_context)
+    project_id = operator.execute(xcom_context)
 
     assert project_id == "project-id"
     create_project_mock.assert_called_with(
@@ -215,19 +255,19 @@ def test_operator_create_project_from_dataset(mocker):
     )
 
 
-def test_operator_create_project_from_dataset_id(mocker):
+def test_operator_create_project_from_dataset_id(mocker, xcom_context):
     project_mock = mocker.Mock()
     project_mock.id = "project-id"
     create_project_mock = mocker.patch.object(
         dr.Project, "create_from_dataset", return_value=project_mock
     )
-    context = {"params": {"project_name": "test project"}}
+    xcom_context["params"] = {"project_name": "test project"}
 
     operator = CreateProjectOperator(
         task_id="create_project_from_dataset_id", dataset_id="some_dataset_id"
     )
-    operator.render_template_fields(context)
-    project_id = operator.execute(context)
+    operator.render_template_fields(xcom_context)
+    project_id = operator.execute(xcom_context)
 
     assert project_id == "project-id"
     create_project_mock.assert_called_with(
@@ -268,34 +308,36 @@ def test_operator_create_project_from_dataset_id_and_version_id_in_use_case(mock
     use_case_get_mock.assert_called_once_with("test-use-case-id")
 
 
-def test_operator_create_project_from_recipe_id(mocker):
+def test_operator_create_project_from_recipe_id(mocker, xcom_context):
     project_mock = mocker.Mock()
     project_mock.id = "project-id"
     create_project_mock = mocker.patch.object(
         dr.Project, "create_from_recipe", return_value=project_mock
     )
-    context = {"params": {"project_name": "test project"}}
+    xcom_context["params"] = {"project_name": "test project"}
 
     operator = CreateProjectOperator(
         task_id="create_project_from_recipe_id",
         recipe_id="recipe-id",
     )
-    operator.render_template_fields(context)
-    project_id = operator.execute(context)
+    operator.render_template_fields(xcom_context)
+    project_id = operator.execute(xcom_context)
 
     assert project_id == "project-id"
-    create_project_mock.assert_called_with(recipe_id="recipe-id", project_name="test project")
+    create_project_mock.assert_called_with(
+        recipe_id="recipe-id", project_name="test project", use_case=None
+    )
 
 
-def test_operator_create_project_fails_when_no_datasetid_or_training_data():
-    context = {"params": {"project_name": "test project"}}
+def test_operator_create_project_fails_when_no_datasetid_or_training_data(xcom_context):
+    xcom_context["params"] = {"project_name": "test project"}
     operator = CreateProjectOperator(task_id="create_project_no_dataset_id")
-    operator.render_template_fields(context)
+    operator.render_template_fields(xcom_context)
 
     # should raise AirflowFailException if no "training_data" or "training_dataset_id"
     # or dataset_id provided
     with pytest.raises(AirflowFailException):
-        operator.execute(context)
+        operator.execute(xcom_context)
 
 
 def test_operator_train_models(mocker):

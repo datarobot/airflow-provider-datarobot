@@ -16,11 +16,12 @@ from airflow.utils.context import Context
 from datarobot import SNAPSHOT_POLICY
 
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
+from datarobot_provider.operators.base_datarobot_operator import BaseUseCaseEntityOperator
 
 DATAROBOT_MAX_WAIT = 600
 
 
-class CreateFeatureDiscoveryRecipeOperator(BaseDatarobotOperator):
+class CreateFeatureDiscoveryRecipeOperator(BaseUseCaseEntityOperator):
     """
     Create a Feature Discovery recipe.
 
@@ -57,7 +58,6 @@ class CreateFeatureDiscoveryRecipeOperator(BaseDatarobotOperator):
         self,
         *,
         dataset_id: str,
-        use_case_id: str,
         dataset_definitions: Iterable[dict],
         relationships: Iterable[dict],
         feature_discovery_settings: Optional[Iterable[dict]] = None,
@@ -65,7 +65,6 @@ class CreateFeatureDiscoveryRecipeOperator(BaseDatarobotOperator):
     ) -> None:
         super().__init__(**kwargs)
         self.dataset_id = dataset_id
-        self.use_case_id = use_case_id
         self.dataset_definitions = dataset_definitions
         self.relationships = relationships
         self.feature_discovery_settings = feature_discovery_settings
@@ -74,7 +73,7 @@ class CreateFeatureDiscoveryRecipeOperator(BaseDatarobotOperator):
         response = dr.client.get_client().post(
             "/recipes/fromDataset/",
             data={
-                "useCaseId": self.use_case_id,
+                "useCaseId": self.get_use_case_id(context, required=True),
                 "status": "draft",
                 "datasetId": self.dataset_id,
                 "recipeType": "FEATURE_DISCOVERY",
