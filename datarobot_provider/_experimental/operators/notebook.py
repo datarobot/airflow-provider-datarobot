@@ -57,13 +57,13 @@ class NotebookRunOperator(BaseDatarobotOperator):
         self,
         *,
         notebook_id: str = "{{ params.notebook_id }}",
-        notebook_path: Optional[str] = "{{ params.notebook_path }}",
-        notebook_parameters: OperatorParametersType = "{{ params.notebook_parameters }}",
+        notebook_path: Optional[str] = "{{ params.notebook_path | default('') }}",
+        notebook_parameters: OperatorParametersType = "{{ params.notebook_parameters | default('') }}",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.notebook_id = notebook_id
-        self.notebook_path = notebook_path if notebook_path else None
+        self.notebook_path = notebook_path
         self.notebook_parameters = notebook_parameters
         self.parameters = None
 
@@ -78,7 +78,7 @@ class NotebookRunOperator(BaseDatarobotOperator):
 
     def _validate_notebook_path(self) -> None:
         path_suffix = ".ipynb"
-        if self.notebook_path is not None:
+        if self.notebook_path:
             path = Path(self.notebook_path)
             if not path.is_absolute():
                 raise AirflowException(
