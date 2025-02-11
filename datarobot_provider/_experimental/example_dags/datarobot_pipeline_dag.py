@@ -10,11 +10,11 @@ from datetime import datetime
 from airflow.decorators import dag
 
 from datarobot_provider.operators.datarobot import CreateProjectOperator
-from datarobot_provider.operators.datarobot import DeployRecommendedModelOperator
-from datarobot_provider.operators.datarobot import GetFeatureDriftOperator
-from datarobot_provider.operators.datarobot import GetTargetDriftOperator
-from datarobot_provider.operators.datarobot import ScorePredictionsOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
+from datarobot_provider.operators.deployment import DeployRecommendedModelOperator
+from datarobot_provider.operators.deployment import GetFeatureDriftOperator
+from datarobot_provider.operators.deployment import GetTargetDriftOperator
+from datarobot_provider.operators.deployment import ScorePredictionsOperator
 from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
 from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
 

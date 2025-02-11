@@ -15,14 +15,14 @@ from datarobot.models.deployment.data_drift import TargetDrift
 
 from datarobot_provider.operators.base_datarobot_operator import XCOM_DEFAULT_USE_CASE_ID
 from datarobot_provider.operators.datarobot import CreateProjectOperator
-from datarobot_provider.operators.datarobot import DeployModelOperator
-from datarobot_provider.operators.datarobot import DeployRecommendedModelOperator
-from datarobot_provider.operators.datarobot import GetFeatureDriftOperator
 from datarobot_provider.operators.datarobot import GetOrCreateUseCaseOperator
-from datarobot_provider.operators.datarobot import GetTargetDriftOperator
-from datarobot_provider.operators.datarobot import ScorePredictionsOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
-from datarobot_provider.operators.datarobot import _serialize_drift
+from datarobot_provider.operators.deployment import DeployModelOperator
+from datarobot_provider.operators.deployment import DeployRecommendedModelOperator
+from datarobot_provider.operators.deployment import GetFeatureDriftOperator
+from datarobot_provider.operators.deployment import GetTargetDriftOperator
+from datarobot_provider.operators.deployment import ScorePredictionsOperator
+from datarobot_provider.operators.deployment import _serialize_drift
 
 
 @pytest.fixture

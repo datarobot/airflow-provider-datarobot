@@ -33,7 +33,7 @@ from datetime import datetime
 from airflow.decorators import dag
 
 from datarobot_provider.operators.credentials import GetOrCreateCredentialOperator
-from datarobot_provider.operators.datarobot import ScorePredictionsOperator
+from datarobot_provider.operators.deployment import ScorePredictionsOperator
 from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
 
 
