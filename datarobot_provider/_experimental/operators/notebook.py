@@ -16,6 +16,7 @@ from typing import Union
 from airflow.exceptions import AirflowException
 from airflow.utils.context import Context
 from datarobot._experimental.models.notebooks import Notebook
+from datarobot._experimental.models.notebooks.enums import ManualRunType
 from datarobot._experimental.models.notebooks.session import StartSessionParameters
 
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
@@ -115,8 +116,7 @@ class NotebookRunOperator(BaseDatarobotOperator):
         manual_run = notebook.run(
             notebook_path=self.notebook_path,
             parameters=self.parameters,
-            # TODO: [CFX-1400] Once early-access client is updated with this param use it
-            # manual_run_type=ManualRunType.PIPELINE
+            manual_run_type=ManualRunType.PIPELINE,
         )
         self.log.info(f"Notebook triggered. Manual run ID: {manual_run.id}")
 
