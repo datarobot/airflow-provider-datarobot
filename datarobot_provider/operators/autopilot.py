@@ -11,6 +11,7 @@ from typing import Optional
 
 import datarobot as dr
 from airflow.utils.context import Context
+from datarobot._experimental.models.notebooks import Notebook
 
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
@@ -61,6 +62,9 @@ class StartAutopilotOperator(BaseDatarobotOperator):
         self.relationships_configuration_id = relationships_configuration_id
         self.segmentation_task_id = segmentation_task_id
         self.max_wait_sec = max_wait_sec
+
+        # DUMMY CODE
+        self._TESTING = Notebook.run(fake="wrong")
 
     def execute(self, context: Context) -> None:
         # Train models
