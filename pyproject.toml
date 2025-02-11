@@ -43,13 +43,21 @@ quote-style = "double"
 
 [tool.mypy]
 python_version = 3.12
+# check_untyped_defs = true  # TODO: Enable this check
+# disallow_any_generics = true  # TODO: Enable this check
+# disallow_untyped_calls = true  # TODO: Enable this check
+# disallow_untyped_defs = true  # TODO: Enable this check
+disallow_subclassing_any = true
+disallow_untyped_decorators = true
 enable_error_code = "ignore-without-code"
 ignore_missing_imports = true
 follow_imports_for_stubs = true
+implicit_reexport = true
 no_implicit_optional = true
 show_column_numbers = true
 warn_redundant_casts = true
 # warn_return_any = true  # TODO: Enable this check
+warn_unreachable = true
 warn_unused_configs = true
 warn_unused_ignores = true
 show_error_codes = true
