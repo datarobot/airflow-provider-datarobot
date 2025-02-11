@@ -168,7 +168,7 @@ def test_create_feature_discovery_recipe(
     if remove_version_id:
         # Test we auto-add version ID when absent in CreateFeatureDiscoveryRecipeOperator
         for d in dataset_definitions:
-            d.pop('catalogVersionId')
+            d.pop("catalogVersionId")
 
     operator = CreateFeatureDiscoveryRecipeOperator(
         task_id="create_feature_discovery_recipe_operator",
@@ -194,7 +194,7 @@ def test_create_feature_discovery_recipe(
     expected_dataset_definitions = dataset_definitions
     if remove_version_id:
         for d in expected_dataset_definitions:
-            d['catalogVersionId'] = 'replace-version-id'
+            d["catalogVersionId"] = "replace-version-id"
 
     get_client_mock.assert_called_once()
     replace_config_mock.assert_called_once_with(
