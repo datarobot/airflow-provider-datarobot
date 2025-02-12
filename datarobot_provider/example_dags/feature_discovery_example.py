@@ -139,7 +139,7 @@ def datarobot_feature_discovery_pipeline(
         {"name": "enable_record_count", "value": True},
         {"name": "enable_numeric_sum", "value": True},
     ]
-    # TODO: [DM-17066] Remove this, temporary to ignore lint:
+    # TODO: [DM-17066] Remove below line, temporary fix to ignore lint:
     _ = feature_discovery_settings
 
     # Create a Feature Discovery recipe with all the above information.
