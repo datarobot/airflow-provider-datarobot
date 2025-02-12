@@ -136,15 +136,14 @@ def hospital_readmissions_example():
         project_id=create_project.output,
         metric="readmitted",
     )
-
     # register model
     register_model = CreateRegisteredModelVersionOperator(
         task_id="register_model",
         model_version_params={
             "model_type": "leaderboard",
-            "leaderboard_model_id": select_best_model.output,
-            "name": "My Registered Model",
-            "registered_model_name": "My Model Registry",
+            "model_id": select_best_model.output,
+            "name": "Highest readmitted score test",
+            "registered_model_name": "Highest readmitted score test",
         },
     )
 

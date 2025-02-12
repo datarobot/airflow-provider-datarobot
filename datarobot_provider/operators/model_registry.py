@@ -32,6 +32,8 @@ class CreateRegisteredModelVersionOperator(BaseDatarobotOperator):
     :param model_version_params: Dictionary with parameters for creating model version.
     """
 
+    template_fields = ["model_version_params"]
+
     def __init__(
         self,
         *,
