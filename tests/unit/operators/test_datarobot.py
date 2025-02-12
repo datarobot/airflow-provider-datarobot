@@ -21,6 +21,7 @@ from datarobot_provider.operators.datarobot import GetFeatureDriftOperator
 from datarobot_provider.operators.datarobot import GetOrCreateUseCaseOperator
 from datarobot_provider.operators.datarobot import GetTargetDriftOperator
 from datarobot_provider.operators.datarobot import ScorePredictionsOperator
+from datarobot_provider.operators.datarobot import SelectBestModelOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
 from datarobot_provider.operators.datarobot import _serialize_drift
 
@@ -519,6 +520,52 @@ def test_operator_get_target_drift(mocker, drift_details):
 
     assert drift == expected_target_drift
     get_drift_mock.assert_called_with(**target_drift_params["target_drift"])
+
+
+def test_select_best_model_operator_with_provided_metric(mocker):
+    project_id = "dummy_project"
+    metric = "LogLoss"
+    project_mock = mocker.Mock()
+    project_mock.metric = "LogLoss"
+    model1 = mocker.Mock()
+    model1.id = "model1"
+    model1.metrics = {"LogLoss": {"validation": 0.7}}
+    model2 = mocker.Mock()
+    model2.id = "model2"
+    model2.metrics = {"LogLoss": {"validation": 0.85}}
+    project_mock.get_models.return_value = [model1, model2]
+    mocker.patch.object(dr.Project, "get", return_value=project_mock)
+    operator = SelectBestModelOperator(
+        task_id="select_best_model",
+        project_id=project_id,
+        metric=metric,
+    )
+    dummy_context = {"ti": mocker.Mock()}
+    result = operator.execute(dummy_context)
+    assert operator.task_id == "select_best_model"
+    assert result == "model2"
+
+
+def test_select_best_model_operator_without_provided_metric(mocker):
+    project_id = "dummy_project"
+    project_mock = mocker.Mock()
+    project_mock.metric = "AUC"
+    model1 = mocker.Mock()
+    model1.id = "model1"
+    model1.metrics = {"AUC": {"validation": 0.65}}
+    model2 = mocker.Mock()
+    model2.id = "model2"
+    model2.metrics = {"AUC": {"validation": 0.9}}
+    project_mock.get_models.return_value = [model1, model2]
+    mocker.patch.object(dr.Project, "get", return_value=project_mock)
+    operator = SelectBestModelOperator(
+        task_id="select_best_model",
+        project_id=project_id,
+    )
+    dummy_context = {"ti": mocker.Mock()}
+    result = operator.execute(dummy_context)
+    assert operator.task_id == "select_best_model"
+    assert result == "model2"
 
 
 def test_operator_get_feature_drift(mocker, drift_details):
