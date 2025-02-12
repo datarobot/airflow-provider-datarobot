@@ -7,7 +7,7 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 import pytest
 
-from datarobot_provider.example_dags.deprecated.datarobot_azure_storage_batch_scoring_dag import (
+from datarobot_provider._experimental.example_dags.datarobot_azure_storage_batch_scoring_dag import (
     datarobot_azure_storage_batch_scoring,
 )
 
