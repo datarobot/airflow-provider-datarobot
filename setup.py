@@ -11,6 +11,7 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 import re
 
+from setuptools import find_packages
 from setuptools import setup
 
 common_setup_kwargs = dict(
@@ -30,7 +31,6 @@ common_setup_kwargs = dict(
     packages=None,
     package_data={"airflow_provider_datarobot": ["py.typed"]},
     python_requires=">=3.9",
-    python_versions=">= 3.9",
     long_description=None,
     long_description_content_type="text/markdown",
     classifiers=None,
@@ -126,10 +126,12 @@ description = DESCRIPTION_TEMPLATE.format(
     pip_package_name=package_name,
 )
 
+packages = find_packages(exclude=["docs*", "tests*", "*_experimental*"])
+
 common_setup_kwargs.update(
     name=package_name,
     version=version,
-    packages=["datarobot_provider"],
+    packages=packages,
     long_description=description,
     classifiers=classifiers,
 )
