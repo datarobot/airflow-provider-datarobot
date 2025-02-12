@@ -139,7 +139,7 @@ def datarobot_feature_discovery_pipeline(
         {"name": "enable_record_count", "value": True},
         {"name": "enable_numeric_sum", "value": True},
     ]
-    # To ignore lint:
+    # TODO: [DM-17066] Remove this, temporary to ignore lint:
     _ = feature_discovery_settings
 
     # Create a Feature Discovery recipe with all the above information.
@@ -148,7 +148,7 @@ def datarobot_feature_discovery_pipeline(
         use_case_id=create_use_case.output,
         dataset_definitions=dataset_definitions,
         relationships=relationships,
-        # TODO: Update to pass `feature_discovery_settings` once 3.6.2 python client released
+        # TODO: [DM-17066] Update to pass `feature_discovery_settings` once 3.6.2 python client released
         feature_discovery_settings=None,
         task_id="create_feature_discovery_recipe",
     )
