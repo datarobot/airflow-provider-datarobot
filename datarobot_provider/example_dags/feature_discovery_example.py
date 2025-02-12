@@ -5,11 +5,9 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from datetime import datetime
-
-import datarobot as dr
 
 from airflow.decorators import dag
+from airflow.models.baseoperator import cross_downstream
 from datarobot import AUTOPILOT_MODE
 
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
@@ -65,23 +63,19 @@ def datarobot_feature_discovery_pipeline(
         use_case_id=create_use_case.output,
     )
 
-    # TEMPORARY create client for debugging:
-    dr.Client("<token>", "https://staging.datarobot.com/api/v2")
-
     # Define the secondary datasets for Feature Discovery
     profile_dataset_definition = {
-        "dataset_identifier": "profile",
-        "catalog_id": upload_profile_dataset.output,
+        "identifier": "profile",
+        "catalogId": upload_profile_dataset.output,
     }
 
     transaction_dataset_definition = {
-        "dataset_identifier": "transactions",
-        "dataset_id": upload_transactions_dataset.output,
-        "primary_temporal_key": "Date",
+        "identifier": "transactions",
+        "catalogId": upload_transactions_dataset.output,
+        "primaryTemporalKey": "Date",
     }
 
     # Alternatively, you can define a DatasetDefinitionOperator:
-
     # transaction_dataset_definition = DatasetDefinitionOperator(
     #     task_id="transaction_dataset_definition",
     #     dataset_identifier="transactions",
@@ -105,8 +99,8 @@ def datarobot_feature_discovery_pipeline(
         prediction_point_rounding_time_unit="DAY",
     )
 
-    profile_transaction_relationship_definition = DatasetRelationshipOperator(
-        task_id="relationship_definition",
+    profile_transaction_relationship = DatasetRelationshipOperator(
+        task_id="profile_transaction_relationship",
         dataset1_identifier="profile",  # join profile
         dataset2_identifier="transactions",  # to transactions
         dataset1_keys=["CustomerID"],  # on CustomerID
@@ -116,7 +110,7 @@ def datarobot_feature_discovery_pipeline(
     dataset_definitions = [profile_dataset_definition, transaction_dataset_definition]
     relationships = [
         primary_profile_relationship.output,
-        profile_transaction_relationship_definition.output,
+        profile_transaction_relationship.output,
     ]
 
     feature_discovery_settings = [
@@ -145,6 +139,8 @@ def datarobot_feature_discovery_pipeline(
         {"name": "enable_record_count", "value": True},
         {"name": "enable_numeric_sum", "value": True},
     ]
+    # To ignore lint:
+    _ = feature_discovery_settings
 
     # Create a Feature Discovery recipe with all the above information.
     create_feature_discovery_recipe = CreateFeatureDiscoveryRecipeOperator(
@@ -152,12 +148,16 @@ def datarobot_feature_discovery_pipeline(
         use_case_id=create_use_case.output,
         dataset_definitions=dataset_definitions,
         relationships=relationships,
-        feature_discovery_settings=feature_discovery_settings,
+        # TODO: Update to pass `feature_discovery_settings` once 3.6.2 python client released
+        feature_discovery_settings=None,
+        task_id="create_feature_discovery_recipe",
     )
 
     # Create and launch a project from the recipe.
     create_project = CreateProjectOperator(
-        recipe_id=create_feature_discovery_recipe.output, use_case_id=create_use_case.output
+        recipe_id=create_feature_discovery_recipe.output,
+        use_case_id=create_use_case.output,
+        task_id="create_project",
     )
 
     train_models = StartAutopilotOperator(task_id="train_models", project_id=create_project.output)
@@ -168,8 +168,14 @@ def datarobot_feature_discovery_pipeline(
 
     (
         create_use_case
-        >> (upload_primary_dataset, upload_profile_dataset, upload_transactions_dataset)
-        >> (primary_profile_relationship, profile_transaction_relationship_definition)
+        >> [upload_primary_dataset, upload_profile_dataset, upload_transactions_dataset]
+    )
+    cross_downstream(
+        [upload_primary_dataset, upload_profile_dataset, upload_transactions_dataset],
+        [primary_profile_relationship, profile_transaction_relationship],
+    )
+    (
+        [primary_profile_relationship, profile_transaction_relationship]
         >> create_feature_discovery_recipe
         >> create_project
         >> train_models
