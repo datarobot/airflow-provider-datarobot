@@ -14,6 +14,7 @@ from datarobot_provider.operators.ai_catalog import CreateWranglingRecipeOperato
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.operators.datarobot import GetOrCreateUseCaseOperator
+from datarobot_provider.operators.datarobot import SelectBestModelOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
 from datarobot_provider.operators.model_registry import CreateRegisteredModelVersionOperator
 from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
@@ -128,12 +129,20 @@ def hospital_readmissions_example():
         task_id="check_autopilot_complete",
         project_id=create_project.output,
     )
+
+    # select best model
+    select_best_model = SelectBestModelOperator(
+        task_id="select_best_model",
+        project_id=create_project.output,
+        metric="readmitted",
+    )
+
     # register model
     register_model = CreateRegisteredModelVersionOperator(
         task_id="register_model",
         model_version_params={
             "model_type": "leaderboard",
-            "leaderboard_model_id": train_models,
+            "leaderboard_model_id": select_best_model.output,
             "name": "My Registered Model",
             "registered_model_name": "My Model Registry",
         },
@@ -147,6 +156,7 @@ def hospital_readmissions_example():
         >> create_project
         >> train_models
         >> autopilot_complete_sensor
+        >> select_best_model
         >> register_model
     )
 

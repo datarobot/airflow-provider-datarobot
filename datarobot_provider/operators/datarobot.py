@@ -529,6 +529,33 @@ class GetFeatureDriftOperator(BaseDatarobotOperator):
         return [_serialize_drift(feature) for feature in drift]
 
 
+class SelectBestModelOperator(BaseDatarobotOperator):
+    def __init__(self, *, project_id: str, metric: Optional[str] = None, **kwargs):
+        super().__init__(**kwargs)
+        self.project_id = project_id
+        self.metric = metric
+
+    def validate(self) -> None:
+        if not self.project_id:
+            raise AirflowFailException("The `project_id` parameter is required.")
+
+    def execute(self, context: Context) -> str:
+        self.log.info(f"Fetching models for project {self.project_id}...")
+
+        project = dr.Project.get(self.project_id)
+
+        if not self.metric:
+            self.metric = project.metric
+        models = project.get_models()
+        best_model = sorted(
+            models,
+            key=lambda model: model.metrics.get(self.metric, {}).get("validation", float("-inf")),
+            reverse=True,
+        )[0]
+        best_model_id = str(best_model.id)
+        return best_model_id
+
+
 def _serialize_drift(drift_obj, date_format=DATETIME_FORMAT):
     drift_dict = drift_obj.__dict__.copy()
     drift_dict["period"] = {
