@@ -204,4 +204,6 @@ pipeline:
                         connectorRef: account.dockerhub_datarobot_read
                         image: docker
                         shell: Sh
-                        command: set -exuo pipefail
+                        command: |-
+                          set -exuo pipefail
+                          make install-astro
