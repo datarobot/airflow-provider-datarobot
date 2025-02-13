@@ -203,8 +203,9 @@ pipeline:
                         image: alpine:3.21
                         shell: Bash
                         command: |-
+                          apk update
+                          apk add --no-cache bash
                           set -exuo pipefail
-                          apk update && apk add bash
                           make install-astro
                           # make create-astro-dev
                         resources:
