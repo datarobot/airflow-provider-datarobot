@@ -206,6 +206,9 @@ pipeline:
                         shell: Sh
                         command: |-
                           set -exuo pipefail
+                          ## Setup container environment
                           apk update
                           apk add sudo make bash curl
+                          # Run testing
                           make install-astro
+                          make create-astro-dev
