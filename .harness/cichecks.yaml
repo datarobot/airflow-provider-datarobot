@@ -204,7 +204,7 @@ pipeline:
                         shell: Bash
                         command: |-
                           set -exuo pipefail
-                          RUN apt-get install sudo
+                          apt-get install sudo
                           make test-development-container
                         resources:
                           limits:
