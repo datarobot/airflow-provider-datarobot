@@ -175,3 +175,35 @@ pipeline:
                           limits:
                             memory: 1Gi
                             cpu: "1.5"
+        - stage:
+            name: Build and test astro environment
+            identifier: test_astro_environment
+            description: ""
+            type: CI
+            spec:
+              cloneCodebase: true
+              infrastructure:
+                type: KubernetesDirect
+                spec:
+                  connectorRef: account.cigeneral
+                  namespace: harness-delegate-ng
+                  automountServiceAccountToken: true
+                  nodeSelector: {}
+                  os: Linux
+              execution:
+                steps:
+                  - step:
+                      type: Run
+                      name: run build and test astro environment
+                      identifier: run_build_and_test_astro_environment
+                      spec:
+                        connectorRef: account.dockerhub_datarobot_read
+                        image: python:3.12
+                        shell: Bash
+                        command: |-
+                          set -exuo pipefail
+                          make test-development-container
+                        resources:
+                          limits:
+                            memory: 1Gi
+                            cpu: "1.5"

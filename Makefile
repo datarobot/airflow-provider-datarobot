@@ -79,11 +79,12 @@ create-astro-dev:
 	cd astro-dev && astro dev init
 	grep -qF -- 'RUN pip install -r \"/usr/local/airflow/requirements_dev.txt\"' ./astro-dev/Dockerfile || \
 	echo "RUN pip install -r \"/usr/local/airflow/requirements_dev.txt\"" >> ./astro-dev/Dockerfile
+	grep -qF -- 'AIRFLOW__CORE__TEST_CONNECTION=Enabled' ./astro-dev/.env || \
+	echo "AIRFLOW__CORE__TEST_CONNECTION=Enabled" >> ./astro-dev/.env
 
 clean-astro-dev:
-	-$(MAKE) stop-astro-dev
+	-$(MAKE) kill-astro-dev
 	rm -rf astro-dev
-	docker container prune
 	$(MAKE) create-astro-dev
 
 start-astro-dev:
@@ -91,6 +92,9 @@ start-astro-dev:
 
 stop-astro-dev:
 	cd astro-dev && astro dev stop
+
+kill-astro-dev:
+	cd astro-dev && astro dev kill
 
 build-astro-dev:
 	-$(MAKE) stop-astro-dev
@@ -120,5 +124,8 @@ build-early-access: clean  ## Make early access build
 	python setup_early_access.py sdist bdist_wheel
 
 test-development-container:
+	$(MAKE) install-astro
 	$(MAKE) clean-astro-dev
 	$(MAKE) build-astro-dev
+	chmod +x ./scripts/test_development_container.sh
+	./scripts/test_development_container.sh
