@@ -104,7 +104,7 @@ build-astro-dev:
 	cp -p "`ls -dtr1 ./dist/*.whl | sort -n | tail -1`" "./astro-dev/"
 	echo "/usr/local/airflow/`find ./dist/*.whl -exec basename {} \; | sort -n | tail -1`" > \
  		./astro-dev/requirements_dev.txt
-	cp -r ./datarobot_provider/example_dags/* ./astro-dev/dags/
+	$(MAKE) copy-examples-astro-dev
 	$(MAKE) start-astro-dev
 
 copy-examples-astro-dev:
