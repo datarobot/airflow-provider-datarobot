@@ -16,6 +16,7 @@ from datarobot.models.deployment.data_drift import TargetDrift
 from datarobot_provider.operators.base_datarobot_operator import XCOM_DEFAULT_USE_CASE_ID
 from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.operators.datarobot import GetOrCreateUseCaseOperator
+from datarobot_provider.operators.datarobot import SelectBestModelOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
 from datarobot_provider.operators.deployment import DeployModelOperator
 from datarobot_provider.operators.deployment import DeployRecommendedModelOperator
@@ -519,6 +520,44 @@ def test_operator_get_target_drift(mocker, drift_details):
 
     assert drift == expected_target_drift
     get_drift_mock.assert_called_with(**target_drift_params["target_drift"])
+
+
+def test_select_best_model_with_provided_metric(mocker):
+    project_id = "dummy_project"
+    metric = "LogLoss"
+    project_mock = mocker.Mock()
+    project_mock.metric = "AUC"
+    model = mocker.Mock()
+    model.id = "model2"
+    project_mock.get_top_model.return_value = model
+    mocker.patch.object(dr.Project, "get", return_value=project_mock)
+    operator = SelectBestModelOperator(
+        task_id="select_best_model",
+        project_id=project_id,
+        metric=metric,
+    )
+    dummy_context = {"ti": mocker.Mock()}
+    result = operator.execute(dummy_context)
+    assert operator.task_id == "select_best_model"
+    assert result == "model2"
+
+
+def test_select_best_model_without_provided_metric(mocker):
+    project_id = "dummy_project"
+    project_mock = mocker.Mock()
+    project_mock.metric = "AUC"
+    model = mocker.Mock()
+    model.id = "model2"
+    project_mock.get_top_model.return_value = model
+    mocker.patch.object(dr.Project, "get", return_value=project_mock)
+    operator = SelectBestModelOperator(
+        task_id="select_best_model",
+        project_id=project_id,
+    )
+    dummy_context = {"ti": mocker.Mock()}
+    result = operator.execute(dummy_context)
+    assert operator.task_id == "select_best_model"
+    assert result == "model2"
 
 
 def test_operator_get_feature_drift(mocker, drift_details):
