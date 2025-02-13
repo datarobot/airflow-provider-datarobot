@@ -211,6 +211,4 @@ pipeline:
                           apk add sudo make bash curl
                           apk add python3 py3-pip py3-build
                           # Run testing
-                          make install-astro
-                          make create-astro-dev
-                          make build-astro-dev
+                          make test-development-container
