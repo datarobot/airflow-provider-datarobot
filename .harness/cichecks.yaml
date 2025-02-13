@@ -205,7 +205,7 @@ pipeline:
                         command: |-
                           set -exuo pipefail
                           apt-get update
-                          apt-get install sudo docker.io
+                          echo "y" > apt-get install sudo docker.io
                           make test-development-container
                         resources:
                           limits:
