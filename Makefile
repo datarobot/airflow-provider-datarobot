@@ -98,10 +98,8 @@ build-astro-dev:
 	pip install --upgrade build
 	python -m build
 	cp -p "`ls -dtr1 ./dist/*.whl | sort -n | tail -1`" "./astro-dev/"
-	#echo "/usr/local/airflow/`find ./dist/*.whl -exec basename {} \; | sort -n | tail -1`" > \
-# 		./astro-dev/requirements_dev.txt
-#	rm -rf ./astro-dev/datarobot_provider
-#	cp -r datarobot_provider ./astro-dev/datarobot_provider
+	echo "/usr/local/airflow/`find ./dist/*.whl -exec basename {} \; | sort -n | tail -1`" > \
+ 		./astro-dev/requirements_dev.txt
 	cp -r ./datarobot_provider/example_dags/* ./astro-dev/dags/
 	$(MAKE) start-astro-dev
 
