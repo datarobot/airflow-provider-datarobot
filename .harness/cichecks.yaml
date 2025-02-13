@@ -204,6 +204,7 @@ pipeline:
                         shell: Bash
                         command: |-
                           set -exuo pipefail
+                          apt-get update
                           apt-get install sudo
                           make test-development-container
                         resources:
