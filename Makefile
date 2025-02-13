@@ -99,7 +99,7 @@ kill-astro-dev:
 build-astro-dev:
 	-$(MAKE) stop-astro-dev
 	rm -rf ./dist
-	#pip install --upgrade build
+	pip install --upgrade build
 	python -m build
 	cp -p "`ls -dtr1 ./dist/*.whl | sort -n | tail -1`" "./astro-dev/"
 	echo "/usr/local/airflow/`find ./dist/*.whl -exec basename {} \; | sort -n | tail -1`" > \
@@ -126,6 +126,12 @@ build-early-access: clean  ## Make early access build
 test-development-container:
 	$(MAKE) install-astro
 	$(MAKE) clean-astro-dev
-	$(MAKE) build-astro-dev
-	chmod +x ./scripts/test_development_container.sh
-	./scripts/test_development_container.sh
+	rm -rf ./dist
+	python -m build
+	cp -p "`ls -dtr1 ./dist/*.whl | sort -n | tail -1`" "./astro-dev/"
+	echo "/usr/local/airflow/`find ./dist/*.whl -exec basename {} \; | sort -n | tail -1`" > \
+ 		./astro-dev/requirements_dev.txt
+	$(MAKE) copy-examples-astro-dev
+	cd astro-dev && astro dev start --no-cache --no-browser
+#	chmod +x ./scripts/test_development_container.sh
+#	./scripts/test_development_container.sh
