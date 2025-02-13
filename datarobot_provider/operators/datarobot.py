@@ -295,7 +295,7 @@ class SelectBestModelOperator(BaseDatarobotOperator):
             raise AirflowFailException("The `project_id` parameter is required.")
 
     def execute(self, context: Context) -> str:
-        self.log.info(f"Fetching models for project {self.project_id}")
+        self.log.info(f"Selecting top model for project_id: {self.project_id}")
         project = dr.Project.get(self.project_id)
 
         if not self.metric:
