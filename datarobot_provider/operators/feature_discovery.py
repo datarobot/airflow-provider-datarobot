@@ -11,7 +11,6 @@ from typing import Iterable
 from typing import Optional
 
 import datarobot as dr
-from airflow.exceptions import AirflowFailException
 from airflow.utils.context import Context
 from datarobot import SNAPSHOT_POLICY
 
@@ -69,29 +68,24 @@ class CreateFeatureDiscoveryRecipeOperator(BaseUseCaseEntityOperator):
         self.relationships = relationships
         self.feature_discovery_settings = feature_discovery_settings
 
-    def execute(self, context: Context) -> None:
-        response = dr.client.get_client().post(
-            "/recipes/fromDataset/",
-            data={
-                "useCaseId": self.get_use_case_id(context, required=True),
-                "status": "draft",
-                "datasetId": self.dataset_id,
-                "recipeType": "FEATURE_DISCOVERY",
-            },
+    def execute(self, context: Context) -> str:
+        use_case: dr.UseCase = self.get_use_case(context, required=True)  # type: ignore[assignment]
+        dataset = dr.Dataset.get(self.dataset_id)
+
+        recipe = dr.models.Recipe.from_dataset(
+            use_case,
+            dataset,
+            recipe_type=dr.enums.RecipeType.FEATURE_DISCOVERY,
         )
-        if response.status_code != 201:
-            e_msg = "Server unexpectedly returned status code {}"
-            raise AirflowFailException(e_msg.format(response.status_code))
 
         # Get dataset version ID if it isn't defined by the user:
         for dataset_definition in self.dataset_definitions:
             if not dataset_definition.get("catalogVersionId"):
-                dataset = dr.Dataset.get(dataset_definition["catalogId"])
-                dataset_definition["catalogVersionId"] = dataset.version_id
+                secondary_dataset = dr.Dataset.get(dataset_definition["catalogId"])
+                dataset_definition["catalogVersionId"] = secondary_dataset.version_id
 
-        recipe = response.json()
-        recipe_id = recipe["id"]
-        recipe_config_id = recipe["settings"]["relationshipsConfigurationId"]
+        recipe_id = recipe.id
+        recipe_config_id = recipe.settings.relationships_configuration_id
 
         # Add secondary dataset configuration information into the Recipe config
         dr.RelationshipsConfiguration(recipe_config_id).replace(
