@@ -85,7 +85,7 @@ class CreateFeatureDiscoveryRecipeOperator(BaseUseCaseEntityOperator):
                 dataset_definition["catalogVersionId"] = secondary_dataset.version_id
 
         recipe_id = recipe.id
-        recipe_config_id = recipe.settings.relationships_configuration_id
+        recipe_config_id = recipe.settings.relationships_configuration_id  # type: ignore[union-attr]
 
         # Add secondary dataset configuration information into the Recipe config
         dr.RelationshipsConfiguration(recipe_config_id).replace(
