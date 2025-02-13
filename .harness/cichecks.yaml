@@ -207,5 +207,5 @@ pipeline:
                         command: |-
                           set -exuo pipefail
                           apk update
-                          apk add sudo make bash
+                          apk add sudo make bash curl
                           make install-astro
