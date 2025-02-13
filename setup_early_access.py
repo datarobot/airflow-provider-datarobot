@@ -11,6 +11,7 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from datetime import datetime
 
+from setuptools import find_packages
 from setuptools import setup
 
 from setup import DESCRIPTION_TEMPLATE
@@ -49,10 +50,12 @@ description = DESCRIPTION_TEMPLATE.format(
     pip_package_name=pip_package_name,
 )
 
+packages = find_packages(exclude=["docs*", "tests*"])
+
 common_setup_kwargs.update(
     name=package_name,
     version=version,
-    packages=["datarobot_provider"],
+    packages=packages,
     long_description=description,
     classifiers=classifiers,
     install_requires=["apache-airflow>=2.3.0", "datarobot-early-access"],
