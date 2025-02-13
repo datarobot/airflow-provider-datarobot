@@ -206,5 +206,6 @@ pipeline:
                         shell: Sh
                         command: |-
                           set -exuo pipefail
-                          sudo apt-get install build-essential
+                          apk update
+                          apk add sudo make
                           make install-astro
