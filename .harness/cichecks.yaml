@@ -190,7 +190,7 @@ pipeline:
                   automountServiceAccountToken: true
                   nodeSelector: {}
                   containerSecurityContext:
-                    privileged: true
+                    privileged: false
                   os: Linux
               execution:
                 steps:
@@ -212,3 +212,8 @@ pipeline:
                           limits:
                             memory: 1Gi
                             cpu: "1.5"
+              caching:
+                enabled: true
+                paths: []
+              buildIntelligence:
+                enabled: true
