@@ -82,7 +82,7 @@ create-astro-dev:
 	grep -qF -- 'AIRFLOW__CORE__TEST_CONNECTION=Enabled' ./astro-dev/.env || \
 	echo "AIRFLOW__CORE__TEST_CONNECTION=Enabled" >> ./astro-dev/.env
 
-clean-astro-dev:
+clean-astro-dev:  ## Completely wipeout an existing development environment and reset it
 	-$(MAKE) kill-astro-dev
 	rm -rf astro-dev
 	$(MAKE) create-astro-dev
