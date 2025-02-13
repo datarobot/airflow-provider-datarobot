@@ -267,3 +267,38 @@ class TrainModelsOperator(BaseDatarobotOperator):
                 f"with settings={context['params']['autopilot_settings']}"
             )
             project.set_target(**context["params"]["autopilot_settings"])
+
+
+class SelectBestModelOperator(BaseDatarobotOperator):
+    """
+    Selects the best model from a DataRobot project based on a specified evaluation metric.
+
+    If the evaluation metric is not provided, the operator uses the project's primary metric.
+
+    :param project_id: DataRobot project ID.
+    :type project_id: str
+    :param metric: The evaluation metric used to rank models.
+    :type metric: str, optional
+    :return: The best model's ID as a string.
+    :rtype: str
+    """
+
+    template_fields = ["project_id"]
+
+    def __init__(self, *, project_id: str, metric: Optional[str] = None, **kwargs):
+        super().__init__(**kwargs)
+        self.project_id = project_id
+        self.metric = metric
+
+    def validate(self) -> None:
+        if not self.project_id:
+            raise AirflowFailException("The `project_id` parameter is required.")
+
+    def execute(self, context: Context) -> str:
+        self.log.info(f"Selecting top model for project_id: {self.project_id}")
+        project = dr.Project.get(self.project_id)
+
+        if not self.metric:
+            self.metric = project.metric
+        best_model = project.get_top_model(metric=self.metric)
+        return str(best_model.id)
