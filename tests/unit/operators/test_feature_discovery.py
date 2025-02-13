@@ -159,13 +159,9 @@ def test_create_feature_discovery_recipe(
         dr.models.Recipe, "from_dataset", return_value=recipe_mock
     )
     dataset_mock = mocker.Mock(version_id="version-id")
-    mocker.patch.object(
-        dr.Dataset, "get", return_value=dataset_mock
-    )
+    mocker.patch.object(dr.Dataset, "get", return_value=dataset_mock)
     use_case_mock = mocker.Mock()
-    mocker.patch.object(
-        BaseUseCaseEntityOperator, "get_use_case", return_value=use_case_mock
-    )
+    mocker.patch.object(BaseUseCaseEntityOperator, "get_use_case", return_value=use_case_mock)
 
     replace_config_mock = mocker.patch.object(dr.RelationshipsConfiguration, "replace")
 
