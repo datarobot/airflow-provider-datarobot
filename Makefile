@@ -83,10 +83,11 @@ create-astro-dev:
 clean-astro-dev:
 	-$(MAKE) stop-astro-dev
 	rm -rf astro-dev
+	docker container prune
 	$(MAKE) create-astro-dev
 
 start-astro-dev:
-	cd astro-dev && astro dev start
+	cd astro-dev && astro dev start --no-cache
 
 stop-astro-dev:
 	cd astro-dev && astro dev stop
@@ -97,8 +98,11 @@ build-astro-dev:
 	pip install --upgrade build
 	python -m build
 	cp -p "`ls -dtr1 ./dist/*.whl | sort -n | tail -1`" "./astro-dev/"
-	echo "/usr/local/airflow/`find ./dist/*.whl -exec basename {} \; | sort -n | tail -1`" > \
- 		./astro-dev/requirements_dev.txt
+	#echo "/usr/local/airflow/`find ./dist/*.whl -exec basename {} \; | sort -n | tail -1`" > \
+# 		./astro-dev/requirements_dev.txt
+#	rm -rf ./astro-dev/datarobot_provider
+#	cp -r datarobot_provider ./astro-dev/datarobot_provider
+	cp -r ./datarobot_provider/example_dags/* ./astro-dev/dags/
 	$(MAKE) start-astro-dev
 
 copy-examples-astro-dev:
@@ -116,3 +120,7 @@ build-release: clean  ## Make release build
 build-early-access: clean  ## Make early access build
 	pip3 install --no-cache-dir --upgrade pip setuptools wheel twine
 	python setup_early_access.py sdist bdist_wheel
+
+test-development-container:
+	$(MAKE) clean-astro-dev
+	$(MAKE) build-astro-dev
