@@ -79,17 +79,22 @@ create-astro-dev:
 	cd astro-dev && astro dev init
 	grep -qF -- 'RUN pip install -r \"/usr/local/airflow/requirements_dev.txt\"' ./astro-dev/Dockerfile || \
 	echo "RUN pip install -r \"/usr/local/airflow/requirements_dev.txt\"" >> ./astro-dev/Dockerfile
+	grep -qF -- 'AIRFLOW__CORE__TEST_CONNECTION=Enabled' ./astro-dev/.env || \
+	echo "AIRFLOW__CORE__TEST_CONNECTION=Enabled" >> ./astro-dev/.env
 
-clean-astro-dev:
-	-$(MAKE) stop-astro-dev
+clean-astro-dev:  ## Completely wipeout an existing development environment and reset it
+	-$(MAKE) kill-astro-dev
 	rm -rf astro-dev
 	$(MAKE) create-astro-dev
 
 start-astro-dev:
-	cd astro-dev && astro dev start
+	cd astro-dev && astro dev start --no-cache
 
 stop-astro-dev:
 	cd astro-dev && astro dev stop
+
+kill-astro-dev:
+	cd astro-dev && astro dev kill
 
 build-astro-dev:
 	-$(MAKE) stop-astro-dev
@@ -99,6 +104,7 @@ build-astro-dev:
 	cp -p "`ls -dtr1 ./dist/*.whl | sort -n | tail -1`" "./astro-dev/"
 	echo "/usr/local/airflow/`find ./dist/*.whl -exec basename {} \; | sort -n | tail -1`" > \
  		./astro-dev/requirements_dev.txt
+	$(MAKE) copy-examples-astro-dev
 	$(MAKE) start-astro-dev
 
 copy-examples-astro-dev:
@@ -116,3 +122,10 @@ build-release: clean  ## Make release build
 build-early-access: clean  ## Make early access build
 	pip3 install --no-cache-dir --upgrade pip setuptools wheel twine
 	python setup_early_access.py sdist bdist_wheel
+
+test-development-container:
+	$(MAKE) install-astro
+	$(MAKE) clean-astro-dev
+	$(MAKE) build-astro-dev
+	chmod +x ./scripts/test_development_container.sh
+	./scripts/test_development_container.sh

@@ -58,7 +58,7 @@ common_setup_kwargs.update(
     packages=packages,
     long_description=description,
     classifiers=classifiers,
-    install_requires=["apache-airflow>=2.3.0", "datarobot-early-access"],
+    install_requires=["apache-airflow>=2.6.0", "datarobot-early-access"],
 )
 
 setup(**common_setup_kwargs)
