@@ -175,3 +175,33 @@ pipeline:
                           limits:
                             memory: 1Gi
                             cpu: "1.5"
+        - stage:
+            name: Test dev environment
+            identifier: test_dev_environment
+            description: ""
+            type: CI
+            spec:
+              cloneCodebase: true
+              caching:
+                enabled: true
+              buildIntelligence:
+                enabled: true
+              infrastructure:
+                type: KubernetesDirect
+                spec:
+                  connectorRef: account.cigeneral
+                  namespace: harness-delegate-ng
+                  automountServiceAccountToken: true
+                  nodeSelector: {}
+                  os: Linux
+              execution:
+                steps:
+                  - step:
+                      type: Run
+                      name: Run test dev environment
+                      identifier: run_test_dev_environment
+                      spec:
+                        connectorRef: account.dockerhub_datarobot_read
+                        image: docker
+                        shell: Sh
+                        command: set -exuo pipefail
