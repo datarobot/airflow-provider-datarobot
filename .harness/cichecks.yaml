@@ -189,6 +189,8 @@ pipeline:
                   namespace: harness-delegate-ng
                   automountServiceAccountToken: true
                   nodeSelector: {}
+                  containerSecurityContext:
+                    privileged: true
                   os: Linux
               execution:
                 steps:
