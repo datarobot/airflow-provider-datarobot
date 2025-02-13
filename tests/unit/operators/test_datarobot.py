@@ -522,18 +522,14 @@ def test_operator_get_target_drift(mocker, drift_details):
     get_drift_mock.assert_called_with(**target_drift_params["target_drift"])
 
 
-def test_select_best_model_operator_with_provided_metric(mocker):
+def test_select_best_model_with_provided_metric(mocker):
     project_id = "dummy_project"
     metric = "LogLoss"
     project_mock = mocker.Mock()
-    project_mock.metric = "LogLoss"
-    model1 = mocker.Mock()
-    model1.id = "model1"
-    model1.metrics = {"LogLoss": {"validation": 0.7}}
-    model2 = mocker.Mock()
-    model2.id = "model2"
-    model2.metrics = {"LogLoss": {"validation": 0.85}}
-    project_mock.get_models.return_value = [model1, model2]
+    project_mock.metric = "AUC"
+    model = mocker.Mock()
+    model.id = "model2"
+    project_mock.get_top_model.return_value = model
     mocker.patch.object(dr.Project, "get", return_value=project_mock)
     operator = SelectBestModelOperator(
         task_id="select_best_model",
@@ -546,17 +542,13 @@ def test_select_best_model_operator_with_provided_metric(mocker):
     assert result == "model2"
 
 
-def test_select_best_model_operator_without_provided_metric(mocker):
+def test_select_best_model_without_provided_metric(mocker):
     project_id = "dummy_project"
     project_mock = mocker.Mock()
     project_mock.metric = "AUC"
-    model1 = mocker.Mock()
-    model1.id = "model1"
-    model1.metrics = {"AUC": {"validation": 0.65}}
-    model2 = mocker.Mock()
-    model2.id = "model2"
-    model2.metrics = {"AUC": {"validation": 0.9}}
-    project_mock.get_models.return_value = [model1, model2]
+    model = mocker.Mock()
+    model.id = "model2"
+    project_mock.get_top_model.return_value = model
     mocker.patch.object(dr.Project, "get", return_value=project_mock)
     operator = SelectBestModelOperator(
         task_id="select_best_model",

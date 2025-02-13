@@ -279,7 +279,6 @@ class SelectBestModelOperator(BaseDatarobotOperator):
     :type project_id: str
     :param metric: The evaluation metric used to rank models.
     :type metric: str, optional
-    :type datarobot_conn_id: str, optional
     :return: The best model's ID as a string.
     :rtype: str
     """
@@ -301,11 +300,5 @@ class SelectBestModelOperator(BaseDatarobotOperator):
 
         if not self.metric:
             self.metric = project.metric
-        models = project.get_models()
-        best_model = sorted(
-            models,
-            key=lambda model: model.metrics.get(self.metric, {}).get("validation", float("-inf")),
-            reverse=True,
-        )[0]
-        best_model_id = str(best_model.id)
-        return best_model_id
+        best_model = project.get_top_model(metric=self.metric)
+        return str(best_model.id)
