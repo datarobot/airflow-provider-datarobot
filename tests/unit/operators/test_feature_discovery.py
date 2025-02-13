@@ -148,8 +148,9 @@ def test_dataset_relationship_operator(relationships):
     assert operator_result == relationships[0]
 
 
+@pytest.mark.parametrize("remove_version_id", [True, False])
 def test_create_feature_discovery_recipe(
-    mocker, dataset_definitions, relationships, feature_discovery_settings
+    mocker, dataset_definitions, relationships, feature_discovery_settings, remove_version_id
 ):
     mock_client_response = mocker.Mock(status_code=201)
     mock_client_response.json.return_value = {
@@ -159,8 +160,15 @@ def test_create_feature_discovery_recipe(
     mock_client = mocker.Mock()
     mock_client.post.return_value = mock_client_response
     get_client_mock = mocker.patch.object(dr.client, "get_client", return_value=mock_client)
+    mock_dataset = mocker.Mock(version_id="replace-version-id")
+    mocker.patch.object(dr.Dataset, "get", return_value=mock_dataset)
 
     replace_config_mock = mocker.patch.object(dr.RelationshipsConfiguration, "replace")
+
+    if remove_version_id:
+        # Test we auto-add version ID when absent in CreateFeatureDiscoveryRecipeOperator
+        for d in dataset_definitions:
+            d.pop("catalogVersionId")
 
     operator = CreateFeatureDiscoveryRecipeOperator(
         task_id="create_feature_discovery_recipe_operator",
@@ -182,9 +190,15 @@ def test_create_feature_discovery_recipe(
             "recipeType": "FEATURE_DISCOVERY",
         },
     )
+
+    expected_dataset_definitions = dataset_definitions
+    if remove_version_id:
+        for d in expected_dataset_definitions:
+            d["catalogVersionId"] = "replace-version-id"
+
     get_client_mock.assert_called_once()
     replace_config_mock.assert_called_once_with(
-        dataset_definitions, relationships, feature_discovery_settings
+        expected_dataset_definitions, relationships, feature_discovery_settings
     )
 
     assert operator_result == "recipe_id"

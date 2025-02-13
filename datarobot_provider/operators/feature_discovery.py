@@ -83,6 +83,12 @@ class CreateFeatureDiscoveryRecipeOperator(BaseUseCaseEntityOperator):
             e_msg = "Server unexpectedly returned status code {}"
             raise AirflowFailException(e_msg.format(response.status_code))
 
+        # Get dataset version ID if it isn't defined by the user:
+        for dataset_definition in self.dataset_definitions:
+            if not dataset_definition.get("catalogVersionId"):
+                dataset = dr.Dataset.get(dataset_definition["catalogId"])
+                dataset_definition["catalogVersionId"] = dataset.version_id
+
         recipe = response.json()
         recipe_id = recipe["id"]
         recipe_config_id = recipe["settings"]["relationshipsConfigurationId"]
