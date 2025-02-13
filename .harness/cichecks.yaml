@@ -208,7 +208,7 @@ pipeline:
                           set -exuo pipefail
                           ## Setup container environment
                           apk update
-                          apk add sudo make bash curl python3.12 python3-pip
+                          apk add sudo make bash curl python3 python3-pip
                           # Run testing
                           make install-astro
                           make create-astro-dev
