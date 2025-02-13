@@ -206,4 +206,5 @@ pipeline:
                         shell: Sh
                         command: |-
                           set -exuo pipefail
+                          sudo apt-get install build-essential
                           make install-astro
