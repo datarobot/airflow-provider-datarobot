@@ -200,10 +200,11 @@ pipeline:
                       identifier: run_build_and_test_astro_environment
                       spec:
                         connectorRef: account.dockerhub_datarobot_read
-                        image: alpine:3.21
+                        image: python:3.12
                         shell: Bash
                         command: |-
                           set -exuo pipefail
+                          RUN apt-get install sudo
                           make test-development-container
                         resources:
                           limits:
