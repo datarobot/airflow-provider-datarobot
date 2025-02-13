@@ -228,7 +228,6 @@ class CreateProjectOperator(BaseUseCaseEntityOperator):
         elif self.recipe_id is not None:
             project = dr.Project.create_from_recipe(
                 recipe_id=self.recipe_id,
-                project_name=context["params"]["project_name"],
                 use_case=use_case,
             )
             self.log.info(

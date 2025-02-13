@@ -23,7 +23,6 @@ from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
     schedule=None,
     tags=["example", "csv", "feature discovery"],
     params={
-        "project_name": "Demo Lending Club DataRobot Feature Discovery",
         "autopilot_settings": {
             "target": "BadLoan",
             "mode": AUTOPILOT_MODE.QUICK,
