@@ -77,7 +77,7 @@ def datarobot_feature_discovery_pipeline(
     #     task_id="transaction_dataset_definition",
     #     dataset_identifier="transactions",
     #     dataset_id="<Dataset  ID>",
-    #     dataset_version_id="<Dataset Version ID"<Dataset Version ID>">",
+    #     dataset_version_id="<Dataset Version ID>",
     # ).output
 
     # Define the relationships between the datasets.
