@@ -12,7 +12,7 @@ from airflow.decorators import dag
 from airflow.decorators import task
 from datarobot import SCORING_TYPE
 
-from datarobot_provider.operators.model import RetrainModelOperator
+from datarobot_provider.operators.model_training import RetrainModelOperator
 from datarobot_provider.sensors.model_training import ModelTrainingJobSensor
 
 
