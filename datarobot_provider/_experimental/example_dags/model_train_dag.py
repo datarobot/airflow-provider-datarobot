@@ -11,7 +11,7 @@ from datetime import datetime
 from airflow.decorators import dag
 from airflow.decorators import task
 
-from datarobot_provider.operators.model import TrainModelOperator
+from datarobot_provider.operators.model_training import TrainModelOperator
 from datarobot_provider.sensors.model_training import ModelTrainingJobSensor
 
 
