@@ -9,6 +9,7 @@
 import datarobot as dr
 import pytest
 
+from datarobot_provider.operators.base_datarobot_operator import BaseUseCaseEntityOperator
 from datarobot_provider.operators.feature_discovery import CreateFeatureDiscoveryRecipeOperator
 from datarobot_provider.operators.feature_discovery import DatasetDefinitionOperator
 from datarobot_provider.operators.feature_discovery import DatasetRelationshipOperator
@@ -152,16 +153,15 @@ def test_dataset_relationship_operator(relationships):
 def test_create_feature_discovery_recipe(
     mocker, dataset_definitions, relationships, feature_discovery_settings, remove_version_id
 ):
-    mock_client_response = mocker.Mock(status_code=201)
-    mock_client_response.json.return_value = {
-        "id": "recipe_id",
-        "settings": {"relationshipsConfigurationId": "recipe_config_id"},
-    }
-    mock_client = mocker.Mock()
-    mock_client.post.return_value = mock_client_response
-    get_client_mock = mocker.patch.object(dr.client, "get_client", return_value=mock_client)
-    mock_dataset = mocker.Mock(version_id="replace-version-id")
-    mocker.patch.object(dr.Dataset, "get", return_value=mock_dataset)
+    recipe_settings_mock = mocker.Mock(relationships_configuration_id="recipe_config_id")
+    recipe_mock = mocker.Mock(id="recipe_id", settings=recipe_settings_mock)
+    create_recipe_mock = mocker.patch.object(
+        dr.models.Recipe, "from_dataset", return_value=recipe_mock
+    )
+    dataset_mock = mocker.Mock(version_id="version-id")
+    mocker.patch.object(dr.Dataset, "get", return_value=dataset_mock)
+    use_case_mock = mocker.Mock()
+    mocker.patch.object(BaseUseCaseEntityOperator, "get_use_case", return_value=use_case_mock)
 
     replace_config_mock = mocker.patch.object(dr.RelationshipsConfiguration, "replace")
 
@@ -181,14 +181,10 @@ def test_create_feature_discovery_recipe(
 
     operator_result = operator.execute(context={"params": {}})
 
-    mock_client.post.assert_called_once_with(
-        "/recipes/fromDataset/",
-        data={
-            "useCaseId": "use_case_id",
-            "status": "draft",
-            "datasetId": "dataset_id",
-            "recipeType": "FEATURE_DISCOVERY",
-        },
+    create_recipe_mock.assert_called_once_with(
+        use_case_mock,
+        dataset_mock,
+        recipe_type="FEATURE_DISCOVERY",
     )
 
     expected_dataset_definitions = dataset_definitions
@@ -196,7 +192,6 @@ def test_create_feature_discovery_recipe(
         for d in expected_dataset_definitions:
             d["catalogVersionId"] = "replace-version-id"
 
-    get_client_mock.assert_called_once()
     replace_config_mock.assert_called_once_with(
         expected_dataset_definitions, relationships, feature_discovery_settings
     )
