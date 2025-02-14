@@ -26,7 +26,6 @@ from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
         "autopilot_settings": {
             "target": "BadLoan",
             "mode": AUTOPILOT_MODE.QUICK,
-            "feature_engineering_prediction_point": "date",
         },
         "advanced_options": {"feature_discovery_supervised_feature_reduction": True},
     },
@@ -71,7 +70,6 @@ def datarobot_feature_discovery_pipeline(
     transaction_dataset_definition = {
         "identifier": "transactions",
         "catalogId": upload_transactions_dataset.output,
-        "primaryTemporalKey": "Date",
     }
 
     # Alternatively, you can define a DatasetDefinitionOperator:
@@ -89,13 +87,6 @@ def datarobot_feature_discovery_pipeline(
         dataset2_identifier="profile",  # to profile
         dataset1_keys=["CustomerID"],  # on CustomerID
         dataset2_keys=["CustomerID"],
-        feature_derivation_windows=[
-            {"start": -7, "end": -1, "unit": "DAY"},
-            {"start": -14, "end": -1, "unit": "DAY"},
-            {"start": -30, "end": -1, "unit": "DAY"},
-        ],  # example of multiple FDW
-        prediction_point_rounding=1,
-        prediction_point_rounding_time_unit="DAY",
     )
 
     profile_transaction_relationship = DatasetRelationshipOperator(
@@ -138,8 +129,6 @@ def datarobot_feature_discovery_pipeline(
         {"name": "enable_record_count", "value": True},
         {"name": "enable_numeric_sum", "value": True},
     ]
-    # TODO: [DM-17066] Remove below line, temporary fix to ignore lint:
-    _ = feature_discovery_settings
 
     # Create a Feature Discovery recipe with all the above information.
     create_feature_discovery_recipe = CreateFeatureDiscoveryRecipeOperator(
@@ -147,8 +136,7 @@ def datarobot_feature_discovery_pipeline(
         use_case_id=create_use_case.output,
         dataset_definitions=dataset_definitions,
         relationships=relationships,
-        # TODO: [DM-17066] Update to pass `feature_discovery_settings` once 3.6.2 python client released
-        feature_discovery_settings=None,
+        feature_discovery_settings=feature_discovery_settings,
         task_id="create_feature_discovery_recipe",
     )
 

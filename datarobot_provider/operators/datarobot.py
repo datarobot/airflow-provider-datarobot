@@ -167,6 +167,7 @@ class CreateProjectOperator(BaseUseCaseEntityOperator):
         "dataset_id",
         "dataset_version_id",
         "credential_id",
+        "recipe_id",
         "use_case_id",
     ]
 
