@@ -9,7 +9,7 @@
 import datarobot as dr
 import pytest
 
-from datarobot_provider.operators.model_training import TrainModelOperator
+from datarobot_provider.operators.model import TrainModelOperator
 
 
 def test_operator_train_model(mocker):

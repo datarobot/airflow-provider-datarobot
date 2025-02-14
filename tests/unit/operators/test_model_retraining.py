@@ -10,7 +10,7 @@ import datarobot as dr
 import pytest
 from datarobot import SCORING_TYPE
 
-from datarobot_provider.operators.model_training import RetrainModelOperator
+from datarobot_provider.operators.model import RetrainModelOperator
 
 
 def test_operator_retrain_model(mocker):

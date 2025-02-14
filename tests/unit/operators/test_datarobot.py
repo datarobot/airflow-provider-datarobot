@@ -6,6 +6,8 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 import datarobot as dr
 import pytest
@@ -17,6 +19,7 @@ from datarobot_provider.operators.base_datarobot_operator import XCOM_DEFAULT_US
 from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.operators.datarobot import GetOrCreateUseCaseOperator
 from datarobot_provider.operators.datarobot import SelectBestModelOperator
+from datarobot_provider.operators.datarobot import GetProjectBlueprintsOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
 from datarobot_provider.operators.deployment import DeployModelOperator
 from datarobot_provider.operators.deployment import DeployRecommendedModelOperator
@@ -349,7 +352,7 @@ def test_operator_train_models(mocker):
     settings = {"target": "readmitted"}
     operator.execute(context={"params": {"autopilot_settings": settings}})
 
-    project_mock.set_target.assert_called_with(**settings)
+    project_mock.analyze_and_model.assert_called_with(**settings)
 
 
 def test_operator_deploy_model(mocker):
@@ -578,3 +581,60 @@ def test_operator_get_feature_drift(mocker, drift_details):
 
     assert drift == expected_feature_drift
     get_drift_mock.assert_called_with(**feature_drift_params["feature_drift"])
+
+
+@patch("datarobot_provider.operators.datarobot.dr.Project.get")
+def test_execute_with_filter(mock_get_project):
+    mock_project = MagicMock()
+    mock_project.get_blueprints.return_value = [
+        MagicMock(
+            id="blueprint-id-1",
+            model_type="xgboost",
+        ),
+        MagicMock(
+            id="blueprint-id-2",
+            model_type="lightgbm",
+        ),
+    ]
+    mock_get_project.return_value = mock_project
+
+    operator = GetProjectBlueprintsOperator(
+        task_id="get_blueprints", project_id="project-id", filter_model_type="xgboost"
+    )
+    result = operator.execute(context={})
+
+    assert result == "blueprint-id-1"
+    mock_get_project.assert_called_once_with("project-id")
+    mock_project.get_blueprints.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "return_all, expected",
+    [
+        (True, ["blueprint-id-1", "blueprint-id-2"]),
+        (False, "blueprint-id-1"),
+    ],
+)
+@patch("datarobot_provider.operators.datarobot.dr.Project.get")
+def test_execute_without_filter(mock_get_project, return_all, expected):
+    mock_project = MagicMock()
+    mock_project.get_blueprints.return_value = [
+        MagicMock(
+            id="blueprint-id-1",
+            model_type="xgboost",
+        ),
+        MagicMock(
+            id="blueprint-id-2",
+            model_type="lightgbm",
+        ),
+    ]
+    mock_get_project.return_value = mock_project
+
+    operator = GetProjectBlueprintsOperator(
+        task_id="get_blueprints", project_id="project-id", return_all=return_all
+    )
+    result = operator.execute(context={})
+
+    assert result == expected
+    mock_get_project.assert_called_once_with("project-id")
+    mock_project.get_blueprints.assert_called_once()
