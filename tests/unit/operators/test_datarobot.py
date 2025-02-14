@@ -18,8 +18,8 @@ from datarobot.models.deployment.data_drift import TargetDrift
 from datarobot_provider.operators.base_datarobot_operator import XCOM_DEFAULT_USE_CASE_ID
 from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.operators.datarobot import GetOrCreateUseCaseOperator
-from datarobot_provider.operators.datarobot import SelectBestModelOperator
 from datarobot_provider.operators.datarobot import GetProjectBlueprintsOperator
+from datarobot_provider.operators.datarobot import SelectBestModelOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
 from datarobot_provider.operators.deployment import DeployModelOperator
 from datarobot_provider.operators.deployment import DeployRecommendedModelOperator
