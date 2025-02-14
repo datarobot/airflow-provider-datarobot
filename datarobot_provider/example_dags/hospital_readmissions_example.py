@@ -134,7 +134,7 @@ def hospital_readmissions_example():
     select_best_model = SelectBestModelOperator(
         task_id="select_best_model",
         project_id=create_project.output,
-        metric="readmitted",
+        metric="RMSE",
     )
     # register model
     register_model = CreateRegisteredModelVersionOperator(
