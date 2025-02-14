@@ -12,6 +12,7 @@ from hashlib import sha256
 from typing import Any
 from typing import List
 from typing import Optional
+from typing import cast
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
@@ -301,7 +302,7 @@ class CreateDatasetFromRecipeOperator(BaseUseCaseEntityOperator):
     def _get_dataset_name(
         self,
         materialization_destination: Optional[dr.models.dataset.MaterializationDestination],
-    ):
+    ) -> Optional[str]:
         return self.dataset_name or (
             materialization_destination and materialization_destination["table"]
         )
@@ -472,7 +473,7 @@ class CreateOrUpdateDataSourceOperator(BaseDatarobotOperator):
         self.log.debug(f"Found existing DataStore: {data_store.canonical_name}, id={data_store.id}")
 
         if not self.dataset_name:
-            self.dataset_name = self._get_default_data_source_name(data_store.id)
+            self.dataset_name = self._get_default_data_source_name(cast(str, data_store.id))
             self.log.info("Use default name for the data source: %s", self.dataset_name)
 
         # Creating DataSourceParameters:
@@ -520,7 +521,7 @@ class CreateOrUpdateDataSourceOperator(BaseDatarobotOperator):
 
         return data_source.id
 
-    def _get_default_data_source_name(self, data_store_id) -> str:
+    def _get_default_data_source_name(self, data_store_id: str) -> str:
         """Build default name based on the data source params."""
         parts = ["Airflow", data_store_id]
 
@@ -528,7 +529,12 @@ class CreateOrUpdateDataSourceOperator(BaseDatarobotOperator):
             parts += ["q", sha256(self.query.encode()).hexdigest()]
 
         else:
-            parts += ["t", self.table_schema, self.table_name]
+            parts_additions = ["t"]
+            if self.table_schema:
+                parts_additions.append(self.table_schema)
+            if self.table_name:
+                parts_additions.append(self.table_name)
+            parts += parts_additions
 
         return "-".join(parts)
 
@@ -588,8 +594,8 @@ class CreateWranglingRecipeOperator(BaseUseCaseEntityOperator):
         operations: Optional[List[dict]] = None,
         downsampling_directive: Optional[dr.enums.DownsamplingOperations] = None,
         downsampling_arguments: Optional[dict] = None,
-        **kwargs,
-    ):
+        **kwargs: Any,
+    ) -> None:
         super().__init__(**kwargs)
         self.dataset_id = dataset_id
         self.data_store_id = data_store_id

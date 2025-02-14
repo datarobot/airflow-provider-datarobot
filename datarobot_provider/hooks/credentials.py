@@ -13,6 +13,7 @@ from typing import Union
 
 from airflow.exceptions import AirflowException
 from airflow.hooks.base import BaseHook
+from airflow.models.connection import Connection
 from datarobot.models.credential import Credential
 from datarobot.models.data_store import DataStore
 
@@ -39,20 +40,20 @@ class CredentialsBaseHook(BaseHook):
         super().__init__()
         self.datarobot_credentials_conn_id = datarobot_credentials_conn_id
 
-    def create_credentials(self, conn) -> Credential:
+    def create_credentials(self, conn: Connection) -> Credential:
         """Creates DataRobot Credentials."""
         raise NotImplementedError()
 
-    def get_credential_data(self, conn) -> dict:
+    def get_credential_data(self, conn: Connection) -> dict:
         """Get credential data dict to use with methods that
         accept credential_data instead of credential ID"""
         raise NotImplementedError()
 
-    def update_credentials(self, conn, credential: Credential) -> None:
+    def update_credentials(self, conn: Connection, credential: Credential) -> None:
         """Updates DataRobot Credentials"""
         raise NotImplementedError()
 
-    def get_or_create_credential(self, conn) -> Credential:
+    def get_or_create_credential(self, conn: Connection) -> Credential:
         # Trying to find existing DataRobot Credentials:
         if not self.datarobot_credentials_conn_id:
             raise AirflowException("datarobot_credentials_conn_id is not defined")
@@ -141,7 +142,7 @@ class BasicCredentialsHook(CredentialsBaseHook):
         super().__init__()
         self.datarobot_credentials_conn_id = datarobot_credentials_conn_id
 
-    def create_credentials(self, conn) -> Credential:
+    def create_credentials(self, conn: Connection) -> Credential:
         """Creates DataRobot Basic Credentials using provided login/password."""
         if not conn.login:
             raise AirflowException("login is not defined")
@@ -162,7 +163,7 @@ class BasicCredentialsHook(CredentialsBaseHook):
 
         return credential
 
-    def update_credentials(self, conn, credential: Credential) -> None:
+    def update_credentials(self, conn: Connection, credential: Credential) -> None:
         """Updates DataRobot Basic Credentials using provided login/password."""
         basic_credentials = {
             "user": conn.login,
@@ -181,7 +182,7 @@ class BasicCredentialsHook(CredentialsBaseHook):
                 f"Error updating Basic Credentials: {self.datarobot_credentials_conn_id}"
             ) from None
 
-    def get_credential_data(self, conn) -> dict:
+    def get_credential_data(self, conn: Connection) -> dict:
         # For methods that accept credential data instead of credential ID
         credential_data = {
             "credentialType": "basic",
@@ -223,7 +224,7 @@ class GoogleCloudCredentialsHook(CredentialsBaseHook):
     hook_name = "DataRobot GCP Credentials"
     conn_type = "datarobot.credentials.gcp"
 
-    def parse_gcp_key(self, conn) -> dict:
+    def parse_gcp_key(self, conn: Connection) -> dict:
         gcp_key = conn.extra_dejson.get("gcp_key", "")
 
         if not gcp_key:
@@ -242,7 +243,7 @@ class GoogleCloudCredentialsHook(CredentialsBaseHook):
                 f"Error parsing GCP key json for credentials: {self.datarobot_credentials_conn_id}"
             ) from None
 
-    def create_credentials(self, conn) -> Credential:
+    def create_credentials(self, conn: Connection) -> Credential:
         """Returns Google Cloud credentials for params in connection object"""
         gcp_key_json = self.parse_gcp_key(conn)
 
@@ -257,7 +258,7 @@ class GoogleCloudCredentialsHook(CredentialsBaseHook):
         )
         return credential
 
-    def update_credentials(self, conn, credential: Credential) -> None:
+    def update_credentials(self, conn: Connection, credential: Credential) -> None:
         """Updates a Google Cloud credentials for params in connection object"""
 
         gcp_credentials = {
@@ -279,7 +280,7 @@ class GoogleCloudCredentialsHook(CredentialsBaseHook):
                 f"Error updating Google Cloud Credentials: {self.datarobot_credentials_conn_id}"
             ) from None
 
-    def get_credential_data(self, conn) -> dict:
+    def get_credential_data(self, conn: Connection) -> dict:
         # For methods that accept credential data instead of credential ID
         credential_data = {
             "credentialType": "gcp",
@@ -324,7 +325,7 @@ class AwsCredentialsHook(CredentialsBaseHook):
     hook_name = "DataRobot AWS Credentials"
     conn_type = "datarobot.credentials.aws"
 
-    def create_credentials(self, conn) -> Credential:
+    def create_credentials(self, conn: Connection) -> Credential:
         """Returns AWS credentials for params in connection object"""
 
         if not conn.login:
@@ -359,7 +360,7 @@ class AwsCredentialsHook(CredentialsBaseHook):
                 f"Error creating AWS Credentials: {self.datarobot_credentials_conn_id}"
             ) from None
 
-    def update_credentials(self, conn, credential: Credential) -> None:
+    def update_credentials(self, conn: Connection, credential: Credential) -> None:
         """Updates AWS credentials for params in connection object"""
 
         if not conn.login:
@@ -390,7 +391,7 @@ class AwsCredentialsHook(CredentialsBaseHook):
                 f"Error updating AWS Credentials: {self.datarobot_credentials_conn_id}"
             ) from None
 
-    def get_credential_data(self, conn) -> dict:
+    def get_credential_data(self, conn: Connection) -> dict:
         # For methods that accept credential data instead of credential ID
         credential_data = {
             "credentialType": "s3",
@@ -441,7 +442,7 @@ class AzureStorageCredentialsHook(CredentialsBaseHook):
     hook_name = "DataRobot Azure Storage Credentials"
     conn_type = "datarobot.credentials.azure"
 
-    def create_azure_connection_string(self, conn) -> str:
+    def create_azure_connection_string(self, conn: Connection) -> str:
         if not conn.login:
             raise AirflowException("Storage Account Name is not defined")
 
@@ -454,7 +455,7 @@ class AzureStorageCredentialsHook(CredentialsBaseHook):
         )
         return azure_connection_string
 
-    def create_credentials(self, conn) -> Credential:
+    def create_credentials(self, conn: Connection) -> Credential:
         """Returns Azure Storage credentials for params in connection object"""
 
         try:
@@ -480,7 +481,7 @@ class AzureStorageCredentialsHook(CredentialsBaseHook):
                 f"Error creating Azure Credentials: {self.datarobot_credentials_conn_id}"
             ) from None
 
-    def update_credentials(self, conn, credential: Credential) -> None:
+    def update_credentials(self, conn: Connection, credential: Credential) -> None:
         """Updates Azure Storage credentials for params in connection object"""
 
         azure_credentials = {"azure_connection_string": self.create_azure_connection_string(conn)}
@@ -496,7 +497,7 @@ class AzureStorageCredentialsHook(CredentialsBaseHook):
                 f"Error updating Azure Storage Credentials: {self.datarobot_credentials_conn_id}"
             ) from None
 
-    def get_credential_data(self, conn) -> dict:
+    def get_credential_data(self, conn: Connection) -> dict:
         # For methods that accept credential data instead of credential ID
         credential_data = {
             "credentialType": "azure",
@@ -539,7 +540,7 @@ class OAuthCredentialsHook(CredentialsBaseHook):
     hook_name = "DataRobot OAuth Credentials"
     conn_type = "datarobot.credentials.oauth"
 
-    def create_credentials(self, conn) -> Credential:
+    def create_credentials(self, conn: Connection) -> Credential:
         """Returns OAuth credentials for params in connection object"""
 
         if not conn.login:
@@ -574,7 +575,7 @@ class OAuthCredentialsHook(CredentialsBaseHook):
                 f"Error creating OAuth Credentials: {self.datarobot_credentials_conn_id}"
             ) from None
 
-    def update_credentials(self, conn, credential: Credential) -> None:
+    def update_credentials(self, conn: Connection, credential: Credential) -> None:
         """Updates OAuth credentials for params in connection object"""
 
         if not conn.password:
@@ -601,7 +602,7 @@ class OAuthCredentialsHook(CredentialsBaseHook):
                 f"Error updating OAuth Credentials: {self.datarobot_credentials_conn_id}"
             ) from None
 
-    def get_credential_data(self, conn) -> dict:
+    def get_credential_data(self, conn: Connection) -> dict:
         # For methods that accept credential data instead of credential ID
         credential_data = {
             "credentialType": "oauth",

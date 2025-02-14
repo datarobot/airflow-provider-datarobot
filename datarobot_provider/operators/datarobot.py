@@ -296,7 +296,7 @@ class SelectBestModelOperator(BaseDatarobotOperator):
 
     template_fields = ["project_id"]
 
-    def __init__(self, *, project_id: str, metric: Optional[str] = None, **kwargs):
+    def __init__(self, *, project_id: str, metric: Optional[str] = None, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.project_id = project_id
         self.metric = metric
