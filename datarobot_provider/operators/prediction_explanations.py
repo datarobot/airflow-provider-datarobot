@@ -47,7 +47,7 @@ class PredictionExplanationsInitializationOperator(BaseDatarobotOperator):
         self.project_id = project_id
         self.model_id = model_id
 
-    def validate(self):
+    def validate(self) -> None:
         if self.project_id is None:
             raise ValueError(
                 "project_id is required to trigger a prediction explanations initialization."
@@ -104,7 +104,7 @@ class ComputePredictionExplanationsOperator(BaseDatarobotOperator):
         self.model_id = model_id
         self.external_dataset_id = external_dataset_id
 
-    def validate(self):
+    def validate(self) -> None:
         if self.project_id is None:
             raise ValueError("project_id is required to compute prediction explanations.")
 

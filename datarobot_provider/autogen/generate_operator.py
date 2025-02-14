@@ -244,7 +244,7 @@ parser.add_argument("--whitelist", type=str, help="Whitelist file path")
 parser.add_argument("--output_folder", type=str, help="Output folder path")
 
 
-def to_snake_case(camel_case_str):
+def to_snake_case(camel_case_str: str) -> str:
     return "".join(["_" + i.lower() if i.isupper() else i for i in camel_case_str]).lstrip("_")
 
 

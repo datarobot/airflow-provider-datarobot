@@ -9,6 +9,7 @@
 import json
 from typing import Any
 from typing import Optional
+from typing import Tuple
 from typing import Union
 
 from airflow.exceptions import AirflowException
@@ -112,7 +113,7 @@ class CredentialsBaseHook(BaseHook):
         # get Credentials with credential_data
         return self.get_conn()
 
-    def test_connection(self):
+    def test_connection(self) -> Tuple[bool, str]:
         """Test that we can create DataRobot Credentials without errors"""
         try:
             credential, _ = self.run()

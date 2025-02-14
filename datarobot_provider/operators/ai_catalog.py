@@ -87,7 +87,7 @@ class UploadDatasetOperator(BaseUseCaseEntityOperator):
 
         return ai_catalog_dataset.id
 
-    def _file_path_param_is_deprecated(self):
+    def _file_path_param_is_deprecated(self) -> None:
         self.log.warning(
             "**file_path_param** is deprecated. "
             f"Use `file_path={{{{ params.{self.file_path_param} }}}}` instead."
@@ -608,7 +608,7 @@ class CreateWranglingRecipeOperator(BaseUseCaseEntityOperator):
         self.downsampling_directive = downsampling_directive
         self.downsampling_arguments = downsampling_arguments
 
-    def validate(self):
+    def validate(self) -> None:
         if self.dataset_id and self.data_store_id:
             raise AirflowException(
                 "You have to specify either dataset_id or data_store_id. Not both."

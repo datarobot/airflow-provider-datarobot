@@ -33,7 +33,7 @@ class BaseDatarobotOperator(BaseOperator):
 
         self.validate()
 
-    def validate(self):
+    def validate(self) -> None:
         """Implement your validation of rendered operator fields here."""
 
     def __init__(self, *, datarobot_conn_id: str = "datarobot_default", **kwargs: Any):
@@ -54,7 +54,7 @@ class BaseUseCaseEntityOperator(BaseDatarobotOperator):
     """
 
     @classmethod
-    def __init_subclass__(cls, **kwargs):
+    def __init_subclass__(cls, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)
         if "use_case_id" not in cls.template_fields:
             cls.template_fields = (*cls.template_fields, "use_case_id")

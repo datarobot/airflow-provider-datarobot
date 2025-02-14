@@ -182,7 +182,7 @@ class DeployModelPackageOperator(BaseDatarobotOperator):
             e_msg = "Server unexpectedly returned status code {}"
             raise AirflowFailException(e_msg.format(response.status_code))
 
-    def validate(self):
+    def validate(self) -> None:
         if self.deployment_name is None:
             raise ValueError("deployment_name is required.")
 
