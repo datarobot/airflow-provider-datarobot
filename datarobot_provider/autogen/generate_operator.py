@@ -248,7 +248,7 @@ def to_snake_case(camel_case_str):
     return "".join(["_" + i.lower() if i.isupper() else i for i in camel_case_str]).lstrip("_")
 
 
-def main(whitelist_path: Path, output_folder: Path):
+def main(whitelist_path: Path, output_folder: Path) -> None:
     # load whitelist yaml
     with open(whitelist_path, "r") as f:
         whitelist = yaml.safe_load(f)

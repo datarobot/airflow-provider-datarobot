@@ -25,7 +25,7 @@ class BaseDatarobotOperator(BaseOperator):
 
     dr_hook: DataRobotHook
 
-    def pre_execute(self, context: Context):
+    def pre_execute(self, context: Context) -> None:
         super().pre_execute(context)
 
         self.dr_hook = DataRobotHook(datarobot_conn_id=self.datarobot_conn_id)
@@ -63,12 +63,15 @@ class BaseUseCaseEntityOperator(BaseDatarobotOperator):
             )
 
     def __init__(
-        self, *, use_case_id: Optional[str] = "{{ params.use_case_id | default('') }}", **kwargs
-    ):
+        self,
+        *,
+        use_case_id: Optional[str] = "{{ params.use_case_id | default('') }}",
+        **kwargs: Any,
+    ) -> None:
         super().__init__(**kwargs)
         self.use_case_id = use_case_id
 
-    def get_use_case(self, context: Context, required=False) -> Optional[dr.UseCase]:
+    def get_use_case(self, context: Context, required: bool = False) -> Optional[dr.UseCase]:
         """Get a `dr.UseCase` entity based on self.use_case_id or a default Use Case defined at runtime.
         Raises an exception if no Use Case is defined and required=True
         """
@@ -77,7 +80,7 @@ class BaseUseCaseEntityOperator(BaseDatarobotOperator):
 
         return None
 
-    def get_use_case_id(self, context: Context, required=False) -> Optional[str]:
+    def get_use_case_id(self, context: Context, required: bool = False) -> Optional[str]:
         """Get self.use_case_id or a default Use Case id defined at runtime.
         Raises an exception if no Use Case id is defined and required=True"""
         if use_case_id := (
@@ -100,7 +103,7 @@ class BaseUseCaseEntityOperator(BaseDatarobotOperator):
         entity: Union[dr.Project, dr.Dataset, dr.models.Recipe, dr.Application],
         *,
         context: Context,
-    ):
+    ) -> None:
         """Add an *entity* into Use Case defined as self.use_case_id or a default DAG Use Case."""
         if use_case := self.get_use_case(context):
             use_case.add(entity)
