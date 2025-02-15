@@ -14,6 +14,7 @@ from datarobot._experimental.models.notebooks.enums import ScheduledRunStatus
 from datarobot._experimental.models.notebooks.notebook import Notebook
 from datarobot._experimental.models.notebooks.scheduled_job import NotebookScheduledJob
 
+from datarobot_provider.constants import DATAROBOT_CONN_ID
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
 
@@ -42,7 +43,7 @@ class NotebookRunCompleteSensor(BaseSensorOperator):
         *,
         notebook_id: str = "{{ params.notebook_id }}",
         job_id: str,
-        datarobot_conn_id: str = "datarobot_default",
+        datarobot_conn_id: str = DATAROBOT_CONN_ID,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
