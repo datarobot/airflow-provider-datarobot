@@ -6,7 +6,6 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 import json
-from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 from typing import Optional
@@ -38,16 +37,14 @@ class NotebookRunOperator(BaseDatarobotOperator):
     :param notebook_path: Path to the notebook file. Must be provided if the notebook is part of a Codespace.
     :type notebook_path: str
     :param notebook_parameters: Parameters to be set as environment variables in the notebook session. Must be in the
-        form of `{"name": "FOO", "value": "MyValue"}`
+        form of `{"data": [{"name": "FOO", "value": "MyValue"}, {"name": "BAR", "value": "OtherValue"}]}`
     :type notebook_parameters: dict, optional
-    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
-    :type datarobot_conn_id: str, optional
     :return: The ID of the triggered notebook run.
     :rtype: str
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = [
+    template_fields = [
         "notebook_id",
         "notebook_path",
         "notebook_parameters",
@@ -76,6 +73,16 @@ class NotebookRunOperator(BaseDatarobotOperator):
             # DAGs using Airflow's `Param` model can't seem to take an array/list - it needs to be an object/dict
             self.parameters = parsed_parameters.get("data")
 
+    def _validate_notebook_parameters(self) -> None:
+        try:
+            self._parse_notebook_parameters()
+        except Exception as exc:
+            self.log.warning(
+                f"Error ({str(exc)}) parsing notebook parameters: {self.notebook_parameters}"
+                f" type={type(self.notebook_parameters)}"
+            )
+            raise AirflowException("Please check the format of your notebook parameters.") from exc
+
     def _validate_notebook_path(self) -> None:
         path_suffix = ".ipynb"
         if self.notebook_path:
@@ -88,16 +95,6 @@ class NotebookRunOperator(BaseDatarobotOperator):
                 raise AirflowException(
                     f"Supplied notebook path ({self.notebook_path}) must end with '{path_suffix}."
                 )
-
-    def _validate_notebook_parameters(self) -> None:
-        try:
-            self._parse_notebook_parameters()
-        except Exception as exc:
-            self.log.warning(
-                f"Error ({str(exc)}) parsing notebook parameters: {self.notebook_parameters}"
-                f" type={type(self.notebook_parameters)}"
-            )
-            raise AirflowException("Please check the format of your notebook parameters.") from exc
 
     def validate(self) -> None:
         self._validate_notebook_path()
@@ -112,7 +109,7 @@ class NotebookRunOperator(BaseDatarobotOperator):
         if not notebook.use_case_id:
             raise AirflowException("Notebook should have use_case_id")
 
-        # Run the notebook
+        # Run the notebook as a manual run of type "pipeline"
         manual_run = notebook.run(
             notebook_path=self.notebook_path,
             parameters=self.parameters,
