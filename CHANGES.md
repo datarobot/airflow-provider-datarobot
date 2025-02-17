@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.0
 
 ### New features
 - Introduce `CreateRegisteredModelVersionOperator <datarobot_provider.operators.CreateRegisteredModelVersionOperator>`
