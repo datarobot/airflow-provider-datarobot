@@ -328,9 +328,7 @@ def test_operator_create_project_from_recipe_id(mocker, xcom_context):
     project_id = operator.execute(xcom_context)
 
     assert project_id == "project-id"
-    create_project_mock.assert_called_with(
-        recipe_id="recipe-id", project_name="test project", use_case=None
-    )
+    create_project_mock.assert_called_with(recipe_id="recipe-id", use_case=None)
 
 
 def test_operator_create_project_fails_when_no_datasetid_or_training_data(xcom_context):
