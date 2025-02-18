@@ -184,7 +184,7 @@ class GetDeploymentStatusOperator(BaseDatarobotOperator):
         super().__init__(**kwargs)
         self.deployment_id = deployment_id
 
-    def validate(self):
+    def validate(self) -> None:
         if not self.deployment_id:
             raise ValueError("Invalid or missing `deployment_id` value")
 
@@ -234,7 +234,7 @@ class ReplaceModelOperator(BaseDatarobotOperator):
         self.reason = reason
         self.max_wait_sec = max_wait_sec
 
-    def validate(self):
+    def validate(self) -> None:
         if self.deployment_id is None:
             raise AirflowFailException("deployment_id must be provided")
 
@@ -396,7 +396,7 @@ class ActivateDeploymentOperator(BaseDatarobotOperator):
         self.activate = activate
         self.max_wait_sec = max_wait_sec
 
-    def validate(self):
+    def validate(self) -> None:
         if self.deployment_id is None:
             raise ValueError("Invalid or missing `deployment_id` value")
 

@@ -298,7 +298,7 @@ class CreateCustomModelVersionOperator(BaseDatarobotOperator):
         self.create_from_previous = create_from_previous
         self.max_wait_sec = max_wait_sec
 
-    def validate(self):
+    def validate(self) -> None:
         if self.custom_model_id is None:
             raise ValueError(
                 "custom_model_id is required attribute for CreateCustomModelVersionOperator"
@@ -398,7 +398,7 @@ class CustomModelTestOperator(BaseDatarobotOperator):
         self.dataset_id = dataset_id
         self.max_wait_sec = max_wait_sec
 
-    def validate(self):
+    def validate(self) -> None:
         if self.custom_model_id is None:
             raise ValueError("custom_model_id is required attribute")
 
@@ -444,7 +444,7 @@ class GetCustomModelTestOverallStatusOperator(BaseDatarobotOperator):
         super().__init__(**kwargs)
         self.custom_model_test_id = custom_model_test_id
 
-    def validate(self):
+    def validate(self) -> None:
         if self.custom_model_test_id is None:
             raise ValueError("custom_model_test_id is required attribute")
 
@@ -505,7 +505,7 @@ class CreateCustomModelDeploymentOperator(BaseDatarobotOperator):
         self.importance = importance
         self.max_wait_sec = max_wait_sec
 
-    def validate(self):
+    def validate(self) -> None:
         if self.custom_model_version_id is None:
             raise ValueError("Invalid or missing `custom_model_version_id` value")
 

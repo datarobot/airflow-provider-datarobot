@@ -59,7 +59,7 @@ class AddExternalDatasetOperator(BaseDatarobotOperator):
         self.dataset_version_id = dataset_version_id
         self.max_wait_sec = max_wait_sec
 
-    def validate(self):
+    def validate(self) -> None:
         if self.project_id is None:
             raise ValueError("project_id is required to add external dataset.")
 
@@ -118,7 +118,7 @@ class RequestModelPredictionsOperator(BaseDatarobotOperator):
         self.model_id = model_id
         self.external_dataset_id = external_dataset_id
 
-    def validate(self):
+    def validate(self) -> None:
         if self.project_id is None:
             raise ValueError("project_id is required to compute model predictions.")
 

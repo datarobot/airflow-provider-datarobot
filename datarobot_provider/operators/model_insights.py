@@ -45,7 +45,7 @@ class ComputeFeatureImpactOperator(BaseDatarobotOperator):
         self.project_id = project_id
         self.model_id = model_id
 
-    def validate(self):
+    def validate(self) -> None:
         if not self.project_id:
             raise ValueError("project_id is required to compute Feature Impact.")
 
@@ -92,7 +92,7 @@ class ComputeFeatureEffectsOperator(BaseDatarobotOperator):
         self.project_id = project_id
         self.model_id = model_id
 
-    def validate(self):
+    def validate(self) -> None:
         if not self.project_id:
             raise ValueError("project_id is required to compute Feature Effects.")
 
@@ -139,7 +139,7 @@ class ComputeShapOperator(BaseDatarobotOperator):
         self.project_id = project_id
         self.model_id = model_id
 
-    def validate(self):
+    def validate(self) -> None:
         if self.project_id is None:
             raise ValueError("project_id is required to compute SHAP impact.")
 

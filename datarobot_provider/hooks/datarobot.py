@@ -6,6 +6,7 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from typing import Any
+from typing import Tuple
 
 from airflow import __version__ as AIRFLOW_VERSION
 from airflow.exceptions import AirflowException
@@ -80,7 +81,7 @@ class DataRobotHook(BaseHook):
 
         # Creating version-specific user agent suffix for collecting usage statistics and troubleshoot purposes:
         provider_package_name = get_provider_info().get("package-name")
-        provider_versions = "".join(get_provider_info().get("versions"))
+        provider_versions = "".join(get_provider_info()["versions"])
         user_agent_suffix = "{}-{}-airflow-{}".format(
             provider_package_name, provider_versions, AIRFLOW_VERSION
         )
@@ -91,7 +92,7 @@ class DataRobotHook(BaseHook):
         # Initialize DataRobot client
         return self.get_conn()
 
-    def test_connection(self):
+    def test_connection(self) -> Tuple[bool, str]:
         """Test HTTP Connection"""
         try:
             self.run()

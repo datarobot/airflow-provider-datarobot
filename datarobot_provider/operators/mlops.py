@@ -36,7 +36,7 @@ class SubmitActualsFromCatalogOperator(BaseDatarobotOperator):
         self.dataset_id = dataset_id
         self.dataset_version_id = dataset_version_id
 
-    def validate(self):
+    def validate(self) -> None:
         if self.deployment_id is None:
             raise ValueError("deployment_id is required to submit actuals.")
 

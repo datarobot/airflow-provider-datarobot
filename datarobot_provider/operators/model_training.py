@@ -58,7 +58,7 @@ class TrainModelOperator(BaseDatarobotOperator):
         self.featurelist_id = featurelist_id
         self.source_project_id = source_project_id
 
-    def validate(self):
+    def validate(self) -> None:
         if not self.project_id:
             raise ValueError("project_id is required.")
 
@@ -120,7 +120,7 @@ class RetrainModelOperator(BaseDatarobotOperator):
         self.model_id = model_id
         self.featurelist_id = featurelist_id
 
-    def validate(self):
+    def validate(self) -> None:
         if self.project_id is None:
             raise ValueError("project_id is required.")
 
