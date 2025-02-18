@@ -6,6 +6,7 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from typing import Any
+from typing import Tuple
 
 from airflow.exceptions import AirflowException
 from datarobot import Credential
@@ -159,7 +160,7 @@ class JDBCDataSourceHook(BasicCredentialsHook):
         # get or create DataStore object updated with actual parameters
         return self.get_conn()
 
-    def test_connection(self):
+    def test_connection(self) -> Tuple[bool, str]:
         """Test DataRobot connection to JDBC DataSource"""
         try:
             _, credential_data, data_store = self.run()

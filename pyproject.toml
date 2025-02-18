@@ -62,3 +62,10 @@ warn_unused_configs = true
 warn_unused_ignores = true
 show_error_codes = true
 pretty = true
+
+[[tool.mypy.overrides]]
+module = [
+    "datarobot_provider.autogen.*",
+    "datarobot_provider._experimental.example_dags.*"
+]
+ignore_errors = true
