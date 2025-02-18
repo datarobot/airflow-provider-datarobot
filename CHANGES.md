@@ -14,6 +14,7 @@ to create datasets from project data.
 - Make `CreateOrUpdateDataSourceOperator <datarobot_provider.operators.ai_catalog.CreateOrUpdateDataSourceOperator>` `dataset_name` parameter optional.
 - Make `CreateOrUpdateDataSourceOperator <datarobot_provider.operators.ai_catalog.CreateOrUpdateDataSourceOperator>` parameters use templates.
 - Add `hospital_readmissions_example.py` DAG.
+- Add `feature_discovery_example.py` DAG.
 - Add an optional *use_case_id* parameter into `CreateProjectOperator <datarobot_provider.operators.ai_catalog.datarobot.CreateProjectOperator>`
 - Add `GetDataStoreOperator <datarobot_provider.operators.datarobot.GetProjectBlueprintsOperator>` to get blueprint ids for a project.
 
