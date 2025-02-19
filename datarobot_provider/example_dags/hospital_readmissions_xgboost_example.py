@@ -50,7 +50,7 @@ def hospital_readmissions_xgboost_example():
         task_id="create_recipe",
         dataset_id=upload_dataset.output,
         dialect=dr.enums.DataWranglingDialect.SPARK,
-        # See the list of available *operation* options in the DtaRobot API documentation:
+        # See the list of available *operation* options in the DataRobot API documentation:
         # https://docs.datarobot.com/en/docs/api/reference/public-api/data_wrangling.html#schemaoneofdirective
         # General *operation* structure is:
         # {"directive": <One of dr.enums.WranglingOperations>, "arguments": <dictionary>}
