@@ -26,6 +26,8 @@ common_setup_kwargs = dict(
     project_urls={
         "Documentation": "https://github.com/datarobot/airflow-provider-datarobot/",
         "Changelog": "https://github.com/datarobot/airflow-provider-datarobot/blob/main/CHANGES.md",
+        "Bug Tracker": "https://github.com/datarobot/airflow-provider-datarobot/issues",
+        "Source Code": "https://github.com/datarobot/airflow-provider-datarobot",
     },
     license="DataRobot Tool and Utility Agreement",
     packages=None,
