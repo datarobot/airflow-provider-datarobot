@@ -15,9 +15,9 @@ from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 from airflow.utils.context import Context
 
+from datarobot_provider.constants import DATAROBOT_CONN_ID
+from datarobot_provider.constants import XCOM_DEFAULT_USE_CASE_ID
 from datarobot_provider.hooks.datarobot import DataRobotHook
-
-XCOM_DEFAULT_USE_CASE_ID = "default_use_case_id"
 
 
 class BaseDatarobotOperator(BaseOperator):
@@ -36,7 +36,7 @@ class BaseDatarobotOperator(BaseOperator):
     def validate(self) -> None:
         """Implement your validation of rendered operator fields here."""
 
-    def __init__(self, *, datarobot_conn_id: str = "datarobot_default", **kwargs: Any):
+    def __init__(self, *, datarobot_conn_id: str = DATAROBOT_CONN_ID, **kwargs: Any):
         super().__init__(**kwargs)
         self.datarobot_conn_id = datarobot_conn_id
         if kwargs.get("xcom_push") is not None:

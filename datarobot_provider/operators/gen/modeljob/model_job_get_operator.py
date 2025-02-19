@@ -13,6 +13,7 @@ from airflow.models import BaseOperator
 from airflow.utils.context import Context
 from datarobot.models.modeljob import ModelJob
 
+from datarobot_provider.constants import DATAROBOT_CONN_ID
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
 
@@ -37,7 +38,7 @@ class ModelJobGetOperator(BaseOperator):
         *,
         project_id: Optional[str] = None,
         model_job_id: Optional[str] = None,
-        datarobot_conn_id: str = "datarobot_default",
+        datarobot_conn_id: str = DATAROBOT_CONN_ID,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)

@@ -12,6 +12,7 @@ from airflow.sensors.base import BaseSensorOperator
 from airflow.utils.context import Context
 from datarobot.errors import AsyncProcessUnsuccessfulError
 
+from datarobot_provider.constants import DATAROBOT_CONN_ID
 from datarobot_provider.hooks.datarobot import DataRobotHook
 
 
@@ -34,7 +35,7 @@ class MonitoringJobCompleteSensor(BaseSensorOperator):
         self,
         *,
         job_id: str,
-        datarobot_conn_id: str = "datarobot_default",
+        datarobot_conn_id: str = DATAROBOT_CONN_ID,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)

@@ -105,6 +105,7 @@ class GenerateOperators:
             ("Context", "from airflow.utils.context import Context"),
             (f"from {module_key} import {module_obj_key}",),
             ("",),
+            ("DATAROBOT_CONN_ID", "from datarobot_provider.constants import DATAROBOT_CONN_ID"),
             ("DataRobotHook", "from datarobot_provider.hooks.datarobot import DataRobotHook"),
         ]
         actual_imports = []
@@ -189,7 +190,7 @@ class GenerateOperators:
         op_init = "\tdef __init__(self,*,"
         for param in docstring["Parameters"]:
             op_init += f"{param.name}: Optional[{param.type}] = None,"
-        op_init += 'datarobot_conn_id: str = "datarobot_default",\n'
+        op_init += "datarobot_conn_id: str = DATAROBOT_CONN_ID,\n"
         op_init += "**kwargs: Any) -> None:\n"
         op_init += "\t\tsuper().__init__(**kwargs)\n"
         for param in docstring["Parameters"]:

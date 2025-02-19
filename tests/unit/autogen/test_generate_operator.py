@@ -120,7 +120,7 @@ def test_construct_operator_attibutes(generator, docstring_fixture):
 def test_construct_operator_init(generator, docstring_fixture):
     result = generator.construct_operator_init(docstring_fixture)
     expected = (
-        '\tdef __init__(self,*,project_id: Optional[str] = None,model_job_id: Optional[str] = None,datarobot_conn_id: str = "datarobot_default",\n'
+        "\tdef __init__(self,*,project_id: Optional[str] = None,model_job_id: Optional[str] = None,datarobot_conn_id: str = DATAROBOT_CONN_ID,\n"
         "**kwargs: Any) -> None:\n"
         "\t\tsuper().__init__(**kwargs)\n"
         "\t\tself.project_id = project_id\n"
