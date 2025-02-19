@@ -7,7 +7,9 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 import pytest
 
-from datarobot_provider._experimental.example_dags.datarobot_score_dag import datarobot_score
+from datarobot_provider._experimental.deprecated_example_dags.datarobot_score_dag import (
+    datarobot_score,
+)
 
 
 def test_dag_loaded(dagbag):
