@@ -7,7 +7,9 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 import pytest
 
-from datarobot_provider._experimental.example_dags.datarobot_pipeline_dag import datarobot_pipeline
+from datarobot_provider._experimental.deprecated_example_dags.datarobot_pipeline_dag import (
+    datarobot_pipeline,
+)
 
 
 def test_dag_loaded(dagbag):
