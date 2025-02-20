@@ -7,7 +7,7 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 import pytest
 
-from datarobot_provider._experimental.example_dags.datarobot_gcp_storage_batch_scoring_dag import (
+from datarobot_provider._experimental.deprecated_example_dags.datarobot_gcp_storage_batch_scoring_dag import (
     datarobot_gcp_batch_scoring,
 )
 

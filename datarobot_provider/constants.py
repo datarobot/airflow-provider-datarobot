@@ -8,3 +8,5 @@
 
 
 DATAROBOT_CONN_ID = "datarobot_default"
+
+XCOM_DEFAULT_USE_CASE_ID = "default_use_case_id"

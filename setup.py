@@ -26,6 +26,8 @@ common_setup_kwargs = dict(
     project_urls={
         "Documentation": "https://github.com/datarobot/airflow-provider-datarobot/",
         "Changelog": "https://github.com/datarobot/airflow-provider-datarobot/blob/main/CHANGES.md",
+        "Bug Tracker": "https://github.com/datarobot/airflow-provider-datarobot/issues",
+        "Source Code": "https://github.com/datarobot/airflow-provider-datarobot",
     },
     license="DataRobot Tool and Utility Agreement",
     packages=None,
@@ -55,7 +57,7 @@ common_setup_kwargs = dict(
             "freezegun>=1.5.1",
         ],
         "docs": [
-            "Sphinx>=8.1.3",
+            "Sphinx>=8.1.3,<8.2.0",
             "sphinx_rtd_theme>=3.0",
             "sphinx-autodoc-typehints>=2",
             "pyenchant==3.2.2",
@@ -78,7 +80,6 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
 ]
 
 DESCRIPTION_TEMPLATE = """
