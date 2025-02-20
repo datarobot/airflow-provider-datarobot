@@ -57,7 +57,7 @@ common_setup_kwargs = dict(
             "freezegun>=1.5.1",
         ],
         "docs": [
-            "Sphinx>=8.1.3,<8.2.0",
+            "Sphinx>=8.1.3",
             "sphinx_rtd_theme>=3.0",
             "sphinx-autodoc-typehints>=2",
             "pyenchant==3.2.2",
