@@ -10,7 +10,9 @@ from typing import Any
 from typing import Optional
 
 import datarobot as dr
+from airflow.exceptions import AirflowFailException
 from airflow.utils.context import Context
+from datarobot.insights import ShapPreview
 
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
@@ -109,46 +111,44 @@ class ComputeFeatureEffectsOperator(BaseDatarobotOperator):
         return job.id
 
 
-class ComputeShapOperator(BaseDatarobotOperator):
+class ComputeShapPreviewOperator(BaseDatarobotOperator):
     """
-    Creates SHAP impact job in DataRobot.
-    :param project_id: DataRobot project ID
-    :type project_id: str
-    :param model_id: DataRobot model ID
-    :type model_id: str
-    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
-    :type datarobot_conn_id: str, optional
-    :return: SHAP impact job ID
-    :rtype: str
+    Creates SHAP preview job in DataRobot.
+
+    Parameters
+    ----------
+    project_id : str
+        DataRobot project ID
+    model_id : str
+        DataRobot model ID
+    datarobot_conn_id : str, optional
+        Connection ID, defaults to `datarobot_default`
+
+    Returns
+    -------
+    str
+        SHAP preview result id
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
     template_fields: Sequence[str] = [
-        "project_id",
         "model_id",
     ]
 
     def __init__(
         self,
         *,
-        project_id: Optional[str] = None,
         model_id: Optional[str] = None,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
-        self.project_id = project_id
-        self.model_id = model_id
+        self.model_id = str(model_id) if model_id else None
 
     def validate(self) -> None:
-        if self.project_id is None:
-            raise ValueError("project_id is required to compute SHAP impact.")
-
-        if self.model_id is None:
-            raise ValueError("model_id is required to compute SHAP impact.")
+        if not self.model_id:
+            raise AirflowFailException("The `model_id` parameter is required.")
 
     def execute(self, context: Context) -> str:
-        shap_impact_job = dr.ShapImpact.create(project_id=self.project_id, model_id=self.model_id)
+        shap_preview = ShapPreview.create(entity_id=self.model_id)  # type: ignore[arg-type]
 
-        self.log.info(f"Compute SHAP impact Job submitted, job_id={shap_impact_job.id}")
-
-        return shap_impact_job.id
+        return shap_preview.id
