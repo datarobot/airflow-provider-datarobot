@@ -1,7 +1,8 @@
 # DataRobot Provider for Apache Airflow
+[![Documentation](https://img.shields.io/badge/docs-readthedocs-forestgreen)](https://datarobot-datarobot-airflow-provider.readthedocs-hosted.com/en/latest/)
 [![PyPI version](https://img.shields.io/pypi/v/airflow-provider-datarobot)](https://pypi.org/project/airflow-provider-datarobot/)
-![License](https://img.shields.io/pypi/l/airflow-provider-datarobot)
 ![Python versions](https://img.shields.io/pypi/pyversions/airflow-provider-datarobot)
+![License](https://img.shields.io/pypi/l/airflow-provider-datarobot)
 
 This package provides operators, sensors, and a hook to integrate [DataRobot](https://www.datarobot.com) into Apache Airflow.
 Using these components, you should be able to build the essential DataRobot pipeline - create a project, train models, deploy a model,
