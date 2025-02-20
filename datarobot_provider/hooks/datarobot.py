@@ -15,6 +15,7 @@ from datarobot.client import Client
 from datarobot.rest import RESTClientObject
 
 from datarobot_provider import get_provider_info
+from datarobot_provider.constants import DATAROBOT_CONN_ID
 
 
 class DataRobotHook(BaseHook):
@@ -26,7 +27,7 @@ class DataRobotHook(BaseHook):
     """
 
     conn_name_attr = "datarobot_conn_id"
-    default_conn_name = "datarobot_default"
+    default_conn_name = DATAROBOT_CONN_ID
     conn_type = "http"
     hook_name = "DataRobot"
 
