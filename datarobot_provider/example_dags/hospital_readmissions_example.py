@@ -143,7 +143,7 @@ def hospital_readmissions_example():
             "model_type": "leaderboard",
             "model_id": select_best_model.output,
             "name": "Highest readmitted score test",
-            "registered_model_name": "Highest readmitted score test",
+            "registered_model_name": "Highest readmitted score test {{ ts }}",
         },
     )
 
