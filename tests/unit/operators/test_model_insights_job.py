@@ -8,10 +8,12 @@
 
 import datarobot as dr
 import pytest
+from airflow.exceptions import AirflowFailException
+from datarobot.insights import ShapPreview
 
 from datarobot_provider.operators.model_insights import ComputeFeatureEffectsOperator
 from datarobot_provider.operators.model_insights import ComputeFeatureImpactOperator
-from datarobot_provider.operators.model_insights import ComputeShapOperator
+from datarobot_provider.operators.model_insights import ComputeShapPreviewOperator
 
 
 def test_operator_compute_feature_impact(mocker):
@@ -137,46 +139,24 @@ def test_operator_compute_feature_effects_no_model_id(mocker):
 
 
 def test_operator_compute_shap(mocker):
-    project_id = "test-project-id"
     model_id = "test-model-id"
     job_id = 123
 
     job_mock = mocker.Mock()
     job_mock.id = job_id
 
-    request_shap_mock = mocker.patch.object(dr.ShapImpact, "create", return_value=job_mock)
+    request_shap_mock = mocker.patch.object(ShapPreview, "create", return_value=job_mock)
 
-    operator = ComputeShapOperator(task_id="compute_shap", project_id=project_id, model_id=model_id)
+    operator = ComputeShapPreviewOperator(task_id="compute_shap", model_id=model_id)
 
     result = operator.execute(context={"params": {}})
 
-    request_shap_mock.assert_called_with(project_id=project_id, model_id=model_id)
+    request_shap_mock.assert_called_with(entity_id=model_id)
     assert result == job_id
 
 
-def test_operator_compute_shap_no_project_id(mocker):
-    project_id = "test-project-id"
-    model_id = "test-model-id"
+def test_operator_compute_shap_no_model_id():
+    operator = ComputeShapPreviewOperator(task_id="compute_shap")
 
-    model_mock = mocker.Mock()
-    model_mock.id = model_id
-    model_mock.project_id = project_id
-
-    operator = ComputeShapOperator(task_id="compute_shap", model_id=model_id)
-
-    with pytest.raises(ValueError):
-        operator.execute(context={"params": {}})
-
-
-def test_operator_compute_shap_no_model_id(mocker):
-    project_id = "test-project-id"
-    model_id = "test-model-id"
-
-    model_mock = mocker.Mock()
-    model_mock.id = model_id
-    model_mock.project_id = project_id
-
-    operator = ComputeShapOperator(task_id="compute_shap", project_id=project_id)
-
-    with pytest.raises(ValueError):
-        operator.execute(context={"params": {}})
+    with pytest.raises(AirflowFailException):
+        operator.validate()
