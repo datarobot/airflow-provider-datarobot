@@ -24,7 +24,7 @@ common_setup_kwargs = dict(
     maintainer_email="api-maintainer@datarobot.com",
     url="https://datarobot.com",
     project_urls={
-        "Documentation": "https://github.com/datarobot/airflow-provider-datarobot/",
+        "Documentation": "https://datarobot-datarobot-airflow-provider.readthedocs-hosted.com/en/latest/",
         "Changelog": "https://github.com/datarobot/airflow-provider-datarobot/blob/main/CHANGES.md",
         "Bug Tracker": "https://github.com/datarobot/airflow-provider-datarobot/issues",
         "Source Code": "https://github.com/datarobot/airflow-provider-datarobot",
