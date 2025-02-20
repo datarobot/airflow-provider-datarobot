@@ -64,6 +64,7 @@ common_setup_kwargs = dict(
             "sphinx-copybutton",
             "sphinx-markdown-builder",
             "myst-parser==4.0.0",
+            "numpydoc>=1.7.0,<1.8.0",
         ],
     },
 )
