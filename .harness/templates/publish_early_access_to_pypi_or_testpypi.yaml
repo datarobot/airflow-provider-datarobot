@@ -57,9 +57,12 @@ template:
                           VERSION=$(python3 setup.py --version)  
                       fi
 
-                      if [ "$BUILD_TYPE" == "pypi" ] || [ "$BUILD_TYPE" == "early-access" ]; then
+                      if [ "$BUILD_TYPE" == "pypi" ]; then
                           REPO_URL='https://upload.pypi.org/legacy/'
-                          UPLOAD_SECRET='<+secrets.getValue("PyPI_token_for_airflow-provider-datarobot")>'
+                          UPLOAD_SECRET='<+secrets.getValue("pypi_release_token")>'
+                      elif [ "$BUILD_TYPE" == "early-access" ]; then
+                          REPO_URL='https://upload.pypi.org/legacy/'
+                          UPLOAD_SECRET='<+secrets.getValue("pypi_early_access_token")>'
                       fi
                   }
 
