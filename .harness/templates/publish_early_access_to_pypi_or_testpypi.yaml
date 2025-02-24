@@ -51,23 +51,23 @@ template:
                       REPO_URL='https://test.pypi.org/legacy/'
                       UPLOAD_SECRET='<+secrets.getValue("testpypi_token")>'
 
-                      if [ "$BUILD_TYPE" == "test-early-access" ] || [ "$BUILD_TYPE" == "early-access" ]; then
+                      if [ "$BUILD_TYPE" == "release-early-access-pypi" ] || [ "$BUILD_TYPE" == "release-early-access-test-pypi" ]; then
                           VERSION=$(python3 setup_early_access.py --version)
                       else
                           VERSION=$(python3 setup.py --version)  
                       fi
 
-                      if [ "$BUILD_TYPE" == "pypi" ]; then
+                      if [ "$BUILD_TYPE" == "release-mainline-pypi" ]; then
                           REPO_URL='https://upload.pypi.org/legacy/'
                           UPLOAD_SECRET='<+secrets.getValue("pypi_release_token")>'
-                      elif [ "$BUILD_TYPE" == "early-access" ]; then
+                      elif [ "$BUILD_TYPE" == "release-early-access-pypi" ]; then
                           REPO_URL='https://upload.pypi.org/legacy/'
                           UPLOAD_SECRET='<+secrets.getValue("pypi_early_access_token")>'
                       fi
                   }
 
                   build_and_upload() {
-                      if [ "$BUILD_TYPE" == "test-early-access" ] || [ "$BUILD_TYPE" == "early-access" ]; then
+                      if [ "$BUILD_TYPE" == "release-early-access-pypi" ] || [ "$BUILD_TYPE" == "release-early-access-test-pypi" ]; then
                           echo "[BUILD PACKAGE - EARLY ACCESS]"
                           make build-early-access
                       else
@@ -78,7 +78,7 @@ template:
                       echo "[TWINE CHECK]"
                       twine check dist/*
 
-                      if [ "$BUILD_TYPE" == "test-early-access" ] || [ "$BUILD_TYPE" == "early-access" ]; then
+                      if [ "$BUILD_TYPE" == "release-early-access-pypi" ] || [ "$BUILD_TYPE" == "release-early-access-test-pypi" ]; then
                           echo "[TWINE UPLOAD - EARLY ACCESS]"
                           twine upload \
                               --verbose \
@@ -98,7 +98,7 @@ template:
                   }
 
                   push_tags() {
-                      if [ "$BUILD_TYPE" == "early-access" ]; then
+                      if [ "$BUILD_TYPE" == "release-early-access-pypi" ]; then
                           echo '[PUSHING EARLY ACCESS TAGS]'
                           git tag -f early-access && git push -f origin early-access
                       fi
@@ -115,7 +115,7 @@ template:
     variables:
       - name: BUILD_TYPE
         type: String
-        default: test-early-access
+        default: release-early-access-test-pypi
         description: ""
         required: true
-        value: <+input>.default(test-early-access).allowedValues(release-mainline,release-early-access,test-mainline,test-early-access)
+        value: <+input>.default(release-early-access-test-pypi).allowedValues(release-mainline-pypi,release-early-access-pypi,release-mainline-test-pypi,release-early-access-test-pypi)
