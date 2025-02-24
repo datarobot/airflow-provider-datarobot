@@ -109,7 +109,6 @@ template:
                       pip3 install --no-cache-dir --upgrade pip setuptools wheel six twine
                       set_build_variables
                       build_and_upload
-                      push_tags
                   }
 
                   main "$@"
