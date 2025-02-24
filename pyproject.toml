@@ -66,6 +66,6 @@ pretty = true
 [[tool.mypy.overrides]]
 module = [
     "datarobot_provider.autogen.*",
-    "datarobot_provider._experimental.example_dags.*"
+    "datarobot_provider._experimental.deprecated_example_dags.*"
 ]
 ignore_errors = true
