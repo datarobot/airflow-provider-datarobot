@@ -21,7 +21,7 @@ pipeline:
               - name: BUILD_TYPE
                 type: String
                 default: test-early-access
-                value: test
+                value: release-mainline-test-pypi
     - stage:
         name: Approve Release to Pypi
         identifier: Approve_Release
@@ -61,7 +61,7 @@ pipeline:
               - name: BUILD_TYPE
                 type: String
                 default: test-early-access
-                value: pypi
+                value: release-mainline-pypi
   properties:
     ci:
       codebase:
