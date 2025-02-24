@@ -118,4 +118,4 @@ template:
         default: test-early-access
         description: ""
         required: true
-        value: <+input>.default(test-early-access).allowedValues(test,early-access,pypi,test-early-access)
+        value: <+input>.default(test-early-access).allowedValues(release-mainline,release-early-access,test-mainline,test-early-access)
