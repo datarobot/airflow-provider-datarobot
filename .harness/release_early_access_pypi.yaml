@@ -21,7 +21,7 @@ pipeline:
               - name: BUILD_TYPE
                 type: String
                 default: release-early-access-test-pypi
-                value: <+input>.default(release-early-access-test-pypi).allowedValues(release-mainline-pypi,release-early-access-pypi,release-mainline-test-pypi,release-early-access-test-pypi)
+                value: release-early-access-pypi
   identifier: releaseearlyaccesspypi
   name: release-early-access-pypi
   properties:
