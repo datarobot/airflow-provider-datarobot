@@ -7,7 +7,6 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from collections.abc import Sequence
 from typing import Any
-from typing import Optional
 
 import datarobot as dr
 from airflow.exceptions import AirflowFailException
@@ -138,17 +137,15 @@ class ComputeShapPreviewOperator(BaseDatarobotOperator):
     def __init__(
         self,
         *,
-        model_id: Optional[str] = None,
+        model_id: str,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
-        self.model_id = str(model_id) if model_id else None
+        self.model_id = str(model_id)
 
     def validate(self) -> None:
         if not self.model_id:
             raise AirflowFailException("The `model_id` parameter is required.")
 
-    def execute(self, context: Context) -> str:
-        shap_preview = ShapPreview.create(entity_id=self.model_id)  # type: ignore[arg-type]
-
-        return shap_preview.id
+    def execute(self, context: Context) -> None:
+        ShapPreview.compute(entity_id=self.model_id)

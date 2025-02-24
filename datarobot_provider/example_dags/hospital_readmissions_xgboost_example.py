@@ -19,7 +19,6 @@ from datarobot_provider.operators.datarobot import TrainModelsOperator
 from datarobot_provider.operators.model_insights import ComputeShapPreviewOperator
 from datarobot_provider.operators.model_registry import CreateRegisteredModelVersionOperator
 from datarobot_provider.operators.model_training import TrainModelOperator
-from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
 from datarobot_provider.sensors.model_training import ModelTrainingJobSensor
 
 """
@@ -126,20 +125,13 @@ def hospital_readmissions_xgboost_example():
     project_id = str(create_project.output)
 
     # Launch modeling autopilot in manual mode.
-    train_models = TrainModelsOperator(task_id="train_models", project_id=project_id)
-
-    # Wait for the autopilot completion.
-    autopilot_complete_sensor = AutopilotCompleteSensor(
-        task_id="check_autopilot_complete",
-        project_id=project_id,
-    )
+    start_modeling = TrainModelsOperator(task_id="train_models", project_id=project_id)
 
     # Get the blueprint id of an xgboost model.
     get_blueprint_id = GetProjectBlueprintsOperator(
         task_id="get_blueprint_id",
         project_id=project_id,
-        filter_model_type="xgboost",
-        return_all=False,
+        filter_model_type="extreme gradient boosted",
     )
 
     trained_model = TrainModelOperator(
@@ -166,7 +158,7 @@ def hospital_readmissions_xgboost_example():
         task_id="register_model",
         model_version_params={
             "model_type": "leaderboard",
-            "model_id": trained_model.output,
+            "model_id": str(trained_model_sensor.output),
             "name": "Highest readmitted score test",
             "registered_model_name": "Highest readmitted score test",
         },
@@ -178,8 +170,7 @@ def hospital_readmissions_xgboost_example():
         >> create_recipe
         >> publish_recipe
         >> create_project
-        >> train_models
-        >> autopilot_complete_sensor
+        >> start_modeling
         >> get_blueprint_id
         >> trained_model
         >> trained_model_sensor
