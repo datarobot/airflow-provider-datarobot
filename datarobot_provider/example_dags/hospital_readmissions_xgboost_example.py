@@ -159,8 +159,8 @@ def hospital_readmissions_xgboost_example():
         model_version_params={
             "model_type": "leaderboard",
             "model_id": str(trained_model_sensor.output),
-            "name": "Highest readmitted score test",
-            "registered_model_name": "Highest readmitted score test",
+            "name": "Highest readmitted score xgboost test",
+            "registered_model_name": "Highest readmitted score xgboost test",
         },
     )
 
