@@ -138,7 +138,7 @@ def hospital_readmissions_xgboost_example():
     get_blueprint_id = GetProjectBlueprintsOperator(
         task_id="get_blueprint_id",
         project_id=project_id,
-        model_type="xgboost",
+        filter_model_type="xgboost",
         return_all=False,
     )
 
