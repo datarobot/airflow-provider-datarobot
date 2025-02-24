@@ -12,5 +12,5 @@
 /datarobot_provider/operators/monitoring.py              @datarobot/model-management
 /datarobot_provider/operators/monitoring_job.py          @datarobot/tracking-agent
 /datarobot_provider/operators/prediction_explanations.py @datarobot/trust-explainable-ai
-/docs                                                    @datarobot/api-docs
+/docs/                                                   @datarobot/api-docs
 /tests/                                                  @datarobot/machine-learning-development
