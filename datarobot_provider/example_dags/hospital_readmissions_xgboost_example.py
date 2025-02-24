@@ -183,7 +183,8 @@ def hospital_readmissions_xgboost_example():
         >> get_blueprint_id
         >> trained_model
         >> trained_model_sensor
-        >> [insights, register_model]
+        >> insights
+        >> register_model
     )
 
 
