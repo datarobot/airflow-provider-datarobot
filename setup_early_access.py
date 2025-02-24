@@ -9,7 +9,7 @@
 # affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-import os
+import re
 from datetime import datetime
 
 from setuptools import find_packages
@@ -53,20 +53,20 @@ description = DESCRIPTION_TEMPLATE.format(
 packages = find_packages(exclude=["docs*", "tests*"])
 
 
-def _copy_file(source_file, destination_file):
-    with open(source_file, "r") as source, open(destination_file, "w") as destination:
-        for line in source:
-            destination.write(line)
+def _replace_string_in_file(filepath, pattern, replacement):
+    with open(filepath, "r") as file:
+        file_content = file.read()
+    modified_content = re.sub(pattern, replacement, file_content)
+    with open(filepath, "w") as file:
+        file.write(modified_content)
 
 
 # Airflow relies on entry point for provider discovery (as seen defined in common_setup_kwargs)
-early_access_dunder_init = "./early_access_dunder_init.txt"
-copy_of_dunder_init = "datarobot_provider/__init__BKP.py"
 dunder_init = "datarobot_provider/__init__.py"
-# Make copy in order to reset below after building package
-_copy_file(dunder_init, copy_of_dunder_init)
-_copy_file(early_access_dunder_init, dunder_init)
-
+# Replace package name
+mainline = r'"package-name": "airflow-provider-datarobot"'
+early_access = '"package-name": "airflow-provider-datarobot-early-access"'
+_replace_string_in_file(dunder_init, mainline, early_access)
 
 common_setup_kwargs.update(
     name=package_name,
@@ -79,6 +79,5 @@ common_setup_kwargs.update(
 
 setup(**common_setup_kwargs)
 
-# Reset changes we made to dunder init file and remove backup
-_copy_file(copy_of_dunder_init, dunder_init)
-os.remove(copy_of_dunder_init)
+# Reset changes we made to dunder init file
+_replace_string_in_file(dunder_init, early_access, mainline)
