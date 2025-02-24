@@ -201,7 +201,6 @@ class CreateProjectOperator(BaseUseCaseEntityOperator):
             )
             self.log.info(f"Project created: project_id={project.id} from local file")
             project.unsupervised_mode = context["params"].get("unsupervised_mode")
-            project.use_feature_discovery = context["params"].get("use_feature_discovery")
             project.unlock_holdout()
             return project.id
         elif self.dataset_id is not None or "training_dataset_id" in context["params"]:
