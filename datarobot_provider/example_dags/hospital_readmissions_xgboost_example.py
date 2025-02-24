@@ -16,9 +16,11 @@ from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.operators.datarobot import GetOrCreateUseCaseOperator
 from datarobot_provider.operators.datarobot import GetProjectBlueprintsOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
+from datarobot_provider.operators.model_insights import ComputeShapPreviewOperator
 from datarobot_provider.operators.model_registry import CreateRegisteredModelVersionOperator
 from datarobot_provider.operators.model_training import TrainModelOperator
 from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
+from datarobot_provider.sensors.model_training import ModelTrainingJobSensor
 
 """
 Example of Aiflow DAG for DataRobot data preparation and model training.
@@ -146,6 +148,19 @@ def hospital_readmissions_xgboost_example():
         blueprint_id=str(get_blueprint_id.output),
     )
 
+    trained_model_sensor = ModelTrainingJobSensor(
+        task_id="model_training_complete",
+        project_id=project_id,
+        job_id=str(trained_model.output),
+        poke_interval=5,
+        timeout=3600,
+    )
+
+    insights = ComputeShapPreviewOperator(
+        task_id="compute_shap_insights",
+        model_id=str(trained_model_sensor.output),
+    )
+
     # register model
     register_model = CreateRegisteredModelVersionOperator(
         task_id="register_model",
@@ -167,7 +182,8 @@ def hospital_readmissions_xgboost_example():
         >> autopilot_complete_sensor
         >> get_blueprint_id
         >> trained_model
-        >> register_model
+        >> trained_model_sensor
+        >> [insights, register_model]
     )
 
 
