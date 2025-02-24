@@ -22,8 +22,8 @@ pipeline:
             variables:
               - name: BUILD_TYPE
                 type: String
-                default: test-early-access
-                value: test-early-access
+                default: release-early-access-test-pypi
+                value: release-early-access-test-pypi
   properties:
     ci:
       codebase:
