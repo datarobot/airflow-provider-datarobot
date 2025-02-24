@@ -20,7 +20,7 @@ pipeline:
             variables:
               - name: BUILD_TYPE
                 type: String
-                default: test-early-access
+                default: release-early-access-test-pypi
                 value: release-mainline-test-pypi
     - stage:
         name: Approve Release to Pypi
@@ -60,7 +60,7 @@ pipeline:
             variables:
               - name: BUILD_TYPE
                 type: String
-                default: test-early-access
+                default: release-early-access-test-pypi
                 value: release-mainline-pypi
   properties:
     ci:
