@@ -20,8 +20,8 @@ pipeline:
             variables:
               - name: BUILD_TYPE
                 type: String
-                default: test-early-access
-                value: early-access
+                default: release-early-access-test-pypi
+                value: <+input>.default(release-early-access-test-pypi).allowedValues(release-mainline-pypi,release-early-access-pypi,release-mainline-test-pypi,release-early-access-test-pypi)
   identifier: releaseearlyaccesspypi
   name: release-early-access-pypi
   properties:
