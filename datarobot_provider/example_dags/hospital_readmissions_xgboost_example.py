@@ -154,13 +154,14 @@ def hospital_readmissions_xgboost_example():
     )
 
     # register model
+    registered_model_name = f"Highest readmitted score {str(trained_model_sensor.output)}"
     register_model = CreateRegisteredModelVersionOperator(
         task_id="register_model",
         model_version_params={
             "model_type": "leaderboard",
             "model_id": str(trained_model_sensor.output),
-            "name": "Highest readmitted score xgboost test",
-            "registered_model_name": "Highest readmitted score xgboost test",
+            "name": registered_model_name,
+            "registered_model_name": registered_model_name,
         },
     )
 
