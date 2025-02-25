@@ -9,6 +9,7 @@
 # affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+import re
 from datetime import datetime
 
 from setuptools import find_packages
@@ -51,6 +52,22 @@ description = DESCRIPTION_TEMPLATE.format(
 
 packages = find_packages(exclude=["docs*", "tests*"])
 
+
+def _replace_string_in_file(filepath, pattern, replacement):
+    with open(filepath, "r") as file:
+        file_content = file.read()
+    modified_content = re.sub(pattern, replacement, file_content)
+    with open(filepath, "w") as file:
+        file.write(modified_content)
+
+
+# Airflow relies on entry point for provider discovery (as seen defined in common_setup_kwargs)
+dunder_init = "datarobot_provider/__init__.py"
+# Replace package name
+mainline = r'"package-name": "airflow-provider-datarobot"'
+early_access = '"package-name": "airflow-provider-datarobot-early-access"'
+_replace_string_in_file(dunder_init, mainline, early_access)
+
 common_setup_kwargs.update(
     name=package_name,
     version=version,
@@ -61,3 +78,6 @@ common_setup_kwargs.update(
 )
 
 setup(**common_setup_kwargs)
+
+# Reset changes we made to dunder init file
+_replace_string_in_file(dunder_init, early_access, mainline)
