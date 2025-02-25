@@ -8,7 +8,7 @@
 
 import datarobot as dr
 import pytest
-from airflow.exceptions import AirflowFailException
+from airflow.exceptions import AirflowException
 from datarobot.insights import ShapPreview
 
 from datarobot_provider.operators.model_insights import ComputeFeatureEffectsOperator
@@ -145,18 +145,16 @@ def test_operator_compute_shap(mocker):
     job_mock = mocker.Mock()
     job_mock.id = job_id
 
-    request_shap_mock = mocker.patch.object(ShapPreview, "create", return_value=job_mock)
+    request_shap_mock = mocker.patch.object(ShapPreview, "compute", return_value=job_mock)
 
     operator = ComputeShapPreviewOperator(task_id="compute_shap", model_id=model_id)
 
     result = operator.execute(context={"params": {}})
 
     request_shap_mock.assert_called_with(entity_id=model_id)
-    assert result == job_id
+    assert result is None
 
 
 def test_operator_compute_shap_no_model_id():
-    operator = ComputeShapPreviewOperator(task_id="compute_shap")
-
-    with pytest.raises(AirflowFailException):
-        operator.validate()
+    with pytest.raises(AirflowException):
+        ComputeShapPreviewOperator(task_id="compute_shap")
