@@ -16,9 +16,10 @@ from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.operators.datarobot import GetOrCreateUseCaseOperator
 from datarobot_provider.operators.datarobot import GetProjectBlueprintsOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
+from datarobot_provider.operators.model_insights import ComputeShapPreviewOperator
 from datarobot_provider.operators.model_registry import CreateRegisteredModelVersionOperator
 from datarobot_provider.operators.model_training import TrainModelOperator
-from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
+from datarobot_provider.sensors.model_training import ModelTrainingJobSensor
 
 """
 Example of Aiflow DAG for DataRobot data preparation and model training.
@@ -124,20 +125,13 @@ def hospital_readmissions_xgboost_example():
     project_id = str(create_project.output)
 
     # Launch modeling autopilot in manual mode.
-    train_models = TrainModelsOperator(task_id="train_models", project_id=project_id)
-
-    # Wait for the autopilot completion.
-    autopilot_complete_sensor = AutopilotCompleteSensor(
-        task_id="check_autopilot_complete",
-        project_id=project_id,
-    )
+    start_modeling = TrainModelsOperator(task_id="train_models", project_id=project_id)
 
     # Get the blueprint id of an xgboost model.
     get_blueprint_id = GetProjectBlueprintsOperator(
         task_id="get_blueprint_id",
         project_id=project_id,
-        model_type="xgboost",
-        return_all=False,
+        filter_model_type="extreme gradient boosted",
     )
 
     trained_model = TrainModelOperator(
@@ -146,14 +140,28 @@ def hospital_readmissions_xgboost_example():
         blueprint_id=str(get_blueprint_id.output),
     )
 
+    trained_model_sensor = ModelTrainingJobSensor(
+        task_id="model_training_complete",
+        project_id=project_id,
+        job_id=str(trained_model.output),
+        poke_interval=5,
+        timeout=3600,
+    )
+
+    insights = ComputeShapPreviewOperator(
+        task_id="compute_shap_insights",
+        model_id=str(trained_model_sensor.output),
+    )
+
     # register model
+    registered_model_name = f"Highest readmitted score {str(trained_model_sensor.output)}"
     register_model = CreateRegisteredModelVersionOperator(
         task_id="register_model",
         model_version_params={
             "model_type": "leaderboard",
-            "model_id": trained_model.output,
-            "name": "Highest readmitted score test",
-            "registered_model_name": "Highest readmitted score test",
+            "model_id": str(trained_model_sensor.output),
+            "name": registered_model_name,
+            "registered_model_name": registered_model_name,
         },
     )
 
@@ -163,10 +171,11 @@ def hospital_readmissions_xgboost_example():
         >> create_recipe
         >> publish_recipe
         >> create_project
-        >> train_models
-        >> autopilot_complete_sensor
+        >> start_modeling
         >> get_blueprint_id
         >> trained_model
+        >> trained_model_sensor
+        >> insights
         >> register_model
     )
 

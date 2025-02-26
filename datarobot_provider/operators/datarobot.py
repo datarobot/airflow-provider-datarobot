@@ -337,7 +337,7 @@ class GetProjectBlueprintsOperator(BaseDatarobotOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = ["project_id", "return_all", "filter_model_type"]
+    template_fields: Sequence[str] = ["project_id"]
 
     def __init__(
         self,
@@ -349,19 +349,19 @@ class GetProjectBlueprintsOperator(BaseDatarobotOperator):
     ) -> None:
         super().__init__(**kwargs)
         self.project_id = project_id
-        self.filter_type = filter_model_type
+        self.filter_model_type = filter_model_type
         self.return_all = return_all
 
     def execute(self, context: Context) -> Union[List[Union[str, None]], str]:
         # Get DataRobot project blueprints
         project = dr.Project.get(self.project_id)
         blueprints: List[Blueprint] = project.get_blueprints()
-        if self.filter_type:
+        if self.filter_model_type:
             # Filter blueprints by type
             blueprint_ids = [
                 blueprint.id
                 for blueprint in blueprints
-                if self.filter_type in str(blueprint.model_type).lower()
+                if self.filter_model_type in str(blueprint.model_type).lower()
             ]
         else:
             blueprint_ids = [blueprint.id for blueprint in blueprints]
