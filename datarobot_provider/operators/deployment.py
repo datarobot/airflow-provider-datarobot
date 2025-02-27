@@ -476,20 +476,20 @@ class GetTargetDriftOperator(BaseDatarobotOperator):
 
 
 class DeployRegisteredModelOperator(BaseDatarobotOperator):
-"""
-Create a deployment from a registered model version using DataRobot's API.
-
-This operator creates a deployment for a registered model version by calling
-DataRobot's `Deployment.create_from_registered_model_version()` method. It allows
-optional extra parameters to be passed to the DataRobot client call.
-
-Args:
-    model_package_id (str): The registered model version ID to deploy.
-    deployment_label (str): The label or name to assign to the deployment.
-    extra_params (dict, optional): A dictionary of additional parameters to pass
-        to the DataRobot deployment creation API.
-    kwargs (dict): Additional keyword arguments passed to the BaseDatarobotOperator.
-"""
+    """
+    Create a deployment from a registered model version using DataRobot's API.
+    
+    This operator creates a deployment for a registered model version by calling
+    DataRobot's `Deployment.create_from_registered_model_version()` method. It allows
+    optional extra parameters to be passed to the DataRobot client call.
+    
+    Args:
+        model_package_id (str): The registered model version ID to deploy.
+        deployment_label (str): The label or name to assign to the deployment.
+        extra_params (dict, optional): A dictionary of additional parameters to pass
+            to the DataRobot deployment creation API.
+        kwargs (dict): Additional keyword arguments passed to the BaseDatarobotOperator.
+    """
 
     template_fields: Sequence[str] = ["model_package_id", "deployment_label", "extra_params"]
 
