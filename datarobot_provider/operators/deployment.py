@@ -7,6 +7,7 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from typing import TYPE_CHECKING
 from typing import Any
+from typing import Dict
 from typing import Optional
 from typing import Sequence
 
@@ -472,3 +473,53 @@ class GetTargetDriftOperator(BaseDatarobotOperator):
         target_drift_params = context["params"].get("target_drift", {})
         drift = deployment.get_target_drift(**target_drift_params)
         return _serialize_drift(drift)
+
+
+class DeployRegisteredModelOperator(BaseDatarobotOperator):
+    """
+    Create a deployment from a registered model version using DataRobot's API.
+
+    This operator creates a deployment for a registered model version by calling
+    DataRobot's `Deployment.create_from_registered_model_version()` method. It allows
+    optional extra parameters to be passed to the DataRobot client call.
+
+    :param model_package_id: The registered model version ID to deploy.
+    :param deployment_label: The label or name to assign to the deployment.
+    :param extra_params: (Optional) A dictionary of additional parameters to pass
+                         to the DataRobot deployment creation API.
+    :param kwargs: Additional keyword arguments passed to the BaseDatarobotOperator.
+    """
+
+    template_fields: Sequence[str] = ["model_package_id", "deployment_label", "extra_params"]
+
+    def __init__(
+        self,
+        *,
+        model_package_id: str,
+        deployment_label: str,
+        extra_params: Optional[Dict[str, Any]] = None,
+        **kwargs: Any,
+    ) -> None:
+        self.extra_params = extra_params or {}
+        super().__init__(**kwargs)
+        self.model_package_id = model_package_id
+        self.deployment_label = deployment_label
+
+    def validate(self) -> None:
+        if not self.model_package_id:
+            raise ValueError("model_package_id must be provided.")
+        if not self.deployment_label:
+            raise ValueError("label must be provided.")
+
+    def execute(self, context: Context) -> str:
+        self.log.info(
+            "Creating deployment from registered model version: %s", self.model_package_id
+        )
+
+        # Create deployment from registered model.
+        deployment = dr.Deployment.create_from_registered_model_version(
+            model_package_id=self.model_package_id, label=self.deployment_label, **self.extra_params
+        )
+
+        self.log.info("Deployment created with ID: %s", deployment.id)
+        return deployment.id

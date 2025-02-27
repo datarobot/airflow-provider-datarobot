@@ -5,6 +5,7 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+from unittest.mock import MagicMock
 from unittest.mock import Mock
 
 import datarobot as dr
@@ -12,6 +13,7 @@ import pytest
 from airflow.exceptions import AirflowFailException
 
 from datarobot_provider.operators.deployment import ActivateDeploymentOperator
+from datarobot_provider.operators.deployment import DeployRegisteredModelOperator
 from datarobot_provider.operators.deployment import GetDeploymentModelOperator
 from datarobot_provider.operators.deployment import GetDeploymentStatusOperator
 from datarobot_provider.operators.deployment import ReplaceModelOperator
@@ -258,3 +260,42 @@ def test_operator_get_deployment_status_not_provided(mocker):
 
     with pytest.raises(ValueError):
         operator.execute(operator.execute(context={"params": {}}))
+
+
+def test_validate_missing_params():
+    """Test that validate() raises an error when required parameters are missing."""
+    with pytest.raises(ValueError, match="model_package_id must be provided"):
+        op = DeployRegisteredModelOperator(
+            task_id="test_task", model_package_id="", deployment_label="Test Deployment"
+        )
+        op.validate()
+
+    with pytest.raises(ValueError, match="label must be provided"):
+        op = DeployRegisteredModelOperator(
+            task_id="test_task", model_package_id="model_123", deployment_label=""
+        )
+        op.validate()
+
+
+def test_execute_creates_deployment(mocker):
+    """Test that execute() calls the DataRobot API and returns the deployment id."""
+    test_deployment = MagicMock()
+    test_deployment.id = "deployment_123"
+
+    mock_create_deployment = mocker.patch.object(
+        dr.Deployment, "create_from_registered_model_version", return_value=test_deployment
+    )
+
+    op = DeployRegisteredModelOperator(
+        task_id="test_task",
+        model_package_id="model_123",
+        deployment_label="Test Deployment",
+        extra_params={"extra_param": "value"},
+    )
+    context = {}
+
+    result = op.execute(context)
+    assert result == "deployment_123"
+    mock_create_deployment.assert_called_once_with(
+        model_package_id="model_123", label="Test Deployment", extra_param="value"
+    )
