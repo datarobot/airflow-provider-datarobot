@@ -246,7 +246,7 @@ class UpdateDriftTrackingOperator(BaseDatarobotOperator):
         deployment_id (str): The ID of the deployment to update.
         target_drift_enabled (bool): Boolean flag to enable target drift tracking.
         feature_drift_enabled (bool): Boolean flag to enable feature drift tracking.
-        kwargs (dict): Additional keyword  arguments passed to the BaseDatarobotOperator.
+        kwargs (dict): Additional keyword arguments passed to the BaseDatarobotOperator.
     """
 
     template_fields: Sequence[str] = [
