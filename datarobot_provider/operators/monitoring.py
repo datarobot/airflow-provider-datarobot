@@ -235,19 +235,19 @@ class UpdateMonitoringSettingsOperator(BaseDatarobotOperator):
 
 
 class UpdateDriftTrackingOperator(BaseDatarobotOperator):
-"""
-Update drift tracking settings for a DataRobot deployment using DataRobot's API.
-
-This operator updates drift tracking settings for an existing deployment by calling
-the deployment's `update_drift_tracking_settings()` method. It allows optional extra parameters
-to be passed to the DataRobot client call.
-
-Args:
-    deployment_id (str): The ID of the deployment to update.
-    target_drift_enabled (bool): Boolean flag to enable target drift tracking.
-    feature_drift_enabled (bool): Boolean flag to enable feature drift tracking.
-    kwargs (dict): Additional keyword arguments passed to the BaseDatarobotOperator.
-"""
+    """
+    Update drift tracking settings for a DataRobot deployment using DataRobot's API.
+    
+    This operator updates drift tracking settings for an existing deployment by calling
+    the deployment's `update_drift_tracking_settings()` method. It allows optional extra parameters
+    to be passed to the DataRobot client call.
+    
+    Args:
+        deployment_id (str): The ID of the deployment to update.
+        target_drift_enabled (bool): Boolean flag to enable target drift tracking.
+        feature_drift_enabled (bool): Boolean flag to enable feature drift tracking.
+        kwargs (dict): Additional keyword arguments passed to the BaseDatarobotOperator.
+    """
 
     template_fields: Sequence[str] = [
         "deployment_id",
