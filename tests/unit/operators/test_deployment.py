@@ -262,7 +262,7 @@ def test_operator_get_deployment_status_not_provided(mocker):
         operator.execute(operator.execute(context={"params": {}}))
 
 
-def test_validate_missing_params():
+def test_deploy_register_model_validate_missing_params():
     """Test that validate() raises an error when required parameters are missing."""
     with pytest.raises(ValueError, match="model_package_id must be provided"):
         op = DeployRegisteredModelOperator(
@@ -277,7 +277,7 @@ def test_validate_missing_params():
         op.validate()
 
 
-def test_execute_creates_deployment(mocker):
+def test_deploy_register_model_execute_creates_deployment(mocker):
     """Test that execute() calls the DataRobot API and returns the deployment id."""
     test_deployment = MagicMock()
     test_deployment.id = "deployment_123"

@@ -232,3 +232,51 @@ class UpdateMonitoringSettingsOperator(BaseDatarobotOperator):
             self.log.info(
                 f"No need to update predictions data collection settings for deployment_id={self.deployment_id}"
             )
+
+
+class UpdateDriftTrackingOperator(BaseDatarobotOperator):
+    """
+    Update drift tracking settings for a DataRobot deployment using DataRobot's API.
+
+    This operator updates drift tracking settings for an existing deployment by calling
+    the deployment's `update_drift_tracking_settings()` method. It allows optional extra parameters
+    to be passed to the DataRobot client call.
+
+    :param deployment_id: The ID of the deployment to update.
+    :param target_drift_enabled: Boolean flag to enable target drift tracking.
+    :param feature_drift_enabled: Boolean flag to enable feature drift tracking.
+    :param kwargs: Additional keyword arguments passed to the BaseDatarobotOperator.
+    """
+
+    template_fields: Sequence[str] = [
+        "deployment_id",
+        "target_drift_enabled",
+        "feature_drift_enabled",
+    ]
+
+    def __init__(
+        self,
+        *,
+        deployment_id: str,
+        target_drift_enabled: bool = True,
+        feature_drift_enabled: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.deployment_id = deployment_id
+        self.target_drift_enabled = target_drift_enabled
+        self.feature_drift_enabled = feature_drift_enabled
+
+    def validate(self) -> None:
+        if not self.deployment_id:
+            raise ValueError("deployment_id must be provided.")
+
+    def execute(self, context: Context) -> str:
+        self.log.info("Updating drift tracking settings for deployment: %s", self.deployment_id)
+        deployment = dr.Deployment.get(self.deployment_id)
+        deployment.update_drift_tracking_settings(
+            target_drift_enabled=self.target_drift_enabled,
+            feature_drift_enabled=self.feature_drift_enabled,
+        )
+        self.log.info("Drift tracking settings updated for deployment: %s", self.deployment_id)
+        return self.deployment_id

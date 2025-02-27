@@ -15,6 +15,7 @@ from datarobot.models.deployment import ServiceStats
 from datarobot_provider.operators.monitoring import GetAccuracyOperator
 from datarobot_provider.operators.monitoring import GetMonitoringSettingsOperator
 from datarobot_provider.operators.monitoring import GetServiceStatsOperator
+from datarobot_provider.operators.monitoring import UpdateDriftTrackingOperator
 from datarobot_provider.operators.monitoring import UpdateMonitoringSettingsOperator
 from datarobot_provider.operators.monitoring import _serialize_metrics
 
@@ -328,3 +329,35 @@ def test_operator_no_need_update_monitoring_settings(mocker, monitoring_settings
     update_drift_tracking_settings_mock.assert_not_called()
     update_association_id_settings_mock.assert_not_called()
     update_predictions_data_collection_settings_mock.assert_not_called()
+
+
+def test_update_drift_settings_execute_success(mocker):
+    """Test that execute() calls update_drift_tracking_settings with the correct parameters and returns the deployment_id."""
+    dummy_deployment = dr.Deployment("test_deployment_id")
+    update_patch = mocker.patch.object(dummy_deployment, "update_drift_tracking_settings")
+    mocker.patch.object(dr.Deployment, "get", return_value=dummy_deployment)
+
+    op = UpdateDriftTrackingOperator(
+        task_id="test",
+        deployment_id="test_deployment_id",
+        target_drift_enabled=True,
+        feature_drift_enabled=False,
+    )
+
+    context = {}
+    result = op.execute(context)
+
+    update_patch.assert_called_once_with(target_drift_enabled=True, feature_drift_enabled=False)
+    assert result == "test_deployment_id"
+
+
+def test_update_drift_settings_validate_missing_deployment_id():
+    """Test that validate() raises a ValueError when deployment_id is missing."""
+    op = UpdateDriftTrackingOperator(
+        task_id="test",
+        deployment_id="",
+        target_drift_enabled=True,
+        feature_drift_enabled=True,
+    )
+    with pytest.raises(ValueError, match="deployment_id must be provided."):
+        op.validate()
