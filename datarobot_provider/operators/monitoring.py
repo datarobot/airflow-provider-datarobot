@@ -274,7 +274,7 @@ class UpdateDriftTrackingOperator(BaseDatarobotOperator):
 
     def execute(self, context: Context) -> str:
         self.log.info("Updating drift tracking settings for deployment: %s", self.deployment_id)
-        deployment = dr.Deployment.get(self.deployment_id)
+        deployment = dr.Deployment(id=self.deployment_id)
         deployment.update_drift_tracking_settings(
             target_drift_enabled=self.target_drift_enabled,
             feature_drift_enabled=self.feature_drift_enabled,

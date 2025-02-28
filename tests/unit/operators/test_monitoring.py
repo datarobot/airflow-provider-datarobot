@@ -332,10 +332,9 @@ def test_operator_no_need_update_monitoring_settings(mocker, monitoring_settings
 
 
 def test_update_drift_settings_execute_success(mocker):
-    """Test that execute() calls update_drift_tracking_settings with the correct parameters and returns the deployment_id."""
-    dummy_deployment = dr.Deployment("test_deployment_id")
+    dummy_deployment = dr.Deployment(id="test_deployment_id")
     update_patch = mocker.patch.object(dummy_deployment, "update_drift_tracking_settings")
-    mocker.patch.object(dr.Deployment, "get", return_value=dummy_deployment)
+    mocker.patch.object(dr, "Deployment", return_value=dummy_deployment)
 
     op = UpdateDriftTrackingOperator(
         task_id="test",
