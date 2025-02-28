@@ -9,6 +9,7 @@
 import datarobot as dr
 from airflow.decorators import dag
 
+from datarobot_provider.example_dags.wrangler_example_recipe import WRANGLER_EXAMPLE_RECIPE
 from datarobot_provider.operators.ai_catalog import CreateDatasetFromRecipeOperator
 from datarobot_provider.operators.ai_catalog import CreateWranglingRecipeOperator
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
@@ -55,59 +56,7 @@ def hospital_readmissions_xgboost_example():
         # https://docs.datarobot.com/en/docs/api/reference/public-api/data_wrangling.html#schemaoneofdirective
         # General *operation* structure is:
         # {"directive": <One of dr.enums.WranglingOperations>, "arguments": <dictionary>}
-        operations=[
-            {
-                "directive": "rename-columns",
-                "arguments": {
-                    "columnMappings": [
-                        {"originalName": "admission_type_id", "newName": "AdmissionType"},
-                        {
-                            "originalName": "discharge_disposition_id",
-                            "newName": "DischargeDisposition",
-                        },
-                        {"originalName": "admission_source_id", "newName": "AdmissionSource"},
-                    ]
-                },
-            },
-            {
-                "directive": "replace",
-                "arguments": {
-                    "origin": "AdmissionType",
-                    "searchFor": "",
-                    "replacement": "Not Available",
-                    "matchMode": "exact",
-                },
-            },
-            {
-                "directive": "replace",
-                "arguments": {
-                    "searchFor": r"\\[(\\d+).*",
-                    "replacement": r"$1",
-                    "origin": "age",
-                    "matchMode": "regex",
-                },
-            },
-            {
-                "directive": "compute-new",
-                "arguments": {
-                    "expression": "CAST(`age` AS Integer)",
-                    "newFeatureName": "int-age",
-                },
-            },
-            {
-                "directive": "drop-columns",
-                "arguments": {
-                    "columns": [
-                        "citoglipton",
-                        "acetohexamide",
-                        "miglitol",
-                        "troglitazone",
-                        "examide",
-                        "age",
-                    ]
-                },
-            },
-        ],
+        operations=WRANGLER_EXAMPLE_RECIPE,
     )
 
     # Apply data preparation and save the modified data in the Data Registry.
