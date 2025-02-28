@@ -69,10 +69,6 @@ def hospital_readmissions_deployment_prediction_generation():
         task_id="create_recipe",
         dataset_id=str(predictions_dataset.output),
         dialect=DataWranglingDialect.SPARK,
-        # See the list of available *operation* options in the DataRobot API documentation:
-        # https://docs.datarobot.com/en/docs/api/reference/public-api/data_wrangling.html#schemaoneofdirective
-        # General *operation* structure is:
-        # {"directive": <One of dr.enums.WranglingOperations>, "arguments": <dictionary>}
         operations=WRANGLER_EXAMPLE_RECIPE,
     )
 
