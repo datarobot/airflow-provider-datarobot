@@ -7,8 +7,15 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 
 from airflow.decorators import dag
+from airflow.operators.empty import EmptyOperator
+from datarobot.enums import DataWranglingDialect
 
+from datarobot_provider.example_dags.wrangler_example_recipe import WRANGLER_EXAMPLE_RECIPE
+from datarobot_provider.operators.ai_catalog import CreateDatasetFromRecipeOperator
+from datarobot_provider.operators.ai_catalog import CreateWranglingRecipeOperator
+from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 from datarobot_provider.operators.deployment import DeployRegisteredModelOperator
+from datarobot_provider.operators.deployment import ScorePredictionsOperator
 from datarobot_provider.operators.monitoring import UpdateDriftTrackingOperator
 
 """
@@ -34,6 +41,7 @@ Configurable parameters for this dag:
         "default_prediction_server_id": "",
         "target_drift_enabled": True,
         "feature_drift_enabled": True,
+        "predictions_dataset_file_path": "https://s3.amazonaws.com/datarobot_public_datasets/10k_diabetes.csv",
     },
 )
 def hospital_readmissions_deployment_prediction_generation():
@@ -51,7 +59,50 @@ def hospital_readmissions_deployment_prediction_generation():
         feature_drift_enabled="{{ params.feature_drift_enabled }}",
     )
 
+    # Upload the data into Data Registry.
+    predictions_dataset = UploadDatasetOperator(
+        task_id="upload_dataset", file_path="{{ params.predictions_dataset_file_path }}"
+    )
+
+    # Define data preparation.
+    predictions_recipe = CreateWranglingRecipeOperator(
+        task_id="create_recipe",
+        dataset_id=str(predictions_dataset.output),
+        dialect=DataWranglingDialect.SPARK,
+        # See the list of available *operation* options in the DataRobot API documentation:
+        # https://docs.datarobot.com/en/docs/api/reference/public-api/data_wrangling.html#schemaoneofdirective
+        # General *operation* structure is:
+        # {"directive": <One of dr.enums.WranglingOperations>, "arguments": <dictionary>}
+        operations=WRANGLER_EXAMPLE_RECIPE,
+    )
+
+    # Apply data preparation and save the modified data in the Data Registry.
+    publish_recipe = CreateDatasetFromRecipeOperator(
+        task_id="publish_recipe",
+        recipe_id=str(predictions_recipe.output),
+        do_snapshot=True,
+    )
+
+    deployment_predictions = ScorePredictionsOperator(
+        task_id="deployment_predictions",
+        deployment_id=str(deploy_registered_model.output),
+        score_settings={
+            "intake_settings": {
+                "type": "dataset",
+                "data_store_id": str(publish_recipe.output),
+            }
+        },
+    )
+
+    start_dag = EmptyOperator(task_id="start_dag")
+    end_dag = EmptyOperator(task_id="end_dag")
+    collect_ops = EmptyOperator(task_id="collect_ops")
+
+    (start_dag >> [deploy_registered_model, predictions_dataset])
     (deploy_registered_model >> update_drift_tracking)
+    (predictions_dataset >> predictions_recipe >> publish_recipe)
+    ([update_drift_tracking, publish_recipe] >> collect_ops)
+    (collect_ops >> deployment_predictions >> end_dag)
 
 
 hospital_readmissions_deployment_prediction_generation()
