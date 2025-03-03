@@ -14,9 +14,11 @@ from datarobot_provider.example_dags.wrangler_example_recipe import WRANGLER_EXA
 from datarobot_provider.operators.ai_catalog import CreateDatasetFromRecipeOperator
 from datarobot_provider.operators.ai_catalog import CreateWranglingRecipeOperator
 from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
+from datarobot_provider.operators.datarobot import GetOrCreateUseCaseOperator
 from datarobot_provider.operators.deployment import DeployRegisteredModelOperator
 from datarobot_provider.operators.deployment import ScorePredictionsOperator
 from datarobot_provider.operators.monitoring import UpdateDriftTrackingOperator
+from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
 
 """
 Example of Aiflow DAG for DataRobot data deployment and prediction generation.
@@ -28,12 +30,14 @@ Configurable parameters for this dag:
 * target_drift_enabled - if target drift tracking is to be turned on
 * feature_drift_enabled - if feature drift tracking is to be turned on
 
+PREDICTION SERVER IDS:
+See https://docs.datarobot.com/en/docs/api/reference/predapi/pred-server-id.html
+
 """
 
 
 @dag(
     schedule=None,
-    render_template_as_native_obj=True,
     tags=["example", "csv", "predictions", "deployment"],
     params={
         "model_package_id": "",
@@ -45,6 +49,9 @@ Configurable parameters for this dag:
     },
 )
 def hospital_readmissions_deployment_prediction_generation():
+    # Create a Use Case to keep all subsequent assets. Default name is "Airflow"
+    create_use_case = GetOrCreateUseCaseOperator(task_id="create_use_case", set_default=True)
+
     deploy_registered_model = DeployRegisteredModelOperator(
         task_id="deploy_registered_model",
         model_package_id="{{ params.model_package_id }}",
@@ -54,9 +61,9 @@ def hospital_readmissions_deployment_prediction_generation():
 
     update_drift_tracking = UpdateDriftTrackingOperator(
         task_id="update_drift_tracking",
-        deployment_id=deploy_registered_model.output,
-        target_drift_enabled="{{ params.target_drift_enabled }}",
-        feature_drift_enabled="{{ params.feature_drift_enabled }}",
+        deployment_id=str(deploy_registered_model.output),
+        target_drift_enabled=bool("{{ params.target_drift_enabled }}"),
+        feature_drift_enabled=bool("{{ params.feature_drift_enabled }}"),
     )
 
     # Upload the data into Data Registry.
@@ -85,20 +92,23 @@ def hospital_readmissions_deployment_prediction_generation():
         score_settings={
             "intake_settings": {
                 "type": "dataset",
-                "data_store_id": str(publish_recipe.output),
+                "dataset_id": str(publish_recipe.output),
             }
         },
     )
 
-    start_dag = EmptyOperator(task_id="start_dag")
-    end_dag = EmptyOperator(task_id="end_dag")
+    scoring_complete_sensor = ScoringCompleteSensor(
+        task_id="check_scoring_complete",
+        job_id=str(deployment_predictions.output),
+    )
+
     collect_ops = EmptyOperator(task_id="collect_ops")
 
-    (start_dag >> [deploy_registered_model, predictions_dataset])
+    (create_use_case >> [deploy_registered_model, predictions_dataset])
     (deploy_registered_model >> update_drift_tracking)
     (predictions_dataset >> predictions_recipe >> publish_recipe)
     ([update_drift_tracking, publish_recipe] >> collect_ops)
-    (collect_ops >> deployment_predictions >> end_dag)
+    (collect_ops >> deployment_predictions >> scoring_complete_sensor)
 
 
 hospital_readmissions_deployment_prediction_generation()
