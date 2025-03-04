@@ -17,9 +17,9 @@ from pandas import DataFrame
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 
-class ModelRequestPredictionsOperator(BaseDatarobotOperator):
+class GeneratePredictionsOperator(BaseDatarobotOperator):
     """
-    Starts predictions generation job for a model.
+    Starts predictions generation job for a given model and dataset.
 
     Args:
         project_id (str): DataRobot project ID.
@@ -79,7 +79,7 @@ class ModelRequestPredictionsOperator(BaseDatarobotOperator):
         return predict_job.id
 
 
-class PredictJobGetPredictionsOperator(BaseDatarobotOperator):
+class GetPredictionsOperator(BaseDatarobotOperator):
     """
     Gets predictions from a PredictJob.
 
@@ -117,7 +117,7 @@ class PredictJobGetPredictionsOperator(BaseDatarobotOperator):
         return predictions
 
 
-class PredictJobGetOperator(BaseDatarobotOperator):
+class GetPredictJobOperator(BaseDatarobotOperator):
     """
     Gets a PredictJob.
 
@@ -162,9 +162,9 @@ class PredictJobGetOperator(BaseDatarobotOperator):
         return predict_job
 
 
-class PredictJobGetResultWhenCompleteOperator(BaseDatarobotOperator):
+class AwaitAndGetPredictionsOperator(BaseDatarobotOperator):
     """
-    Waits and retrieves results of a PredictJob.
+    Waits and retrieves the predictions from a PredictJob.
 
     Args:
         project_id (str): DataRobot project ID.
