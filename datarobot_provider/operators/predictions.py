@@ -176,3 +176,27 @@ class PredictJobGetResultWhenCompleteOperator(BaseDatarobotOperator):
     Raises:
         AirflowFailException: If predict_job_id or project_id is not provided.
     """
+
+    template_fields: List[str] = ["project_id", "predict_job_id"]
+
+    def __init__(self, *, project_id: str, predict_job_id: str, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.project_id = project_id
+        self.predict_job_id = predict_job_id
+
+    def validate(self) -> None:
+        if not self.predict_job_id or not self.project_id:
+            raise AirflowFailException("predict_job_id and project_id must be provided")
+
+    def execute(self, context: Context) -> DataFrame:
+        predict_job = dr.PredictJob.get(
+            project_id=self.project_id,
+            predict_job_id=self.predict_job_id,
+        )
+
+        predictions = predict_job.get_result_when_complete()
+
+        self.log.info(f"Predictions waited for and retrieved, predict_job_id={self.predict_job_id}")
+
+        # NOTE: Again, can we return a DataFrame here?
+        return predictions
