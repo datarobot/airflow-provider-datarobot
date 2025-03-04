@@ -19,20 +19,20 @@ from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOp
 
 class ModelRequestPredictionsOperator(BaseDatarobotOperator):
     """
-    Start predictions generation job for a model
+    Starts predictions generation job for a model.
 
     Args:
-        project_id (str): DataRobot project ID
-        model_id (str): DataRobot model ID
-        dataset_id (str, optional): DataRobot dataset ID. Defaults to None.
-        file_path (str, optional): File path to the dataset. Defaults to None.
+        project_id (str): DataRobot project ID.
+        model_id (str): DataRobot model ID.
+        dataset_id (Optional[str]): DataRobot dataset ID. Defaults to None.
+        file_path (Optional[str]): File path to the dataset. Defaults to None.
 
     Returns:
-        str - PredictJob ID
+        str: PredictJob ID.
 
     Raises:
-        ValueError: If neither dataset_id nor file_path is provided
-        ValueError: If both dataset_id and file_path are provided
+        AirflowFailException: If neither dataset_id nor file_path is provided.
+        AirflowFailException: If both dataset_id and file_path are provided.
     """
 
     template_fields: List[str] = ["project_id", "model_id", "dataset_id", "file_path"]
@@ -81,7 +81,17 @@ class ModelRequestPredictionsOperator(BaseDatarobotOperator):
 
 class PredictJobGetPredictionsOperator(BaseDatarobotOperator):
     """
-    Get predictions from a PredictJob
+    Gets predictions from a PredictJob.
+
+    Args:
+        project_id (str): DataRobot project ID.
+        predict_job_id (str): PredictJob ID.
+
+    Returns:
+        DataFrame: Predictions DataFrame.
+
+    Raises:
+        AirflowFailException: If predict_job_id or project_id is not provided.
     """
 
     template_fields: List[str] = ["project_id", "predict_job_id"]
@@ -109,7 +119,18 @@ class PredictJobGetPredictionsOperator(BaseDatarobotOperator):
 
 class PredictJobGetOperator(BaseDatarobotOperator):
     """
-    Get a PredictJob
+    Gets a PredictJob.
+
+    Args:
+        project_id (str): DataRobot project ID.
+        predict_job_id (str): PredictJob ID.
+
+    Returns:
+        dr.PredictJob: PredictJob object.
+
+    Raises:
+        AirflowFailException: If predict_job_id or project_id is not provided.
+        AirflowFailException: If PredictJob has already finished.
     """
 
     template_fields: List[str] = ["project_id", "predict_job_id"]
@@ -143,5 +164,15 @@ class PredictJobGetOperator(BaseDatarobotOperator):
 
 class PredictJobGetResultWhenCompleteOperator(BaseDatarobotOperator):
     """
-    Wait and retrieve results of a PredictJob
+    Waits and retrieves results of a PredictJob.
+
+    Args:
+        project_id (str): DataRobot project ID.
+        predict_job_id (str): PredictJob ID.
+
+    Returns:
+        DataFrame: Predictions DataFrame.
+
+    Raises:
+        AirflowFailException: If predict_job_id or project_id is not provided.
     """
