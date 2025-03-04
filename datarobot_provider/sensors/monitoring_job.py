@@ -20,12 +20,12 @@ class MonitoringJobCompleteSensor(BaseSensorOperator):
     """
     Checks whether monitoring job is complete.
 
-    :param job_id: Monitoring job ID
-    :type job_id: str
-    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
-    :type datarobot_conn_id: str, optional
-    :return: False if not yet completed
-    :rtype: bool
+    Args:
+        job_id (str): Monitoring job ID.
+        datarobot_conn_id (str, optional): Connection ID, defaults to `datarobot_default`.
+
+    Returns:
+        bool: False if not yet completed.
     """
 
     # Specify the arguments that are allowed to parse with jinja templating

@@ -8,9 +8,12 @@
 import datarobot as dr
 import pytest
 from datarobot.errors import AsyncProcessUnsuccessfulError
+from datarobot.models import JobStatusResult
+from datarobot.models import StatusCheckJob
 
 from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
 from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
+from datarobot_provider.sensors.datarobot import StatusCheckJobCompleteSensor
 
 
 def test_sensor_autopilot_complete__success(mocker):
@@ -64,5 +67,52 @@ def test_sensor_scoring_complete__raise_error(mocker):
 
     operator = ScoringCompleteSensor(task_id="check_autopilot_complete", job_id="job-id")
 
+    with pytest.raises(AsyncProcessUnsuccessfulError):
+        operator.poke(context={})
+
+
+@pytest.mark.parametrize(
+    "status, expected",
+    [
+        ("COMPLETED", True),
+        ("UNKNOWN_STATUS", False),
+    ],
+)
+def test_status_check_complete(mocker, status, expected):
+    job_mock = mocker.Mock()
+    job_status_result = JobStatusResult(
+        status=status,
+        status_id="job-id",
+        completed_resource_url="completed-resource-url",
+        message="message",
+    )
+    job_mock.get_status.return_value = job_status_result
+    mocker.patch.object(StatusCheckJob, "from_id", return_value=job_mock)
+
+    operator = StatusCheckJobCompleteSensor(task_id="check_scoring_complete", job_id="job-id")
+    result = operator.poke(context={})
+
+    assert result is expected
+
+
+@pytest.mark.parametrize(
+    "status",
+    [
+        "ABORT",
+        "ERROR",
+    ],
+)
+def test_status_check_complete_errors(mocker, status):
+    job_mock = mocker.Mock()
+    job_status_result = JobStatusResult(
+        status=status,
+        status_id="job-id",
+        completed_resource_url="completed-resource-url",
+        message="message",
+    )
+    job_mock.get_status.return_value = job_status_result
+    mocker.patch.object(StatusCheckJob, "from_id", return_value=job_mock)
+
+    operator = StatusCheckJobCompleteSensor(task_id="check_scoring_complete", job_id="job-id")
     with pytest.raises(AsyncProcessUnsuccessfulError):
         operator.poke(context={})

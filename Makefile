@@ -57,6 +57,9 @@ unit-tests:
 typecheck:
 	mypy --config-file pyproject.toml datarobot_provider
 
+html-docs:
+	cd docs && $(MAKE) html
+
 test-docs:
 	cd docs && $(MAKE) doctest
 
