@@ -10,8 +10,6 @@
 The `hospital_readmissions_xgboost_example` DAG demonstrates how to use the DataRobot provider for Apache Airflow to create a project, train a model, and register it to DataRobot MLOps.
 This flow is similar to`datarobot_provider/examples/hospital_readmissions_example.py`, except that it trains a single model based on the model type and uses the manual mode.
 The `hospital_readmissions_example.py` flow uses a different set of operators for training.
-`datarobot_provider/examples/hospital_readmissions_example.py` except that it trains a single model based on the model
-type and uses the manual mode. This utilizes a different set of operators for training.
 
 This example covers the following steps:
 * Create or reuse a use case
