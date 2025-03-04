@@ -10,18 +10,6 @@ from pandas import DataFrame
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 
-# ======= Do we need these operators? =======
-class ProjectUploadDatasetOperator(BaseDatarobotOperator):
-    """
-    Upload a new dataset to a DataRobot project
-    """
-
-    ...
-
-
-# ===========================================
-
-
 class ModelRequestPredictionsOperator(BaseDatarobotOperator):
     """
     Start predictions generation job for a model
