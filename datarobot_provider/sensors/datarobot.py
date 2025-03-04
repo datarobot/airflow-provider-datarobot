@@ -133,7 +133,7 @@ class StatusCheckJobCompleteSensor(BaseSensorOperator):
         # Initialize DataRobot client
         DataRobotHook(datarobot_conn_id=self.datarobot_conn_id).run()
 
-        self.log.info("Checking if scoring is complete")
+        self.log.info("Checking if async job is complete")
         job = StatusCheckJob.from_id(self.job_id)
         try:
             job_data = job.get_status()

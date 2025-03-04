@@ -11,8 +11,3 @@
 .. autoclass:: datarobot_provider.sensors.datarobot.ScoringCompleteSensor
    :members:
 ```
-
-```{eval-rst}
-.. autoclass:: datarobot_provider.sensors.datarobot.StatusCheckJobCompleteSensor
-   :members:
-```
