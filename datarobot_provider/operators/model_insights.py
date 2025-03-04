@@ -11,7 +11,9 @@ from typing import Any
 import datarobot as dr
 from airflow.exceptions import AirflowFailException
 from airflow.utils.context import Context
+from datarobot.insights import ShapImpact
 from datarobot.insights import ShapPreview
+from datarobot.models import StatusCheckJob
 
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
@@ -19,14 +21,14 @@ from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOp
 class ComputeFeatureImpactOperator(BaseDatarobotOperator):
     """
     Creates Feature Impact job in DataRobot.
-    :param project_id: DataRobot project ID
-    :type project_id: str
-    :param model_id: DataRobot model ID
-    :type model_id: str
-    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
-    :type datarobot_conn_id: str, optional
-    :return: Feature Impact job ID
-    :rtype: str
+
+    Args:
+        project_id (str): DataRobot project ID.
+        model_id (str): DataRobot model ID.
+        datarobot_conn_id (str, optional): Connection ID, defaults to `datarobot_default`.
+
+    Returns:
+        str: Feature Impact job ID.
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
@@ -66,14 +68,14 @@ class ComputeFeatureImpactOperator(BaseDatarobotOperator):
 class ComputeFeatureEffectsOperator(BaseDatarobotOperator):
     """
     Submit request to compute Feature Effects for the model.
-    :param project_id: DataRobot project ID
-    :type project_id: str
-    :param model_id: DataRobot model ID
-    :type model_id: str
-    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
-    :type datarobot_conn_id: str, optional
-    :return: Feature Effects job ID
-    :rtype: str
+
+    Args:
+        project_id (str): DataRobot project ID.
+        model_id (str): DataRobot model ID.
+        datarobot_conn_id (str, optional): Connection ID, defaults to `datarobot_default`.
+
+    Returns:
+        str: Feature Effects job ID.
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
@@ -116,8 +118,6 @@ class ComputeShapPreviewOperator(BaseDatarobotOperator):
 
     Parameters
     ----------
-    project_id : str
-        DataRobot project ID
     model_id : str
         DataRobot model ID
     datarobot_conn_id : str, optional
@@ -147,5 +147,46 @@ class ComputeShapPreviewOperator(BaseDatarobotOperator):
         if not self.model_id:
             raise AirflowFailException("The `model_id` parameter is required.")
 
-    def execute(self, context: Context) -> None:
-        ShapPreview.compute(entity_id=self.model_id)
+    def execute(self, context: Context) -> str:
+        job: StatusCheckJob = ShapPreview.compute(entity_id=self.model_id)
+        return job.job_id
+
+
+class ComputeShapImpactOperator(BaseDatarobotOperator):
+    """
+    Creates SHAP impact job in DataRobot.
+
+    Parameters
+    ----------
+    model_id : str
+        DataRobot model ID
+    datarobot_conn_id : str, optional
+        Connection ID, defaults to `datarobot_default`
+
+    Returns
+    -------
+    str
+        SHAP impact job id
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Sequence[str] = [
+        "model_id",
+    ]
+
+    def __init__(
+        self,
+        *,
+        model_id: str,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.model_id = str(model_id)
+
+    def validate(self) -> None:
+        if not self.model_id:
+            raise AirflowFailException("The `model_id` parameter is required.")
+
+    def execute(self, context: Context) -> str:
+        job: StatusCheckJob = ShapImpact.compute(entity_id=self.model_id)
+        return job.job_id
