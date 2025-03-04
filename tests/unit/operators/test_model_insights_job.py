@@ -9,10 +9,12 @@
 import datarobot as dr
 import pytest
 from airflow.exceptions import AirflowException
+from datarobot.insights import ShapImpact
 from datarobot.insights import ShapPreview
 
 from datarobot_provider.operators.model_insights import ComputeFeatureEffectsOperator
 from datarobot_provider.operators.model_insights import ComputeFeatureImpactOperator
+from datarobot_provider.operators.model_insights import ComputeShapImpactOperator
 from datarobot_provider.operators.model_insights import ComputeShapPreviewOperator
 
 
@@ -143,7 +145,7 @@ def test_operator_compute_shap(mocker):
     job_id = 123
 
     job_mock = mocker.Mock()
-    job_mock.id = job_id
+    job_mock.job_id = job_id
 
     request_shap_mock = mocker.patch.object(ShapPreview, "compute", return_value=job_mock)
 
@@ -152,9 +154,31 @@ def test_operator_compute_shap(mocker):
     result = operator.execute(context={"params": {}})
 
     request_shap_mock.assert_called_with(entity_id=model_id)
-    assert result is None
+    assert result == 123
 
 
 def test_operator_compute_shap_no_model_id():
     with pytest.raises(AirflowException):
         ComputeShapPreviewOperator(task_id="compute_shap")
+
+
+def test_operator_compute_shap_impact(mocker):
+    model_id = "test-model-id"
+    job_id = 123
+
+    job_mock = mocker.Mock()
+    job_mock.job_id = job_id
+
+    request_shap_mock = mocker.patch.object(ShapImpact, "compute", return_value=job_mock)
+
+    operator = ComputeShapImpactOperator(task_id="compute_shap", model_id=model_id)
+
+    result = operator.execute(context={"params": {}})
+
+    request_shap_mock.assert_called_with(entity_id=model_id)
+    assert result == 123
+
+
+def test_operator_compute_shap_impact_no_model_id():
+    with pytest.raises(AirflowException):
+        ComputeShapImpactOperator(task_id="compute_shap")
