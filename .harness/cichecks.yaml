@@ -100,7 +100,6 @@ pipeline:
             template:
               templateRef: unit_tests
               versionLabel: "1"
-              gitBranch: mattn/MODEL-18049-update-ea-pipeline
         - stage:
             name: Build docs tests
             identifier: test_build_docs
