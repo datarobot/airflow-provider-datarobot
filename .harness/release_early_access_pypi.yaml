@@ -17,19 +17,6 @@ pipeline:
               templateRef: unit_tests
               versionLabel: "1"
     - stage:
-        name: Publish to Pypi
-        identifier: Publish_to_Pypi
-        template:
-          templateRef: publish_early_access_to_pypi_or_testpypi
-          versionLabel: "1"
-          templateInputs:
-            type: CI
-            variables:
-              - name: BUILD_TYPE
-                type: String
-                default: release-early-access-test-pypi
-                value: release-early-access-pypi
-    - stage:
         name: Publish to Test Pypi
         identifier: Publish_to_Test_Pypi
         template:
@@ -42,6 +29,19 @@ pipeline:
                 type: String
                 default: release-early-access-test-pypi
                 value: release-early-access-test-pypi
+    - stage:
+        name: Publish to Pypi
+        identifier: Publish_to_Pypi
+        template:
+          templateRef: publish_early_access_to_pypi_or_testpypi
+          versionLabel: "1"
+          templateInputs:
+            type: CI
+            variables:
+              - name: BUILD_TYPE
+                type: String
+                default: release-early-access-test-pypi
+                value: release-early-access-pypi
   identifier: releaseearlyaccesspypi
   name: release-early-access-pypi
   properties:
