@@ -19,14 +19,13 @@ class ModelTrainingJobSensor(DataRobotJobSensor):
     """
     Checks whether DataRobot Model Training Job is complete.
 
-    :param project_id: DataRobot project ID
-    :type project_id: str
-    :param job_id: DataRobot Job ID
-    :type job_id: str
-    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
-    :type datarobot_conn_id: str, optional
-    :return: False if not yet completed, PokeReturnValue(True, trained_model.id) if model training completed
-    :rtype: bool | PokeReturnValue
+    Args:
+        project_id (str): DataRobot project ID.
+        job_id (str): DataRobot Job ID.
+        datarobot_conn_id (str, optional): Connection ID, defaults to `datarobot_default`.
+
+    Returns:
+        bool | PokeReturnValue: False if not yet completed, PokeReturnValue(True, trained_model.id) if model training completed.
     """
 
     def get_job_result(self, context: Context) -> Union[bool, PokeReturnValue]:
