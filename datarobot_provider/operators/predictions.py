@@ -17,7 +17,7 @@ from pandas import DataFrame
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 
-class GeneratePredictionsOperator(BaseDatarobotOperator):
+class RequestPredictionsOperator(BaseDatarobotOperator):
     """
     Starts predictions generation job for a given model and dataset.
 
