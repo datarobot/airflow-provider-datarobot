@@ -37,7 +37,7 @@ Configurable parameters for this dag:
         "autopilot_settings": {"target": "readmitted", "mode": "quick", "max_wait": 3600},
     },
 )
-def hospital_readmissions_example():
+def dataprep_wrangler_autopilot():
     # Create a Use Case to keep all subsequent assets. Default name is "Airflow"
     create_use_case = GetOrCreateUseCaseOperator(task_id="create_use_case", set_default=True)
 
@@ -160,4 +160,4 @@ def hospital_readmissions_example():
     )
 
 
-hospital_readmissions_example()
+dataprep_wrangler_autopilot()
