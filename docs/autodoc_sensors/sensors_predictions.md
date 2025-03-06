@@ -1,4 +1,4 @@
-(datarobot-sensors)=
+(predictions-sensors)=
 
 # Predictions Sensors
 
