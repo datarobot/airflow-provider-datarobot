@@ -54,7 +54,7 @@ class AutopilotBaseOperator(BaseDatarobotOperator):
 
         project = dr.Project.get(project_id)
         if project.target:
-            raise AirflowFailException(f"Models are already trained for project_id={project.id}")
+            raise AirflowFailException(f"Autopilot has already started for project_id={project.id}")
 
         if featurelist_id:
             autopilot_settings["featurelist_id"] = featurelist_id
@@ -114,7 +114,6 @@ class StartAutopilotOperator(AutopilotBaseOperator):
 
     def __init__(
         self,
-        *,
         project_id: str,
         featurelist_id: Optional[str] = None,
         relationships_configuration_id: Optional[str] = None,
