@@ -335,7 +335,7 @@ def test_operator_create_custom_model_test_status_op(mocker, custom_model_params
 
 
 def test_operator_get_custom_model_test_no_custom_model_test_id_op():
-    custom_model_test_id = "custom-model-test-id"
+    custom_model_test_id = None
 
     operator = GetCustomModelTestOverallStatusOperator(
         task_id="create_custom_model_test",
@@ -343,7 +343,7 @@ def test_operator_get_custom_model_test_no_custom_model_test_id_op():
     )
 
     with pytest.raises(ValueError):
-        operator.execute(context={"params": custom_model_params})
+        operator.validate()
 
 
 def test_operator_create_custom_model_deployment_op(mocker, custom_model_params):
@@ -396,7 +396,7 @@ def test_operator_create_custom_model_deployment_no_custom_model_id_op():
     )
 
     with pytest.raises(ValueError):
-        operator.execute(context={"params": custom_model_params})
+        operator.validate()
 
 
 def test_operator_create_custom_model_deployment_no_deployment_name_op():
@@ -410,4 +410,4 @@ def test_operator_create_custom_model_deployment_no_deployment_name_op():
     )
 
     with pytest.raises(ValueError):
-        operator.execute(context={"params": custom_model_params})
+        operator.validate()

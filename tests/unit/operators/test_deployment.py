@@ -228,7 +228,7 @@ def test_operator_activate_deployment_not_provided(mocker):
     )
 
     with pytest.raises(ValueError):
-        operator.execute(operator.execute(context={"params": {}}))
+        operator.validate()
 
 
 def test_operator_get_deployment_status(mocker):
@@ -259,7 +259,7 @@ def test_operator_get_deployment_status_not_provided(mocker):
     )
 
     with pytest.raises(ValueError):
-        operator.execute(operator.execute(context={"params": {}}))
+        operator.validate()
 
 
 def test_deploy_register_model_validate_missing_params():
