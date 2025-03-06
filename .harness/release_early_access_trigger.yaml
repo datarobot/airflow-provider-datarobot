@@ -1,0 +1,19 @@
+trigger:
+  name: release-early-access-weekly
+  identifier: releaseearlyaccessweekly
+  enabled: true
+  stagesToExecute: []
+  tags: {}
+  orgIdentifier: AGENTS
+  projectIdentifier: airflowproviderdatarobot
+  pipelineIdentifier: releaseearlyaccesspypi
+  source:
+    type: Scheduled
+    spec:
+      type: Cron
+      spec:
+        expression: 0 14 * * TUE
+        type: UNIX
+  pipelineBranchName: main
+  inputSetRefs:
+    - releaseearlyaccesspypiinputset

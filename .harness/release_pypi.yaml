@@ -3,12 +3,19 @@ pipeline:
   orgIdentifier: AGENTS
   tags: {}
   stages:
-    - stage:
-        name: Lint
-        identifier: Lint
-        template:
-          templateRef: Lint_Repo
-          versionLabel: "1"
+    - parallel:
+        - stage:
+            name: Lint
+            identifier: Lint
+            template:
+              templateRef: Lint_Repo
+              versionLabel: "1"
+        - stage:
+            name: Unit Tests
+            identifier: Unit_Tests
+            template:
+              templateRef: unit_tests
+              versionLabel: "1"
     - stage:
         name: Publish Release to TestPypi
         identifier: Publish_Release_to_TestPypi

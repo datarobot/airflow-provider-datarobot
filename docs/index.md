@@ -15,7 +15,8 @@ To access other clients and additional information about DataRobot's APIs, visit
 
 reference/index.md
 examples/index.md
-autodoc/api_reference.md
+autodoc_operators/api_reference.md
+autodoc_sensors/api_reference.md
 CHANGES.md
 ```
 

@@ -1,7 +1,17 @@
 # Changelog
 
-## Unreleased Changes
-- Add `hospital_readmissions_xgboost_example.py` DAG.
+## 0.2.0
+- Add `hospital_readmissions_xgboost_example.py` example DAG.
+- Add `hospital_readmissions_deployment_prediction_generation.py` example DAG.
+- Update `TrainModelsOperator` to latest sdk.
+- Add updated `TrainModelOperator` for training single models.
+- Add `GetProjectBlueprintsOperator` for getting blueprint ids for a project.
+- Add `DeployRegisteredModelOperator` for deploying registered models.
+- Add `UpdateDriftTrackingOperator` for updating drift tracking settings on deployments.
+- Update `ComputeFeatureImpactOperator` to latest sdk compatibility.
+- Updated `ComputeFeatureEffectsOperator` to latest sdk compatibility.
+- Add `ComputeShapPreviewOperator` to compute SHAP previews for a model.
+- Add `ComputeShapImpactOperator` to compute SHAP impact for a model.
 
 ## 0.1.0
 
@@ -20,14 +30,6 @@ to create datasets from project data.
 - Add `feature_discovery_example.py` DAG.
 - Add an optional *use_case_id* parameter into `CreateProjectOperator <datarobot_provider.operators.ai_catalog.datarobot.CreateProjectOperator>`
 - Add `GetDataStoreOperator <datarobot_provider.operators.datarobot.GetProjectBlueprintsOperator>` to get blueprint ids for a project.
-
-### Bugfixes
-
-### API changes
-
-### Deprecation summary
-
-### Documentation changes
 
 ### Experimental changes
 
