@@ -133,3 +133,30 @@ pipeline:
                           limits:
                             memory: 1Gi
                             cpu: "1.5"
+        - stage:
+            name: Airflow Startup
+            identifier: airflowstartup
+            description: ""
+            type: CI
+            spec:
+              cloneCodebase: true
+              caching:
+                enabled: true
+                paths: []
+              buildIntelligence:
+                enabled: true
+              platform:
+                os: Linux
+                arch: Amd64
+              runtime:
+                type: Cloud
+                spec: {}
+              execution:
+                steps:
+                  - step:
+                      type: Run
+                      name: Create Python Environment
+                      identifier: Create_Python_Environment
+                      spec:
+                        shell: Bash
+                        command: make req-dev
