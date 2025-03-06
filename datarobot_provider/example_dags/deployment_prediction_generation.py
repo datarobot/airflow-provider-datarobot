@@ -48,7 +48,7 @@ See https://docs.datarobot.com/en/docs/api/reference/predapi/pred-server-id.html
         "predictions_dataset_file_path": "https://s3.amazonaws.com/datarobot_public_datasets/10k_diabetes.csv",
     },
 )
-def hospital_readmissions_deployment_prediction_generation():
+def deployment_prediction_generation():
     # Create a Use Case to keep all subsequent assets. Default name is "Airflow"
     create_use_case = GetOrCreateUseCaseOperator(task_id="create_use_case", set_default=True)
 
@@ -111,4 +111,4 @@ def hospital_readmissions_deployment_prediction_generation():
     (collect_ops >> deployment_predictions >> scoring_complete_sensor)
 
 
-hospital_readmissions_deployment_prediction_generation()
+deployment_prediction_generation()
