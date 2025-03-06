@@ -21,68 +21,75 @@ from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOp
 DATAROBOT_MAX_WAIT = 600
 
 
-def start_autopilot(
-    project_id,
-    autopilot_settings,
-    partitioning_settings=None,
-    datetime_partitioning_settings=None,
-    advanced_options=None,
-    featurelist_id=None,
-    relationships_configuration_id=None,
-    segmentation_task_id=None,
-    max_wait_sec=DATAROBOT_MAX_WAIT,
-):
-    """
-    Triggers DataRobot Autopilot to train set of models.
+class AutopilotBaseOperator(BaseDatarobotOperator):
+    @staticmethod
+    def start_autopilot(
+        project_id,
+        autopilot_settings,
+        partitioning_settings=None,
+        datetime_partitioning_settings=None,
+        advanced_options=None,
+        featurelist_id=None,
+        relationships_configuration_id=None,
+        segmentation_task_id=None,
+        max_wait_sec=DATAROBOT_MAX_WAIT,
+    ):
+        """
+        Triggers DataRobot Autopilot to train set of models.
 
-    Args:
-        project_id (str): DataRobot project ID.
-        autopilot_settings (dict): Autopilot settings.
-        partitioning_settings (dict, optional): Partitioning settings.
-        datetime_partitioning_settings (dict, optional): Datetime partitioning settings.
-        advanced_options (dict, optional): Advanced options.
-        featurelist_id (str, optional): Specifies which feature list to use.
-        relationships_configuration_id (str, optional): ID of the relationships configuration to use.
-        segmentation_task_id (str, optional): The segmentation task that should be used to split the project for
-            segmented modeling.
-        max_wait_sec (int, optional): For some settings, an asynchronous task must be run to analyze the dataset.
-            max_wait governs the maximum time (in seconds) to wait before giving up.
-        datarobot_conn_id (str, optional): Connection ID, defaults to `datarobot_default`.
-    """
+        Args:
+            project_id (str): DataRobot project ID.
+            autopilot_settings (dict): Autopilot settings.
+            partitioning_settings (dict, optional): Partitioning settings.
+            datetime_partitioning_settings (dict, optional): Datetime partitioning settings.
+            advanced_options (dict, optional): Advanced options.
+            featurelist_id (str, optional): Specifies which feature list to use.
+            relationships_configuration_id (str, optional): ID of the relationships configuration to use.
+            segmentation_task_id (str, optional): The segmentation task that should be used to split the project for
+                segmented modeling.
+            max_wait_sec (int, optional): For some settings, an asynchronous task must be run to analyze the dataset.
+                max_wait governs the maximum time (in seconds) to wait before giving up.
+            datarobot_conn_id (str, optional): Connection ID, defaults to `datarobot_default`.
+        """
 
-    project = dr.Project.get(project_id)
-    if project.target:
-        raise AirflowFailException(f"Models are already trained for project_id={project.id}")
+        project = dr.Project.get(project_id)
+        if project.target:
+            raise AirflowFailException(f"Models are already trained for project_id={project.id}")
 
-    if featurelist_id:
-        autopilot_settings["featurelist_id"] = featurelist_id
+        if featurelist_id:
+            autopilot_settings["featurelist_id"] = featurelist_id
 
-    if relationships_configuration_id:
-        autopilot_settings["relationships_configuration_id"] = relationships_configuration_id
+        if relationships_configuration_id:
+            autopilot_settings["relationships_configuration_id"] = relationships_configuration_id
 
-    if segmentation_task_id:
-        autopilot_settings["segmentation_task_id"] = segmentation_task_id
+        if segmentation_task_id:
+            autopilot_settings["segmentation_task_id"] = segmentation_task_id
 
-    autopilot_settings["max_wait"] = max_wait_sec
+        autopilot_settings["max_wait"] = max_wait_sec
 
-    if datetime_partitioning_settings and partitioning_settings:
-        raise AirflowFailException(
-            "parameters: datetime_partitioning_settings and partitioning_settings are mutually exclusive"
-        )
+        if datetime_partitioning_settings and partitioning_settings:
+            raise AirflowFailException(
+                "parameters: datetime_partitioning_settings and partitioning_settings are mutually exclusive"
+            )
 
-    if datetime_partitioning_settings:
-        project.set_datetime_partitioning(datetime_partitioning_settings)
-    elif partitioning_settings:
-        project.set_partitioning_method(partitioning_settings)
+        if datetime_partitioning_settings:
+            if isinstance(datetime_partitioning_settings, dict):
+                project.set_datetime_partitioning(**datetime_partitioning_settings)
+            else:
+                project.set_datetime_partitioning(
+                    datetime_partition_spec=datetime_partitioning_settings
+                )
+        elif partitioning_settings:
+            project.set_partitioning_method(**partitioning_settings)
 
-    if advanced_options:
-        project.set_options(advanced_options)
+        if advanced_options:
+            project.set_options(**advanced_options)
 
-    # finalize the project and start the autopilot
-    project.analyze_and_model(**autopilot_settings)
+        # finalize the project and start the autopilot
+        project.analyze_and_model(**autopilot_settings)
 
 
-class StartAutopilotOperator(BaseDatarobotOperator):
+class StartAutopilotOperator(AutopilotBaseOperator):
     """
     Triggers DataRobot Autopilot to train set of models.
 
@@ -124,7 +131,7 @@ class StartAutopilotOperator(BaseDatarobotOperator):
 
     def execute(self, context: Context) -> None:
         self.log.info(f"Starting DataRobot Autopilot for project_id={self.project_id}")
-        start_autopilot(
+        self.start_autopilot(
             project_id=self.project_id,
             autopilot_settings=context["params"]["autopilot_settings"],
             partitioning_settings=context["params"].get("partitioning_settings"),
@@ -137,7 +144,7 @@ class StartAutopilotOperator(BaseDatarobotOperator):
         )
 
 
-class StartDatetimeAutopilotOperator(BaseDatarobotOperator):
+class StartDatetimeAutopilotOperator(AutopilotBaseOperator):
     """
     Configure the project as a datetime partitioned project. This operator should be run after
     the CreateProjectOperator and before training models. It will return a
@@ -345,7 +352,7 @@ class StartDatetimeAutopilotOperator(BaseDatarobotOperator):
                 unsupervised_type=self.unsupervised_type,
             )
 
-            start_autopilot(
+            self.start_autopilot(
                 project_id=self.project_id,
                 autopilot_settings=context["params"]["autopilot_settings"],
                 partitioning_settings=None,
