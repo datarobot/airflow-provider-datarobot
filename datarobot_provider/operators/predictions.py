@@ -79,16 +79,16 @@ class RequestPredictionsOperator(BaseDatarobotOperator):
         return predict_job.id
 
 
-class GetPredictionsOperator(BaseDatarobotOperator):
+class SavePredictionsToDatasetOperator(BaseDatarobotOperator):
     """
-    Gets predictions from a PredictJob.
+    Save the predictions from a PredictJob to a dataset.
 
     Args:
         project_id (str): DataRobot project ID.
         predict_job_id (str): PredictJob ID.
 
     Returns:
-        DataFrame: Predictions DataFrame.
+        id: Dataset ID.
 
     Raises:
         AirflowFailException: If predict_job_id or project_id is not provided.
@@ -113,5 +113,8 @@ class GetPredictionsOperator(BaseDatarobotOperator):
 
         self.log.info(f"Predictions retrieved, predict_job_id={self.predict_job_id}")
 
-        ## NOTE: Can we even return a DataFrame here?
-        return predictions
+        project = dr.Project.get(self.project_id)
+        predictions_dataset = project.upload_dataset(
+            sourcedata=predictions, dataset_filename=f"prediction-results-{self.predict_job_id}.csv"
+        )
+        return predictions_dataset.id
