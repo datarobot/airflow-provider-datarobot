@@ -9,10 +9,10 @@
 import datarobot as dr
 from airflow.decorators import dag
 
-from datarobot_provider.example_dags.wrangler_example_recipe import WRANGLER_EXAMPLE_RECIPE
 from datarobot_provider.operators.ai_catalog import CreateDatasetFromRecipeOperator
 from datarobot_provider.operators.ai_catalog import CreateWranglingRecipeOperator
-from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
+from datarobot_provider.operators.ai_catalog import CreateOrUpdateDataSourceOperator
+from datarobot_provider.operators.connections import GetDataStoreOperator
 from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.operators.datarobot import GetOrCreateUseCaseOperator
 from datarobot_provider.operators.datarobot import GetProjectBlueprintsOperator
@@ -23,9 +23,12 @@ from datarobot_provider.operators.model_training import TrainModelOperator
 from datarobot_provider.sensors.model_training import ModelTrainingJobSensor
 
 """
-Example of Aiflow DAG for DataRobot data preparation and model training.
+Example of Aiflow DAG to apply db data transformations and train an xgboost model.
 Configurable parameters for this dag:
-* dataset_file_path - URL or a local path for a csv/parquet/xlsx file.
+* data_connection - database connection name you can find at https://app.datarobot.com/account/data-connections 
+* table_schema - the database schema to use
+* primary_table - the table to start with 
+* secondary_table - the table to JOIN to the original table
 * project_name - name of the project as displayed in DataRobot UI.
 * autopilot_settings - a dictionary with the modelling project autopilot settings.
 """
@@ -33,30 +36,81 @@ Configurable parameters for this dag:
 
 @dag(
     schedule=None,
-    tags=["example", "csv", "wrangling", "modeling"],
+    tags=["example", "snowflake", "wrangling", "modeling"],
     params={
-        "dataset_file_path": "https://s3.amazonaws.com/datarobot_public_datasets/10k_diabetes.csv",
+        "data_connection": "Demo Connection",
+        "table_schema": "TRIAL_READONLY",
+        "primary_table": "LENDING_CLUB_DATA",
+        "secondary_table": "LENDING_CLUB_TRANSACTIONS",
         "project_name": "hospital-readmissions-example",
-        "autopilot_settings": {"target": "readmitted", "mode": "manual", "max_wait": 3600},
+        "autopilot_settings": {"target": "BadLoan", "mode": "manual", "max_wait": 3600},
     },
 )
 def model_training_xgboost():
     # Create a Use Case to keep all subsequent assets. Default name is "Airflow"
     create_use_case = GetOrCreateUseCaseOperator(task_id="create_use_case", set_default=True)
 
-    # Upload the data into Data Registry.
-    upload_dataset = UploadDatasetOperator(task_id="upload_dataset")
+    get_data_store = GetDataStoreOperator(task_id='get_data_store')
 
-    # Define data preparation.
+    define_transactions_table = CreateOrUpdateDataSourceOperator(
+        data_store_id=get_data_store.output,
+        table_name='{{ params.secondary_table }}',
+    )
+
+    # Define data preparation:
+    # * Join `LENDING_CLUB_TRANSACTIONS` table,
+    # * cast the `Amount` column to decimal
+    # * and apply different types of aggregation.
     create_recipe = CreateWranglingRecipeOperator(
         task_id="create_recipe",
-        dataset_id=upload_dataset.output,
-        dialect=dr.enums.DataWranglingDialect.SPARK,
-        # See the list of available *operation* options in the DataRobot API documentation:
-        # https://docs.datarobot.com/en/docs/api/reference/public-api/data_wrangling.html#schemaoneofdirective
-        # General *operation* structure is:
-        # {"directive": <One of dr.enums.WranglingOperations>, "arguments": <dictionary>}
-        operations=WRANGLER_EXAMPLE_RECIPE,
+        data_store_id=get_data_store.output,
+        table_name='{{ params.primary_table }}',
+        dialect=dr.enums.DataWranglingDialect.SNOWFLAKE,
+        operations=[
+        {
+          "directive": "join",
+          "arguments": {
+            "leftKeys": ["CustomerID"],
+            "rightKeys": ["CustomerID"],
+            "joinType": "left",
+            "source": "table",
+            "rightDataSourceId": define_transactions_table.output,
+          }
+        },
+        {
+          "directive": "replace",
+          "arguments": {
+            "origin": "Amount",
+            "searchFor": "[$,]",
+            "replacement": "",
+            "matchMode": "regex",
+            "isCaseSensitive": False
+          }
+        },
+        {
+          "directive": "compute-new",
+          "arguments": {
+            "expression": "CAST(\"Amount\" AS Decimal(10, 2))",
+            "newFeatureName": "decimal amount"
+          }
+        },
+        {
+          "directive": "aggregate",
+          "arguments": {
+            "groupBy": [
+              "CustomerID",
+              "BadLoan",
+              "date"
+            ],
+            "aggregations": [
+              {
+                "feature": "decimal amount",
+                "functions": ["sum", "avg", "stddev", "min", "max", "median"]
+              }
+            ]
+          }
+        }
+      ],
     )
 
     # Apply data preparation and save the modified data in the Data Registry.
@@ -116,8 +170,8 @@ def model_training_xgboost():
 
     (
         create_use_case
-        >> upload_dataset
-        >> create_recipe
+        >> get_data_store
+        >> define_transactions_table
         >> publish_recipe
         >> create_project
         >> start_modeling
