@@ -236,6 +236,10 @@ pipeline:
                           echo "Searching for errors in dags"
                           docker exec -i "$CONTAINER_NAME" ls
                           docker exec -i "$CONTAINER_NAME" ls logs/scheduler/latest/
-                          docker exec -i "$CONTAINER_NAME" grep -R "Error" logs/scheduler/latest/
+                          echo "cat"
+                          docker exec -i "$CONTAINER_NAME" cat logs/scheduler/latest/dataprep_wrangler_autopilot.py.log
+                          echo "grep"
+                          docker exec -i "$CONTAINER_NAME" grep "Error" logs/scheduler/latest/dataprep_wrangler_autopilot.py.log
+                          echo "check"
                           ERRORS=$(docker exec -i "$CONTAINER_NAME" grep -R "Error" logs/scheduler/latest/)
                           echo $ERRORS
