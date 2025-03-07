@@ -239,7 +239,7 @@ pipeline:
                           echo "cat"
                           docker exec -i "$CONTAINER_NAME" cat logs/scheduler/latest/dataprep_wrangler_autopilot.py.log
                           echo "grep"
-                          docker exec -i "$CONTAINER_NAME" grep "Error" logs/scheduler/latest/dataprep_wrangler_autopilot.py.log
+                          docker exec -i "$CONTAINER_NAME" /bin/bash -c 'grep -R "Error" logs/scheduler/latest/'
                           echo "check"
                           ERRORS=$(docker exec -i "$CONTAINER_NAME" grep -R "Error" logs/scheduler/latest/)
                           echo $ERRORS
