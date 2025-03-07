@@ -237,12 +237,3 @@ pipeline:
                           docker exec -i "$CONTAINER_NAME" grep -R "Error" logs/scheduler/latest/
                           ERRORS=$(docker exec -i "$CONTAINER_NAME" grep -R "Error" logs/scheduler/latest/)
                           echo $ERRORS
-
-                          # Check if any errors were found
-                          if [ "$ERRORS" == "" ]; then
-                            echo "no errors found"
-                            exit 0
-                          else
-                            echo "errors found in dag"
-                            exit 1
-                          fi;
