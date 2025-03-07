@@ -220,8 +220,6 @@ pipeline:
 
                           # Start astro
                           cd astro-dev && astro dev start --no-cache --no-browser
-
-                          docker ps -a
                   - step:
                       type: Run
                       name: Check airflow for errors
@@ -229,6 +227,8 @@ pipeline:
                       spec:
                         shell: Bash
                         command: |-
+                          docker ps -a
+
                           ERRORS=$(docker exec -it astro-dev_a87185-scheduler-1 cat logs/scheduler/latest/dataprep_wrangler_autopilot.py.log | grep "Error")
 
                           echo $ERRORS
