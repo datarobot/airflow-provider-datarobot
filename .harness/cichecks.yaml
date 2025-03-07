@@ -234,7 +234,13 @@ pipeline:
                           # Scan the logs for any python errors
                           # These will have the prefix Error in the lines
                           echo "Searching for errors in example dags"
-                          docker exec -i "$CONTAINER_NAME" awk "/Error/ {print}" logs/scheduler/latest/dataprep_wrangler_autopilot.py.log
+                          status=$(docker exec -i "$CONTAINER_NAME" awk "/Error/ {print}" logs/scheduler/latest/dataprep_wrangler_autopilot.py.log)
+                          if [[ -z $status ]]
+                          then
+                              echo "found"
+                          else
+                              echo "$status"
+                          fi
 
                           if docker exec -i "$CONTAINER_NAME" awk "/Error/ {print}" logs/scheduler/latest/dataprep_wrangler_autopilot.py.log; then echo "errors found" && exit 1; fi
                           if docker exec -i "$CONTAINER_NAME" awk "/Error/ {print}" logs/scheduler/latest/deployment_prediction_generation.py.log; then echo "errors found"; fi
