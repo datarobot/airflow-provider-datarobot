@@ -159,4 +159,7 @@ pipeline:
                       identifier: Create_Python_Environment
                       spec:
                         shell: Bash
-                        command: make req-dev
+                        command: |-
+                          cat /etc/os-release
+                          make install-astro
+                          make req-dev
