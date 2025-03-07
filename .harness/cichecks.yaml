@@ -232,12 +232,12 @@ pipeline:
                           CONTAINER_NAME=$(docker ps | grep scheduler | awk '{print $1}')
                           echo $CONTAINER_NAME
 
-                          echo $(docker exec -it "$CONTAINER_NAME" cat logs/scheduler/latest/dataprep_wrangler_autopilot.py.log)
-                          ERRORS=$(docker exec -it "$CONTAINER_NAME" cat logs/scheduler/latest/dataprep_wrangler_autopilot.py.log | grep "Error")
+                          echo "Searching for errors in dags"
+                          ERRORS=$(docker exec -it "$CONTAINER_NAME" grep -R "Error" logs/scheduler/latest/)
                           echo $ERRORS
 
                           if [ "$ERRORS" == "" ]; then
-                            echo "no errors"
+                            echo "no errors found"
                             exit 0
                           else
                             echo "errors found in dag"
