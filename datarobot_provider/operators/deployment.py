@@ -218,20 +218,20 @@ class ReplaceModelOperator(BaseDatarobotOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = ["deployment_id", "new_model_id", "reason"]
+    template_fields: Sequence[str] = ["deployment_id", "new_registered_model_version_id", "reason"]
 
     def __init__(
         self,
         *,
         deployment_id: str,
-        new_model_id: str,
+        new_registered_model_version_id: str,
         reason: str = MODEL_REPLACEMENT_REASON.OTHER,
         max_wait_sec: int = 600,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.deployment_id = deployment_id
-        self.new_model_id = new_model_id
+        self.new_registered_model_version_id = new_registered_model_version_id
         self.reason = reason
         self.max_wait_sec = max_wait_sec
 
@@ -239,30 +239,35 @@ class ReplaceModelOperator(BaseDatarobotOperator):
         if self.deployment_id is None:
             raise AirflowFailException("deployment_id must be provided")
 
-        if self.new_model_id is None:
-            raise AirflowFailException("new_model_id must be provided")
+        if self.new_registered_model_version_id is None:
+            raise AirflowFailException("new_registered_model_version_id must be provided")
 
     def execute(self, context: Context) -> None:
         self.log.info(f"Getting model_id for deployment_id={self.deployment_id}")
         deployment = dr.Deployment.get(deployment_id=self.deployment_id)
         self.log.info(
-            f"Validating replacement model new_model_id={self.new_model_id} for deployment_id={self.deployment_id}"
+            f"Validating replacement model new_registered_model_version_id={self.new_registered_model_version_id} "
+            f"for deployment_id={self.deployment_id}"
         )
         check_result, check_message, status_list = deployment.validate_replacement_model(
-            new_model_id=self.new_model_id
+            new_registered_model_version_id=self.new_registered_model_version_id
         )
         self.log.info(f"Validation result: {check_result}, message: {check_message}")
         self.log.info(f"Validation result details: {status_list}")
         if check_result == "failing":
             raise AirflowFailException(check_message)
         self.log.info(
-            f"Trying to replace a model for deployment_id={self.deployment_id} to new_model_id={self.new_model_id}"
+            f"Trying to replace a model for deployment_id={self.deployment_id} "
+            f"to new_registered_model_version_id={self.new_registered_model_version_id}"
         )
-        deployment.replace_model(
-            new_model_id=self.new_model_id, reason=self.reason, max_wait=self.max_wait_sec
+        deployment.perform_model_replace(
+            new_registered_model_version_id=self.new_registered_model_version_id,
+            reason=self.reason,
+            max_wait=self.max_wait_sec,
         )
         self.log.info(
-            f"Model for deployment_id={self.deployment_id} replaced to new_model_id={self.new_model_id}"
+            f"Model for deployment_id={self.deployment_id} replaced "
+            f"to new_registered_model_version_id={self.new_registered_model_version_id}"
         )
 
 

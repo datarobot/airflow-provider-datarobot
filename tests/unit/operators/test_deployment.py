@@ -70,7 +70,7 @@ def test_operator_get_deployment_model(mocker, deployment_mock_obj, deployment_m
 
 def test_operator_replace_deployment_model(mocker, validate_replacement_model_passing_details):
     deployment_id = "deployment-id"
-    new_model_id = "new-model-id"
+    new_registered_model_version_id = "new-registered-model-version-id"
 
     get_deployment_mock = mocker.patch.object(
         dr.Deployment, "get", return_value=dr.Deployment(deployment_id)
@@ -82,12 +82,12 @@ def test_operator_replace_deployment_model(mocker, validate_replacement_model_pa
         return_value=validate_replacement_model_passing_details,
     )
 
-    replace_model_mock = mocker.patch.object(dr.Deployment, "replace_model")
+    replace_model_mock = mocker.patch.object(dr.Deployment, "perform_model_replace")
 
     operator = ReplaceModelOperator(
         task_id="replace_deployment_model",
         deployment_id=deployment_id,
-        new_model_id=new_model_id,
+        new_registered_model_version_id=new_registered_model_version_id,
         reason="ACCURACY",
         max_wait_sec=3600,
     )
@@ -99,11 +99,13 @@ def test_operator_replace_deployment_model(mocker, validate_replacement_model_pa
     )
 
     validate_replacement_model_mock.assert_called_with(
-        new_model_id=new_model_id,
+        new_registered_model_version_id=new_registered_model_version_id,
     )
 
     replace_model_mock.assert_called_with(
-        new_model_id=new_model_id, reason="ACCURACY", max_wait=3600
+        new_registered_model_version_id=new_registered_model_version_id,
+        reason="ACCURACY",
+        max_wait=3600,
     )
 
 
@@ -111,7 +113,7 @@ def test_operator_replace_deployment_model_failed(
     mocker, validate_replacement_model_failed_details
 ):
     deployment_id = "deployment-id"
-    new_model_id = "new-model-id"
+    new_registered_model_version_id = "new-registered-model-version-id"
 
     get_deployment_mock = mocker.patch.object(
         dr.Deployment, "get", return_value=dr.Deployment(deployment_id)
@@ -123,12 +125,12 @@ def test_operator_replace_deployment_model_failed(
         return_value=validate_replacement_model_failed_details,
     )
 
-    replace_model_mock = mocker.patch.object(dr.Deployment, "replace_model")
+    replace_model_mock = mocker.patch.object(dr.Deployment, "perform_model_replace")
 
     operator = ReplaceModelOperator(
         task_id="replace_deployment_model",
         deployment_id=deployment_id,
-        new_model_id=new_model_id,
+        new_registered_model_version_id=new_registered_model_version_id,
         reason="ACCURACY",
         max_wait_sec=3600,
     )
@@ -141,7 +143,7 @@ def test_operator_replace_deployment_model_failed(
     )
 
     validate_replacement_model_mock.assert_called_with(
-        new_model_id=new_model_id,
+        new_registered_model_version_id=new_registered_model_version_id,
     )
 
     replace_model_mock.assert_not_called()
