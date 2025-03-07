@@ -1,13 +1,13 @@
-# Hospital Readmissions Example
+# Dataprep and Autopilot
 
-> **datarobot_provider/examples/hospital_readmissions_example.py**
+> **datarobot_provider/examples/dataprep_wrangler_autopilot.py**
 
 ```{admonition} Required Feature Flags
 * ENABLE_DATA_REGISTRY_WRANGLING
 * ENABLE_MLOPS
 ```
 
-The `hospital_readmissions_example` DAG demonstrates how to use the DataRobot provider for Apache Airflow to
+The `dataprep_wrangler_autopilot` DAG demonstrates how to use the DataRobot provider for Apache Airflow to
 create a project, train a model, and register it to DataRobot MLOps. The initial demo flow utilizes a public csv
 file with hospital readmissions data.
 
