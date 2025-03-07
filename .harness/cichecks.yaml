@@ -217,17 +217,11 @@ pipeline:
 
                           # Copy example dags to astro
                           cp -r ./datarobot_provider/example_dags/* ./astro-dev/dags/
-                  - step:
-                      type: Run
-                      name: Start and test airflow
-                      identifier: Start_and_test_airflow
-                      spec:
-                        shell: Bash
-                        command: |-
-                          shopt -s expand_aliases
-                          source ~/.bash_profile
 
+                          # Start astro
                           cd astro-dev && astro dev start --no-cache --no-browser
+
+                          docker ps -a
                   - step:
                       type: Run
                       name: Check airflow for errors
