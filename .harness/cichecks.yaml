@@ -237,7 +237,7 @@ pipeline:
                           docker exec -i "$CONTAINER_NAME" ls
                           docker exec -i "$CONTAINER_NAME" ls logs/scheduler/latest/
                           echo "cat"
-                          INFO=$(docker exec -i "$CONTAINER_NAME" cat logs/scheduler/latest/dataprep_wrangler_autopilot.py.log)
-                          ERRORS=$(docker exec -i "$CONTAINER_NAME" cat logs/scheduler/latest/dataprep_wrangler_autopilot.py.log)
+                          INFO=${docker exec -i "$CONTAINER_NAME" awk "/INFO/ {print}" logs/scheduler/latest/dataprep_wrangler_autopilot.py.log)
                           echo $INFO
+                          ERRORS=${docker exec -i "$CONTAINER_NAME" awk "/Error/ {print}" logs/scheduler/latest/dataprep_wrangler_autopilot.py.log)
                           echo $ERRORS
