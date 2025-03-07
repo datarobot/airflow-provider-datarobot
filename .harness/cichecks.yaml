@@ -155,12 +155,93 @@ pipeline:
                 steps:
                   - step:
                       type: Run
-                      name: Create Python Environment
+                      name: Create pyenv environment
                       identifier: Create_Python_Environment
                       spec:
                         shell: Bash
                         command: |-
-                          cat /etc/os-release
+                          sudo apt update
+                          sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+                          curl https://pyenv.run | bash
+                          echo -e 'export PYENV_ROOT="$HOME/.pyenv"\nexport PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
+                          echo -e 'eval "$(pyenv init --path)"\neval "$(pyenv init -)"\neval "$(pyenv virtualenv-init -)"' >> ~/.bash_profile
+                          exec "$SHELL"
+                  - step:
+                      type: Run
+                      name: Install python 3
+                      identifier: Install_python_3
+                      spec:
+                        shell: Bash
+                        command: |-
+                          shopt -s expand_aliases
+                          source ~/.bash_profile
+
                           python --version
-                          make install-astro
-                          make req-dev
+                          which pyenv
+                          python --version
+
+                          pyenv --version
+                          pyenv install 3.12
+                          pyenv global 3.12
+                          pyenv which python
+
+                          alias python="pyenv exec python3.12"
+                          alias pip="pyenv exec python3.12 -m pip"
+                          python --version
+
+                          echo "Installing build and req-dev"
+                          pyenv exec python3.12 -m pip install --no-cache-dir --upgrade pip setuptools wheel twine
+                          pyenv exec python3.12 -m pip install -e ".[dev]"
+
+                          echo "Installing astro"
+                          curl -sSL install.astronomer.io | sudo bash -s
+                          make create-astro-dev
+                  - step:
+                      type: Run
+                      name: Build wheel
+                      identifier: Build_wheel
+                      spec:
+                        shell: Bash
+                        command: |-
+                          shopt -s expand_aliases
+                          source ~/.bash_profile
+
+                          # Build wheel
+                          rm -rf ./dist
+                          pyenv exec python3.12 setup.py sdist bdist_wheel
+
+                          # Update astro with latest wheel
+                          cp -p "`ls -dtr1 ./dist/*.whl | sort -n | tail -1`" "./astro-dev/"
+                          echo "/usr/local/airflow/`find ./dist/*.whl -exec basename {} \; | sort -n | tail -1`" > \
+                              ./astro-dev/requirements_dev.txt
+
+                          # Copy example dags to astro
+                          cp -r ./datarobot_provider/example_dags/* ./astro-dev/dags/
+                  - step:
+                      type: Run
+                      name: Start and test airflow
+                      identifier: Start_and_test_airflow
+                      spec:
+                        shell: Bash
+                        command: |-
+                          shopt -s expand_aliases
+                          source ~/.bash_profile
+
+                          cd astro-dev && astro dev start --no-cache --no-browser
+                  - step:
+                      type: Run
+                      name: Check airflow for errors
+                      identifier: Check_airflow_for_errors
+                      spec:
+                        shell: Bash
+                        command: |-
+                          ERRORS=$(docker exec -it astro-dev_a87185-scheduler-1 cat logs/scheduler/latest/dataprep_wrangler_autopilot.py.log | grep "Error")
+
+                          echo $ERRORS
+                          if [ "$ERRORS" == "" ]; then
+                            echo "no errors"
+                            exit 0
+                          else
+                            echo "errors found in dag"
+                            exit 1
+                          fi;
