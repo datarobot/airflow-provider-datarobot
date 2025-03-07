@@ -229,9 +229,13 @@ pipeline:
                         command: |-
                           docker ps -a
 
-                          ERRORS=$(docker exec -it astro-dev_a87185-scheduler-1 cat logs/scheduler/latest/dataprep_wrangler_autopilot.py.log | grep "Error")
+                          CONTAINER_NAME=$(docker ps | grep scheduler | awk '{print $1}')
+                          echo $CONTAINER_NAME
 
+                          echo $(docker exec -it "$CONTAINER_NAME" cat logs/scheduler/latest/dataprep_wrangler_autopilot.py.log)
+                          ERRORS=$(docker exec -it "$CONTAINER_NAME" cat logs/scheduler/latest/dataprep_wrangler_autopilot.py.log | grep "Error")
                           echo $ERRORS
+
                           if [ "$ERRORS" == "" ]; then
                             echo "no errors"
                             exit 0
