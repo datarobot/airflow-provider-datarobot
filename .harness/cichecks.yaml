@@ -161,5 +161,6 @@ pipeline:
                         shell: Bash
                         command: |-
                           cat /etc/os-release
+                          python --version
                           make install-astro
                           make req-dev
