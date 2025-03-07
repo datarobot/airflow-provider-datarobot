@@ -234,6 +234,8 @@ pipeline:
                           # Scan the logs for any python errors
                           # These will have the prefix Error in the lines
                           echo "Searching for errors in dags"
+                          docker exec -i "$CONTAINER_NAME" ls
+                          docker exec -i "$CONTAINER_NAME" ls logs/scheduler/latest/
                           docker exec -i "$CONTAINER_NAME" grep -R "Error" logs/scheduler/latest/
                           ERRORS=$(docker exec -i "$CONTAINER_NAME" grep -R "Error" logs/scheduler/latest/)
                           echo $ERRORS
