@@ -176,15 +176,13 @@ pipeline:
                           shopt -s expand_aliases
                           source ~/.bash_profile
 
-                          python --version
-                          which pyenv
-                          python --version
-
+                          # Ensure python 3.12 is on the machine
                           pyenv --version
                           pyenv install 3.12
                           pyenv global 3.12
                           pyenv which python
 
+                          # Overwrite aliases or pyenv global won't work
                           alias python="pyenv exec python3.12"
                           alias pip="pyenv exec python3.12 -m pip"
                           python --version
@@ -198,7 +196,7 @@ pipeline:
                           make create-astro-dev
                   - step:
                       type: Run
-                      name: Build wheel
+                      name: Build wheel and start airflow
                       identifier: Build_wheel
                       spec:
                         shell: Bash
@@ -229,13 +227,17 @@ pipeline:
                         command: |-
                           docker ps -a
 
+                          # Get the container name for the scheduler
                           CONTAINER_NAME=$(docker ps | grep scheduler | awk '{print $1}')
                           echo $CONTAINER_NAME
 
+                          # Scan the logs for any python errors
+                          # These will have the prefix Error in the lines
                           echo "Searching for errors in dags"
-                          ERRORS=$(docker exec -it "$CONTAINER_NAME" grep -R "Error" logs/scheduler/latest/)
+                          ERRORS=$(docker exec -i "$CONTAINER_NAME" grep -R "Error" logs/scheduler/latest/)
                           echo $ERRORS
 
+                          # Check if any errors were found
                           if [ "$ERRORS" == "" ]; then
                             echo "no errors found"
                             exit 0
