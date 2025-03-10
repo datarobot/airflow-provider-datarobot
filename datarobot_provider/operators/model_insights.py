@@ -230,7 +230,7 @@ class GetLiftChartInsightOperator(BaseDatarobotOperator):
 
     def validate(self) -> None:
         if not self.project_id:
-            raise AirflowFailException("The `model_id` parameter is required.")
+            raise AirflowFailException("The `project_id` parameter is required.")
         if not self.model_id:
             raise AirflowFailException("The `model_id` parameter is required.")
 
