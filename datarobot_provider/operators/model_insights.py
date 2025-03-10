@@ -7,10 +7,14 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from collections.abc import Sequence
 from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
 
 import datarobot as dr
 from airflow.exceptions import AirflowFailException
 from airflow.utils.context import Context
+from datarobot import Model
 from datarobot.insights import ShapImpact
 from datarobot.insights import ShapPreview
 from datarobot.models import StatusCheckJob
@@ -190,3 +194,55 @@ class ComputeShapImpactOperator(BaseDatarobotOperator):
     def execute(self, context: Context) -> str:
         job: StatusCheckJob = ShapImpact.compute(entity_id=self.model_id)
         return job.job_id
+
+
+class GetLiftChartInsightOperator(BaseDatarobotOperator):
+    """
+    Creates Lift Chart insight data.
+
+    Args:
+        project_id (str): DataRobot model ID.
+        model_id (str): DataRobot model ID.
+        datarobot_conn_id (str, optional): Connection ID, defaults to `datarobot_default`.
+
+    Returns:
+        List[Dict[str, Any]]: List of the lift chart bins containing the actuals and predicted values.
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Sequence[str] = [
+        "project_id",
+        "model_id",
+    ]
+
+    def __init__(
+        self,
+        *,
+        project_id: str,
+        model_id: str,
+        source: Optional[str] = "validation",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.project_id = str(project_id)
+        self.model_id = str(model_id)
+        self.source = str(source)
+
+    def validate(self) -> None:
+        if not self.project_id:
+            raise AirflowFailException("The `project_id` parameter is required.")
+        if not self.model_id:
+            raise AirflowFailException("The `model_id` parameter is required.")
+
+    def get_model(self) -> Model:
+        model: Model = Model.get(self.project_id, self.model_id)
+        if not model:
+            raise AirflowFailException(
+                f"Model with id {self.model_id} not found in project {self.project_id}."
+            )
+        return model
+
+    def execute(self, context: Context) -> List[Dict[str, Any]]:
+        model = self.get_model()
+        lift_chart = model.get_lift_chart(source=self.source)
+        return lift_chart.bins
