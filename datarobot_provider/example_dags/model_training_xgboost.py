@@ -40,9 +40,9 @@ Configurable parameters for this dag:
     params={
         "data_connection": "Demo Connection",
         "table_schema": "TRIAL_READONLY",
-        "primary_table": "LENDING_CLUB_DATA",
+        "primary_table": "LENDING_CLUB_TRAINING",
         "secondary_table": "LENDING_CLUB_TRANSACTIONS",
-        "project_name": "hospital-readmissions-example",
+        "project_name": "Lending Club",
         "autopilot_settings": {"target": "BadLoan", "mode": "manual", "max_wait": 3600},
     },
 )
@@ -169,6 +169,7 @@ def model_training_xgboost():
         create_use_case
         >> get_data_store
         >> define_transactions_table
+        >> create_recipe
         >> publish_recipe
         >> create_project
         >> start_modeling

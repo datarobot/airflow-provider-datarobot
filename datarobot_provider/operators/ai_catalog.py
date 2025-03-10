@@ -667,11 +667,8 @@ class CreateWranglingRecipeOperator(BaseUseCaseEntityOperator):
         )
 
         if self.operations:
-            client_operations = [
-                dr.models.recipe.WranglingOperation.from_data(x) for x in self.operations
-            ]
-            dr.models.Recipe.set_operations(recipe.id, client_operations)
-            logging.info("%d operations set.", len(client_operations))
+            self._set_operations(recipe)
+            logging.info("%d operations set.", len(self.operations))
 
         if self.downsampling_directive is not None:
             client_downsampling = dr.models.recipe.DownsamplingOperation(
@@ -699,3 +696,43 @@ class CreateWranglingRecipeOperator(BaseUseCaseEntityOperator):
             base_name = f"{self.table_schema}-{base_name}"
 
         return f"Airflow:{base_name}"
+
+    def _set_operations(self, recipe: dr.models.Recipe):
+        secondary_inputs = {}
+
+        if recipe.inputs[0].input_type == dr.enums.RecipeInputType.DATASOURCE:
+            data_store_id = recipe.inputs[0].data_store_id
+        else:
+            data_store_id = None
+
+        for operation_data in self.operations:
+            if operation_data['directive'] == 'join':
+                if operation_data['arguments'].get('rightDataSourceId'):
+                    secondary_inputs[operation_data['arguments'][
+                        'rightDataSourceId']] = dr.models.JDBCTableDataSourceInput(
+                        input_type=dr.enums.RecipeInputType.DATASOURCE,
+                        data_store_id=data_store_id,
+                        data_source_id=operation_data['arguments']['rightDataSourceId'],
+                    )
+
+                else:
+                    if not operation_data['arguments'].get('rightDatasetVersionId'):
+                        dataset = dr.Dataset.get(operation_data['arguments']['rightDatasetId'])
+                        operation_data['arguments']['rightDatasetVersionId'] = dataset.version_id
+
+                    secondary_inputs[operation_data['arguments'][
+                        'rightDatasetVersionId']] = dr.models.RecipeDatasetInput(
+                        input_type=dr.enums.RecipeInputType.DATASET,
+                        dataset_id=operation_data['arguments']['rightDatasetId'],
+                        dataset_version_id=operation_data['arguments']['rightDatasetVersionId'],
+                    )
+
+        if secondary_inputs:
+            inputs = recipe.inputs + list(secondary_inputs.values())
+            dr.models.Recipe.set_inputs(recipe.id, inputs)
+
+        client_operations = [
+            dr.models.recipe.WranglingOperation.from_data(x) for x in self.operations
+        ]
+
+        dr.models.Recipe.set_operations(recipe.id, client_operations)
