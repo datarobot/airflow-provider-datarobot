@@ -26,3 +26,8 @@
 .. autoclass:: datarobot_provider.operators.model_insights.GetRocCurveInsightOperator
    :members:
 ```
+
+```{eval-rst}
+.. autoclass:: datarobot_provider.operators.model_insights.GetLiftChartInsightOperator
+   :members:
+```
