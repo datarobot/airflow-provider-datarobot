@@ -40,7 +40,7 @@ Configurable parameters for this dag:
         "autopilot_settings": {"target": "readmitted", "mode": "manual", "max_wait": 3600},
     },
 )
-def hospital_readmissions_xgboost_example():
+def model_training_xgboost():
     # Create a Use Case to keep all subsequent assets. Default name is "Airflow"
     create_use_case = GetOrCreateUseCaseOperator(task_id="create_use_case", set_default=True)
 
@@ -129,4 +129,4 @@ def hospital_readmissions_xgboost_example():
     )
 
 
-hospital_readmissions_xgboost_example()
+model_training_xgboost()

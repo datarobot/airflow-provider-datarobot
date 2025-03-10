@@ -66,7 +66,7 @@ def test_operator_train_model_no_project_id():
     )
 
     with pytest.raises(ValueError):
-        operator.execute(context={"params": {}})
+        operator.validate()
 
 
 def test_operator_train_model_no_blueprint_id():
@@ -78,4 +78,4 @@ def test_operator_train_model_no_blueprint_id():
     )
 
     with pytest.raises(ValueError):
-        operator.execute(context={"params": {}})
+        operator.validate()
