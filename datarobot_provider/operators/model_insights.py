@@ -198,7 +198,7 @@ class ComputeShapImpactOperator(BaseDatarobotOperator):
 
 class GetLiftChartInsightOperator(BaseDatarobotOperator):
     """
-    Creates ROC curve insight data.
+    Creates Lift Chart insight data.
 
     Args:
         project_id (str): DataRobot model ID.
@@ -206,7 +206,7 @@ class GetLiftChartInsightOperator(BaseDatarobotOperator):
         datarobot_conn_id (str, optional): Connection ID, defaults to `datarobot_default`.
 
     Returns:
-        Dict[str, Any]: Roc curve points, positive class predictions, negative class predictions.
+        List[Dict[str, Any]]: List of the lift chart bins containing the actuals and predicted values.
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
