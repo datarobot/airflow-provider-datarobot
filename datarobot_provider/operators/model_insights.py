@@ -156,6 +156,46 @@ class ComputeShapPreviewOperator(BaseDatarobotOperator):
         return job.job_id
 
 
+class ComputeShapImpactOperator(BaseDatarobotOperator):
+    """
+    Creates SHAP impact job in DataRobot.
+
+    Parameters
+    ----------
+    model_id : str
+        DataRobot model ID
+    datarobot_conn_id : str, optional
+        Connection ID, defaults to `datarobot_default`
+
+    Returns
+    -------
+    str
+        SHAP impact job id
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Sequence[str] = [
+        "model_id",
+    ]
+
+    def __init__(
+        self,
+        *,
+        model_id: str,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.model_id = str(model_id)
+
+    def validate(self) -> None:
+        if not self.model_id:
+            raise AirflowFailException("The `model_id` parameter is required.")
+
+    def execute(self, context: Context) -> str:
+        job: StatusCheckJob = ShapImpact.compute(entity_id=self.model_id)
+        return job.job_id
+
+
 class GetRocCurveInsightOperator(BaseDatarobotOperator):
     """
     Creates ROC curve insight data.
@@ -210,46 +250,6 @@ class GetRocCurveInsightOperator(BaseDatarobotOperator):
             "positive_class_predictions": roc_data.positive_class_predictions,
             "negative_class_predictions": roc_data.negative_class_predictions,
         }
-
-
-class ComputeShapImpactOperator(BaseDatarobotOperator):
-    """
-    Creates SHAP impact job in DataRobot.
-
-    Parameters
-    ----------
-    model_id : str
-        DataRobot model ID
-    datarobot_conn_id : str, optional
-        Connection ID, defaults to `datarobot_default`
-
-    Returns
-    -------
-    str
-        SHAP impact job id
-    """
-
-    # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = [
-        "model_id",
-    ]
-
-    def __init__(
-        self,
-        *,
-        model_id: str,
-        **kwargs: Any,
-    ) -> None:
-        super().__init__(**kwargs)
-        self.model_id = str(model_id)
-
-    def validate(self) -> None:
-        if not self.model_id:
-            raise AirflowFailException("The `model_id` parameter is required.")
-
-    def execute(self, context: Context) -> str:
-        job: StatusCheckJob = ShapImpact.compute(entity_id=self.model_id)
-        return job.job_id
 
 
 class GetLiftChartInsightOperator(BaseDatarobotOperator):

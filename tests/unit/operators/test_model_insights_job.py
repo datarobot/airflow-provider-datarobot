@@ -145,6 +145,50 @@ def test_operator_compute_feature_effects_no_model_id(mocker):
         operator.validate()
 
 
+def test_operator_compute_shap(mocker):
+    model_id = "test-model-id"
+    job_id = 123
+
+    job_mock = mocker.Mock()
+    job_mock.job_id = job_id
+
+    request_shap_mock = mocker.patch.object(ShapPreview, "compute", return_value=job_mock)
+
+    operator = ComputeShapPreviewOperator(task_id="compute_shap", model_id=model_id)
+
+    result = operator.execute(context={"params": {}})
+
+    request_shap_mock.assert_called_with(entity_id=model_id)
+    assert result == 123
+
+
+def test_operator_compute_shap_no_model_id():
+    with pytest.raises(AirflowException):
+        ComputeShapPreviewOperator(task_id="compute_shap")
+
+
+def test_operator_compute_shap_impact(mocker):
+    model_id = "test-model-id"
+    job_id = 123
+
+    job_mock = mocker.Mock()
+    job_mock.job_id = job_id
+
+    request_shap_mock = mocker.patch.object(ShapImpact, "compute", return_value=job_mock)
+
+    operator = ComputeShapImpactOperator(task_id="compute_shap", model_id=model_id)
+
+    result = operator.execute(context={"params": {}})
+
+    request_shap_mock.assert_called_with(entity_id=model_id)
+    assert result == 123
+
+
+def test_operator_compute_shap_impact_no_model_id():
+    with pytest.raises(AirflowException):
+        ComputeShapImpactOperator(task_id="compute_shap")
+
+
 def test_operator_get_roc_curve_insight(mocker):
     project_id = "test-project-id"
     model_id = "test-model-id"
@@ -196,50 +240,6 @@ def test_operator_get_roc_curve_insight_no_model_id(mocker):
 
     with pytest.raises(AirflowFailException):
         operator.validate()
-
-
-def test_operator_compute_shap(mocker):
-    model_id = "test-model-id"
-    job_id = 123
-
-    job_mock = mocker.Mock()
-    job_mock.job_id = job_id
-
-    request_shap_mock = mocker.patch.object(ShapPreview, "compute", return_value=job_mock)
-
-    operator = ComputeShapPreviewOperator(task_id="compute_shap", model_id=model_id)
-
-    result = operator.execute(context={"params": {}})
-
-    request_shap_mock.assert_called_with(entity_id=model_id)
-    assert result == 123
-
-
-def test_operator_compute_shap_no_model_id():
-    with pytest.raises(AirflowException):
-        ComputeShapPreviewOperator(task_id="compute_shap")
-
-
-def test_operator_compute_shap_impact(mocker):
-    model_id = "test-model-id"
-    job_id = 123
-
-    job_mock = mocker.Mock()
-    job_mock.job_id = job_id
-
-    request_shap_mock = mocker.patch.object(ShapImpact, "compute", return_value=job_mock)
-
-    operator = ComputeShapImpactOperator(task_id="compute_shap", model_id=model_id)
-
-    result = operator.execute(context={"params": {}})
-
-    request_shap_mock.assert_called_with(entity_id=model_id)
-    assert result == 123
-
-
-def test_operator_compute_shap_impact_no_model_id():
-    with pytest.raises(AirflowException):
-        ComputeShapImpactOperator(task_id="compute_shap")
 
 
 def test_operator_get_lift_chart_insight(mocker):
