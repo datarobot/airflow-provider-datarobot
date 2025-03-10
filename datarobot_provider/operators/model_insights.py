@@ -246,7 +246,7 @@ class GetRocCurveInsightOperator(BaseDatarobotOperator):
         model = self.get_model()
         roc_data = model.get_roc_curve(source=self.source)
         return {
-            "rocPoints": roc_data.roc_points,
+            "roc_points": roc_data.roc_points,
             "positive_class_predictions": roc_data.positive_class_predictions,
             "negative_class_predictions": roc_data.negative_class_predictions,
         }

@@ -5,6 +5,7 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+from collections import namedtuple
 from unittest.mock import Mock
 
 import datarobot as dr
@@ -192,7 +193,10 @@ def test_operator_compute_shap_impact_no_model_id():
 def test_operator_get_roc_curve_insight(mocker):
     project_id = "test-project-id"
     model_id = "test-model-id"
-    roc_data = Mock(
+    RocResults = namedtuple(
+        "RocResults", ["roc_points", "positive_class_predictions", "negative_class_predictions"]
+    )
+    roc_data = RocResults(
         roc_points=[{"fpr": 0.1, "tpr": 0.9}],
         positive_class_predictions=[0.9],
         negative_class_predictions=[0.1],
@@ -214,7 +218,7 @@ def test_operator_get_roc_curve_insight(mocker):
     get_model_mock.assert_called_with(project_id, model_id)
     model_mock.get_roc_curve.assert_called_with(source="validation")
     assert result == {
-        "rocPoints": roc_data.roc_points,
+        "roc_points": roc_data.roc_points,
         "positive_class_predictions": roc_data.positive_class_predictions,
         "negative_class_predictions": roc_data.negative_class_predictions,
     }
