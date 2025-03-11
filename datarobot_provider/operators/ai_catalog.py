@@ -708,8 +708,10 @@ class CreateWranglingRecipeOperator(BaseUseCaseEntityOperator):
 
         if recipe.inputs[0].input_type == dr.enums.RecipeInputType.DATASOURCE:
             data_store_id = recipe.inputs[0].data_store_id  # type: ignore[union-attr]
+            primary_dataset_id = None
         else:
             data_store_id = None
+            primary_dataset_id = recipe.inputs[0].dataset_id
 
         for operation_data in self.operations:
             if operation_data["directive"] == "join":
@@ -727,13 +729,16 @@ class CreateWranglingRecipeOperator(BaseUseCaseEntityOperator):
                         dataset = dr.Dataset.get(operation_data["arguments"]["rightDatasetId"])
                         operation_data["arguments"]["rightDatasetVersionId"] = dataset.version_id
 
-                    secondary_inputs[operation_data["arguments"]["rightDatasetVersionId"]] = (
-                        RecipeDatasetInput(
-                            input_type=dr.enums.RecipeInputType.DATASET,
-                            dataset_id=operation_data["arguments"]["rightDatasetId"],
-                            dataset_version_id=operation_data["arguments"]["rightDatasetVersionId"],
+                    if operation_data["arguments"]["rightDatasetId"] != primary_dataset_id:
+                        secondary_inputs[operation_data["arguments"]["rightDatasetVersionId"]] = (
+                            RecipeDatasetInput(
+                                input_type=dr.enums.RecipeInputType.DATASET,
+                                dataset_id=operation_data["arguments"]["rightDatasetId"],
+                                dataset_version_id=operation_data["arguments"][
+                                    "rightDatasetVersionId"
+                                ],
+                            )
                         )
-                    )
 
         if secondary_inputs:
             inputs = recipe.inputs + list(secondary_inputs.values())

@@ -6,10 +6,12 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from unittest.mock import ANY
+from unittest.mock import Mock
 
 import datarobot as dr
 import freezegun
 import pytest
+from datarobot.enums import RecipeInputType
 
 from datarobot_provider.operators.ai_catalog import CreateDatasetFromDataStoreOperator
 from datarobot_provider.operators.ai_catalog import CreateDatasetFromProjectOperator
@@ -117,7 +119,7 @@ def test_operator_create_wrangling_recipe_from_dataset(mocker):
     client_mock = mocker.patch(
         "datarobot_provider.operators.ai_catalog.dr.client.get_client"
     ).return_value
-    recipe_mock = mocker.patch("datarobot_provider.operators.ai_catalog.dr.models.Recipe")
+    recipe_mock = mocker.patch("datarobot_provider.operators.ai_catalog.Recipe")
     recipe_mock.from_dataset.return_value.id = "test-recipe-id"
     context = {"params": {"use_case_id": "test-use-case-id"}}
 
@@ -173,7 +175,7 @@ def test_operator_create_wrangling_recipe_from_db_table(mocker):
     client_mock = mocker.patch(
         "datarobot_provider.operators.ai_catalog.dr.client.get_client"
     ).return_value
-    recipe_mock = mocker.patch("datarobot_provider.operators.ai_catalog.dr.models.Recipe")
+    recipe_mock = mocker.patch("datarobot_provider.operators.ai_catalog.Recipe")
     recipe_mock.from_data_store.return_value.id = "test-recipe-id"
     context = {
         "params": {
@@ -225,6 +227,100 @@ def test_operator_create_wrangling_recipe_from_db_table(mocker):
     )
     recipe_mock.set_operations.assert_called_once()
     recipe_mock.update_downsampling.assert_called_once()
+
+
+def test_operator_create_wrangling_recipe_join_dataset(mocker):
+    get_dataset_mock = mocker.patch.object(
+        dr.Dataset, "get", return_value=Mock(version_id="secondary-dataset-version-id")
+    )
+    get_exp_container_mock = mocker.patch.object(dr.UseCase, "get")
+    client_mock = mocker.patch(
+        "datarobot_provider.operators.ai_catalog.dr.client.get_client"
+    ).return_value
+    recipe_mock = mocker.patch("datarobot_provider.operators.ai_catalog.Recipe")
+    recipe_mock.from_dataset.return_value.id = "test-recipe-id"
+    recipe_mock.from_dataset.return_value.inputs = [
+        dr.models.recipe.RecipeDatasetInput(
+            input_type=RecipeInputType.DATASET,
+            dataset_id="test-dataset-id",
+            dataset_version_id="legacy-version-id",
+        )
+    ]
+    context = {"params": {"use_case_id": "test-use-case-id"}}
+
+    operator = CreateWranglingRecipeOperator(
+        task_id="create_recipe",
+        recipe_name="Test name",
+        dataset_id="test-dataset-id",
+        dialect=dr.enums.DataWranglingDialect.SPARK,
+        operations=[
+            {
+                "directive": "drop-columns",
+                "arguments": {"columns": ["test-feature-1", "test-feature-2"]},
+            },
+            {
+                "directive": "join",
+                "arguments": {
+                    "leftKeys": ["key-left"],
+                    "rightKeys": ["key-right"],
+                    "joinType": "inner",
+                    "source": "dataset",
+                    "rightDatasetId": "secondary-dataset-id",
+                },
+            },
+            {
+                "directive": "join",
+                "arguments": {
+                    "leftKeys": ["key-left"],
+                    "rightKeys": ["key-right"],
+                    "joinType": "inner",
+                    "source": "dataset",
+                    "rightDatasetId": "test-dataset-id",
+                },
+            },
+        ],
+        downsampling_directive=dr.enums.DownsamplingOperations.RANDOM_SAMPLE,
+        downsampling_arguments={"value": 100, "seed": 25},
+    )
+    operator.render_template_fields(context)
+
+    recipe_id = operator.execute(context=context)
+
+    assert recipe_id == "test-recipe-id"
+    assert get_dataset_mock.call_count == 3
+    get_exp_container_mock.assert_called_once_with("test-use-case-id")
+    client_mock.patch.assert_called_once_with(
+        "recipes/test-recipe-id/",
+        json={"name": "Test name", "description": "Created with Apache-Airflow"},
+    )
+    recipe_mock.from_dataset.assert_called_once_with(
+        get_exp_container_mock.return_value,
+        get_dataset_mock.return_value,
+        dialect=dr.enums.DataWranglingDialect.SPARK,
+    )
+    recipe_mock.set_operations.assert_called_once_with("test-recipe-id", ANY)
+    assert len(recipe_mock.set_operations.call_args.args[1]) == 3
+
+    recipe_mock.update_downsampling.assert_called_once()
+    assert (
+        recipe_mock.update_downsampling.call_args.args[1].directive
+        == dr.enums.DownsamplingOperations.RANDOM_SAMPLE
+    )
+    assert recipe_mock.update_downsampling.call_args.args[1].arguments == {"value": 100, "seed": 25}
+    recipe_mock.set_inputs.assert_called_once_with("test-recipe-id", ANY)
+    assert len(recipe_mock.set_inputs.call_args.args[1]) == 2
+
+    assert recipe_mock.set_inputs.call_args_list[0].args[1][0].dataset_id == "test-dataset-id"
+    assert (
+        recipe_mock.set_inputs.call_args_list[0].args[1][0].dataset_version_id
+        == "legacy-version-id"
+    )
+
+    assert recipe_mock.set_inputs.call_args.args[1][1].dataset_id == "secondary-dataset-id"
+    assert (
+        recipe_mock.set_inputs.call_args.args[1][1].dataset_version_id
+        == "secondary-dataset-version-id"
+    )
 
 
 @pytest.mark.parametrize(
