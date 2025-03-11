@@ -324,7 +324,7 @@ def test_operator_create_wrangling_recipe_join_dataset(mocker):
 
 
 def test_operator_create_wrangling_recipe_join_datasource(mocker):
-    data_store_id = 'test-data-store-id'
+    data_store_id = "test-data-store-id"
     get_datastore_mock = mocker.patch.object(
         dr.DataStore, "get", return_value=dr.DataStore(data_store_type="jdbc")
     )
@@ -337,7 +337,7 @@ def test_operator_create_wrangling_recipe_join_datasource(mocker):
     recipe_mock.from_data_store.return_value.inputs = [
         dr.models.recipe.JDBCTableDataSourceInput(
             data_store_id=data_store_id,
-            data_source_id='primary_data_source_id',
+            data_source_id="primary_data_source_id",
             input_type=RecipeInputType.DATASOURCE,
         ),
     ]
@@ -379,7 +379,6 @@ def test_operator_create_wrangling_recipe_join_datasource(mocker):
                     "rightDataSourceId": "secondary-datasource-id-2",
                 },
             },
-
         ],
         downsampling_directive=dr.enums.DownsamplingOperations.RANDOM_SAMPLE,
         downsampling_arguments={"value": 100, "seed": 25},
@@ -402,7 +401,9 @@ def test_operator_create_wrangling_recipe_join_datasource(mocker):
     assert len(recipe_mock.set_inputs.call_args.args[1]) == 3
     assert {x.data_store_id for x in recipe_mock.set_inputs.call_args.args[1]} == {data_store_id}
     assert [x.data_source_id for x in recipe_mock.set_inputs.call_args.args[1]] == [
-        'primary_data_source_id', "secondary-datasource-id-1", "secondary-datasource-id-2"
+        "primary_data_source_id",
+        "secondary-datasource-id-1",
+        "secondary-datasource-id-2",
     ]
 
 
