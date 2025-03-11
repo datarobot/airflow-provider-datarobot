@@ -323,6 +323,89 @@ def test_operator_create_wrangling_recipe_join_dataset(mocker):
     )
 
 
+def test_operator_create_wrangling_recipe_join_datasource(mocker):
+    data_store_id = 'test-data-store-id'
+    get_datastore_mock = mocker.patch.object(
+        dr.DataStore, "get", return_value=dr.DataStore(data_store_type="jdbc")
+    )
+    get_exp_container_mock = mocker.patch.object(dr.UseCase, "get")
+    client_mock = mocker.patch(
+        "datarobot_provider.operators.ai_catalog.dr.client.get_client"
+    ).return_value
+    recipe_mock = mocker.patch("datarobot_provider.operators.ai_catalog.Recipe")
+    recipe_mock.from_data_store.return_value.id = "test-recipe-id"
+    recipe_mock.from_data_store.return_value.inputs = [
+        dr.models.recipe.JDBCTableDataSourceInput(
+            data_store_id=data_store_id,
+            data_source_id='primary_data_source_id',
+            input_type=RecipeInputType.DATASOURCE,
+        ),
+    ]
+    context = {
+        "params": {
+            "use_case_id": "test-use-case-id",
+            "table_schema": "PUBLIC",
+            "table_name": "TestTable",
+        }
+    }
+
+    operator = CreateWranglingRecipeOperator(
+        task_id="create_recipe",
+        recipe_name="Test name",
+        data_store_id=data_store_id,
+        dialect=dr.enums.DataWranglingDialect.SNOWFLAKE,
+        operations=[
+            {
+                "directive": "drop-columns",
+                "arguments": {"columns": ["test-feature-1", "test-feature-2"]},
+            },
+            {
+                "directive": "join",
+                "arguments": {
+                    "leftKeys": ["key-left"],
+                    "rightKeys": ["key-right"],
+                    "joinType": "inner",
+                    "source": "table",
+                    "rightDataSourceId": "secondary-datasource-id-1",
+                },
+            },
+            {
+                "directive": "join",
+                "arguments": {
+                    "leftKeys": ["key-left"],
+                    "rightKeys": ["key-right"],
+                    "joinType": "inner",
+                    "source": "table",
+                    "rightDataSourceId": "secondary-datasource-id-2",
+                },
+            },
+
+        ],
+        downsampling_directive=dr.enums.DownsamplingOperations.RANDOM_SAMPLE,
+        downsampling_arguments={"value": 100, "seed": 25},
+    )
+    operator.render_template_fields(context)
+
+    recipe_id = operator.execute(context=context)
+
+    assert recipe_id == "test-recipe-id"
+    get_datastore_mock.assert_called_once_with(data_store_id)
+    get_exp_container_mock.assert_called_once_with("test-use-case-id")
+    client_mock.patch.assert_called_once_with(
+        "recipes/test-recipe-id/",
+        json={"name": "Test name", "description": "Created with Apache-Airflow"},
+    )
+
+    recipe_mock.set_operations.assert_called_once_with("test-recipe-id", ANY)
+    recipe_mock.update_downsampling.assert_called_once()
+    recipe_mock.set_inputs.assert_called_once_with("test-recipe-id", ANY)
+    assert len(recipe_mock.set_inputs.call_args.args[1]) == 3
+    assert {x.data_store_id for x in recipe_mock.set_inputs.call_args.args[1]} == {data_store_id}
+    assert [x.data_source_id for x in recipe_mock.set_inputs.call_args.args[1]] == [
+        'primary_data_source_id', "secondary-datasource-id-1", "secondary-datasource-id-2"
+    ]
+
+
 @pytest.mark.parametrize(
     "test_params, do_snapshot, expected_name, expected_mat_destination",
     [
