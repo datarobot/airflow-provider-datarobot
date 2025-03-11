@@ -50,8 +50,8 @@ def model_training_xgboost():
     # Create a Use Case to keep all subsequent assets. Default name is "Airflow"
     create_use_case = GetOrCreateUseCaseOperator(task_id="create_use_case", set_default=True)
 
+    # Define input data
     get_data_store = GetDataStoreOperator(task_id="get_data_store")
-
     define_transactions_table = CreateOrUpdateDataSourceOperator(
         task_id="define_transactions_table",
         data_store_id=get_data_store.output,
