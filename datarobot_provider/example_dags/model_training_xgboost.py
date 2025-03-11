@@ -53,7 +53,7 @@ def model_training_xgboost():
     get_data_store = GetDataStoreOperator(task_id="get_data_store")
 
     define_transactions_table = CreateOrUpdateDataSourceOperator(
-        task_id='define_transactions_table',
+        task_id="define_transactions_table",
         data_store_id=get_data_store.output,
         table_name="{{ params.secondary_table }}",
     )

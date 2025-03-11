@@ -706,25 +706,27 @@ class CreateWranglingRecipeOperator(BaseUseCaseEntityOperator):
             data_store_id = None
 
         for operation_data in self.operations:
-            if operation_data['directive'] == 'join':
-                if operation_data['arguments'].get('rightDataSourceId'):
-                    secondary_inputs[operation_data['arguments'][
-                        'rightDataSourceId']] = dr.models.JDBCTableDataSourceInput(
-                        input_type=dr.enums.RecipeInputType.DATASOURCE,
-                        data_store_id=data_store_id,
-                        data_source_id=operation_data['arguments']['rightDataSourceId'],
+            if operation_data["directive"] == "join":
+                if operation_data["arguments"].get("rightDataSourceId"):
+                    secondary_inputs[operation_data["arguments"]["rightDataSourceId"]] = (
+                        dr.models.JDBCTableDataSourceInput(
+                            input_type=dr.enums.RecipeInputType.DATASOURCE,
+                            data_store_id=data_store_id,
+                            data_source_id=operation_data["arguments"]["rightDataSourceId"],
+                        )
                     )
 
                 else:
-                    if not operation_data['arguments'].get('rightDatasetVersionId'):
-                        dataset = dr.Dataset.get(operation_data['arguments']['rightDatasetId'])
-                        operation_data['arguments']['rightDatasetVersionId'] = dataset.version_id
+                    if not operation_data["arguments"].get("rightDatasetVersionId"):
+                        dataset = dr.Dataset.get(operation_data["arguments"]["rightDatasetId"])
+                        operation_data["arguments"]["rightDatasetVersionId"] = dataset.version_id
 
-                    secondary_inputs[operation_data['arguments'][
-                        'rightDatasetVersionId']] = dr.models.RecipeDatasetInput(
-                        input_type=dr.enums.RecipeInputType.DATASET,
-                        dataset_id=operation_data['arguments']['rightDatasetId'],
-                        dataset_version_id=operation_data['arguments']['rightDatasetVersionId'],
+                    secondary_inputs[operation_data["arguments"]["rightDatasetVersionId"]] = (
+                        dr.models.RecipeDatasetInput(
+                            input_type=dr.enums.RecipeInputType.DATASET,
+                            dataset_id=operation_data["arguments"]["rightDatasetId"],
+                            dataset_version_id=operation_data["arguments"]["rightDatasetVersionId"],
+                        )
                     )
 
         if secondary_inputs:
