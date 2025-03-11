@@ -314,7 +314,7 @@ class GetResidualsChartInsightOperator(BaseDatarobotOperator):
         datarobot_conn_id (str, optional): Connection ID, defaults to `datarobot_default`.
 
     Returns:
-        List[Dict[str, Any]]: List of the lift chart bins containing the actuals and predicted values.
+        Dict[str, float]: The residual chart values for the model.
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
