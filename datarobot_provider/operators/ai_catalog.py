@@ -27,7 +27,6 @@ from datarobot.models import RecipeDatasetInput
 from datarobot.models.recipe_operation import RandomSamplingOperation
 from datarobot.utils.source import parse_source_type
 
-from datarobot_provider.hooks.connections import JDBCDataSourceHook
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 from datarobot_provider.operators.base_datarobot_operator import BaseUseCaseEntityOperator
 
@@ -181,14 +180,13 @@ class CreateDatasetFromDataStoreOperator(BaseDatarobotOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = []
+    template_fields: Sequence[str] = ['data_store_id']
+
+    def __init__(self, *, data_store_id: str, **kwargs):
+        super().__init__(**kwargs)
+        self.data_store_id = data_store_id
 
     def execute(self, context: Context) -> str:
-        # Fetch stored JDBC Connection with credentials
-        _, credential_data, data_store = JDBCDataSourceHook(
-            datarobot_credentials_conn_id=context["params"]["datarobot_jdbc_connection"]
-        ).run()
-
         dataset_name = context["params"]["dataset_name"]
 
         data_source = None
@@ -211,7 +209,7 @@ class CreateDatasetFromDataStoreOperator(BaseDatarobotOperator):
 
         if data_source is None:
             # Adding data_store_id to params (required for DataSource creation):
-            params.data_store_id = data_store.id
+            params.data_store_id = self.data_store_id
             # Creating DataSource using params with data_store_id
             self.log.info(f"Creating DataSource: {dataset_name}")
             data_source = dr.DataSource.create(
@@ -229,7 +227,6 @@ class CreateDatasetFromDataStoreOperator(BaseDatarobotOperator):
         self.log.info(f"Creating Dataset from DataSource: {dataset_name}")
         ai_catalog_dataset: dr.Dataset = dr.Dataset.create_from_data_source(
             data_source_id=data_source.id,
-            credential_data=credential_data,
             persist_data_after_ingestion=context["params"]["persist_data_after_ingestion"],
             do_snapshot=context["params"]["do_snapshot"],
             max_wait=DATAROBOT_MAX_WAIT_SEC,

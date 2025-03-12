@@ -13,7 +13,6 @@ from airflow.decorators import task
 from datarobot_provider.operators.ai_catalog import CreateDatasetFromDataStoreOperator
 from datarobot_provider.operators.bias_and_fairness import UpdateBiasAndFairnessSettingsOperator
 from datarobot_provider.operators.connections import GetDataStoreOperator
-from datarobot_provider.operators.credentials import GetOrCreateCredentialOperator
 from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
 from datarobot_provider.operators.deployment import DeployRecommendedModelOperator
@@ -35,7 +34,7 @@ from datarobot_provider.sensors.monitoring_job import MonitoringJobCompleteSenso
     start_date=datetime(2023, 1, 1),
     tags=["example", "end-to-end", "pipline"],
     params={
-        "data_connection": "demo_datarobot_jdbc_connection",
+        "data_connection": "Demo Connection",
         "dataset_name": "Demo-Airflow-training-dataset",
         "table_schema": "DEMO_SCHEMA",
         "table_name": "DEMO-TRAINING-DATASET",
@@ -88,19 +87,16 @@ from datarobot_provider.sensors.monitoring_job import MonitoringJobCompleteSenso
     },
 )
 def advanced_datarobot_pipeline_jdbc():
+    get_jdbc_connection_op = GetDataStoreOperator(task_id="get_jdbc_connection")
+
     dataset_connect_op = CreateDatasetFromDataStoreOperator(
         task_id="create_dataset_jdbc",
-    )
-
-    get_jdbc_credentials_op = GetOrCreateCredentialOperator(
-        task_id="get_jdbc_credentials",
-        credentials_param_name="datarobot_jdbc_connection",
+        data_store_id=get_jdbc_connection_op.output,
     )
 
     create_project_op = CreateProjectOperator(
         task_id="create_project",
         dataset_id=dataset_connect_op.output,
-        credential_id=get_jdbc_credentials_op.output,
     )
 
     train_models_op = TrainModelsOperator(
@@ -133,15 +129,11 @@ def advanced_datarobot_pipeline_jdbc():
         deployment_id=deploy_model_op.output,
     )
 
-    get_jdbc_connection_op = GetDataStoreOperator(task_id="get_jdbc_connection")
-
     score_predictions_op = ScorePredictionsOperator(
         task_id="score_predictions_jdbc",
         deployment_id=deploy_model_op.output,
         intake_datastore_id=get_jdbc_connection_op.output,
         output_datastore_id=get_jdbc_connection_op.output,
-        intake_credential_id=get_jdbc_credentials_op.output,
-        output_credential_id=get_jdbc_credentials_op.output,
     )
 
     scoring_complete_sensor = ScoringCompleteSensor(
@@ -168,7 +160,6 @@ def advanced_datarobot_pipeline_jdbc():
         task_id="batch_monitoring",
         deployment_id=deploy_model_op.output,
         datastore_id=get_jdbc_connection_op.output,
-        credential_id=get_jdbc_credentials_op.output,
     )
 
     batch_monitoring_complete_sensor = MonitoringJobCompleteSensor(
@@ -201,8 +192,8 @@ def advanced_datarobot_pipeline_jdbc():
     )
 
     (
-        dataset_connect_op
-        >> get_jdbc_credentials_op
+        get_jdbc_connection_op
+        >> dataset_connect_op
         >> create_project_op
         >> train_models_op
         >> autopilot_complete_sensor
@@ -210,7 +201,6 @@ def advanced_datarobot_pipeline_jdbc():
         >> update_monitoring_settings_op
         >> update_segment_analysis_settings_op
         >> update_bias_and_fairness_settings_op
-        >> get_jdbc_connection_op
         >> score_predictions_op
         >> scoring_complete_sensor
         >> batch_monitoring_op
