@@ -21,6 +21,7 @@ from datarobot_provider.operators.model_insights import ComputeFeatureImpactOper
 from datarobot_provider.operators.model_insights import ComputeShapImpactOperator
 from datarobot_provider.operators.model_insights import ComputeShapPreviewOperator
 from datarobot_provider.operators.model_insights import GetLiftChartInsightOperator
+from datarobot_provider.operators.model_insights import GetResidualsChartInsightOperator
 from datarobot_provider.operators.model_insights import GetRocCurveInsightOperator
 
 
@@ -298,6 +299,62 @@ def test_operator_get_lift_chart_insight_no_model_id(mocker):
 
     operator = GetLiftChartInsightOperator(
         task_id="get_lift_chart_insight", project_id=project_id, model_id=""
+    )
+
+    with pytest.raises(AirflowFailException):
+        operator.validate()
+
+
+def test_operator_get_residuals_chart_insight(mocker):
+    project_id = "test-project-id"
+    model_id = "test-model-id"
+    ResidualsResults = namedtuple(
+        "ResidualsResults", ["residual_mean", "coefficient_of_determination", "standard_deviation"]
+    )
+    residuals_data = ResidualsResults(
+        residual_mean=0.1,
+        coefficient_of_determination=0.2,
+        standard_deviation=0.3,
+    )
+
+    model_mock = mocker.Mock()
+    model_mock.id = model_id
+    model_mock.project_id = project_id
+    model_mock.get_residuals_chart.return_value = residuals_data
+
+    get_model_mock = mocker.patch.object(Model, "get", return_value=model_mock)
+
+    operator = GetResidualsChartInsightOperator(
+        task_id="get_residuals_chart_insight", project_id=project_id, model_id=model_id
+    )
+
+    result = operator.execute(context={"params": {}})
+
+    get_model_mock.assert_called_with(project_id, model_id)
+    model_mock.get_residuals_chart.assert_called_with(source="validation")
+    assert result == {
+        "residual_mean": residuals_data.residual_mean,
+        "coefficient_of_determination": residuals_data.coefficient_of_determination,
+        "standard_deviation": residuals_data.standard_deviation,
+    }
+
+
+def test_operator_get_residuals_chart_insight_no_project_id(mocker):
+    model_id = "test-model-id"
+
+    operator = GetResidualsChartInsightOperator(
+        task_id="get_residuals_chart_insight", project_id="", model_id=model_id
+    )
+
+    with pytest.raises(AirflowFailException):
+        operator.validate()
+
+
+def test_operator_get_residuals_chart_insight_no_model_id(mocker):
+    project_id = "test-project-id"
+
+    operator = GetResidualsChartInsightOperator(
+        task_id="get_residuals_chart_insight", project_id=project_id, model_id=""
     )
 
     with pytest.raises(AirflowFailException):
