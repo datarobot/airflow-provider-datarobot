@@ -141,8 +141,8 @@ def datarobot_feature_discovery_retraining_and_scoring_pipeline(
 
     replace_model = ReplaceModelOperator(
         task_id="replace_model",
-        deployment_id=select_best_model.output,
-        new_registered_model_version_id=str("{{ params.deployment_id }}"),
+        new_registered_model_version_id=select_best_model.output,
+        deployment_id=str("{{ params.deployment_id }}"),
     )
 
     (
