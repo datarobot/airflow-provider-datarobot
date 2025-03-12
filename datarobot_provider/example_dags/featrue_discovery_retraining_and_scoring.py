@@ -32,7 +32,7 @@ from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
         "deployment_id": "",
     },
 )
-def datarobot_feature_discovery_retraining_and_scoring_pipeline(
+def datarobot_feature_discovery_retraining_and_scoring(
     primary_dataset_path=(
         "https://s3.us-east-1.amazonaws.com/datarobot_public_datasets/LendingClub/target.csv"
     ),
@@ -141,7 +141,7 @@ def datarobot_feature_discovery_retraining_and_scoring_pipeline(
     # replace model
     replace_model = ReplaceModelOperator(
         task_id="replace_model",
-        new_registered_model_version_id=select_best_model.output,
+        new_registered_model_version_id=register_model.output,
         deployment_id=str("{{ params.deployment_id }}"),
     )
 
@@ -158,4 +158,4 @@ def datarobot_feature_discovery_retraining_and_scoring_pipeline(
     )
 
 
-datarobot_feature_discovery_retraining_and_scoring_pipeline()
+datarobot_feature_discovery_retraining_and_scoring()
