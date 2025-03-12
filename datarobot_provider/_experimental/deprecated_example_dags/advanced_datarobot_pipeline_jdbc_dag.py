@@ -12,7 +12,7 @@ from airflow.decorators import task
 
 from datarobot_provider.operators.ai_catalog import CreateDatasetFromDataStoreOperator
 from datarobot_provider.operators.bias_and_fairness import UpdateBiasAndFairnessSettingsOperator
-from datarobot_provider.operators.connections import GetOrCreateDataStoreOperator
+from datarobot_provider.operators.connections import GetDataStoreOperator
 from datarobot_provider.operators.credentials import GetOrCreateCredentialOperator
 from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
@@ -35,7 +35,7 @@ from datarobot_provider.sensors.monitoring_job import MonitoringJobCompleteSenso
     start_date=datetime(2023, 1, 1),
     tags=["example", "end-to-end", "pipline"],
     params={
-        "datarobot_jdbc_connection": "demo_datarobot_jdbc_connection",
+        "data_connection": "demo_datarobot_jdbc_connection",
         "dataset_name": "Demo-Airflow-training-dataset",
         "table_schema": "DEMO_SCHEMA",
         "table_name": "DEMO-TRAINING-DATASET",
@@ -133,10 +133,7 @@ def advanced_datarobot_pipeline_jdbc():
         deployment_id=deploy_model_op.output,
     )
 
-    get_jdbc_connection_op = GetOrCreateDataStoreOperator(
-        task_id="get_jdbc_connection",
-        connection_param_name="datarobot_jdbc_connection",
-    )
+    get_jdbc_connection_op = GetDataStoreOperator(task_id="get_jdbc_connection")
 
     score_predictions_op = ScorePredictionsOperator(
         task_id="score_predictions_jdbc",

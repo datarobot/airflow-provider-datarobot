@@ -10,52 +10,9 @@ from typing import Any
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
-from airflow.exceptions import AirflowNotFoundException
 from airflow.utils.context import Context
 
-from datarobot_provider.hooks.connections import JDBCDataSourceHook
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
-
-
-class GetOrCreateDataStoreOperator(BaseDatarobotOperator):
-    """
-    !! Please, manage database connections via DataRobot rather than Airflow and use *GetDataStoreOperator* instead. !!
-
-    Fetching DataStore by connection name or creating if it does not exist
-    and return DataStore ID.
-
-    :param connection_param_name: name of parameter in the config file corresponding to connection name
-    :type connection_param_name: str, optional
-    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
-    :type datarobot_conn_id: str, optional
-    :return: DataRobot Credentials ID
-    :rtype: str
-    """
-
-    def __init__(
-        self,
-        *,
-        connection_param_name: str = "datarobot_connection_name",
-        **kwargs: Any,
-    ) -> None:
-        super().__init__(**kwargs)
-        self.connection_param_name = connection_param_name
-
-    def execute(self, context: Context) -> str:
-        if self.connection_param_name not in context["params"]:
-            raise AirflowNotFoundException(
-                f"Attribute: {self.connection_param_name} not present in config"
-            )
-        # Getting connection name from config:
-        connection_name = context["params"][self.connection_param_name]
-
-        # Fetch stored JDBC Connection with credentials
-        _, _, data_store = JDBCDataSourceHook(datarobot_credentials_conn_id=connection_name).run()
-
-        if data_store is not None:
-            self.log.info(f"Found preconfigured jdbc connection: {connection_name}")
-
-        return data_store.id
 
 
 class GetDataStoreOperator(BaseDatarobotOperator):
