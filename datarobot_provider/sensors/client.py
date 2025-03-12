@@ -21,10 +21,11 @@ class BaseAsyncResolutionSensor(BaseSensorOperator):
     """
     Checks if the DataRobot Async API call has completed.
 
-    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
-    :type datarobot_conn_id: str, optional
-    :return: False if not yet completed
-    :rtype: bool
+    Args:
+        datarobot_conn_id (str, optional): Connection ID, defaults to `datarobot_default`.
+
+    Returns:
+        bool: False if not yet completed.
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
