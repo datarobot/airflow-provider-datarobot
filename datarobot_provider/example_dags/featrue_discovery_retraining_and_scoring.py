@@ -138,7 +138,7 @@ def datarobot_feature_discovery_retraining_and_scoring_pipeline(
             "registered_model_name": "Highest readmitted score test {{ ts }}",
         },
     )
-
+    # replace model
     replace_model = ReplaceModelOperator(
         task_id="replace_model",
         new_registered_model_version_id=select_best_model.output,
