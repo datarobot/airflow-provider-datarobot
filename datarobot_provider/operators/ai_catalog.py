@@ -180,7 +180,7 @@ class CreateDatasetFromDataStoreOperator(BaseDatarobotOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = ['data_store_id']
+    template_fields: Sequence[str] = ["data_store_id"]
 
     def __init__(self, *, data_store_id: str, **kwargs):
         super().__init__(**kwargs)

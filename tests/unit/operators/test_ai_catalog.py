@@ -93,7 +93,7 @@ def test_operator_create_dataset_from_jdbc(mocker):
         dr.Dataset, "create_from_data_source", return_value=dataset_mock
     )
 
-    operator = CreateDatasetFromDataStoreOperator(task_id="load_jdbc_dataset", data_store_id='test')
+    operator = CreateDatasetFromDataStoreOperator(task_id="load_jdbc_dataset", data_store_id="test")
     dataset_id = operator.execute(
         context={
             "params": test_params,
