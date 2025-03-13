@@ -305,7 +305,7 @@ class GetProjectModelsOperator(BaseDatarobotOperator):
         project_id (str): DataRobot project ID.
 
     Returns:
-        str: The best model's ID as a string.
+        List[Tuple[str, str]]: The best model's ID as a string.
     """
 
     template_fields = ["project_id"]
