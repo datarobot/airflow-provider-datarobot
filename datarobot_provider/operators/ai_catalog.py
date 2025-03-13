@@ -180,11 +180,12 @@ class CreateDatasetFromDataStoreOperator(BaseDatarobotOperator):
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
-    template_fields: Sequence[str] = ["data_store_id"]
+    template_fields: Sequence[str] = ["data_store_id", "credential_id"]
 
-    def __init__(self, *, data_store_id: str, **kwargs: Any):
+    def __init__(self, *, data_store_id: str, credential_id: Optional[str] = None, **kwargs: Any):
         super().__init__(**kwargs)
         self.data_store_id = data_store_id
+        self.credential_id = credential_id
 
     def execute(self, context: Context) -> str:
         dataset_name = context["params"]["dataset_name"]
@@ -227,6 +228,7 @@ class CreateDatasetFromDataStoreOperator(BaseDatarobotOperator):
         self.log.info(f"Creating Dataset from DataSource: {dataset_name}")
         ai_catalog_dataset: dr.Dataset = dr.Dataset.create_from_data_source(
             data_source_id=data_source.id,
+            credential_id=self.credential_id,
             persist_data_after_ingestion=context["params"]["persist_data_after_ingestion"],
             do_snapshot=context["params"]["do_snapshot"],
             max_wait=DATAROBOT_MAX_WAIT_SEC,

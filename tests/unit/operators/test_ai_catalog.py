@@ -93,7 +93,9 @@ def test_operator_create_dataset_from_jdbc(mocker):
         dr.Dataset, "create_from_data_source", return_value=dataset_mock
     )
 
-    operator = CreateDatasetFromDataStoreOperator(task_id="load_jdbc_dataset", data_store_id="test")
+    operator = CreateDatasetFromDataStoreOperator(
+        task_id="load_jdbc_dataset", data_store_id="test", credential_id="test-cred-id"
+    )
     dataset_id = operator.execute(
         context={
             "params": test_params,
@@ -104,6 +106,7 @@ def test_operator_create_dataset_from_jdbc(mocker):
 
     create_jdbc_dataset_mock.assert_called_with(
         data_source_id="datasource-id",
+        credential_id="test-cred-id",
         persist_data_after_ingestion=test_params["persist_data_after_ingestion"],
         do_snapshot=test_params["do_snapshot"],
         max_wait=3600,
