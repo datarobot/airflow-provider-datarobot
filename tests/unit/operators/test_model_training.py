@@ -5,10 +5,13 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 import datarobot as dr
 import pytest
 
+from datarobot_provider.operators.model_training import AdvancedTuneModelOperator
 from datarobot_provider.operators.model_training import TrainModelOperator
 
 
@@ -79,3 +82,41 @@ def test_operator_train_model_no_blueprint_id():
 
     with pytest.raises(ValueError):
         operator.validate()
+
+
+@pytest.mark.parametrize(
+    "parameters, set_parameter_calls",
+    [
+        ([], 0),
+        ([("task_name", "parameter_name", "value")], 1),
+        (
+            [
+                ("task_name1", "parameter_name1", "value1"),
+                ("task_name2", "parameter_name2", "value2"),
+            ],
+            2,
+        ),
+    ],
+)
+@patch("datarobot_provider.operators.model_training.dr.Model.get")
+def test_advanced_tune_model_operator_execute(mock_get_model, parameters, set_parameter_calls):
+    mock_model = MagicMock()
+    mock_tune = MagicMock()
+    mock_job = MagicMock()
+    mock_job.id = "job-id"
+    mock_tune.run.return_value = mock_job
+    mock_model.start_advanced_tuning_session.return_value = mock_tune
+    mock_get_model.return_value = mock_model
+
+    operator = AdvancedTuneModelOperator(
+        task_id="advanced_tune", project_id="project-id", model_id="model-id", parameters=parameters
+    )
+    result = operator.execute(context={})
+    assert result == "job-id"
+    mock_get_model.assert_called_once_with("project-id", "model-id")
+    assert mock_tune.set_parameter.call_count == set_parameter_calls
+    for call in parameters:
+        mock_tune.set_parameter.assert_any_call(
+            task_name=call[0], parameter_name=call[1], value=call[2]
+        )
+    mock_tune.run.assert_called_once()
