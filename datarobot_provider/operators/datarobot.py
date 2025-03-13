@@ -9,6 +9,7 @@ from collections.abc import Sequence
 from typing import Any
 from typing import List
 from typing import Optional
+from typing import Tuple
 from typing import Union
 
 import datarobot as dr
@@ -294,6 +295,35 @@ class SelectBestModelOperator(BaseDatarobotOperator):
             self.metric = project.metric
         best_model = project.get_top_model(metric=self.metric)
         return str(best_model.id)
+
+
+class GetProjectModelsOperator(BaseDatarobotOperator):
+    """
+    Returns a list of all trained models and their ids.
+
+    Args:
+        project_id (str): DataRobot project ID.
+
+    Returns:
+        List[Tuple[str, str]]: The best model's ID as a string.
+    """
+
+    template_fields = ["project_id"]
+
+    def __init__(self, *, project_id: str, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.project_id = project_id
+
+    def validate(self) -> None:
+        if not self.project_id:
+            raise AirflowFailException("The `project_id` parameter is required.")
+
+    def execute(self, context: Context) -> List[Tuple[str, str]]:
+        self.log.info(f"Selecting top model for project_id: {self.project_id}")
+        project = dr.Project.get(self.project_id)
+        models = project.get_models()
+
+        return [(str(model.id), str(model.model_type)) for model in models]
 
 
 class GetProjectBlueprintsOperator(BaseDatarobotOperator):
