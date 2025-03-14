@@ -5,6 +5,7 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+from json import dumps
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Dict
@@ -253,7 +254,7 @@ class ReplaceModelOperator(BaseDatarobotOperator):
             new_registered_model_version_id=self.new_registered_model_version_id
         )
         self.log.info(f"Validation result: {check_result}, message: {check_message}")
-        self.log.info(f"Validation result details: {status_list}")
+        self.log.info("Validation result details:\n%s", dumps(status_list, indent=2))
         if check_result == "failing":
             raise AirflowFailException(check_message)
         self.log.info(
