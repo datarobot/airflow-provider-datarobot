@@ -16,3 +16,8 @@
 .. autoclass:: datarobot_provider.operators.model_training.AdvancedTuneModelOperator
    :members:
 ```
+
+```{eval-rst}
+.. autoclass:: datarobot_provider.operators.model_training.GetTrainedModelParametersOperator
+   :members:
+```
