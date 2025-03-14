@@ -13,15 +13,12 @@ import pandas as pd
 from airflow.decorators import dag
 
 from datarobot_provider.operators.custom_function import CustomFunctionOperator
-from datarobot_provider.operators.predictions import RequestPredictionsOperator
 
 """
 Example of Aiflow DAG to run any custom function in a DAG, in this case a post processing function on predictions.
 Configurable parameters for this dag:
 * project_id - the project id for the project to use
-* model_id - the model id for the model to use for doing the predictions
-* dataset_id - the dataset id for the dataset to generate predictions for - either this or file_path must be provided
-* file_path - the file path for the dataset to generate predictions for - either this or dataset_id must be provided
+* predict_job_id - the predict job id for the predictions to post-process
 """
 
 
@@ -45,6 +42,8 @@ def post_process_predictions(project_id: str, predict_job_id: str, log: Logger) 
         sourcedata=predictions, dataset_filename=f"postprocessed-predictions-{predict_job_id}.csv"
     )
 
+    log.info(f"Post-processed predictions saved to dataset {postprocessed_dataset.id}")
+
     return postprocessed_dataset.id
 
 
@@ -53,29 +52,20 @@ def post_process_predictions(project_id: str, predict_job_id: str, log: Logger) 
     tags=["example", "custom_function"],
     params={
         "project_id": "YOUR_PROJECT_ID",
-        "model_id": "YOUR_MODEL_ID",
-        "dataset_id": "YOUR_DATASET_ID",
+        "predict_job_id": "YOUR_PREDICT_JOB_ID",
     },
 )
 def custom_function_dag():
-    # Request predictions
-    request_predictions = RequestPredictionsOperator(
-        task_id="request_predictions",
-        project_id="{{ params.project_id }}",
-        model_id="{{ params.model_id }}",
-        dataset_id="{{ params.dataset_id }}",
-    )
-
     post_process = CustomFunctionOperator(
-        task_id="my_function",
+        task_id="custom_post_process_function",
         custom_func=post_process_predictions,
         func_params={
             "project_id": "{{ params.project_id }}",
-            "predict_job_id": str(request_predictions.output),
+            "predict_job_id": "{{ params.predict_job_id }}",
         },
     )
 
-    (request_predictions >> post_process)
+    (post_process)
 
 
 # Instantiate the DAG
