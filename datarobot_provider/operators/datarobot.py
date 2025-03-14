@@ -9,6 +9,7 @@ from collections.abc import Sequence
 from typing import Any
 from typing import List
 from typing import Optional
+from typing import Tuple
 from typing import Union
 
 import datarobot as dr
@@ -30,30 +31,22 @@ class GetOrCreateUseCaseOperator(BaseDatarobotOperator):
     """
     Creates a DataRobot Use Case.
 
-    Parameters
-    ----------
-    datarobot_conn_id: str
-        Connection ID, defaults to `datarobot_default`
-    name: str
-        Use Case name
-    description: Optional[str]
-        Use Case description
-    reuse_policy: CreateUseCaseOperator.ReusePolicy
-        Should the operator reuse an existing Use Case with the same *name*?
+    Args:
+        datarobot_conn_id (str): Connection ID, defaults to `datarobot_default`.
+        name (str): Use Case name.
+        description (Optional[str]): Use Case description.
+        reuse_policy (CreateUseCaseOperator.ReusePolicy): Should the operator reuse an existing Use Case with the same *name*?
 
-        EXACT: Reuse the Use Case if it has exactly the same *name* and *description*.
-        SEARCH_BY_NAME_UPDATE_DESCRIPTION: Reuse the Use Case if it has exactly the same *name*. Update *description* if it's different.
-        SEARCH_BY_NAME_PRESERVE_DESCRIPTION: Reuse the Use Case if it has exactly the same *name*. Don't modify *description*.
-        NO_REUSE: Always create a new Use Case.
+            EXACT: Reuse the Use Case if it has exactly the same *name* and *description*.
+            SEARCH_BY_NAME_UPDATE_DESCRIPTION: Reuse the Use Case if it has exactly the same *name*. Update *description* if it's different.
+            SEARCH_BY_NAME_PRESERVE_DESCRIPTION: Reuse the Use Case if it has exactly the same *name*. Don't modify *description*.
+            NO_REUSE: Always create a new Use Case.
 
-        default: EXACT
+            default: EXACT.
+        set_default (bool): Set this Use Case as a default one for all subsequent tasks in the DAG.
 
-    set_default: bool
-        Set this Use Case as a default one for all subsequent tasks in the DAG.
-
-    Returns
-    -------
-    str: DataRobot UseCase ID
+    Returns:
+        str: DataRobot UseCase ID.
     """
 
     class ReusePolicy(StrEnum):
@@ -145,21 +138,14 @@ class CreateProjectOperator(BaseUseCaseEntityOperator):
     """
     Creates DataRobot project.
 
-    Parameters
-    ----------
-    dataset_id : str, optional
-        DataRobot AI Catalog dataset ID
-    dataset_version_id : str, optional
-        DataRobot AI Catalog dataset version ID
-    datarobot_conn_id : str, optional
-        Connection ID, defaults to `datarobot_default`
-    recipe_id : str, optional
-        DataRobot Recipe ID
+    Args:
+        dataset_id (str, optional): DataRobot AI Catalog dataset ID.
+        dataset_version_id (str, optional): DataRobot AI Catalog dataset version ID.
+        datarobot_conn_id (str, optional): Connection ID, defaults to `datarobot_default`.
+        recipe_id (str, optional): DataRobot Recipe ID.
 
-    Returns
-    -------
-    str
-        DataRobot project ID
+    Returns:
+        str: DataRobot project ID.
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
@@ -246,12 +232,9 @@ class TrainModelsOperator(BaseDatarobotOperator):
     """
     Triggers DataRobot Autopilot to train models.
 
-    Parameters
-    ----------
-    project_id : str
-        DataRobot project ID
-    datarobot_conn_id : str, optional
-        Connection ID, defaults to `datarobot_default`
+    Args:
+        project_id (str): DataRobot project ID.
+        datarobot_conn_id (str, optional): Connection ID, defaults to `datarobot_default`.
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
@@ -285,12 +268,12 @@ class SelectBestModelOperator(BaseDatarobotOperator):
 
     If the evaluation metric is not provided, the operator uses the project's primary metric.
 
-    :param project_id: DataRobot project ID.
-    :type project_id: str
-    :param metric: The evaluation metric used to rank models.
-    :type metric: str, optional
-    :return: The best model's ID as a string.
-    :rtype: str
+    Args:
+        project_id (str): DataRobot project ID.
+        metric (str, optional): The evaluation metric used to rank models.
+
+    Returns:
+        str: The best model's ID as a string.
     """
 
     template_fields = ["project_id"]
@@ -314,26 +297,48 @@ class SelectBestModelOperator(BaseDatarobotOperator):
         return str(best_model.id)
 
 
+class GetProjectModelsOperator(BaseDatarobotOperator):
+    """
+    Returns a list of all trained models and their ids.
+
+    Args:
+        project_id (str): DataRobot project ID.
+
+    Returns:
+        List[Tuple[str, str]]: The best model's ID as a string.
+    """
+
+    template_fields = ["project_id"]
+
+    def __init__(self, *, project_id: str, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.project_id = project_id
+
+    def validate(self) -> None:
+        if not self.project_id:
+            raise AirflowFailException("The `project_id` parameter is required.")
+
+    def execute(self, context: Context) -> List[Tuple[str, str]]:
+        self.log.info(f"Selecting top model for project_id: {self.project_id}")
+        project = dr.Project.get(self.project_id)
+        models = project.get_models()
+
+        return [(str(model.id), str(model.model_type)) for model in models]
+
+
 class GetProjectBlueprintsOperator(BaseDatarobotOperator):
     """
     Get DataRobot project blueprints. Blueprint ids can optionally
     be filtered by a specific model type.
 
-    Parameters
-    ----------
-    project_id : str
-        DataRobot project ID
-    return_all : bool, optional
-        Return all blueprint ids, default is False
-    filter_model_type : str, optional
-        Blueprint filter type, default returns all ids
-    datarobot_conn_id : str, optional
-        Connection ID, defaults to `datarobot_default`
+    Args:
+        project_id (str): DataRobot project ID.
+        return_all (bool, optional): Return all blueprint ids, default is False.
+        filter_model_type (str, optional): Blueprint filter type, default returns all ids.
+        datarobot_conn_id (str, optional): Connection ID, defaults to `datarobot_default`.
 
-    Returns
-    -------
-    list of str
-        List of DataRobot blueprint IDs
+    Returns:
+        list of str: List of DataRobot blueprint IDs.
     """
 
     # Specify the arguments that are allowed to parse with jinja templating

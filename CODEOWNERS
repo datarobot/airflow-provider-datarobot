@@ -1,4 +1,4 @@
-*                                                        @datarobot/machine-learning-development
+*                                                        @datarobot/predictive-ai
 /datarobot_provider/_experimental/operators/notebook.py  @datarobot/cfx
 /datarobot_provider/_experimental/sensors/notebook.py    @datarobot/cfx
 /datarobot_provider/operators/ai_catalog.py              @datarobot/mldata
@@ -6,11 +6,11 @@
 /datarobot_provider/operators/deployment.py              @datarobot/model-management
 /datarobot_provider/operators/feature_discovery.py       @datarobot/mldata
 /datarobot_provider/operators/mlops.py                   @datarobot/model-management
-/datarobot_provider/operators/model_insights.py          @datarobot/trust-explainable-ai
+/datarobot_provider/operators/model_insights.py          @datarobot/predictive-ai
 /datarobot_provider/operators/model_package.py           @datarobot/model-management
 /datarobot_provider/operators/model_predictions.py       @datarobot/predictions
 /datarobot_provider/operators/monitoring.py              @datarobot/model-management
 /datarobot_provider/operators/monitoring_job.py          @datarobot/tracking-agent
-/datarobot_provider/operators/prediction_explanations.py @datarobot/trust-explainable-ai
-/docs/                                                   @datarobot/api-docs
-/tests/                                                  @datarobot/machine-learning-development
+/datarobot_provider/operators/prediction_explanations.py @datarobot/predictive-ai
+/docs/                                                   datarobot/predictive-ai @datarobot/api-docs
+/tests/                                                  @datarobot/predictive-ai

@@ -17,6 +17,17 @@
    :members:
 ```
 
+
+```{eval-rst}
+.. autoclass:: datarobot_provider.operators.datarobot.SelectBestModelOperator
+   :members:
+```
+
+```{eval-rst}
+.. autoclass:: datarobot_provider.operators.datarobot.GetProjectModelsOperator
+   :members:
+```
+
 ```{eval-rst}
 .. autoclass:: datarobot_provider.operators.datarobot.GetProjectBlueprintsOperator
    :members:

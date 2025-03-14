@@ -302,3 +302,59 @@ class GetLiftChartInsightOperator(BaseDatarobotOperator):
         model = self.get_model()
         lift_chart = model.get_lift_chart(source=self.source)
         return lift_chart.bins
+
+
+class GetResidualsChartInsightOperator(BaseDatarobotOperator):
+    """
+    Creates Residuals Chart insight data.
+
+    Args:
+        project_id (str): DataRobot model ID.
+        model_id (str): DataRobot model ID.
+        datarobot_conn_id (str, optional): Connection ID, defaults to `datarobot_default`.
+
+    Returns:
+        Dict[str, float]: The residual chart values for the model.
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Sequence[str] = [
+        "project_id",
+        "model_id",
+    ]
+
+    def __init__(
+        self,
+        *,
+        project_id: str,
+        model_id: str,
+        source: Optional[str] = "validation",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.project_id = str(project_id)
+        self.model_id = str(model_id)
+        self.source = str(source)
+
+    def validate(self) -> None:
+        if not self.project_id:
+            raise AirflowFailException("The `project_id` parameter is required.")
+        if not self.model_id:
+            raise AirflowFailException("The `model_id` parameter is required.")
+
+    def get_model(self) -> Model:
+        model: Model = Model.get(self.project_id, self.model_id)
+        if not model:
+            raise AirflowFailException(
+                f"Model with id {self.model_id} not found in project {self.project_id}."
+            )
+        return model
+
+    def execute(self, context: Context) -> Dict[str, float]:
+        model = self.get_model()
+        residuals = model.get_residuals_chart(source=self.source)
+        return {
+            "residual_mean": residuals.residual_mean,
+            "coefficient_of_determination": residuals.coefficient_of_determination,
+            "standard_deviation": residuals.standard_deviation,
+        }
