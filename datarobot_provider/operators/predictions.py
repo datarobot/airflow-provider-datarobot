@@ -83,6 +83,9 @@ class SavePredictionsToDatasetOperator(BaseDatarobotOperator):
     """
     Save the predictions from a PredictJob to a dataset.
 
+    NOTE: This operator currently first downloads the predictions to the Airflow worker
+    and then uploads them to DataRobot. This may not be suitable for large datasets.
+
     Args:
         project_id (str): DataRobot project ID.
         predict_job_id (str): PredictJob ID.
