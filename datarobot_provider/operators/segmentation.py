@@ -21,15 +21,24 @@ from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOp
 
 class CreateSegmentationTaskOperator(BaseDatarobotOperator):
     """
-    Creates Feature Impact job in DataRobot.
+    Creates a new segmentation task for a model in a project. This operator will handle the process
+    of registering the model and constructing a segmentation task from the resulting registered model
+    with the given parameters.The task can then be used to start a new autopilot using the segmentation task.
+
+    See the StartAutopilotOperator and StartDatetimeAutopilotOperator for more information.
 
     Args:
         project_id (str): DataRobot project ID.
-        model_id (str): DataRobot model ID.
-        datarobot_conn_id (str, optional): Connection ID, defaults to `datarobot_default`.
+        target (str): Target variable for the segmentation task.
+        use_time_series (bool): Whether to use time series data. Defaults to True.
+        datetime_partition_column (Optional[str]): Datetime partition column name.
+        multiseries_id_columns (Optional[List[str]]): List of multiseries ID column names.
+        user_defined_segment_id_columns (Optional[List[str]]): List of user-defined segment ID column names.
+        max_wait (int): Maximum wait time for the task to complete. Defaults to DEFAULT_MAX_WAIT.
+        model_package_id (Optional[str]): Model package ID to use for the segmentation task.
 
     Returns:
-        str: Feature Impact job ID.
+        str: ID of the segmentation task created.
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
