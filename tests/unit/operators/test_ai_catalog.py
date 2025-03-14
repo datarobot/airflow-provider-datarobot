@@ -63,10 +63,8 @@ def test_operator_update_dataset_from_file(mocker):
     )
 
 
-def test_operator_create_dataset_from_jdbc(mocker, mock_airflow_connection_datarobot_jdbc):
-    credential_data = {"credentialType": "basic", "user": "test_login", "password": "test_password"}
+def test_operator_create_dataset_from_jdbc(mocker):
     test_params = {
-        "datarobot_jdbc_connection": "datarobot_test_connection_jdbc_test",
         "dataset_name": "test_dataset_name",
         "table_schema": "integration_demo",
         "table_name": "test_table",
@@ -95,7 +93,9 @@ def test_operator_create_dataset_from_jdbc(mocker, mock_airflow_connection_datar
         dr.Dataset, "create_from_data_source", return_value=dataset_mock
     )
 
-    operator = CreateDatasetFromDataStoreOperator(task_id="load_jdbc_dataset")
+    operator = CreateDatasetFromDataStoreOperator(
+        task_id="load_jdbc_dataset", data_store_id="test", credential_id="test-cred-id"
+    )
     dataset_id = operator.execute(
         context={
             "params": test_params,
@@ -106,7 +106,7 @@ def test_operator_create_dataset_from_jdbc(mocker, mock_airflow_connection_datar
 
     create_jdbc_dataset_mock.assert_called_with(
         data_source_id="datasource-id",
-        credential_data=credential_data,
+        credential_id="test-cred-id",
         persist_data_after_ingestion=test_params["persist_data_after_ingestion"],
         do_snapshot=test_params["do_snapshot"],
         max_wait=3600,
