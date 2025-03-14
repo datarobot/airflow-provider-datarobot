@@ -34,7 +34,7 @@ def post_process_predictions(project_id: str, predict_job_id: str, log: Logger) 
         predict_job_id=predict_job_id,
     )
 
-    # Do some post-processing on the predictions here
+    # Do some post-processing on the predictions dataframe here
     ...
 
     project = dr.Project.get(project_id)
