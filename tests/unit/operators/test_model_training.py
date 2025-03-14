@@ -12,6 +12,7 @@ import datarobot as dr
 import pytest
 
 from datarobot_provider.operators.model_training import AdvancedTuneModelOperator
+from datarobot_provider.operators.model_training import GetModelParametersOperator
 from datarobot_provider.operators.model_training import TrainModelOperator
 
 
@@ -120,3 +121,39 @@ def test_advanced_tune_model_operator_execute(mock_get_model, parameters, set_pa
             task_name=call[0], parameter_name=call[1], value=call[2]
         )
     mock_tune.run.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "project_id, model_id, expected_exception, match",
+    [
+        ("project-id", "model-id", None, None),
+        (None, "model-id", ValueError, "project_id is required."),
+        ("project-id", None, ValueError, "model_id is required."),
+    ],
+)
+def test_get_model_parameters_operator_validate(project_id, model_id, expected_exception, match):
+    operator = GetModelParametersOperator(
+        task_id="get_model_parameters", project_id=project_id, model_id=model_id
+    )
+    if expected_exception:
+        with pytest.raises(expected_exception, match=match):
+            operator.validate()
+    else:
+        operator.validate()
+
+
+@patch("datarobot_provider.operators.model_training.dr.Model.get")
+def test_get_model_parameters_operator_execute(mock_get_model):
+    mock_model = MagicMock()
+    mock_parameters = MagicMock()
+    mock_parameters.parameters = {"param1": "value1", "param2": "value2"}
+    mock_model.get_parameters.return_value = mock_parameters
+    mock_get_model.return_value = mock_model
+
+    operator = GetModelParametersOperator(
+        task_id="get_model_parameters", project_id="project-id", model_id="model-id"
+    )
+    result = operator.execute(context={})
+    assert result == {"param1": "value1", "param2": "value2"}
+    mock_get_model.assert_called_once_with("project-id", "model-id")
+    mock_model.get_parameters.assert_called_once()

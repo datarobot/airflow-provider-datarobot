@@ -7,12 +7,14 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from collections.abc import Sequence
 from typing import Any
+from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Tuple
 
 import datarobot as dr
 from airflow.utils.context import Context
+from datarobot.models import ModelParameters
 
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
@@ -189,3 +191,43 @@ class AdvancedTuneModelOperator(BaseDatarobotOperator):
 
         job = tune.run()
         return job.id
+
+
+class GetModelParametersOperator(BaseDatarobotOperator):
+    """
+    Retrieve the parameters used to train a given model ID.
+
+    Args:
+        project_id (str): DataRobot project ID.
+        model_id (str): DataRobot model ID.
+        datarobot_conn_id (str, optional): Connection ID, defaults to `datarobot_default`.
+
+    Returns:
+        str: Model retraining job ID.
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Sequence[str] = ["project_id", "model_id"]
+
+    def __init__(
+        self,
+        *,
+        project_id: str,
+        model_id: str,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.project_id = project_id
+        self.model_id = model_id
+
+    def validate(self) -> None:
+        if self.project_id is None:
+            raise ValueError("project_id is required.")
+
+        if self.model_id is None:
+            raise ValueError("model_id is required.")
+
+    def execute(self, context: Context) -> Dict[str, Any]:
+        model = dr.Model.get(self.project_id, self.model_id)
+        model_parameters: ModelParameters = model.get_parameters()
+        return model_parameters.parameters
