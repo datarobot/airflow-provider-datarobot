@@ -133,3 +133,112 @@ pipeline:
                           limits:
                             memory: 1Gi
                             cpu: "1.5"
+        - stage:
+            name: Airflow Startup
+            identifier: airflowstartup
+            description: ""
+            type: CI
+            spec:
+              cloneCodebase: true
+              caching:
+                enabled: true
+                paths: []
+              buildIntelligence:
+                enabled: true
+              platform:
+                os: Linux
+                arch: Amd64
+              runtime:
+                type: Cloud
+                spec: {}
+              execution:
+                steps:
+                  - step:
+                      type: Run
+                      name: Create pyenv environment
+                      identifier: Create_Python_Environment
+                      spec:
+                        shell: Bash
+                        command: |-
+                          sudo apt update
+                          sudo apt install -y make grep build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+                          curl https://pyenv.run | bash
+                          echo -e 'export PYENV_ROOT="$HOME/.pyenv"\nexport PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
+                          echo -e 'eval "$(pyenv init --path)"\neval "$(pyenv init -)"\neval "$(pyenv virtualenv-init -)"' >> ~/.bash_profile
+                          exec "$SHELL"
+                  - step:
+                      type: Run
+                      name: Install python 3
+                      identifier: Install_python_3
+                      spec:
+                        shell: Bash
+                        command: |-
+                          shopt -s expand_aliases
+                          source ~/.bash_profile
+
+                          # Ensure python 3.12 is on the machine
+                          pyenv --version
+                          pyenv install 3.12
+                          pyenv global 3.12
+                          pyenv which python
+
+                          # Overwrite aliases or pyenv global won't work
+                          alias python="pyenv exec python3.12"
+                          alias pip="pyenv exec python3.12 -m pip"
+                          python --version
+
+                          echo "Installing build and req-dev"
+                          pyenv exec python3.12 -m pip install --no-cache-dir --upgrade pip setuptools wheel twine
+                          pyenv exec python3.12 -m pip install -e ".[dev]"
+
+                          echo "Installing astro"
+                          curl -sSL install.astronomer.io | sudo bash -s
+                          make create-astro-dev
+                  - step:
+                      type: Run
+                      name: Build wheel and start airflow
+                      identifier: Build_wheel
+                      spec:
+                        shell: Bash
+                        command: |-
+                          shopt -s expand_aliases
+                          source ~/.bash_profile
+
+                          # Build wheel
+                          rm -rf ./dist
+                          pyenv exec python3.12 setup.py sdist bdist_wheel
+
+                          # Update astro with latest wheel
+                          cp -p "`ls -dtr1 ./dist/*.whl | sort -n | tail -1`" "./astro-dev/"
+                          echo "/usr/local/airflow/`find ./dist/*.whl -exec basename {} \; | sort -n | tail -1`" > \
+                              ./astro-dev/requirements_dev.txt
+
+                          # Copy example dags to astro
+                          cp -r ./datarobot_provider/example_dags/* ./astro-dev/dags/
+
+                          # Start astro
+                          cd astro-dev && astro dev start --no-cache --no-browser
+                  - step:
+                      type: Run
+                      name: Check airflow for errors
+                      identifier: Check_airflow_for_errors
+                      spec:
+                        shell: Bash
+                        command: |-
+                          docker ps -a
+
+                          # Get the container name for the scheduler
+                          CONTAINER_NAME=$(docker ps | grep scheduler | awk '{print $1}')
+                          echo $CONTAINER_NAME
+
+                          # Scan the logs for any python errors
+                          # These will have the prefix Error in the lines
+                          echo "Searching for errors in example dags"
+                          status=$(docker exec -i "$CONTAINER_NAME" awk "/Error/ {print}" logs/scheduler/latest/dataprep_wrangler_autopilot.py.log)
+                          if ! (( -z $(docker exec -i "$CONTAINER_NAME" awk "/Error/ {print}" logs/scheduler/latest/dataprep_wrangler_autopilot.py.log) )); then echo "ERROR"; fi
+
+                          if docker exec -i "$CONTAINER_NAME" awk "/Error/ {print}" logs/scheduler/latest/dataprep_wrangler_autopilot.py.log; then echo "errors found" && exit 1; fi
+                          if docker exec -i "$CONTAINER_NAME" awk "/Error/ {print}" logs/scheduler/latest/deployment_prediction_generation.py.log; then echo "errors found"; fi
+                          if docker exec -i "$CONTAINER_NAME" awk "/Error/ {print}" logs/scheduler/latest/feature_discovery_example.py.log; then echo "errors found"; fi
+                          if docker exec -i "$CONTAINER_NAME" awk "/Error/ {print}" logs/scheduler/latest/model_training_xgboost.py.log; then echo "errors found"; fi
+                          echo "no errors found"
