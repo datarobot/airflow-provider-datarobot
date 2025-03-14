@@ -58,7 +58,9 @@ def post_process_predictions(project_id: str, predict_job_id: str, log: Logger) 
 def custom_function_dag():
     post_process = CustomFunctionOperator(
         task_id="custom_post_process_function",
+        # This can be any arbitrary function
         custom_func=post_process_predictions,
+        # The parameters must be specified here as a dictionary
         func_params={
             "project_id": "{{ params.project_id }}",
             "predict_job_id": "{{ params.predict_job_id }}",
