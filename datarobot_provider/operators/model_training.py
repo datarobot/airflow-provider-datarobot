@@ -193,7 +193,7 @@ class AdvancedTuneModelOperator(BaseDatarobotOperator):
         return job.id
 
 
-class GetModelParametersOperator(BaseDatarobotOperator):
+class GetTrainedModelParametersOperator(BaseDatarobotOperator):
     """
     Retrieve the parameters used to train a given model ID.
 

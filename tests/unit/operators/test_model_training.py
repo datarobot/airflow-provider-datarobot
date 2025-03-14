@@ -12,7 +12,7 @@ import datarobot as dr
 import pytest
 
 from datarobot_provider.operators.model_training import AdvancedTuneModelOperator
-from datarobot_provider.operators.model_training import GetModelParametersOperator
+from datarobot_provider.operators.model_training import GetTrainedModelParametersOperator
 from datarobot_provider.operators.model_training import TrainModelOperator
 
 
@@ -132,7 +132,7 @@ def test_advanced_tune_model_operator_execute(mock_get_model, parameters, set_pa
     ],
 )
 def test_get_model_parameters_operator_validate(project_id, model_id, expected_exception, match):
-    operator = GetModelParametersOperator(
+    operator = GetTrainedModelParametersOperator(
         task_id="get_model_parameters", project_id=project_id, model_id=model_id
     )
     if expected_exception:
@@ -150,7 +150,7 @@ def test_get_model_parameters_operator_execute(mock_get_model):
     mock_model.get_parameters.return_value = mock_parameters
     mock_get_model.return_value = mock_model
 
-    operator = GetModelParametersOperator(
+    operator = GetTrainedModelParametersOperator(
         task_id="get_model_parameters", project_id="project-id", model_id="model-id"
     )
     result = operator.execute(context={})
