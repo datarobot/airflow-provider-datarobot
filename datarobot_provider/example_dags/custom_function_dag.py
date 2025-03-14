@@ -15,7 +15,6 @@ def super_func(x, y):
     return x * y
 
 
-# Define the basic parameters of the DAG, like schedule and start_date
 @dag(
     schedule=None,
     tags=["example", "custom_function"],
