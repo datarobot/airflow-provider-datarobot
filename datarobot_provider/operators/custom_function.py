@@ -6,6 +6,7 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 
+import inspect
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -47,6 +48,8 @@ class CustomFunctionOperator(BaseDatarobotOperator):
 
     def execute(self, context: Context) -> Any:
         self.log.info(f"Function execution parameters: {self.func_params}")
+        if "log" in inspect.signature(self.custom_func).parameters:
+            self.func_params["log"] = self.log
         result = self.custom_func(**self.func_params)
         self.log.info(f"Function execution result: {result}")
         return result
