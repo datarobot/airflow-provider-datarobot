@@ -5,6 +5,7 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
+from collections import namedtuple
 from datetime import datetime
 from unittest.mock import MagicMock
 from unittest.mock import patch
@@ -19,6 +20,7 @@ from datarobot_provider.operators.base_datarobot_operator import XCOM_DEFAULT_US
 from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.operators.datarobot import GetOrCreateUseCaseOperator
 from datarobot_provider.operators.datarobot import GetProjectBlueprintsOperator
+from datarobot_provider.operators.datarobot import GetProjectModelsOperator
 from datarobot_provider.operators.datarobot import SelectBestModelOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
 from datarobot_provider.operators.deployment import DeployModelOperator
@@ -636,3 +638,41 @@ def test_execute_without_filter(mock_get_project, return_all, expected):
     assert result == expected
     mock_get_project.assert_called_once_with("project-id")
     mock_project.get_blueprints.assert_called_once()
+
+
+@patch("datarobot_provider.operators.datarobot.dr.Project.get")
+def test_get_project_models_operator(mock_get_project):
+    Model = namedtuple("Model", ["id", "model_type"])
+    mock_project = MagicMock()
+    mock_project.get_models.return_value = [
+        Model(id="model1", model_type="type1"),
+        Model(id="model2", model_type="type2"),
+    ]
+    mock_get_project.return_value = mock_project
+
+    operator = GetProjectModelsOperator(task_id="get_models", project_id="project-id")
+    result = operator.execute(context={})
+
+    assert result == [("model1", "type1"), ("model2", "type2")]
+    mock_get_project.assert_called_once_with("project-id")
+    mock_project.get_models.assert_called_once()
+
+
+@patch("datarobot_provider.operators.datarobot.dr.Project.get")
+def test_get_project_models_operato_with_no_models(mock_get_project):
+    mock_project = MagicMock()
+    mock_project.get_models.return_value = []
+    mock_get_project.return_value = mock_project
+
+    operator = GetProjectModelsOperator(task_id="get_models", project_id="project-id")
+    result = operator.execute(context={})
+
+    assert result == []
+    mock_get_project.assert_called_once_with("project-id")
+    mock_project.get_models.assert_called_once()
+
+
+def test_get_project_models_operator_no_project_id():
+    with pytest.raises(AirflowFailException):
+        operator = GetProjectModelsOperator(task_id="get_models", project_id=None)
+        operator.validate()
