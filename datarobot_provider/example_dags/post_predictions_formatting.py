@@ -49,13 +49,13 @@ def post_process_predictions(project_id: str, predict_job_id: str, log: Logger) 
 
 @dag(
     schedule=None,
-    tags=["example", "custom_function"],
+    tags=["example", "custom_function", "post_predictions_formatting"],
     params={
         "project_id": "YOUR_PROJECT_ID",
         "predict_job_id": "YOUR_PREDICT_JOB_ID",
     },
 )
-def custom_function_dag():
+def post_predictions_formatting_dag():
     post_process = CustomFunctionOperator(
         task_id="custom_post_process_function",
         # This can be any arbitrary function
@@ -71,4 +71,4 @@ def custom_function_dag():
 
 
 # Instantiate the DAG
-custom_function_dag()
+post_predictions_formatting_dag()
