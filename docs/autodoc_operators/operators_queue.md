@@ -1,6 +1,6 @@
-(predictions-modules)=
+(queue-modules)=
 
-# Predictions Modules
+# Queue Modules
 
 ```{eval-rst}
 .. autoclass:: datarobot_provider.operators.queue.CancelJobOperator
