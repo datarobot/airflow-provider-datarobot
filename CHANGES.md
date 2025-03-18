@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.3.0
+- Rename example DAGs to product/GTM desired names
+- Add `CancelJobOperator`
+- Add segmentation task create operator, tests and docs
+- Add get model parameters operator and tests
+- Added Operator and DAG to run custom functions
+- Add example creation feature discovery retraining and scoring
+- Operator to return a list of ids and type for all trained models in project
+- Add operator to change advanced tuning parameters on models
+- Convert final sensor docstrings to correct format
+- Add residuals operator, tests, and docs
+- Update docstrings to Google Docstring format for datarobot operators
+- Remove outdated Feature Discovery operators.
+- Add DB example for data prep
+- Add get roc curve operator
+- Add lift chart, tests and docs
+- Add replace the model operator
+- Add OTV and Time Series start autopilot operator
+- Adding predictions generation operators and sensor
+
 ## 0.2.0
 - Add `hospital_readmissions_xgboost_example.py` example DAG.
 - Add `hospital_readmissions_deployment_prediction_generation.py` example DAG.
