@@ -12,6 +12,52 @@ import pytest
 from datarobot import QUEUE_STATUS
 
 from datarobot_provider.operators.queue import CancelJobOperator
+from datarobot_provider.operators.queue import GetJobsOperator
+
+
+@pytest.mark.parametrize(
+    "project_id, status, expected_exception, match",
+    [
+        ("project-id", QUEUE_STATUS.INPROGRESS, None, None),
+        (None, QUEUE_STATUS.INPROGRESS, ValueError, "project_id is required."),
+        (
+            "project-id",
+            "INVALID_STATUS",
+            ValueError,
+            "Invalid status: INVALID_STATUS, must be a QUEUE_STATUS.",
+        ),
+    ],
+)
+def test_get_jobs_operator_validate(project_id, status, expected_exception, match):
+    operator = GetJobsOperator(task_id="get_jobs", project_id=project_id, status=status)
+    if expected_exception:
+        with pytest.raises(expected_exception, match=match):
+            operator.validate()
+    else:
+        operator.validate()
+
+
+@patch("datarobot_provider.operators.queue.dr.Project.get")
+def test_get_jobs_operator_execute(mock_get_project):
+    mock_project = MagicMock()
+    mock_job1 = MagicMock()
+    mock_job1.id = "job-id-1"
+    mock_job2 = MagicMock()
+    mock_job2.id = "job-id-2"
+    mock_project.get_all_jobs.return_value = [mock_job1, mock_job2]
+    mock_get_project.return_value = mock_project
+
+    operator = GetJobsOperator(
+        task_id="get_jobs",
+        project_id="project-id",
+        status=QUEUE_STATUS.INPROGRESS,
+    )
+    result = operator.execute(context={})
+    assert result == ["job-id-1", "job-id-2"]
+    mock_get_project.assert_called_once_with("project-id")
+    mock_project.get_all_jobs.assert_called_once_with(
+        status=QUEUE_STATUS.INPROGRESS,
+    )
 
 
 @pytest.mark.parametrize(
