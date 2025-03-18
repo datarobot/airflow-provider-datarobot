@@ -1,6 +1,11 @@
-# This repository is public. Do not put here any private DataRobot or customer's data: code, datasets, model artifacts, .etc.
+# This repository is public. Do not put here any private DataRobot or customer code or data.
 
 ## Summary
 
 
-## Rationale
+## Changes
+
+## PR Checklist
+- [ ] Changelog entry updated.
+- [ ] Documentation added or updated (if relevant).
+- [ ] Tests added or updated (if relevant).
