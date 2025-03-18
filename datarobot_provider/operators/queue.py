@@ -23,7 +23,7 @@ class GetJobsOperator(BaseDatarobotOperator):
 
     Args:
         project_id (str): DataRobot project ID.
-        job_id (str): Job ID in the project.
+        status (str): Status of the job. Default is QUEUE_STATUS.INPROGRESS.
         datarobot_conn_id (str, optional): Connection ID, defaults to `datarobot_default`.
     """
 
