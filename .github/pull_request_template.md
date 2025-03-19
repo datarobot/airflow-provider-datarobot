@@ -8,5 +8,5 @@
 
 ## PR Checklist
 - [ ] Changelog entry updated (`CHANGES.md`).
-- [ ] Documentation added or updated in (if relevant).
-- [ ] Tests added or updated in (if relevant).
+- [ ] Documentation added or updated (if relevant).
+- [ ] Tests added or updated (if relevant).
