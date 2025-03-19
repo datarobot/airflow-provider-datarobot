@@ -1,15 +1,9 @@
----
-title: Model Training XGBoost
-description: Train an XGBoost model from a new project and register the model for deployment.
-path: datarobot_provider/examples/model_training_xgboost.py
-
----
-
 # Model Training XGBoost
-`datarobot_provider/examples/model_training_xgboost.py`
+`path: datarobot_provider/examples/model_training_xgboost.py`
 
-This section summarizes the purpose and/or use of the DAG in a couple sentences.
-Unless otherwise necessary, try not to exceed four sentences, and keep each sentence on its own line in the code (it will still render as a paragraph).
+This DAG demonstrates how to use the DataRobot provider for Apache Airflow to wrangle snowflake data,
+create a new project, train an XGBoost model from a selected blueprint, and register it to DataRobot MLOps
+for use as a future deployment.
 
 ## Requirements
 
@@ -18,15 +12,19 @@ Unless otherwise necessary, try not to exceed four sentences, and keep each sent
 
 ## Input parameters
 
-| Parameter | Data Types | Required | Description |
-|-----------|------------| -------- | ----------- |
-| Param1 | Data type | Yes | Describe `param1`. |
-| Param2 | Data type | No | Describe `param2`. |
+| Parameter | Data Types | Required | Description                                                        |
+|-----------|------------|----------|--------------------------------------------------------------------|
+| data_connection | str        | Yes      | Name of the snowflake connection.                                  |
+| table_schema | str        | Yes      | Snowflake table schema.                                            |
+| primary_table | str        | Yes      | Snowflake primary table.                                           |
+| secondary_table | str        | Yes      | Snowflake secondary table to join to the primary table.            |
+| project_name | str        | No       | Name of the project created.                                       |
+| autopilot_settings | dict       | Yes      | Dictionary of autopilot parameters. Only `target` must be defined. |
 
 ## Procedure (Title TBD)
 
 1. Create or reuse a use case
-2. Upload a dataset
+2. Connect to a snowflake data source
 3. Create a wrangler recipe
 4. Publish and run the wrangler recipe
 5. Create a new project/experiment in the use case
