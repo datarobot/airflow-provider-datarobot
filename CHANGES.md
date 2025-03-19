@@ -1,7 +1,7 @@
 # Changelog
 
 ## Unreleased Changes
-
+- Add documentation for `post_predictions_formatting.py`.
 
 ## 0.3.0
 - Rename example DAGs to product/GTM desired names
