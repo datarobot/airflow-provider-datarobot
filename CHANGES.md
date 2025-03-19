@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased Changes
+- Update the `model_training_xgboost.py` documentation.
 
 
 ## 0.3.0
