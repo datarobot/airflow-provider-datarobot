@@ -1,3 +1,11 @@
+# Copyright 2025 DataRobot, Inc. and its affiliates.
+#
+# All rights reserved.
+#
+# This is proprietary source code of DataRobot, Inc. and its affiliates.
+#
+# Released under the terms of DataRobot Tool and Utility Agreement.
+
 from unittest.mock import ANY
 from unittest.mock import Mock
 
@@ -25,9 +33,9 @@ def test_operator_create_wrangling_recipe_from_dataset(mocker):
     get_dataset_mock = mocker.patch.object(Dataset, "get")
     get_exp_container_mock = mocker.patch.object(UseCase, "get")
     client_mock = mocker.patch(
-        "datarobot_provider.operators.ai_catalog.dr.client.get_client"
+        "datarobot_provider.operators.data_prep.dr.client.get_client"
     ).return_value
-    recipe_mock = mocker.patch("datarobot_provider.operators.ai_catalog.Recipe")
+    recipe_mock = mocker.patch("datarobot_provider.operators.data_prep.Recipe")
     recipe_mock.from_dataset.return_value.id = "test-recipe-id"
     context = {"params": {"use_case_id": "test-use-case-id"}}
 
@@ -79,9 +87,9 @@ def test_operator_create_wrangling_recipe_from_db_table(mocker):
     )
     get_exp_container_mock = mocker.patch.object(UseCase, "get")
     client_mock = mocker.patch(
-        "datarobot_provider.operators.ai_catalog.dr.client.get_client"
+        "datarobot_provider.operators.data_prep.dr.client.get_client"
     ).return_value
-    recipe_mock = mocker.patch("datarobot_provider.operators.ai_catalog.Recipe")
+    recipe_mock = mocker.patch("datarobot_provider.operators.data_prep.Recipe")
     recipe_mock.from_data_store.return_value.id = "test-recipe-id"
     context = {
         "params": {
@@ -141,9 +149,9 @@ def test_operator_create_wrangling_recipe_join_dataset(mocker):
     )
     get_exp_container_mock = mocker.patch.object(UseCase, "get")
     client_mock = mocker.patch(
-        "datarobot_provider.operators.ai_catalog.dr.client.get_client"
+        "datarobot_provider.operators.data_prep.dr.client.get_client"
     ).return_value
-    recipe_mock = mocker.patch("datarobot_provider.operators.ai_catalog.Recipe")
+    recipe_mock = mocker.patch("datarobot_provider.operators.data_prep.Recipe")
     recipe_mock.from_dataset.return_value.id = "test-recipe-id"
     recipe_mock.from_dataset.return_value.inputs = [
         RecipeDatasetInput(
@@ -236,9 +244,9 @@ def test_operator_create_wrangling_recipe_join_datasource(mocker):
     )
     get_exp_container_mock = mocker.patch.object(UseCase, "get")
     client_mock = mocker.patch(
-        "datarobot_provider.operators.ai_catalog.dr.client.get_client"
+        "datarobot_provider.operators.data_prep.dr.client.get_client"
     ).return_value
-    recipe_mock = mocker.patch("datarobot_provider.operators.ai_catalog.Recipe")
+    recipe_mock = mocker.patch("datarobot_provider.operators.data_prep.Recipe")
     recipe_mock.from_data_store.return_value.id = "test-recipe-id"
     recipe_mock.from_data_store.return_value.inputs = [
         JDBCTableDataSourceInput(
