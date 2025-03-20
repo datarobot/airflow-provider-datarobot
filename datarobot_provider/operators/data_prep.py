@@ -1,17 +1,28 @@
-from typing import Optional, Dict, Union, Sequence, List, Any, Iterable
 import datetime
+from typing import Any
+from typing import Dict
+from typing import Iterable
+from typing import List
+from typing import Optional
+from typing import Sequence
+from typing import Union
 
 import datarobot as dr
-
 from airflow.exceptions import AirflowException
 from airflow.utils.context import Context
 from datarobot import DataStore
-from datarobot.enums import DataWranglingDialect, DataWranglingDataSourceTypes, \
-    DownsamplingOperations, RecipeInputType
-from datarobot.models import Recipe, DataSourceInput, RecipeDatasetInput, JDBCTableDataSourceInput
+from datarobot.enums import DataWranglingDataSourceTypes
+from datarobot.enums import DataWranglingDialect
+from datarobot.enums import DownsamplingOperations
+from datarobot.enums import RecipeInputType
+from datarobot.models import DataSourceInput
+from datarobot.models import JDBCTableDataSourceInput
+from datarobot.models import Recipe
+from datarobot.models import RecipeDatasetInput
 from datarobot.models.dataset import Dataset
-from datarobot.models.recipe_operation import RandomSamplingOperation, DownsamplingOperation, \
-    WranglingOperation
+from datarobot.models.recipe_operation import DownsamplingOperation
+from datarobot.models.recipe_operation import RandomSamplingOperation
+from datarobot.models.recipe_operation import WranglingOperation
 
 from datarobot_provider.operators.base_datarobot_operator import BaseUseCaseEntityOperator
 
@@ -111,9 +122,7 @@ class CreateWranglingRecipeOperator(BaseUseCaseEntityOperator):
 
             self.log.info("Working with data_store_id=%s", self.data_store_id)
             data_store = DataStore.get(self.data_store_id)
-            if not (
-                data_store.type and data_store.type in iter(DataWranglingDataSourceTypes)
-            ):
+            if not (data_store.type and data_store.type in iter(DataWranglingDataSourceTypes)):
                 raise AirflowException(f"Unexpected data store type: {data_store.type}")
 
             data_source_canonical_name = self._generate_data_source_canonical_name()

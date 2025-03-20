@@ -5,24 +5,18 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-from unittest.mock import ANY
-from unittest.mock import Mock
 
 import datarobot as dr
-import freezegun
 import pytest
-from datarobot.enums import RecipeInputType
 
 from datarobot_provider.operators.data_registry import CreateDatasetFromDataStoreOperator
 from datarobot_provider.operators.data_registry import CreateDatasetFromProjectOperator
 from datarobot_provider.operators.data_registry import CreateDatasetFromRecipeOperator
 from datarobot_provider.operators.data_registry import CreateDatasetVersionOperator
 from datarobot_provider.operators.data_registry import CreateOrUpdateDataSourceOperator
-from datarobot_provider.operators.data_registry import CreateWranglingRecipeOperator
+from datarobot_provider.operators.data_registry import GetDataStoreOperator
 from datarobot_provider.operators.data_registry import UpdateDatasetFromFileOperator
 from datarobot_provider.operators.data_registry import UploadDatasetOperator
-
-from datarobot_provider.operators.data_registry import GetDataStoreOperator
 
 
 def test_operator_get_data_store(mocker):

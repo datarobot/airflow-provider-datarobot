@@ -12,8 +12,8 @@ from datarobot import AUTOPILOT_MODE
 from datarobot.enums import CV_METHOD
 from datarobot.enums import VALIDATION_TYPE
 
-from datarobot_provider.operators.data_registry import UploadDatasetOperator
 from datarobot_provider.operators.autopilot import StartAutopilotOperator
+from datarobot_provider.operators.data_registry import UploadDatasetOperator
 from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
 

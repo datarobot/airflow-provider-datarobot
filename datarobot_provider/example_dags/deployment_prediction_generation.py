@@ -11,8 +11,8 @@ from airflow.operators.empty import EmptyOperator
 from datarobot.enums import DataWranglingDialect
 
 from datarobot_provider.example_dags.wrangler_example_recipe import WRANGLER_EXAMPLE_RECIPE
-from datarobot_provider.operators.data_registry import CreateDatasetFromRecipeOperator
 from datarobot_provider.operators.data_prep import CreateWranglingRecipeOperator
+from datarobot_provider.operators.data_registry import CreateDatasetFromRecipeOperator
 from datarobot_provider.operators.data_registry import UploadDatasetOperator
 from datarobot_provider.operators.datarobot import GetOrCreateUseCaseOperator
 from datarobot_provider.operators.deployment import DeployRegisteredModelOperator

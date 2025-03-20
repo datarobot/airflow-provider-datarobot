@@ -9,8 +9,8 @@
 import datarobot as dr
 from airflow.decorators import dag
 
-from datarobot_provider.operators.data_registry import CreateDatasetFromRecipeOperator
 from datarobot_provider.operators.data_prep import CreateWranglingRecipeOperator
+from datarobot_provider.operators.data_registry import CreateDatasetFromRecipeOperator
 from datarobot_provider.operators.data_registry import UploadDatasetOperator
 from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.operators.datarobot import GetOrCreateUseCaseOperator

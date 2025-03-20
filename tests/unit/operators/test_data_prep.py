@@ -1,16 +1,24 @@
-from unittest.mock import ANY, Mock
+from unittest.mock import ANY
+from unittest.mock import Mock
 
 import freezegun
 import pytest
-from datarobot import Dataset, UseCase, DataStore, RelationshipsConfiguration
-from datarobot.enums import DataWranglingDialect, DownsamplingOperations, \
-    DataWranglingDataSourceTypes, RecipeInputType
-from datarobot.models import RecipeDatasetInput, JDBCTableDataSourceInput, Recipe
+from datarobot import Dataset
+from datarobot import DataStore
+from datarobot import RelationshipsConfiguration
+from datarobot import UseCase
+from datarobot.enums import DataWranglingDataSourceTypes
+from datarobot.enums import DataWranglingDialect
+from datarobot.enums import DownsamplingOperations
+from datarobot.enums import RecipeInputType
+from datarobot.models import JDBCTableDataSourceInput
+from datarobot.models import Recipe
+from datarobot.models import RecipeDatasetInput
 from datarobot.models.recipe_operation import WranglingOperation
 
 from datarobot_provider.operators.base_datarobot_operator import BaseUseCaseEntityOperator
-from datarobot_provider.operators.data_prep import CreateWranglingRecipeOperator, \
-    CreateFeatureDiscoveryRecipeOperator
+from datarobot_provider.operators.data_prep import CreateFeatureDiscoveryRecipeOperator
+from datarobot_provider.operators.data_prep import CreateWranglingRecipeOperator
 
 
 def test_operator_create_wrangling_recipe_from_dataset(mocker):
