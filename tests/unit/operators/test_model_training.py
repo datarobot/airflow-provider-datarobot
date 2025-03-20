@@ -12,7 +12,9 @@ import datarobot as dr
 import pytest
 
 from datarobot_provider.operators.model_training import AdvancedTuneModelOperator
+from datarobot_provider.operators.model_training import CrossValidateModelOperator
 from datarobot_provider.operators.model_training import GetTrainedModelParametersOperator
+from datarobot_provider.operators.model_training import ScoreBacktestsModelOperator
 from datarobot_provider.operators.model_training import TrainModelOperator
 
 
@@ -157,3 +159,87 @@ def test_get_model_parameters_operator_execute(mock_get_model):
     assert result == {"param1": "value1", "param2": "value2"}
     mock_get_model.assert_called_once_with("project-id", "model-id")
     mock_model.get_parameters.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "project_id, model_id, expected_exception, match",
+    [
+        ("project-id", "model-id", None, None),
+        (None, "model-id", ValueError, "project_id is required."),
+        (
+            "project-id",
+            None,
+            ValueError,
+            "blueprint_id is required.",
+        ),  # Note: error message refers to blueprint_id
+    ],
+)
+def test_cross_validate_model_operator_validate(project_id, model_id, expected_exception, match):
+    operator = CrossValidateModelOperator(
+        task_id="cross_validate_model", project_id=project_id, model_id=model_id
+    )
+    if expected_exception:
+        with pytest.raises(expected_exception, match=match):
+            operator.validate()
+    else:
+        operator.validate()
+
+
+@patch("datarobot_provider.operators.model_training.dr.Model.get")
+def test_cross_validate_model_operator_execute(mock_get_model):
+    mock_model = MagicMock()
+    mock_job = MagicMock()
+    mock_job.id = "job-id"
+    mock_model.cross_validate.return_value = mock_job
+    mock_get_model.return_value = mock_model
+
+    operator = CrossValidateModelOperator(
+        task_id="cross_validate_model", project_id="project-id", model_id="model-id"
+    )
+    result = operator.execute(context={})
+
+    assert result == "job-id"
+    mock_get_model.assert_called_once_with("project-id", "model-id")
+    mock_model.cross_validate.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "project_id, model_id, expected_exception, match",
+    [
+        ("project-id", "model-id", None, None),
+        (None, "model-id", ValueError, "project_id is required."),
+        (
+            "project-id",
+            None,
+            ValueError,
+            "blueprint_id is required.",
+        ),  # Note: error message refers to blueprint_id
+    ],
+)
+def test_score_backtests_model_operator_validate(project_id, model_id, expected_exception, match):
+    operator = ScoreBacktestsModelOperator(
+        task_id="score_backtests_model", project_id=project_id, model_id=model_id
+    )
+    if expected_exception:
+        with pytest.raises(expected_exception, match=match):
+            operator.validate()
+    else:
+        operator.validate()
+
+
+@patch("datarobot_provider.operators.model_training.dr.DatetimeModel.get")
+def test_score_backtests_model_operator_execute(mock_get_datetime_model):
+    mock_model = MagicMock()
+    mock_job = MagicMock()
+    mock_job.id = "job-id"
+    mock_model.score_backtests.return_value = mock_job
+    mock_get_datetime_model.return_value = mock_model
+
+    operator = ScoreBacktestsModelOperator(
+        task_id="score_backtests_model", project_id="project-id", model_id="model-id"
+    )
+    result = operator.execute(context={})
+
+    assert result == "job-id"
+    mock_get_datetime_model.assert_called_once_with("project-id", "model-id")
+    mock_model.score_backtests.assert_called_once()
