@@ -46,14 +46,14 @@ to create registered models that are generic containers that group multiple vers
 - Introduce `CreateWranglingRecipeOperator <datarobot_provider.operators.data_prep.CreateWranglingRecipeOperator>`
 and `CreateDatasetFromRecipeOperator <datarobot_provider.operators.data_prep.CreateDatasetFromRecipeOperator>`
 to create a wrangling recipe and publish it as a dataset into an existing use case.
-- Introduce `CreateDatasetFromProjectOperator <datarobot_provider.operators.ai_catalog.CreateDatasetFromProjectOperator>`
+- Introduce `CreateDatasetFromProjectOperator <datarobot_provider.operators.data_registry.CreateDatasetFromProjectOperator>`
 to create datasets from project data.
 - Add `GetDataStoreOperator <datarobot_provider.operators.connections.GetDataStoreOperator>` to work directly with existing DataRobot data connections.
-- Make `CreateOrUpdateDataSourceOperator <datarobot_provider.operators.ai_catalog.CreateOrUpdateDataSourceOperator>` `dataset_name` parameter optional.
-- Make `CreateOrUpdateDataSourceOperator <datarobot_provider.operators.ai_catalog.CreateOrUpdateDataSourceOperator>` parameters use templates.
+- Make `CreateOrUpdateDataSourceOperator <datarobot_provider.operators.data_registry.CreateOrUpdateDataSourceOperator>` `dataset_name` parameter optional.
+- Make `CreateOrUpdateDataSourceOperator <datarobot_provider.operators.data_registry.CreateOrUpdateDataSourceOperator>` parameters use templates.
 - Add `hospital_readmissions_example.py` DAG.
 - Add `feature_discovery_example.py` DAG.
-- Add an optional *use_case_id* parameter into `CreateProjectOperator <datarobot_provider.operators.ai_catalog.datarobot.CreateProjectOperator>`
+- Add an optional *use_case_id* parameter into `CreateProjectOperator <datarobot_provider.operators.datarobot.CreateProjectOperator>`
 - Add `GetDataStoreOperator <datarobot_provider.operators.datarobot.GetProjectBlueprintsOperator>` to get blueprint ids for a project.
 
 ### Experimental changes
