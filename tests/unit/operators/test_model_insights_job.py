@@ -6,7 +6,9 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from collections import namedtuple
+from unittest.mock import MagicMock
 from unittest.mock import Mock
+from unittest.mock import patch
 
 import datarobot as dr
 import pytest
@@ -20,9 +22,48 @@ from datarobot_provider.operators.model_insights import ComputeFeatureEffectsOpe
 from datarobot_provider.operators.model_insights import ComputeFeatureImpactOperator
 from datarobot_provider.operators.model_insights import ComputeShapImpactOperator
 from datarobot_provider.operators.model_insights import ComputeShapPreviewOperator
+from datarobot_provider.operators.model_insights import GetFeaturesUsedOperator
 from datarobot_provider.operators.model_insights import GetLiftChartInsightOperator
 from datarobot_provider.operators.model_insights import GetResidualsChartInsightOperator
 from datarobot_provider.operators.model_insights import GetRocCurveInsightOperator
+
+
+@pytest.mark.parametrize(
+    "project_id, model_id, expected_exception, match",
+    [
+        ("project-id", "model-id", None, None),
+        (None, "model-id", ValueError, "project_id is required."),
+        ("project-id", None, ValueError, "model_id is required."),
+    ],
+)
+def test_get_features_used_operator_validate(project_id, model_id, expected_exception, match):
+    operator = GetFeaturesUsedOperator(
+        task_id="get_features_used", project_id=project_id, model_id=model_id
+    )
+    if expected_exception:
+        with pytest.raises(expected_exception, match=match):
+            operator.validate()
+    else:
+        operator.validate()
+
+
+@patch("datarobot_provider.operators.model_insights.dr.models.Model.get")
+def test_get_features_used_operator_execute(mock_get_model):
+    # Setup the mock
+    mock_model = MagicMock()
+    mock_model.get_features_used.return_value = ["feature1", "feature2", "feature3"]
+    mock_get_model.return_value = mock_model
+
+    # Create and execute the operator
+    operator = GetFeaturesUsedOperator(
+        task_id="get_features_used", project_id="project-id", model_id="model-id"
+    )
+    result = operator.execute(context={})
+
+    # Verify the results
+    assert result == ["feature1", "feature2", "feature3"]
+    mock_get_model.assert_called_once_with("project-id", "model-id")
+    mock_model.get_features_used.assert_called_once()
 
 
 def test_operator_compute_feature_impact(mocker):

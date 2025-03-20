@@ -32,7 +32,7 @@ class GetFeaturesUsedOperator(BaseDatarobotOperator):
         datarobot_conn_id (str, optional): Connection ID, defaults to `datarobot_default`.
 
     Returns:
-        str: Feature Impact job ID.
+        List[str]: The names of the features used in the model.
     """
 
     # Specify the arguments that are allowed to parse with jinja templating
@@ -54,19 +54,16 @@ class GetFeaturesUsedOperator(BaseDatarobotOperator):
 
     def validate(self) -> None:
         if not self.project_id:
-            raise ValueError("project_id is required to retrieve the used features.")
+            raise ValueError("project_id is required.")
 
         if not self.model_id:
-            raise ValueError("model_id is required to retrieve the used features.")
+            raise ValueError("model_id is required.")
 
-    def execute(self, context: Context) -> str:
+    def execute(self, context: Context) -> List[str]:
         model = dr.models.Model.get(self.project_id, self.model_id)
+        features = model.get_features_used()
 
-        job = model.request_feature_impact()
-
-        self.log.info(f"Feature Impact Job submitted, job_id={job.id}")
-
-        return job.id
+        return features
 
 
 class ComputeFeatureImpactOperator(BaseDatarobotOperator):
