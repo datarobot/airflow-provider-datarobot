@@ -231,3 +231,83 @@ class GetTrainedModelParametersOperator(BaseDatarobotOperator):
         model = dr.Model.get(self.project_id, self.model_id)
         model_parameters: ModelParameters = model.get_parameters()
         return model_parameters.parameters
+
+
+class CrossValidateModelOperator(BaseDatarobotOperator):
+    """
+    By default, models are evaluated on the first validation partition. This will compute scoring for all
+    cross validation partitions of the model.
+
+    For datetime partitioned projects, see the ScoreBacktestsModelOperator.
+
+    Args:
+        project_id (str): DataRobot project ID.
+        model_id (str): DataRobot model ID.
+        datarobot_conn_id (str, optional): Connection ID, defaults to `datarobot_default`.
+
+    Returns:
+        str: Cross validation job ID.
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Sequence[str] = [
+        "project_id",
+        "model_id",
+    ]
+
+    def __init__(
+        self,
+        *,
+        project_id: str,
+        model_id: str,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.project_id = project_id
+        self.model_id = model_id
+
+    def validate(self) -> None:
+        if not self.project_id:
+            raise ValueError("project_id is required.")
+
+        if not self.model_id:
+            raise ValueError("blueprint_id is required.")
+
+    def execute(self, context: Context) -> str:
+        model = dr.Model.get(self.project_id, self.model_id)
+        job = model.cross_validate()
+
+        return job.id
+
+
+class ScoreBacktestsModelOperator(CrossValidateModelOperator):
+    """
+    For a Datetime Partitioned Project, backtesting is the only cross-validation method supported.
+    For non-datetime partitioned projects, see the CrossValidateModelOperator.
+
+    By default, models are evaluated on the first backtest only. This will compute scoring for all
+    backtest partitions of the model.
+
+    Args:
+        project_id (str): DataRobot project ID.
+        model_id (str): DataRobot model ID.
+        datarobot_conn_id (str, optional): Connection ID, defaults to `datarobot_default`.
+
+    Returns:
+        str: Score backtests job ID.
+    """
+
+    def __init__(
+        self,
+        *,
+        project_id: str,
+        model_id: str,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(project_id=project_id, model_id=model_id, **kwargs)
+
+    def execute(self, context: Context) -> str:
+        model = dr.DatetimeModel.get(self.project_id, self.model_id)
+        job = model.score_backtests()
+
+        return job.id
