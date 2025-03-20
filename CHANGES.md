@@ -43,8 +43,8 @@
 ### New features
 - Introduce `CreateRegisteredModelVersionOperator <datarobot_provider.operators.CreateRegisteredModelVersionOperator>`
 to create registered models that are generic containers that group multiple versions of models which can be deployed
-- Introduce `CreateWranglingRecipeOperator <datarobot_provider.operators.ai_catalog.CreateWranglingRecipeOperator>`
-and `CreateDatasetFromRecipeOperator <datarobot_provider.operators.ai_catalog.CreateDatasetFromRecipeOperator>`
+- Introduce `CreateWranglingRecipeOperator <datarobot_provider.operators.data_prep.CreateWranglingRecipeOperator>`
+and `CreateDatasetFromRecipeOperator <datarobot_provider.operators.data_prep.CreateDatasetFromRecipeOperator>`
 to create a wrangling recipe and publish it as a dataset into an existing use case.
 - Introduce `CreateDatasetFromProjectOperator <datarobot_provider.operators.ai_catalog.CreateDatasetFromProjectOperator>`
 to create datasets from project data.

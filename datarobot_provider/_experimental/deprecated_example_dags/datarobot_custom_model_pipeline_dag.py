@@ -14,7 +14,7 @@ from airflow.operators.python import BranchPythonOperator
 from datarobot import TARGET_TYPE
 from datarobot.enums import DEPLOYMENT_IMPORTANCE
 
-from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
+from datarobot_provider.operators.data_registry import UploadDatasetOperator
 from datarobot_provider.operators.custom_models import CreateCustomInferenceModelOperator
 from datarobot_provider.operators.custom_models import CreateCustomModelDeploymentOperator
 from datarobot_provider.operators.custom_models import CreateCustomModelVersionOperator

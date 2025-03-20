@@ -10,9 +10,9 @@ from datetime import datetime
 from airflow.decorators import dag
 from airflow.decorators import task
 
-from datarobot_provider.operators.ai_catalog import CreateDatasetFromDataStoreOperator
+from datarobot_provider.operators.data_registry import CreateDatasetFromDataStoreOperator
 from datarobot_provider.operators.bias_and_fairness import UpdateBiasAndFairnessSettingsOperator
-from datarobot_provider.operators.connections import GetDataStoreOperator
+from datarobot_provider.operators.data_registry import GetDataStoreOperator
 from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.operators.datarobot import TrainModelsOperator
 from datarobot_provider.operators.deployment import DeployRecommendedModelOperator
