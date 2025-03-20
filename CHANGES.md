@@ -1,7 +1,7 @@
 # Changelog
 
 ## Unreleased Changes
-
+- Add the `GetFeaturesUsedOperator` to get the features used to train the model.
 
 ## 0.3.0
 - Rename example DAGs to product/GTM desired names

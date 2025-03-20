@@ -24,7 +24,7 @@ from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOp
 
 class GetFeaturesUsedOperator(BaseDatarobotOperator):
     """
-    Get the features used for the model.
+    Get the features used for training the model.
 
     Args:
         project_id (str): DataRobot project ID.
