@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased Changes
+- Add the `CrossValidationMetricsOperator` to compute scoring for all partitions for a model.
+- Add the `ScoreBacktestsModelOperator` to score all backtests for a datetime partitioned model.
 
 
 ## 0.3.0
