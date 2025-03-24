@@ -56,7 +56,7 @@ pipeline:
                       GH_TOKEN: <+secrets.getValue("account.githubpatsvcharnessgit2")>
                       RELEASE_VERSION: <+stage.variables.RELEASE_VERSION>
         variables:
-          - name: RELEASE_VERSION
+          - name: RELEASE_VERSION_TAG
             type: String
             description: |-
               Please provide the tag to use for the release. This version should include the `v` prefix. This tag should be created from a commit prior to a release. It should be the same tag used to execute this pipeline.
