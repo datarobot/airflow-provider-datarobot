@@ -52,11 +52,14 @@ pipeline:
 
                       # Create a standard release
                       gh release create $RELEASE_VERSION --latest=true --title "$RELEASE_VERSION" --generate-notes --verify-tag
+                    envVariables:
+                      GH_TOKEN: <+secrets.getValue("account.githubpatsvcharnessgit2")>
+                      RELEASE_VERSION: <+stage.variables.RELEASE_VERSION>
         variables:
           - name: RELEASE_VERSION
             type: String
             description: |-
-              Please provide the version to use for the release. This version should include the `v` prefix.
+              Please provide the tag to use for the release. This version should include the `v` prefix. This tag should be created from a commit prior to a release. It should be the same tag used to execute this pipeline.
 
               Example:
               v1.0.0
