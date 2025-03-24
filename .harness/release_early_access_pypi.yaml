@@ -51,7 +51,7 @@ pipeline:
                       cd airflow-provider-datarobot
 
                       # Create a standard release
-                      gh release create $RELEASE_VERSION --latest=true --title "$RELEASE_VERSION" --generate-notes
+                      gh release create $RELEASE_VERSION --latest=true --title "$RELEASE_VERSION" --generate-notes --verify-tag
         variables:
           - name: RELEASE_VERSION
             type: String
