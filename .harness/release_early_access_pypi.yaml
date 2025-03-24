@@ -43,11 +43,14 @@ pipeline:
                     shell: Sh
                     command: |-
                       set -ex pipefail
+                      # Install github-cli
                       curl -sS https://webi.sh/gh | sh
 
+                      # Clone the repo
                       git clone https://github.com/datarobot/airflow-provider-datarobot.git
                       cd airflow-provider-datarobot
 
+                      # Create a standard release
                       gh release create $RELEASE_VERSION --latest=true --title "$RELEASE_VERSION" --generate-notes
         variables:
           - name: RELEASE_VERSION
