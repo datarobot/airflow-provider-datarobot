@@ -51,10 +51,10 @@ pipeline:
                       cd airflow-provider-datarobot
 
                       # Create a standard release
-                      gh release create $RELEASE_VERSION --latest=true --title "$RELEASE_VERSION" --generate-notes --verify-tag
+                      gh release create $RELEASE_VERSION_TAG --latest=true --title "$RELEASE_VERSION_TAG" --generate-notes --verify-tag
                     envVariables:
                       GH_TOKEN: <+secrets.getValue("account.githubpatsvcharnessgit2")>
-                      RELEASE_VERSION: <+stage.variables.RELEASE_VERSION>
+                      RELEASE_VERSION_TAG: <+stage.variables.RELEASE_VERSION_TAG>
         variables:
           - name: RELEASE_VERSION_TAG
             type: String
