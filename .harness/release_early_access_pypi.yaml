@@ -17,6 +17,49 @@ pipeline:
               templateRef: unit_tests
               versionLabel: "1"
     - stage:
+        name: Release to Github
+        identifier: Release_to_Github
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          caching:
+            enabled: true
+          buildIntelligence:
+            enabled: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: Release to Github
+                  identifier: Release_to_Github
+                  spec:
+                    shell: Sh
+                    command: |-
+                      set -ex pipefail
+                      curl -sS https://webi.sh/gh | sh
+
+                      git clone https://github.com/datarobot/airflow-provider-datarobot.git
+                      cd airflow-provider-datarobot
+
+                      gh release create $RELEASE_VERSION --latest=true --title "$RELEASE_VERSION" --generate-notes
+        variables:
+          - name: RELEASE_VERSION
+            type: String
+            description: |-
+              Please provide the version to use for the release. This version should include the `v` prefix.
+
+              Example:
+              v1.0.0
+            required: true
+            value: <+input>
+    - stage:
         name: Publish to Test Pypi
         identifier: Publish_to_Test_Pypi
         template:
