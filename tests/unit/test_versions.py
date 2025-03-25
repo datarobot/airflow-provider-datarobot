@@ -48,9 +48,12 @@ def test_changes_file_is_formatted_correctly(changes_file):
     with open(changes_file) as fd:
         lines = fd.readlines()
         assert len(lines) > 0
+
+        # Ensure the automation portion at the top is always correct
         assert lines[0] == "# Changelog\n"
         assert lines[1] == "\n"
         assert lines[2] == "## Unreleased Changes\n"
+
         for line in lines[3:]:
             # Ensure there are not duplicate headings for unreleased changes
             assert line != "## Unreleased Changes\n"
