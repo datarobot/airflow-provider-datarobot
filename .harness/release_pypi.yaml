@@ -16,68 +16,67 @@ pipeline:
             template:
               templateRef: unit_tests
               versionLabel: "1"
-    - parallel:
-        - stage:
-            name: Publish Release to TestPypi
-            identifier: Publish_Release_to_TestPypi
-            template:
-              templateRef: publish_early_access_to_pypi_or_testpypi
-              versionLabel: "1"
-              templateInputs:
-                type: CI
-                variables:
-                  - name: BUILD_TYPE
-                    type: String
-                    default: release-early-access-test-pypi
-                    value: release-mainline-test-pypi
-        - stage:
-            name: Create Github Release
-            identifier: Create_Github_Release
-            description: ""
-            type: CI
+    - stage:
+        name: Create Github Release
+        identifier: Create_Github_Release
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          caching:
+            enabled: true
+          buildIntelligence:
+            enabled: true
+          infrastructure:
+            type: KubernetesDirect
             spec:
-              cloneCodebase: true
-              caching:
-                enabled: true
-              buildIntelligence:
-                enabled: true
-              infrastructure:
-                type: KubernetesDirect
-                spec:
-                  connectorRef: account.cigeneral
-                  namespace: harness-delegate-ng
-                  automountServiceAccountToken: true
-                  nodeSelector: {}
-                  os: Linux
-              execution:
-                steps:
-                  - step:
-                      type: Run
-                      name: run
-                      identifier: run
-                      spec:
-                        connectorRef: account.dockerhub_datarobot_read
-                        image: alpine/git
-                        shell: Sh
-                        command: |-
-                          apk update
-                          apk add yq github-cli
-                          git clone https://svc-harness-git2:${GH_TOKEN}@github.com/datarobot/airflow-provider-datarobot.git
-                          cd airflow-provider-datarobot
+              connectorRef: account.cigeneral
+              namespace: harness-delegate-ng
+              automountServiceAccountToken: true
+              nodeSelector: {}
+              os: Linux
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: run
+                  identifier: run
+                  spec:
+                    connectorRef: account.dockerhub_datarobot_read
+                    image: alpine/git
+                    shell: Sh
+                    command: |-
+                      apk update
+                      apk add yq github-cli
+                      git clone https://svc-harness-git2:${GH_TOKEN}@github.com/datarobot/airflow-provider-datarobot.git
+                      cd airflow-provider-datarobot
 
-                          git config --global user.email "svc-harness-git2@datarobot.com"
-                          git config --global user.name "svc-harness-git2"
+                      git config --global user.email "svc-harness-git2@datarobot.com"
+                      git config --global user.name "svc-harness-git2"
 
-                          # Create a standard release
-                          gh release create v<+stage.variables.RELEASE_VERSION_TAG> --latest=true --title "v<+stage.variables.RELEASE_VERSION_TAG> " --generate-notes --verify-tag
-                        envVariables:
-                          GH_TOKEN: <+secrets.getValue("account.githubpatsvcharnessgit2")>
+                      # Create a standard release
+                      gh release create v<+stage.variables.RELEASE_VERSION_TAG> --latest=true --title "v<+stage.variables.RELEASE_VERSION_TAG> " --generate-notes --verify-tag
+                    envVariables:
+                      GH_TOKEN: <+secrets.getValue("account.githubpatsvcharnessgit2")>
+        variables:
+          - name: RELEASE_VERSION_TAG
+            type: String
+            description: "Release version tag as numbers only (Example: 1.0.2)"
+            required: true
+            value: <+input>
+    - stage:
+        name: Publish Release to TestPypi
+        identifier: Publish_Release_to_TestPypi
+        template:
+          templateRef: publish_early_access_to_pypi_or_testpypi
+          versionLabel: "1"
+          templateInputs:
+            type: CI
             variables:
-              - name: RELEASE_VERSION_TAG
+              - name: BUILD_TYPE
                 type: String
-                description: "Release version tag as numbers only (Example: 1.0.2)"
-                required: true
-                value: <+input>
+                default: release-early-access-test-pypi
+                value: release-mainline-test-pypi
     - stage:
         name: Approve Release to Pypi
         identifier: Approve_Release
