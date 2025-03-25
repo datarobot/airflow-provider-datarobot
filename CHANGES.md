@@ -2,8 +2,10 @@
 
 ## Unreleased Changes
 - Add documentation for `deployment_prediction_generation.py` example DAG.
+- Update the `model_training_xgboost.py` documentation.
 - Add the `CrossValidationMetricsOperator` to compute scoring for all partitions for a model.
 - Add the `ScoreBacktestsModelOperator` to score all backtests for a datetime partitioned model.
+- Add the `GetFeaturesUsedOperator` to get the features used to train the model.
 
 ## 0.3.0
 - Rename example DAGs to product/GTM desired names
@@ -43,17 +45,17 @@
 ### New features
 - Introduce `CreateRegisteredModelVersionOperator <datarobot_provider.operators.CreateRegisteredModelVersionOperator>`
 to create registered models that are generic containers that group multiple versions of models which can be deployed
-- Introduce `CreateWranglingRecipeOperator <datarobot_provider.operators.ai_catalog.CreateWranglingRecipeOperator>`
-and `CreateDatasetFromRecipeOperator <datarobot_provider.operators.ai_catalog.CreateDatasetFromRecipeOperator>`
+- Introduce `CreateWranglingRecipeOperator <datarobot_provider.operators.data_prep.CreateWranglingRecipeOperator>`
+and `CreateDatasetFromRecipeOperator <datarobot_provider.operators.data_prep.CreateDatasetFromRecipeOperator>`
 to create a wrangling recipe and publish it as a dataset into an existing use case.
-- Introduce `CreateDatasetFromProjectOperator <datarobot_provider.operators.ai_catalog.CreateDatasetFromProjectOperator>`
+- Introduce `CreateDatasetFromProjectOperator <datarobot_provider.operators.data_registry.CreateDatasetFromProjectOperator>`
 to create datasets from project data.
 - Add `GetDataStoreOperator <datarobot_provider.operators.connections.GetDataStoreOperator>` to work directly with existing DataRobot data connections.
-- Make `CreateOrUpdateDataSourceOperator <datarobot_provider.operators.ai_catalog.CreateOrUpdateDataSourceOperator>` `dataset_name` parameter optional.
-- Make `CreateOrUpdateDataSourceOperator <datarobot_provider.operators.ai_catalog.CreateOrUpdateDataSourceOperator>` parameters use templates.
+- Make `CreateOrUpdateDataSourceOperator <datarobot_provider.operators.data_registry.CreateOrUpdateDataSourceOperator>` `dataset_name` parameter optional.
+- Make `CreateOrUpdateDataSourceOperator <datarobot_provider.operators.data_registry.CreateOrUpdateDataSourceOperator>` parameters use templates.
 - Add `hospital_readmissions_example.py` DAG.
 - Add `feature_discovery_example.py` DAG.
-- Add an optional *use_case_id* parameter into `CreateProjectOperator <datarobot_provider.operators.ai_catalog.datarobot.CreateProjectOperator>`
+- Add an optional *use_case_id* parameter into `CreateProjectOperator <datarobot_provider.operators.datarobot.CreateProjectOperator>`
 - Add `GetDataStoreOperator <datarobot_provider.operators.datarobot.GetProjectBlueprintsOperator>` to get blueprint ids for a project.
 
 ### Experimental changes
