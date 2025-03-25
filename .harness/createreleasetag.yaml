@@ -37,6 +37,7 @@ pipeline:
                       # Install github-cli
                       curl -sS https://webi.sh/gh | sh
 
+                      git fetch
                       git branch -r
                       ls -la
           platform:
