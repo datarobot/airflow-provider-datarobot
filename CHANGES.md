@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased Changes
+- Update the `model_training_xgboost.py` documentation.
 - Add the `CrossValidationMetricsOperator` to compute scoring for all partitions for a model.
 - Add the `ScoreBacktestsModelOperator` to score all backtests for a datetime partitioned model.
 - Add the `GetFeaturesUsedOperator` to get the features used to train the model.
