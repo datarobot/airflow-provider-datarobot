@@ -43,6 +43,8 @@ def test_airflow_entry_version_is_equivalent(package_version):
 
 
 def test_changes_file_is_formatted_correctly(changes_file):
+    """This test helps to ensure release automation will not encounter any problems
+    when parsing the CHANGES.md file to bump the release version."""
     with open(changes_file) as fd:
         lines = fd.readlines()
         assert len(lines) > 0
