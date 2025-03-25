@@ -49,3 +49,6 @@ def test_changes_file_is_formatted_correctly(changes_file):
         assert lines[0] == "# Changelog\n"
         assert lines[1] == "\n"
         assert lines[2] == "## Unreleased Changes\n"
+        # Ensure there are not duplicate headings for unreleased changes
+        for line in lines[3:]:
+            assert line != "## Unreleased Changes\n"
