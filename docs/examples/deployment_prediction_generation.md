@@ -1,7 +1,7 @@
 # Deployment Prediction Generation
 `path: datarobot_provider/examples/deployment_prediction_generation.py`
 
-Example of Aiflow DAG for DataRobot data deployment and prediction generation. This DAG will create a new deployment
+This is an example of an Aiflow DAG for DataRobot data deployment and prediction generation. This DAG will create a new deployment
 from a registered model and demonstrate how to generate predictions from the deployment.
 
 ## Requirements
@@ -19,7 +19,7 @@ from a registered model and demonstrate how to generate predictions from the dep
 | predictions_dataset_file_path | str        | Yes      | The path to the dataset to be used for predictions.                               |
 
 
-## Procedure (Title TBD)
+## Usage
 
 1. Create or reuse a use case
 2. Deploy the registered model
@@ -29,9 +29,9 @@ from a registered model and demonstrate how to generate predictions from the dep
 6. Make predictions using the deployed model
 7. Wait for the predictions to be finish scoring
 
-## Result (TBD)
+## Result
 
-The result of this DAG is the user will have a new deployment created from a registered model and test making
+You now have a new deployment created from a registered model and test making
 predictions from the new deployment.
 
 ## Troubleshooting
