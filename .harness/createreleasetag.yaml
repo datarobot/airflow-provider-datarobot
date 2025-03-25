@@ -1,0 +1,58 @@
+pipeline:
+  name: create-release-tag
+  identifier: createreleasetag
+  projectIdentifier: airflowproviderdatarobot
+  orgIdentifier: AGENTS
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.svc_harness_git1
+        repoName: airflow-provider-datarobot
+        build: <+input>
+  stages:
+    - stage:
+        name: Create Release Tag
+        identifier: Create_Release_Tag
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          caching:
+            enabled: true
+          buildIntelligence:
+            enabled: true
+          infrastructure:
+            type: KubernetesDirect
+            spec:
+              connectorRef: account.cigeneral
+              namespace: harness-delegate-ng
+              automountServiceAccountToken: true
+              nodeSelector: {}
+              os: Linux
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: run
+                  identifier: run
+                  spec:
+                    connectorRef: account.dockerhub_datarobot_read
+                    image: alpine/git
+                    shell: Sh
+                    command: |-
+                      apk update
+                      apk add yq
+
+                      git clone https://svc-harness-git2:${GH_TOKEN}@github.com/datarobot/airflow-provider-datarobot.git
+                      cd airflow-provider-datarobot
+
+                      git config --global user.email "svc-harness-git2@datarobot.com"
+                      git config --global user.name "svc-harness-git2"
+
+                      # Clone the repo and ensure we create a branch from a detached SHA
+                      git reset --hard
+                      git tag -a v<+stage.variables.RELEASE_VERSION_TAG> <+stage.variables.COMMIT_SHA> -m "Release v<+stage.variables.RELEASE_VERSION_TAG>"
+                      git push origin tag v<+stage.variables.RELEASE_VERSION_TAG>
+                    envVariables:
+                      GH_TOKEN: <+secrets.getValue("account.githubpatsvcharnessgit2")>
