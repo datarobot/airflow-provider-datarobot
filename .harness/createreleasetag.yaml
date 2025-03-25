@@ -41,3 +41,14 @@ pipeline:
                     image: python:3.12
                     shell: Bash
                     command: ls -la
+        variables:
+          - name: COMMIT_SHA
+            type: String
+            description: ""
+            required: true
+            value: <+input>
+          - name: TAG_RELEASE_VERSION
+            type: String
+            description: ""
+            required: true
+            value: <+input>
