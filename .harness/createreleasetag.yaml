@@ -1,0 +1,43 @@
+pipeline:
+  name: create-release-tag
+  identifier: createreleasetag
+  projectIdentifier: airflowproviderdatarobot
+  orgIdentifier: AGENTS
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.svc_harness_git1
+        repoName: airflow-provider-datarobot
+        build: <+input>
+  stages:
+    - stage:
+        name: Create Release Commit
+        identifier: Create_Release_Commit
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          caching:
+            enabled: true
+          buildIntelligence:
+            enabled: true
+          infrastructure:
+            type: KubernetesDirect
+            spec:
+              connectorRef: account.cigeneral
+              namespace: harness-delegate-ng
+              automountServiceAccountToken: true
+              nodeSelector: {}
+              os: Linux
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: Clone and update commit
+                  identifier: Clone_and_update_commit
+                  spec:
+                    connectorRef: account.dockerhub_datarobot_read
+                    image: python:3.12
+                    shell: Bash
+                    command: ls -la
