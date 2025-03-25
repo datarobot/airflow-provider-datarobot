@@ -56,3 +56,14 @@ pipeline:
                       git push origin tag v<+stage.variables.RELEASE_VERSION_TAG>
                     envVariables:
                       GH_TOKEN: <+secrets.getValue("account.githubpatsvcharnessgit2")>
+        variables:
+          - name: COMMIT_SHA
+            type: String
+            description: SHA of the commit to use
+            required: true
+            value: <+input>
+          - name: RELEASE_VERSION_TAG
+            type: String
+            description: "Release version tag as numbers only (Example: 1.0.2)"
+            required: true
+            value: <+input>
