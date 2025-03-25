@@ -150,6 +150,7 @@ For `mainline` releases, the following steps should be followed:
   - See: https://github.com/datarobot/airflow-provider-datarobot/commits/main/
 - Connect to `harness`.
 - Run the `create-release-pr` pipeline with the SHA hash and version as parameters.
+- Review and approve the release PR. Changes are comments can be added to the PR.
 - Run the `create-release-tag` pipeline with the SHA hash and version as parameters.
 - Run the `release-pypi` pipeline with the input set as `Git Tag` and the `Tag Name` as the version (tags includes v, example v1.0.2).
 
