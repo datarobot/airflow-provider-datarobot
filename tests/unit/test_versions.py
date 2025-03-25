@@ -19,6 +19,11 @@ def version_file(root):
 
 
 @pytest.fixture
+def changes_file(root):
+    return os.path.join(root, "CHANGES.md")
+
+
+@pytest.fixture
 def package_version(version_file):
     with open(version_file) as fd:
         version_search = re.search(
@@ -35,3 +40,12 @@ def test_primary_version_defined(package_version):
 def test_airflow_entry_version_is_equivalent(package_version):
     provider_info = get_provider_info()
     assert [package_version] == provider_info["versions"]
+
+
+def test_changes_file_is_formatted_correctly(changes_file):
+    with open(changes_file) as fd:
+        lines = fd.readlines()
+        assert len(lines) > 0
+        assert lines[0] == "# Changelog\n"
+        assert lines[1] == "\n"
+        assert lines[2] == "## Unreleased Changes\n"
