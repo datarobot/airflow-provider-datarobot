@@ -47,13 +47,9 @@
 ## 0.1.0
 
 ### New features
-- Introduce `CreateRegisteredModelVersionOperator <datarobot_provider.operators.CreateRegisteredModelVersionOperator>`
-to create registered models that are generic containers that group multiple versions of models which can be deployed
-- Introduce `CreateWranglingRecipeOperator <datarobot_provider.operators.data_prep.CreateWranglingRecipeOperator>`
-and `CreateDatasetFromRecipeOperator <datarobot_provider.operators.data_prep.CreateDatasetFromRecipeOperator>`
-to create a wrangling recipe and publish it as a dataset into an existing use case.
-- Introduce `CreateDatasetFromProjectOperator <datarobot_provider.operators.data_registry.CreateDatasetFromProjectOperator>`
-to create datasets from project data.
+- Introduce `CreateRegisteredModelVersionOperator <datarobot_provider.operators.CreateRegisteredModelVersionOperator>` to create registered models that are generic containers that group multiple versions of models which can be deployed
+- Introduce `CreateWranglingRecipeOperator <datarobot_provider.operators.data_prep.CreateWranglingRecipeOperator>` and `CreateDatasetFromRecipeOperator <datarobot_provider.operators.data_prep.CreateDatasetFromRecipeOperator>` to create a wrangling recipe and publish it as a dataset into an existing use case.
+- Introduce `CreateDatasetFromProjectOperator <datarobot_provider.operators.data_registry.CreateDatasetFromProjectOperator>` to create datasets from project data.
 - Add `GetDataStoreOperator <datarobot_provider.operators.connections.GetDataStoreOperator>` to work directly with existing DataRobot data connections.
 - Make `CreateOrUpdateDataSourceOperator <datarobot_provider.operators.data_registry.CreateOrUpdateDataSourceOperator>` `dataset_name` parameter optional.
 - Make `CreateOrUpdateDataSourceOperator <datarobot_provider.operators.data_registry.CreateOrUpdateDataSourceOperator>` parameters use templates.
@@ -64,25 +60,24 @@ to create datasets from project data.
 
 ### Experimental changes
 
-- Introduce `NotebookRunOperator <datarobot_provider._experimental.operators.notebook.NotebookRunOperator>`
-and `NotebookRunCompleteSensor <datarobot_provider._experimental.sensors.notebook.NotebookRunCompleteSensor>`
+- Introduce `NotebookRunOperator <datarobot_provider._experimental.operators.notebook.NotebookRunOperator>` and `NotebookRunCompleteSensor <datarobot_provider._experimental.sensors.notebook.NotebookRunCompleteSensor>`
 
 ## 0.0.12
 
 ### New features
 
-Specified supported Python versions to >=3.9
+- Specified supported Python versions to >=3.9
 
 ## 0.0.11
 
 ### Bugfixes
 
-Fixes typo which lead to a bug in UpdateBiasAndFairnessSettingsOperator.
+- Fixes typo which lead to a bug in UpdateBiasAndFairnessSettingsOperator.
 
 ### API changes
 
-UpdateBiasAndFairnessSettingsOperator now accepts param fairness_metric_set instead of fairness_metrics_set.
+- UpdateBiasAndFairnessSettingsOperator now accepts param fairness_metric_set instead of fairness_metrics_set.
 
 ### Deprecation summary
 
-Param UpdateBiasAndFairnessSettingsOperator.fairness_metrics_set is deprecated, and going to be removed in the next minor release.
+- Param UpdateBiasAndFairnessSettingsOperator.fairness_metrics_set is deprecated, and going to be removed in the next minor release.
