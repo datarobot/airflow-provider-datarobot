@@ -22,14 +22,6 @@ pipeline:
             enabled: true
           buildIntelligence:
             enabled: true
-          infrastructure:
-            type: KubernetesDirect
-            spec:
-              connectorRef: account.cigeneral
-              namespace: harness-delegate-ng
-              automountServiceAccountToken: true
-              nodeSelector: {}
-              os: Linux
           execution:
             steps:
               - step:
@@ -39,10 +31,20 @@ pipeline:
                   spec:
                     connectorRef: account.dockerhub_datarobot_read
                     image: python:3.12
-                    shell: Bash
+                    shell: Sh
                     command: |-
+                      set -ex pipefail
+                      # Install github-cli
+                      curl -sS https://webi.sh/gh | sh
+
                       git checkout $<+stage.variables.COMMIT_SHA>
                       git log -5
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
         variables:
           - name: COMMIT_SHA
             type: String
