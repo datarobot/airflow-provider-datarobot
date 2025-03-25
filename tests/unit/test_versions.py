@@ -54,6 +54,6 @@ def test_changes_file_is_formatted_correctly(changes_file):
         for line in lines[3:]:
             # Ensure there are not duplicate headings for unreleased changes
             assert line != "## Unreleased Changes\n"
-            # All changes should be in a list format
+            # All changes should be in a list format, don't manually wrap lines.
             if not line.startswith("##") and line != "\n":
                 assert line[:2] == "- "
