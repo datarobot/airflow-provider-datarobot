@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased Changes
+
+## v0.4.0
 - Add documentation for `post_predictions_formatting.py`.
 - Add documentation for `deployment_prediction_generation.py` example DAG.
 - Update the `model_training_xgboost.py` documentation.
