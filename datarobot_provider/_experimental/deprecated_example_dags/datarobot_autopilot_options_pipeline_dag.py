@@ -10,8 +10,8 @@ from datetime import datetime
 from airflow.decorators import dag
 from datarobot import AUTOPILOT_MODE
 
-from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
 from datarobot_provider.operators.autopilot import StartAutopilotOperator
+from datarobot_provider.operators.data_registry import UploadDatasetOperator
 from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
 

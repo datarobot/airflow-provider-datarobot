@@ -16,7 +16,7 @@ from datetime import datetime
 
 from airflow.decorators import dag
 
-from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
+from datarobot_provider.operators.data_registry import UploadDatasetOperator
 
 
 @dag(

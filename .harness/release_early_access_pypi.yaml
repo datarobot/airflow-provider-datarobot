@@ -17,6 +17,55 @@ pipeline:
               templateRef: unit_tests
               versionLabel: "1"
     - stage:
+        name: Release to Github
+        identifier: Release_to_Github
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          caching:
+            enabled: true
+          buildIntelligence:
+            enabled: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: Release to Github
+                  identifier: Release_to_Github
+                  spec:
+                    shell: Sh
+                    command: |-
+                      set -ex pipefail
+                      # Install github-cli
+                      curl -sS https://webi.sh/gh | sh
+
+                      # Clone the repo
+                      git clone https://github.com/datarobot/airflow-provider-datarobot.git
+                      cd airflow-provider-datarobot
+
+                      # Create a standard release
+                      gh release create $RELEASE_VERSION_TAG --latest=true --title "$RELEASE_VERSION_TAG" --generate-notes --verify-tag
+                    envVariables:
+                      GH_TOKEN: <+secrets.getValue("account.githubpatsvcharnessgit2")>
+                      RELEASE_VERSION_TAG: <+stage.variables.RELEASE_VERSION_TAG>
+        variables:
+          - name: RELEASE_VERSION_TAG
+            type: String
+            description: |-
+              Please provide the tag to use for the release. This version should include the `v` prefix. This tag should be created from a commit prior to a release. It should be the same tag used to execute this pipeline.
+
+              Example:
+              v1.0.0
+            required: true
+            value: <+input>
+    - stage:
         name: Publish to Test Pypi
         identifier: Publish_to_Test_Pypi
         template:

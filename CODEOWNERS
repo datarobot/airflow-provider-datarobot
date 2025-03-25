@@ -1,8 +1,8 @@
 *                                                        @datarobot/predictive-ai
 /datarobot_provider/_experimental/operators/notebook.py  @datarobot/cfx
 /datarobot_provider/_experimental/sensors/notebook.py    @datarobot/cfx
-/datarobot_provider/operators/ai_catalog.py              @datarobot/mldata
-/datarobot_provider/operators/connections.py             @datarobot/mldata
+/datarobot_provider/operators/data_prep.py               @datarobot/mldata
+/datarobot_provider/operators/data_registry.py           @datarobot/mldata
 /datarobot_provider/operators/deployment.py              @datarobot/model-management
 /datarobot_provider/operators/feature_discovery.py       @datarobot/mldata
 /datarobot_provider/operators/mlops.py                   @datarobot/model-management
