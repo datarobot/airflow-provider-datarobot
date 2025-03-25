@@ -38,6 +38,7 @@ pipeline:
                       curl -sS https://webi.sh/gh | sh
 
                       git branch -r
+                      ls -la
           platform:
             os: Linux
             arch: Amd64
