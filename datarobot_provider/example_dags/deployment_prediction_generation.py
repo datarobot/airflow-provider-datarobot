@@ -29,6 +29,7 @@ Configurable parameters for this dag:
   When working with prediction environments, default prediction server Id should not be provided
 * target_drift_enabled - if target drift tracking is to be turned on
 * feature_drift_enabled - if feature drift tracking is to be turned on
+* predictions_dataset_file_path - the path to the dataset to be used for predictions
 
 PREDICTION SERVER IDS:
 See https://docs.datarobot.com/en/docs/api/reference/predapi/pred-server-id.html

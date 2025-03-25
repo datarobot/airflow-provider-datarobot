@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased Changes
+- Add documentation for `deployment_prediction_generation.py` example DAG.
 - Update the `model_training_xgboost.py` documentation.
 - Add the `CrossValidationMetricsOperator` to compute scoring for all partitions for a model.
 - Add the `ScoreBacktestsModelOperator` to score all backtests for a datetime partitioned model.
