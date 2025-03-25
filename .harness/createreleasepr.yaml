@@ -84,11 +84,11 @@ pipeline:
         variables:
           - name: COMMIT_SHA
             type: String
-            description: ""
+            description: SHA of the commit to use
             required: true
             value: <+input>
           - name: RELEASE_VERSION_TAG
             type: String
-            description: ""
+            description: "Release version tag as numbers only (Example: 1.0.2)"
             required: true
             value: <+input>
