@@ -3,6 +3,11 @@
 # Insights Modules
 
 ```{eval-rst}
+.. autoclass:: datarobot_provider.operators.model_insights.GetFeaturesUsedOperator
+   :members:
+```
+
+```{eval-rst}
 .. autoclass:: datarobot_provider.operators.model_insights.ComputeFeatureImpactOperator
    :members:
 ```

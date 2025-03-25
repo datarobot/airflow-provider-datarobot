@@ -5,26 +5,18 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-import datetime
 import logging
 from collections.abc import Sequence
 from hashlib import sha256
 from typing import Any
-from typing import Dict
-from typing import List
 from typing import Optional
-from typing import Union
 from typing import cast
 
 import datarobot as dr
 from airflow.exceptions import AirflowException
 from airflow.utils.context import Context
 from datarobot.enums import FileLocationType
-from datarobot.models import DataSourceInput
-from datarobot.models import JDBCTableDataSourceInput
 from datarobot.models import Recipe
-from datarobot.models import RecipeDatasetInput
-from datarobot.models.recipe_operation import RandomSamplingOperation
 from datarobot.utils.source import parse_source_type
 
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
@@ -32,6 +24,39 @@ from datarobot_provider.operators.base_datarobot_operator import BaseUseCaseEnti
 
 # Time in seconds after which dataset uploading is considered unsuccessful.
 DATAROBOT_MAX_WAIT_SEC = 3600
+
+
+class GetDataStoreOperator(BaseDatarobotOperator):
+    """Get a DataRobot data store id by data connection name.
+    You have to create a DataRobot data connection in advance
+    at https://app.datarobot.com/account/data-connections page.
+
+    :param data_connection: unique, case-sensitive data connection name as you can see it at DataRobot.
+    :type data_connection: str
+    :return: Data store ID.
+    :rtype: str
+    """
+
+    template_fields: Sequence[str] = ["data_connection"]
+
+    def __init__(
+        self,
+        *,
+        data_connection: str = "{{ params.data_connection }}",
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.data_connection = data_connection
+
+    def execute(self, context: Context) -> Any:
+        for datastore in dr.DataStore.list(name=self.data_connection):
+            if datastore.canonical_name == self.data_connection:
+                break
+
+        else:
+            raise AirflowException(f"Connection {self.data_connection} was not found.")
+
+        return datastore.id
 
 
 class UploadDatasetOperator(BaseUseCaseEntityOperator):
@@ -542,209 +567,3 @@ class CreateOrUpdateDataSourceOperator(BaseDatarobotOperator):
             parts += parts_additions
 
         return "-".join(parts)
-
-
-class CreateWranglingRecipeOperator(BaseUseCaseEntityOperator):
-    """Create a Wrangling Recipe
-
-    :param datarobot_conn_id: Connection ID, defaults to `datarobot_default`
-    :param use_case_id: Use Case ID to create the recipe in.
-    :param dataset_id: The dataset to wrangle
-    :param dialect: SQL dialect to apply while wrangling.
-    :param recipe_name: New recipe name.
-    :param recipe_description: New recipe description.
-    :param operations: Wrangling operations to apply.
-    :param downsampling_directive: Downsampling method to apply. *None* for non downsampling.
-    :param downsampling_arguments_param: Downsampling arguments.
-
-    """
-
-    template_fields: Sequence[str] = [
-        "use_case_id",
-        "dataset_id",
-        "data_store_id",
-        "table_schema",
-        "table_name",
-        "dialect",
-        "recipe_name",
-        "recipe_description",
-        "operations",
-        "downsampling_directive",
-        "downsampling_arguments",
-    ]
-    template_fields_renderers: dict[str, str] = {
-        "use_case_id": "string",
-        "dataset_id": "string",
-        "data_store_id": "string",
-        "table_schema": "string",
-        "table_name": "string",
-        "dialect": "string",
-        "recipe_name": "string",
-        "recipe_description": "string",
-        "operations": "json",
-        "downsampling_directive": "string",
-        "downsampling_arguments": "json",
-    }
-
-    def __init__(
-        self,
-        *,
-        dataset_id: Optional[str] = None,
-        data_store_id: Optional[str] = None,
-        table_schema: Optional[str] = "{{ params.get('table_schema', '') }}",
-        table_name: Optional[str] = "{{ params.get('table_name', '') }}",
-        dialect: dr.enums.DataWranglingDialect,
-        recipe_name: Optional[str] = None,
-        recipe_description: Optional[str] = "Created with Apache-Airflow",
-        operations: Optional[List[dict]] = None,
-        downsampling_directive: Optional[dr.enums.DownsamplingOperations] = None,
-        downsampling_arguments: Optional[dict] = None,
-        **kwargs: Any,
-    ) -> None:
-        super().__init__(**kwargs)
-        self.dataset_id = dataset_id
-        self.data_store_id = data_store_id
-        self.table_schema = table_schema
-        self.table_name = table_name
-        self.dialect = dialect
-        self.recipe_name = recipe_name
-        self.recipe_description = recipe_description
-        self.operations = operations or []
-        self.downsampling_directive = downsampling_directive
-        self.downsampling_arguments = downsampling_arguments
-
-    def validate(self) -> None:
-        if self.dataset_id and self.data_store_id:
-            raise AirflowException(
-                "You have to specify either dataset_id or data_store_id. Not both."
-            )
-
-    def execute(self, context: Context) -> str:
-        use_case: dr.UseCase = self.get_use_case(context, required=True)  # type: ignore[assignment]
-
-        if self.dataset_id:
-            self.log.info("Working with dataset_id=%s", self.dataset_id)
-
-            dataset = dr.Dataset.get(self.dataset_id)
-            recipe = Recipe.from_dataset(
-                use_case, dataset, dialect=dr.enums.DataWranglingDialect(self.dialect)
-            )
-
-        elif self.data_store_id:
-            if not self.table_name:
-                raise AirflowException(
-                    "*table_name* parameter must be specified "
-                    "when working with a data store (db connection)."
-                )
-
-            self.log.info("Working with data_store_id=%s", self.data_store_id)
-            data_store = dr.DataStore.get(self.data_store_id)
-            if not (
-                data_store.type and data_store.type in iter(dr.enums.DataWranglingDataSourceTypes)
-            ):
-                raise AirflowException(f"Unexpected data store type: {data_store.type}")
-
-            data_source_canonical_name = self._generate_data_source_canonical_name()
-
-            recipe = Recipe.from_data_store(
-                use_case,
-                data_store,
-                data_source_type=dr.enums.DataWranglingDataSourceTypes(data_store.type),
-                dialect=dr.enums.DataWranglingDialect(self.dialect),
-                data_source_inputs=[
-                    DataSourceInput(
-                        canonical_name=data_source_canonical_name,
-                        schema=self.table_schema,
-                        table=self.table_name,
-                        sampling=RandomSamplingOperation(1000, 0),
-                    )
-                ],
-            )
-
-        else:
-            raise AirflowException("Please specify either dataset_id or data_store_id to wrangle.")
-
-        logging.info(
-            '%s recipe id=%s created in use case "%s". Configuring...',
-            self.dialect,
-            recipe.id,
-            use_case.name,
-        )
-
-        if self.operations:
-            self._set_operations(recipe)
-            logging.info("%d operations set.", len(self.operations))
-
-        if self.downsampling_directive is not None:
-            client_downsampling = dr.models.recipe.DownsamplingOperation(
-                directive=dr.enums.DownsamplingOperations(self.downsampling_directive),
-                arguments=self.downsampling_arguments,
-            )
-            Recipe.update_downsampling(recipe.id, client_downsampling)
-            logging.info("%s dowsnsampling set.", self.downsampling_directive)
-
-        if self.recipe_name or self.recipe_description:
-            data = {"description": self.recipe_description}
-            if self.recipe_name:
-                data["name"] = self.recipe_name
-
-            dr.client.get_client().patch(f"recipes/{recipe.id}/", json=data)
-            logging.info("Recipe name/description set.")
-
-        logging.info("Recipe id=%s is ready.", recipe.id)
-        return recipe.id
-
-    def _generate_data_source_canonical_name(self) -> str:
-        base_name = f"{self.table_name}-{datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')}"
-
-        if self.table_schema:
-            base_name = f"{self.table_schema}-{base_name}"
-
-        return f"Airflow:{base_name}"
-
-    def _set_operations(self, recipe: Recipe) -> None:
-        secondary_inputs: Dict[str, Union[JDBCTableDataSourceInput, RecipeDatasetInput]] = {}
-
-        if recipe.inputs[0].input_type == dr.enums.RecipeInputType.DATASOURCE:
-            data_store_id = recipe.inputs[0].data_store_id  # type: ignore[union-attr]
-            primary_dataset_id = None
-        else:
-            data_store_id = None
-            primary_dataset_id = recipe.inputs[0].dataset_id  # type: ignore[union-attr]
-
-        for operation_data in self.operations:
-            if operation_data["directive"] == "join":
-                if operation_data["arguments"].get("rightDataSourceId"):
-                    secondary_inputs[operation_data["arguments"]["rightDataSourceId"]] = (
-                        JDBCTableDataSourceInput(
-                            input_type=dr.enums.RecipeInputType.DATASOURCE,
-                            data_store_id=data_store_id,  # type: ignore[arg-type]
-                            data_source_id=operation_data["arguments"]["rightDataSourceId"],
-                        )
-                    )
-
-                else:
-                    if not operation_data["arguments"].get("rightDatasetVersionId"):
-                        dataset = dr.Dataset.get(operation_data["arguments"]["rightDatasetId"])
-                        operation_data["arguments"]["rightDatasetVersionId"] = dataset.version_id
-
-                    if operation_data["arguments"]["rightDatasetId"] != primary_dataset_id:
-                        secondary_inputs[operation_data["arguments"]["rightDatasetVersionId"]] = (
-                            RecipeDatasetInput(
-                                input_type=dr.enums.RecipeInputType.DATASET,
-                                dataset_id=operation_data["arguments"]["rightDatasetId"],
-                                dataset_version_id=operation_data["arguments"][
-                                    "rightDatasetVersionId"
-                                ],
-                            )
-                        )
-
-        if secondary_inputs:
-            inputs = recipe.inputs + list(secondary_inputs.values())
-            Recipe.set_inputs(recipe.id, inputs)
-
-        client_operations = [
-            dr.models.recipe.WranglingOperation.from_data(x) for x in self.operations
-        ]
-
-        Recipe.set_operations(recipe.id, client_operations)
