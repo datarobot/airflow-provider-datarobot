@@ -22,7 +22,5 @@ template:
           echo "under the commits on GitHub."
           exit 1
         fi
-
-        exit 1
   identifier: validate_commit_sha
   versionLabel: "1"
