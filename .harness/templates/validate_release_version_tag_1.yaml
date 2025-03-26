@@ -1,0 +1,24 @@
+template:
+  name: validate_release_version_tag
+  type: Step
+  projectIdentifier: airflowproviderdatarobot
+  orgIdentifier: AGENTS
+  spec:
+    type: Run
+    spec:
+      connectorRef: account.dockerhub_datarobot_read
+      image: bash
+      shell: Bash
+      command: |-
+        version=<+stage.variables.RELEASE_VERSION_TAG>
+
+        if [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "RELEASE_VERSION_TAG is correct format."
+        else
+          echo "RELEASE_VERSION_TAG must be format X.Y.Z"
+          echo "and should be numbers only with no leading v."
+          echo "Example: 1.0.2"
+          exit 1
+        fi
+  identifier: validate_release_version_tag
+  versionLabel: "1"

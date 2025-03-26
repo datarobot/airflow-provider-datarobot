@@ -1,0 +1,26 @@
+template:
+  name: validate_commit_sha
+  type: Step
+  projectIdentifier: airflowproviderdatarobot
+  orgIdentifier: AGENTS
+  spec:
+    type: Run
+    spec:
+      connectorRef: account.dockerhub_datarobot_read
+      image: bash
+      shell: Bash
+      command: |-
+        commit_sha=<+stage.variables.COMMIT_SHA>
+        commit_sha_size=${#commit_sha}
+
+        echo "COMMIT_SHA length: $commit_sha_size"
+        if [[ "$commit_sha_size" -eq 7 ]] || [[ "$commit_sha_size" -eq 40 ]]; then
+          echo "COMMIT_SHA is correct format."
+        else
+          echo "COMMIT_SHA must be either the 7 or 40 character"
+          echo "SHA representation from git. This can be found"
+          echo "under the commits on GitHub."
+          exit 1
+        fi
+  identifier: validate_commit_sha
+  versionLabel: "1"

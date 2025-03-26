@@ -2,6 +2,7 @@
 
 ## Unreleased Changes
 - Update all release pipelines to improve releasing to pypi.
+- Add safety checks to release pipelines.
 
 ## v0.4.0
 - Add documentation for `post_predictions_formatting.py`.
