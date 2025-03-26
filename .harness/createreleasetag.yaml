@@ -32,6 +32,19 @@ pipeline:
               os: Linux
           execution:
             steps:
+              - parallel:
+                  - step:
+                      name: validate_release_version_tag
+                      identifier: validate_release_version_tag
+                      template:
+                        templateRef: validate_release_version_tag
+                        versionLabel: "1"
+                  - step:
+                      name: validate_commit_sha
+                      identifier: validate_commit_sha
+                      template:
+                        templateRef: validate_commit_sha
+                        versionLabel: "1"
               - step:
                   type: Run
                   name: run
