@@ -142,6 +142,23 @@ the `build-astro-dev` command._
         make clean-astro-dev
     ```
 
+
+### Release Process
+For `mainline` releases, the following steps should be followed:
+- Determine the next version of the package (example: 1.0.2). Version should not include a `v` prefix.
+- Determine the SHA hash of the commit that will be the release.
+  - See: https://github.com/datarobot/airflow-provider-datarobot/commits/main/
+- Connect to `harness`.
+- Run the `create-release-pr` pipeline with the SHA hash and version as parameters.
+- Review and approve the release PR on GitHub.
+  - Changes are comments can be added to the PR.
+  - The PR will automatically request review once checks pass.
+- Run the `create-release-tag` pipeline with the SHA hash and version as parameters.
+- Run the `release-pypi` pipeline with the input set as `Git Tag` and the `Tag Name` as the version (tags are generated with a `v` prefix, example v1.0.2).
+
+For `early-access` releases, run the `release-early-access-pypi` pipeline. There are no PRs or tags for early-access releases.
+
+
 ## Issues
 
 Please submit [issues](https://github.com/datarobot/airflow-provider-datarobot/issues) and [pull requests](https://github.com/datarobot/airflow-provider-datarobot/pulls) in our official repo:

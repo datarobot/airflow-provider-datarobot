@@ -1,0 +1,94 @@
+pipeline:
+  name: create-release-pr
+  identifier: createreleasepr
+  projectIdentifier: airflowproviderdatarobot
+  orgIdentifier: AGENTS
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.svc_harness_git1
+        repoName: airflow-provider-datarobot
+        build: <+input>
+  stages:
+    - stage:
+        name: Create Release PR
+        identifier: Create_Release_PR
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          caching:
+            enabled: true
+          buildIntelligence:
+            enabled: true
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: run
+                  identifier: run
+                  spec:
+                    connectorRef: account.dockerhub_datarobot_read
+                    image: alpine/git
+                    shell: Sh
+                    command: |-
+                      apk update
+                      apk add yq github-cli
+
+                      git clone https://svc-harness-git2:${GH_TOKEN}@github.com/datarobot/airflow-provider-datarobot.git
+                      cd airflow-provider-datarobot
+
+                      git config --global user.email "svc-harness-git2@datarobot.com"
+                      git config --global user.name "svc-harness-git2"
+
+                      export BRANCH=release-v<+stage.variables.RELEASE_VERSION_TAG>
+
+                      # Clone the repo and ensure we create a branch from a detached SHA
+                      git reset --hard
+                      git checkout -b ${BRANCH} <+stage.variables.COMMIT_SHA>
+
+                      # Update the changelog
+                      git checkout release-v<+stage.variables.RELEASE_VERSION_TAG>
+                      head -n 10 CHANGES.md
+                      awk 'NR==1,/## Unreleased Changes/{sub(/## Unreleased Changes/, "## Unreleased Changes\n\n## v<+stage.variables.RELEASE_VERSION_TAG>")} 1' CHANGES.md > CHANGES
+                      mv CHANGES CHANGES.md
+                      head -n 10 CHANGES.md
+
+                      # Update the primary version
+                      awk '/^__version__/ { print "__version__ = \"<+stage.variables.RELEASE_VERSION_TAG>\""; next; }; { print; }' datarobot_provider/_version.py > _version
+                      mv _version datarobot_provider/_version.py
+                      cat datarobot_provider/_version.py
+
+                      # Update the airflow version
+                      awk '/^        \"versions\": \[/ { print "        \"versions\": [\"<+stage.variables.RELEASE_VERSION_TAG>\"],"; next; }; { print; }' datarobot_provider/__init__.py > __init__
+                      mv __init__ datarobot_provider/__init__.py
+
+                      # Create a release commit
+                      git add -A
+                      git status
+                      git commit -m "[RELEASE] Bump release for v<+stage.variables.RELEASE_VERSION_TAG>"
+
+                      git push --set-upstream origin +${BRANCH}
+                      gh pr create --fill-first --label "Ask for Review on Green"
+                    envVariables:
+                      GH_TOKEN: <+secrets.getValue("account.githubpatsvcharnessgit2")>
+          infrastructure:
+            type: KubernetesDirect
+            spec:
+              connectorRef: account.cigeneral
+              namespace: harness-delegate-ng
+              automountServiceAccountToken: true
+              nodeSelector: {}
+              os: Linux
+        variables:
+          - name: COMMIT_SHA
+            type: String
+            description: SHA of the commit to use
+            required: true
+            value: <+input>
+          - name: RELEASE_VERSION_TAG
+            type: String
+            description: "Release version tag as numbers only (Example: 1.0.2)"
+            required: true
+            value: <+input>
