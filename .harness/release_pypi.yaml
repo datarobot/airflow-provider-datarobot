@@ -38,6 +38,12 @@ pipeline:
           execution:
             steps:
               - step:
+                  name: validate_release_version_tag
+                  identifier: validate_release_version_tag
+                  template:
+                    templateRef: validate_release_version_tag
+                    versionLabel: "1"
+              - step:
                   type: Run
                   name: run
                   identifier: run
