@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased Changes
+
+## v0.4.1
 - Update all release pipelines to improve releasing to pypi.
 - Add safety checks to release pipelines.
 
