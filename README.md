@@ -153,7 +153,7 @@ For `mainline` releases, the following steps should be followed:
 - Review and approve the release PR on GitHub.
   - Changes or comments can be added to the PR.
   - The PR will automatically request review once checks pass.
-- Merge the PR
+- Merge the PR and use the resulting SHA hash from merge to main in the next step (different SHA from previous step)
 - Run the `create-release-tag` pipeline with the SHA hash and version as parameters.
 - Run the `release-pypi` pipeline with the input set as `Git Tag` and the `Tag Name` as the version (tags are generated with a `v` prefix, example v1.0.2).
 
