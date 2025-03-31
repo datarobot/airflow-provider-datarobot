@@ -151,8 +151,9 @@ For `mainline` releases, the following steps should be followed:
 - Connect to `harness`.
 - Run the `create-release-pr` pipeline with the SHA hash and version as parameters.
 - Review and approve the release PR on GitHub.
-  - Changes are comments can be added to the PR.
+  - Changes or comments can be added to the PR.
   - The PR will automatically request review once checks pass.
+- Merge the PR
 - Run the `create-release-tag` pipeline with the SHA hash and version as parameters.
 - Run the `release-pypi` pipeline with the input set as `Git Tag` and the `Tag Name` as the version (tags are generated with a `v` prefix, example v1.0.2).
 
