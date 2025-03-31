@@ -157,7 +157,7 @@ For `mainline` releases, the following steps should be followed:
 - Run the `create-release-tag` pipeline with the SHA hash and version as parameters.
 - Run the `release-pypi` pipeline with the input set as `Git Tag` and the `Tag Name` as the version (tags are generated with a `v` prefix, example v1.0.2).
 
-For `early-access` releases, run the `release-early-access-pypi` pipeline. There are no PRs or tags for early-access releases.
+For `early-access` releases, run the `release-early-access-pypi` pipeline. There are no PRs or tags for early-access releases. The early access version is also automatically released each Tuesday.
 
 
 ## Issues
