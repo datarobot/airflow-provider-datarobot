@@ -1,15 +1,3 @@
-<!--- Previous content; uncertain if it should just be removed.
-
-(example-dag-reference)=
-
-```{toctree}
-:glob: true
-:maxdepth: 1
-
-*
-```
---->
-
 # Example Airflow Directed Acyclic Graphs (DAGs)
 
 This section provides several examples of DAGs that are designed for specialized use cases.
@@ -31,3 +19,12 @@ To make the DataRobot provider for Apache Airflow's example DAGs available:
 2. Copy the [`datarobot_provider/example_dags` Airflow Example DAGs directory](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/example_dags){ target=_blank } to your project.
 
 3. Wait a minute or two and refresh the page. The example DAGs appear on the **DAGs** page, including the **datarobot_pipeline** DAG.
+
+(example-dag-reference)=
+
+```{toctree}
+:glob: true
+:maxdepth: 1
+
+*
+```
