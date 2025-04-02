@@ -6,11 +6,16 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from collections.abc import Sequence
+from datetime import datetime
 from typing import Any
+from typing import Dict
+from typing import List
 from typing import Optional
 
 import datarobot as dr
 from airflow.utils.context import Context
+from datarobot.models.deployment import FeatureDrift
+from datarobot.models.deployment import TargetDrift
 
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
@@ -127,6 +132,108 @@ class GetMonitoringSettingsOperator(BaseDatarobotOperator):
         }
 
         return monitoring_settings
+
+
+class GetTargetDrift(BaseDatarobotOperator):
+    """
+    Retrieve target drift information over a certain time period for a DataRobot deployment using DataRobot's API.
+
+    This operator retrieves target drift over a certain time period for an existing deployment by calling
+    the deployment's `get_target_drift()` method. It allows optional extra parameters
+    to be passed to the DataRobot client call.
+
+    Args:
+        deployment_id (str): The ID of the deployment to update.
+        start_time (datetime): start of the time period.
+        end_time (datetime):  end of the time period.
+        extra_params (dict, optional): A dictionary of additional parameters to pass
+            to the DataRobot deployment creation API.
+        kwargs (dict): Additional keyword arguments passed to the BaseDatarobotOperator.
+    """
+
+    template_fields: Sequence[str] = ["deployment_id", "start_time", "end_time", "extra_params"]
+
+    def __init__(
+        self,
+        *,
+        deployment_id: str,
+        start_time: datetime,
+        end_time: datetime,
+        extra_params: Optional[Dict[str, Any]] = None,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.deployment_id = deployment_id
+        self.start_time = start_time
+        self.end_time = end_time
+        self.extra_params = extra_params or {}
+
+    def validate(self) -> None:
+        if not self.deployment_id:
+            raise ValueError("deployment_id must be provided.")
+
+    def execute(self, context: Context) -> TargetDrift:
+        self.log.info("retrieve Target Drift for deployment: %s", self.deployment_id)
+        deployment = dr.Deployment(id=self.deployment_id)
+        target_drift = deployment.get_target_drift(
+            start_time=self.start_time,
+            end_time=self.end_time,
+            **self.extra_params,
+        )
+        self.log.info("queried target drift information for deployment: %s", self.deployment_id)
+        return target_drift
+
+
+class GetFeatureDrift(BaseDatarobotOperator):
+    """
+    Retrieve drift information for deployment's features over a certain time period
+    for a DataRobot deployment using DataRobot's API.
+
+    This operator retrieves drift information for deployment's features over a certain time
+    period for an existing deployment by calling
+    the deployment's `get_feature_drift()` method. It allows optional extra parameters
+    to be passed to the DataRobot client call.
+
+    Args:
+        deployment_id (str): The ID of the deployment to update.
+        start_time (datetime): start of the time period.
+        end_time (datetime):  end of the time period.
+        extra_params (dict, optional): A dictionary of additional parameters to pass
+            to the DataRobot deployment creation API.
+        kwargs (dict): Additional keyword arguments passed to the BaseDatarobotOperator.
+    """
+
+    template_fields: Sequence[str] = ["deployment_id", "start_time", "end_time", "extra_params"]
+
+    def __init__(
+        self,
+        *,
+        deployment_id: str,
+        start_time: datetime,
+        end_time: datetime,
+        extra_params: Optional[Dict[str, Any]] = None,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.deployment_id = deployment_id
+        self.start_time = start_time
+        self.end_time = end_time
+        self.extra_params = extra_params or {}
+
+    def validate(self) -> None:
+        if not self.deployment_id:
+            raise ValueError("deployment_id must be provided.")
+
+    def execute(self, context: Context) -> List[FeatureDrift]:
+        self.log.info("retrieve Feature Drift for deployment: %s", self.deployment_id)
+        deployment = dr.Deployment(id=self.deployment_id)
+        feature_drift_data = deployment.get_feature_drift(
+            start_time=self.start_time,
+            end_time=self.end_time,
+            **self.extra_params,
+        )
+        self.log.info("queried feature drift information for deployment: %s", self.deployment_id)
+        return feature_drift_data
 
 
 class UpdateMonitoringSettingsOperator(BaseDatarobotOperator):
