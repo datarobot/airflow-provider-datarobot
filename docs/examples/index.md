@@ -1,3 +1,5 @@
+(example-dag-reference)=
+
 # Example Airflow Directed Acyclic Graphs (DAGs)
 
 This section provides several examples of DAGs that are designed for specialized use cases.
@@ -8,6 +10,13 @@ This section provides several examples of DAGs that are designed for specialized
 * **Custom Function**: demonstrates how to make and format predictions from a model trained in DataRobot and push the formatted predictions to an external data storage.
 
 Refer to each individual page for more details on each example DAG.
+
+```{toctree}
+:glob: true
+:maxdepth: 1
+
+*
+```
 
 ## Load example DAGs into Airflow {: #load-example-dags-into-airflow }
 
@@ -20,11 +29,3 @@ To make the DataRobot provider for Apache Airflow's example DAGs available:
 
 3. Wait a minute or two and refresh the page. The example DAGs appear on the **DAGs** page, including the **datarobot_pipeline** DAG.
 
-(example-dag-reference)=
-
-```{toctree}
-:glob: true
-:maxdepth: 1
-
-*
-```
