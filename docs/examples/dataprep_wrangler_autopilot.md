@@ -12,6 +12,8 @@ The initial demo flow utilizes a public .csv file with hospital readmissions dat
 
 ## Input Parameters
 
+<!-- Do we need anything here? Or just N/A? -->
+
 ## Usage
 
 1. Create or reuse a use case
@@ -26,4 +28,8 @@ The initial demo flow utilizes a public .csv file with hospital readmissions dat
 
 ## Result
 
+You now have a project and model registered with DataRobot MLOps.
+
 ## Troubleshooting
+
+_N/A_
