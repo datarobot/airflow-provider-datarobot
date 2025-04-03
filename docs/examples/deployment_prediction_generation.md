@@ -1,8 +1,8 @@
 # Deployment Prediction Generation
 `path: datarobot_provider/examples/deployment_prediction_generation.py`
 
-This is an example of an Aiflow DAG for DataRobot data deployment and prediction generation. This DAG will create a new deployment
-from a registered model and demonstrate how to generate predictions from the deployment.
+This is an example of an Aiflow DAG for DataRobot data deployment and prediction generation.
+This DAG will create a new deployment from a registered model and demonstrate how to generate predictions from the deployment.
 
 ## Requirements
 
@@ -31,10 +31,8 @@ from a registered model and demonstrate how to generate predictions from the dep
 
 ## Result
 
-You now have a new deployment created from a registered model and test making
-predictions from the new deployment.
+You now have a new deployment created from a registered model and test making predictions from the new deployment.
 
 ## Troubleshooting
 In order to make predictions from a deployment via DataRobot's Prediction API, you need a prediction server ID.
-See https://docs.datarobot.com/en/docs/api/reference/predapi/pred-server-id.html for more information on how to
-get the prediction server ID for your organization or deployments.
+See https://docs.datarobot.com/en/docs/api/reference/predapi/pred-server-id.html for more information on how to get the prediction server ID for your organization or deployments.
