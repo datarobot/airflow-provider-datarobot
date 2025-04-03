@@ -12,7 +12,7 @@ The initial demo flow utilizes a public .csv file with hospital readmissions dat
 
 ## Input Parameters
 
-<!-- Do we need anything here? Or just N/A? -->
+_N/A_
 
 ## Usage
 
