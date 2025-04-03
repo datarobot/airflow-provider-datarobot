@@ -13,8 +13,10 @@ from datarobot.models.deployment import Accuracy
 from datarobot.models.deployment import ServiceStats
 
 from datarobot_provider.operators.monitoring import GetAccuracyOperator
+from datarobot_provider.operators.monitoring import GetFeatureDrift
 from datarobot_provider.operators.monitoring import GetMonitoringSettingsOperator
 from datarobot_provider.operators.monitoring import GetServiceStatsOperator
+from datarobot_provider.operators.monitoring import GetTargetDrift
 from datarobot_provider.operators.monitoring import UpdateDriftTrackingOperator
 from datarobot_provider.operators.monitoring import UpdateMonitoringSettingsOperator
 from datarobot_provider.operators.monitoring import _serialize_metrics
@@ -211,6 +213,89 @@ def test_operator_get_monitoring_settings(mocker, monitoring_settings_details):
     monitoring_settings_result = operator.execute(context={"params": {}})
 
     assert monitoring_settings_result == monitoring_settings_details
+
+
+def test_operator_get_target_drift(mocker):
+    deployment_id = "deployment-id"
+    start_time = datetime(2023, 1, 1)
+    end_time = datetime(2023, 1, 2)
+    extra_params = {"param": "value"}
+    expected_target_drift = "expected-target-drift"
+
+    mocker.patch.object(
+        dr.Deployment,
+        "get_target_drift",
+        return_value=expected_target_drift,
+    )
+
+    operator = GetTargetDrift(
+        task_id="get_target_drift",
+        deployment_id=deployment_id,
+        start_time=start_time,
+        end_time=end_time,
+        extra_params=extra_params,
+    )
+
+    target_drift_result = operator.execute(context={"params": {}})
+    assert target_drift_result == expected_target_drift
+
+
+def test_operator_get_target_drift_invalid_deployment_id():
+    start_time = datetime(2023, 1, 1)
+    end_time = datetime(2023, 1, 2)
+    operator = GetTargetDrift(
+        task_id="get_target_drift",
+        deployment_id="",
+        start_time=start_time,
+        end_time=end_time,
+    )
+    with pytest.raises(ValueError, match="deployment_id must be provided."):
+        operator.validate()
+
+
+def test_operator_get_feature_drift(mocker):
+    deployment_id = "deployment-id"
+    start_time = datetime(2023, 1, 1)
+    end_time = datetime(2023, 1, 2)
+    extra_params = {"param": "value"}
+    expected_feature_drift = "expected-feature-drift"
+
+    mocker.patch.object(
+        dr.Deployment,
+        "get_feature_drift",
+        return_value=expected_feature_drift,
+    )
+
+    operator = GetFeatureDrift(
+        task_id="get_feature_drift",
+        deployment_id=deployment_id,
+        start_time=start_time,
+        end_time=end_time,
+        extra_params=extra_params,
+    )
+
+    feature_drift_result = operator.execute(context={"params": {}})
+    assert feature_drift_result == expected_feature_drift
+
+
+def test_operator_get_feature_drift_api_failure(mocker):
+    deployment_id = "deployment-id"
+    start_time = datetime(2023, 1, 1)
+    end_time = datetime(2023, 1, 2)
+    extra_params = {"param": "value"}
+
+    mocker.patch.object(dr.Deployment, "get_feature_drift", side_effect=Exception("API failure"))
+
+    operator = GetFeatureDrift(
+        task_id="get_feature_drift",
+        deployment_id=deployment_id,
+        start_time=start_time,
+        end_time=end_time,
+        extra_params=extra_params,
+    )
+
+    with pytest.raises(Exception, match="API failure"):
+        operator.execute(context={"params": {}})
 
 
 def test_operator_update_monitoring_settings(mocker, monitoring_settings_details):
