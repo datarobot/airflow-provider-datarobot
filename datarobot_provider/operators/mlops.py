@@ -7,9 +7,12 @@
 # Released under the terms of DataRobot Tool and Utility Agreement.
 from collections.abc import Sequence
 from typing import Any
+from typing import List
 from typing import Optional
+from typing import Union
 
 import datarobot as dr
+import pandas as pd
 from airflow.utils.context import Context
 
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
@@ -60,3 +63,55 @@ class SubmitActualsFromCatalogOperator(BaseDatarobotOperator):
         self.log.debug(f"Uploading Actuals from AI Catalog, job_id: {status_job.job_id}")
 
         return status_job.job_id
+
+
+class SubmitActualsOperator(BaseDatarobotOperator):
+    """
+    ability to upload actuals,will be used to calculate accuracy metrics.
+
+    This operator gvies you ability to submit actuals
+    DataRobot's `Deployment.submit_actuals()` method. It allows
+    optional extra parameters to be passed to the DataRobot client call.
+
+    Args:
+        deployment_id (str): DataRobot deployment ID.
+        data (Union[pd.DataFrame, List]): list or pandas.DataFrame
+        batch_size(int): the max number of actuals in each request.
+        kwargs (dict): Additional keyword arguments passed to the BaseDatarobotOperator.
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Sequence[str] = [
+        "deployment_id",
+        "data",
+        "batch_size",
+    ]
+
+    def __init__(
+        self,
+        *,
+        deployment_id: str,
+        data: Union[pd.DataFrame, List],
+        batch_size: int = 10000,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.deployment_id = deployment_id
+        self.data = data
+        self.batch_size = batch_size
+
+    def validate(self) -> None:
+        if self.deployment_id is None:
+            raise ValueError("deployment_id is required to submit actuals.")
+
+        if self.data is None:
+            raise ValueError("data is required to submit actuals.")
+
+    def execute(self, context: Context) -> None:
+        self.log.info("Uploading Actuals")
+
+        deployment = dr.Deployment(id=self.deployment_id)
+
+        deployment.submit_actuals(batch_size=self.batch_size, data=self.data)
+
+        self.log.debug(f"Uploading Actuals for deployment: {self.deployment_id}")
