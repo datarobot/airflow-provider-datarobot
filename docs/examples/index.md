@@ -18,7 +18,7 @@ Refer to each individual page for more details on each example DAG.
 *
 ```
 
-## Load example DAGs into Airflow {: #load-example-dags-into-airflow }
+## Load example DAGs into Airflow
 
 The example DAGs do not appear on the **DAGs** page by default.
 To make the DataRobot provider for Apache Airflow's example DAGs available:
