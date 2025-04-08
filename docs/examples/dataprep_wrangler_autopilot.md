@@ -29,7 +29,3 @@ _N/A_
 ## Result
 
 You now have a project and model registered with DataRobot MLOps.
-
-## Troubleshooting
-
-_N/A_
