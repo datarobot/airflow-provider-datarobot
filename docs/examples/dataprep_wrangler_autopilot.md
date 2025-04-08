@@ -3,7 +3,7 @@
 `path: datarobot_provider/examples/dataprep_wrangler_autopilot.py`
 
 The `dataprep_wrangler_autopilot` DAG demonstrates how to use the DataRobot provider for Apache Airflow to create a project, train a model, and register it to DataRobot MLOps.
-The initial demo flow utilizes a public .csv file with hospital readmissions data.
+The initial demo flow utilizes a public `.csv` file with hospital readmissions data.
 
 ## Requirements
 
