@@ -18,7 +18,6 @@ This DAG will create a new deployment from a registered model and demonstrate ho
 | feature_drift_enabled         | bool       | No       | If feature drift tracking is to be turned on.                                     |
 | predictions_dataset_file_path | str        | Yes      | The path to the dataset to be used for predictions.                               |
 
-
 ## Usage
 
 1. Create or reuse a use case
