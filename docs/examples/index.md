@@ -25,6 +25,6 @@ To make the DataRobot provider for Apache Airflow's example DAGs available:
 
 1. Download the DAG files from the [airflow-provider-datarobot](https://github.com/datarobot/airflow-provider-datarobot/tree/main/datarobot_provider/example_dags){ target=_blank } repository.
 
-2. Copy the [Airflow Example DAGs directory](https://github.com/datarobot/airflow-provider-datarobot/blob/main/datarobot_provider/example_dags){ target=_blank } to your project.
+2. Copy the `Airflow Example DAGs` directory to your project.
 
 3. Wait a minute or two and refresh the page. The example DAGs appear on the **DAGs** page, including the **datarobot_pipeline** DAG.
