@@ -136,5 +136,7 @@ def test_submit_actuals_operator_missing_data():
         data=None,
     )
 
-    with pytest.raises(ValueError, match="data is required to submit actuals."):
+    with pytest.raises(
+        ValueError, match="data should be either a list of dict-like objects or a pandas.DataFrame"
+    ):
         operator.validate()

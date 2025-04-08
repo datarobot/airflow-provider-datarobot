@@ -67,16 +67,17 @@ class SubmitActualsFromCatalogOperator(BaseDatarobotOperator):
 
 class SubmitActualsOperator(BaseDatarobotOperator):
     """
-    ability to upload actuals,will be used to calculate accuracy metrics.
+    ability to upload actuals, will be used to calculate accuracy metrics.
 
-    This operator gvies you ability to submit actuals
+    This operator gives you ability to submit actuals
     DataRobot's `Deployment.submit_actuals()` method. It allows
     optional extra parameters to be passed to the DataRobot client call.
 
     Args:
         deployment_id (str): DataRobot deployment ID.
         data (Union[pd.DataFrame, List]): list or pandas.DataFrame
-        batch_size(int): the max number of actuals in each request.
+            Defaults to an empty list if not provided.
+        batch_size (int): The max number of actuals in each request. Defaults to 10000.
         kwargs (dict): Additional keyword arguments passed to the BaseDatarobotOperator.
     """
 
@@ -104,8 +105,10 @@ class SubmitActualsOperator(BaseDatarobotOperator):
         if self.deployment_id is None:
             raise ValueError("deployment_id is required to submit actuals.")
 
-        if self.data is None:
-            raise ValueError("data is required to submit actuals.")
+        if not isinstance(self.data, (list, pd.DataFrame)):
+            raise ValueError(
+                "data should be either a list of dict-like objects or a pandas.DataFrame"
+            )
 
     def execute(self, context: Context) -> None:
         self.log.info("Uploading Actuals")
