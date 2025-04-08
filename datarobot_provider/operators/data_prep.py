@@ -199,7 +199,7 @@ class CreateWranglingRecipeOperator(BaseUseCaseEntityOperator):
             primary_dataset_id = None
         else:
             data_store_id = None
-            primary_dataset_id = recipe.inputs[0].dataset_id  # type: ignore[union-attr]
+            primary_dataset_id = recipe.inputs[0].dataset_id
 
         for operation_data in self.operations:
             if operation_data["directive"] == "join":
