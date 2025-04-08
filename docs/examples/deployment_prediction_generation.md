@@ -35,4 +35,4 @@ You now have a new deployment created from a registered model and test making pr
 
 ## Troubleshooting
 In order to make predictions from a deployment via DataRobot's Prediction API, you need a prediction server ID.
-See (Get a prediction server ID)[https://docs.datarobot.com/en/docs/api/reference/predapi/pred-server-id.html]{ target=_blank } for more information on how to get the prediction server ID for your organization or deployments.
+See [Get a prediction server ID](https://docs.datarobot.com/en/docs/api/reference/predapi/pred-server-id.html){ target=_blank } for more information on how to get the prediction server ID for your organization or deployments.
