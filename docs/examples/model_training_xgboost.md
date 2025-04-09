@@ -22,16 +22,16 @@ This DAG demonstrates how to use the DataRobot provider for Apache Airflow to wr
 ## Usage
 
 1. Create or reuse a use case
-2. Connect to a snowflake data source
+2. Connect to a Snowflake data source
 3. Create a wrangler recipe
 4. Publish and run the wrangler recipe
 5. Create a new project/experiment in the use case
 6. Run autopilot in manual mode
 7. Get a list of available blueprints
-8. Select an xgboost blueprint
-9. Train the xgboost model
+8. Select an XGBoost blueprint
+9. Train the XGBoost model
 10. Register the model for deployment
-11. Compute SHAP insights on the xgboost model
+11. Compute SHAP insights on the XGBoost model
 
 ## Result
 
