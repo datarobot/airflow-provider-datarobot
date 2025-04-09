@@ -21,6 +21,7 @@ from airflow.utils.context import Context
 from datarobot import DataStore
 from datarobot.enums import DataWranglingDataSourceTypes
 from datarobot.enums import DataWranglingDialect
+from datarobot.enums import DataWranglingSnapshotPolicy
 from datarobot.enums import DownsamplingOperations
 from datarobot.enums import RecipeInputType
 from datarobot.models import DataSourceInput
@@ -199,7 +200,7 @@ class CreateWranglingRecipeOperator(BaseUseCaseEntityOperator):
             primary_dataset_id = None
         else:
             data_store_id = None
-            primary_dataset_id = recipe.inputs[0].dataset_id  # type: ignore[union-attr]
+            primary_dataset_id = recipe.inputs[0].dataset_id
 
         for operation_data in self.operations:
             if operation_data["directive"] == "join":
@@ -225,6 +226,7 @@ class CreateWranglingRecipeOperator(BaseUseCaseEntityOperator):
                                 dataset_version_id=operation_data["arguments"][
                                     "rightDatasetVersionId"
                                 ],
+                                snapshot_policy=DataWranglingSnapshotPolicy.FIXED,
                             )
                         )
 
