@@ -5,12 +5,13 @@
 # This is proprietary source code of DataRobot, Inc. and its affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-
 import datarobot as dr
+import pandas as pd
 import pytest
 from datarobot.models.status_check_job import StatusCheckJob
 
 from datarobot_provider.operators.mlops import SubmitActualsFromCatalogOperator
+from datarobot_provider.operators.mlops import SubmitActualsOperator
 
 
 @pytest.fixture
@@ -97,4 +98,45 @@ def test_operator_submit_actuals_dataset_is_none(mocker, submit_actuals_from_cat
     )
 
     with pytest.raises(ValueError):
+        operator.validate()
+
+
+def test_operator_submit_actuals(mocker):
+    deployment_id = "deployment-id"
+    data = pd.DataFrame({"value": [1, 2, 3]})
+    batch_size = 10000
+
+    mocker.patch.object(
+        dr.Deployment,
+        "submit_actuals",
+        return_value=None,
+    )
+
+    operator = SubmitActualsOperator(
+        task_id="submit_actuals",
+        deployment_id=deployment_id,
+        data=data,
+        batch_size=batch_size,
+    )
+
+    operator.validate()
+    operator.execute(context={"params": {}})
+
+    dr.Deployment.submit_actuals.assert_called_once_with(
+        batch_size=batch_size,
+        data=data,
+    )
+
+
+def test_submit_actuals_operator_missing_data():
+    deployment_id = "deployment-id"
+    operator = SubmitActualsOperator(
+        task_id="submit_actuals",
+        deployment_id=deployment_id,
+        data=None,
+    )
+
+    with pytest.raises(
+        ValueError, match="data should be either a list of dict-like objects or a pandas.DataFrame"
+    ):
         operator.validate()
