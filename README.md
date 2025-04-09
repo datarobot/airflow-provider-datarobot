@@ -10,7 +10,9 @@ and score predictions against the model deployment.
 
 ## Install the Airflow provider
 
-The DataRobot provider for Apache Airflow requires an environment with the following dependencies installed:
+**To run Airflow within DataRobot SaaS environment, please reach out to [DataRobot Support](https://www.datarobot.com/contact-us/).**
+
+For a local installation, the DataRobot provider for Apache Airflow requires an environment with the following dependencies installed:
 
 * [Apache Airflow](https://pypi.org/project/apache-airflow/) >= 2.3
 
