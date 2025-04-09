@@ -154,11 +154,7 @@ def test_operator_create_wrangling_recipe_join_dataset(mocker):
     recipe_mock = mocker.patch("datarobot_provider.operators.data_prep.Recipe")
     recipe_mock.from_dataset.return_value.id = "test-recipe-id"
     recipe_mock.from_dataset.return_value.inputs = [
-        RecipeDatasetInput(
-            input_type=RecipeInputType.DATASET,
-            dataset_id="test-dataset-id",
-            dataset_version_id="legacy-version-id",
-        )
+        RecipeDatasetInput(input_type=RecipeInputType.DATASET, dataset_id="test-dataset-id")
     ]
     context = {"params": {"use_case_id": "test-use-case-id"}}
 
@@ -225,10 +221,7 @@ def test_operator_create_wrangling_recipe_join_dataset(mocker):
     assert len(recipe_mock.set_inputs.call_args.args[1]) == 2
 
     assert recipe_mock.set_inputs.call_args_list[0].args[1][0].dataset_id == "test-dataset-id"
-    assert (
-        recipe_mock.set_inputs.call_args_list[0].args[1][0].dataset_version_id
-        == "legacy-version-id"
-    )
+    assert recipe_mock.set_inputs.call_args_list[0].args[1][0].dataset_version_id is None
 
     assert recipe_mock.set_inputs.call_args.args[1][1].dataset_id == "secondary-dataset-id"
     assert (
