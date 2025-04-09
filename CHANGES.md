@@ -3,6 +3,11 @@
 ## Unreleased Changes
 
 ## v0.5.0
+- Fix support for datarobot 3.7.0 sdk.
+- Implement operators to retrieve target drift and feature drift
+- Update readme to reflect changes to installation environment
+- Add documentation for examples
+- Corrections throughout documentation.
 
 ## v0.4.1
 - Update all release pipelines to improve releasing to pypi.
