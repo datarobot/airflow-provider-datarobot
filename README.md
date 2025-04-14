@@ -10,7 +10,9 @@ and score predictions against the model deployment.
 
 ## Install the Airflow provider
 
-The DataRobot provider for Apache Airflow requires an environment with the following dependencies installed:
+**To run Airflow within DataRobot SaaS environment, please reach out to [DataRobot Support](https://www.datarobot.com/contact-us/).**
+
+For a local installation, the DataRobot provider for Apache Airflow requires an environment with the following dependencies installed:
 
 * [Apache Airflow](https://pypi.org/project/apache-airflow/) >= 2.3
 
@@ -141,6 +143,24 @@ the `build-astro-dev` command._
     ```bash
         make clean-astro-dev
     ```
+
+
+### Release Process
+For `mainline` releases, the following steps should be followed:
+- Determine the next version of the package (example: 1.0.2). Version should not include a `v` prefix.
+- Determine the SHA hash of the commit that will be the release.
+  - See: https://github.com/datarobot/airflow-provider-datarobot/commits/main/
+- Connect to `harness`.
+- Run the `create-release-pr` pipeline with the SHA hash and version as parameters.
+- Review and approve the release PR on GitHub.
+  - Changes or comments can be added to the PR.
+  - The PR will automatically request review once checks pass.
+- Merge the PR and use the resulting SHA hash from merge to main in the next step (different SHA from previous step)
+- Run the `create-release-tag` pipeline with the SHA hash and version as parameters.
+- Run the `release-pypi` pipeline with the input set as `Git Tag` and the `Tag Name` as the version (tags are generated with a `v` prefix, example v1.0.2).
+
+For `early-access` releases, run the `release-early-access-pypi` pipeline. There are no PRs or tags for early-access releases. The early access version is also automatically released each Tuesday.
+
 
 ## Issues
 

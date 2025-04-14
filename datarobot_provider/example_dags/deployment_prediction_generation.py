@@ -11,9 +11,9 @@ from airflow.operators.empty import EmptyOperator
 from datarobot.enums import DataWranglingDialect
 
 from datarobot_provider.example_dags.wrangler_example_recipe import WRANGLER_EXAMPLE_RECIPE
-from datarobot_provider.operators.ai_catalog import CreateDatasetFromRecipeOperator
-from datarobot_provider.operators.ai_catalog import CreateWranglingRecipeOperator
-from datarobot_provider.operators.ai_catalog import UploadDatasetOperator
+from datarobot_provider.operators.data_prep import CreateWranglingRecipeOperator
+from datarobot_provider.operators.data_registry import CreateDatasetFromRecipeOperator
+from datarobot_provider.operators.data_registry import UploadDatasetOperator
 from datarobot_provider.operators.datarobot import GetOrCreateUseCaseOperator
 from datarobot_provider.operators.deployment import DeployRegisteredModelOperator
 from datarobot_provider.operators.deployment import ScorePredictionsOperator
@@ -29,6 +29,7 @@ Configurable parameters for this dag:
   When working with prediction environments, default prediction server Id should not be provided
 * target_drift_enabled - if target drift tracking is to be turned on
 * feature_drift_enabled - if feature drift tracking is to be turned on
+* predictions_dataset_file_path - the path to the dataset to be used for predictions
 
 PREDICTION SERVER IDS:
 See https://docs.datarobot.com/en/docs/api/reference/predapi/pred-server-id.html

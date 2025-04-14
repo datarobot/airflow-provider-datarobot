@@ -21,3 +21,13 @@
 .. autoclass:: datarobot_provider.operators.model_training.GetTrainedModelParametersOperator
    :members:
 ```
+
+```{eval-rst}
+.. autoclass:: datarobot_provider.operators.model_training.CrossValidateModelOperator
+   :members:
+```
+
+```{eval-rst}
+.. autoclass:: datarobot_provider.operators.model_training.ScoreBacktestsModelOperator
+   :members:
+```

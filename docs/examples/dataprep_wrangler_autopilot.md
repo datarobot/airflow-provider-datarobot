@@ -1,23 +1,31 @@
 # Dataprep and Autopilot
 
-> **datarobot_provider/examples/dataprep_wrangler_autopilot.py**
+`path: datarobot_provider/examples/dataprep_wrangler_autopilot.py`
 
-```{admonition} Required Feature Flags
+The `dataprep_wrangler_autopilot` DAG demonstrates how to use the DataRobot provider for Apache Airflow to create a project, train a model, and register it to DataRobot MLOps.
+The initial demo flow utilizes a public `.csv` file with hospital readmissions data.
+
+## Requirements
+
 * ENABLE_DATA_REGISTRY_WRANGLING
 * ENABLE_MLOPS
-```
 
-The `dataprep_wrangler_autopilot` DAG demonstrates how to use the DataRobot provider for Apache Airflow to
-create a project, train a model, and register it to DataRobot MLOps. The initial demo flow utilizes a public csv
-file with hospital readmissions data.
+## Input Parameters
 
-This example covers the following steps:
-* Create or reuse a use case
-* Upload a dataset
-* Create a wrangler recipe
-* Publish and run the wrangler recipe
-* Create a new project/experiment in the use case
-* Run autopilot in quick mode
-* Wait for autopilot to complete before continuing
-* Select the top model
-* Register the model for deployment
+_N/A_
+
+## Usage
+
+1. Create or reuse a use case
+2. Upload a dataset
+3. Create a wrangler recipe
+4. Publish and run the wrangler recipe
+5. Create a new project/experiment in the use case
+6. Run autopilot in quick mode
+7. Wait for autopilot to complete before continuing
+8. Select the top model
+9. Register the model for deployment
+
+## Result
+
+You now have a project and model registered with DataRobot MLOps.

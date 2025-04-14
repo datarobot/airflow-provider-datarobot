@@ -22,6 +22,50 @@ from datarobot.models import StatusCheckJob
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
 
+class GetFeaturesUsedOperator(BaseDatarobotOperator):
+    """
+    Get the features used for training the model.
+
+    Args:
+        project_id (str): DataRobot project ID.
+        model_id (str): DataRobot model ID.
+        datarobot_conn_id (str, optional): Connection ID, defaults to `datarobot_default`.
+
+    Returns:
+        List[str]: The names of the features used in the model.
+    """
+
+    # Specify the arguments that are allowed to parse with jinja templating
+    template_fields: Sequence[str] = [
+        "project_id",
+        "model_id",
+    ]
+
+    def __init__(
+        self,
+        *,
+        project_id: str,
+        model_id: str,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.project_id = project_id
+        self.model_id = model_id
+
+    def validate(self) -> None:
+        if not self.project_id:
+            raise ValueError("project_id is required.")
+
+        if not self.model_id:
+            raise ValueError("model_id is required.")
+
+    def execute(self, context: Context) -> List[str]:
+        model = dr.models.Model.get(self.project_id, self.model_id)
+        features = model.get_features_used()
+
+        return features
+
+
 class ComputeFeatureImpactOperator(BaseDatarobotOperator):
     """
     Creates Feature Impact job in DataRobot.
