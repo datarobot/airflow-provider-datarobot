@@ -3,6 +3,8 @@
 ## Unreleased Changes
 
 ## v1.0.0
+- Implement operator for users to upload actuals
+- Documentation improvements and corrections
 
 ## v0.5.0
 - Fix support for datarobot 3.7.0 sdk.
