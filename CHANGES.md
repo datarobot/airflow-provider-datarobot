@@ -2,6 +2,8 @@
 
 ## Unreleased Changes
 
+## v1.0.0
+
 ## v0.5.0
 - Fix support for datarobot 3.7.0 sdk.
 - Implement operators to retrieve target drift and feature drift
