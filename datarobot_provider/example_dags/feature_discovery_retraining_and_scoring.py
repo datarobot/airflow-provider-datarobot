@@ -37,6 +37,7 @@ from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
         "data_connection": "Demo Connection",
         "table_schema": "TRIAL_READONLY",
         "table_name": "LENDING_CLUB_TRANSACTIONS",
+        "dataset_name": "transactions",
     },
 )
 def datarobot_feature_discovery_retraining_and_scoring(
@@ -73,6 +74,7 @@ def datarobot_feature_discovery_retraining_and_scoring(
     transaction_dataset_definition = {
         "identifier": "transactions",
         "catalogId": create_transactions_dataset.output,
+        "snapshotPolicy": "dynamic",
     }
 
     # Define the relationships between the datasets.
@@ -145,7 +147,11 @@ def datarobot_feature_discovery_retraining_and_scoring(
 
     (
         create_use_case
-        >> [upload_primary_dataset, upload_profile_dataset, create_transactions_dataset]
+        >> [
+            upload_primary_dataset,
+            upload_profile_dataset,
+            get_data_store >> create_transactions_dataset,
+        ]
         >> create_feature_discovery_recipe
         >> create_project
         >> train_models

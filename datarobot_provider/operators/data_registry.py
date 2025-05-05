@@ -194,7 +194,7 @@ class UpdateDatasetFromFileOperator(BaseDatarobotOperator):
         return ai_catalog_dataset.version_id
 
 
-class CreateDatasetFromDataStoreOperator(BaseDatarobotOperator):
+class CreateDatasetFromDataStoreOperator(BaseUseCaseEntityOperator):
     """
     Loading dataset from JDBC Connection to DataRobot AI Catalog and return Dataset ID.
 
@@ -259,6 +259,7 @@ class CreateDatasetFromDataStoreOperator(BaseDatarobotOperator):
             max_wait=DATAROBOT_MAX_WAIT_SEC,
         )
         self.log.info(f"Dataset created: dataset_id={ai_catalog_dataset.id}")
+        self.add_into_use_case(ai_catalog_dataset, context=context)
         return ai_catalog_dataset.id
 
 

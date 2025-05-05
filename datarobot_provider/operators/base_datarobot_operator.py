@@ -6,6 +6,7 @@
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
 
+import logging
 from typing import Any
 from typing import Optional
 from typing import Union
@@ -18,6 +19,8 @@ from airflow.utils.context import Context
 from datarobot_provider.constants import DATAROBOT_CONN_ID
 from datarobot_provider.constants import XCOM_DEFAULT_USE_CASE_ID
 from datarobot_provider.hooks.datarobot import DataRobotHook
+
+logger = logging.getLogger(__name__)
 
 
 class BaseDatarobotOperator(BaseOperator):
@@ -58,7 +61,7 @@ class BaseUseCaseEntityOperator(BaseDatarobotOperator):
         super().__init_subclass__(**kwargs)
         if "use_case_id" not in cls.template_fields:
             cls.template_fields = (*cls.template_fields, "use_case_id")
-            cls.logger().info(
+            logger.info(
                 "use_case_id is implicitly added into %s template_fields list.", cls.__name__
             )
 
