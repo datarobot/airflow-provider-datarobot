@@ -2,6 +2,13 @@
 
 ## Unreleased Changes
 
+
+## v1.0.1
+- Don't allow `apache-airflow>=3.0` until the package is compatible.
+- Update `feature_discovery_retraining_and_scoring` example DAG to work with a dynamic dataset.
+- Update `CreateDatasetFromDataStoreOperator` to add a new dataset into use case.
+
+
 ## v1.0.0
 - Add `SubmitActualsOperator` operator for users to upload actuals
 - Documentation improvements and corrections
