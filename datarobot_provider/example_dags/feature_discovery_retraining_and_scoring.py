@@ -11,6 +11,8 @@ from datarobot import AUTOPILOT_MODE
 
 from datarobot_provider.operators.autopilot import StartAutopilotOperator
 from datarobot_provider.operators.data_prep import CreateFeatureDiscoveryRecipeOperator
+from datarobot_provider.operators.data_registry import CreateDatasetFromDataStoreOperator
+from datarobot_provider.operators.data_registry import GetDataStoreOperator
 from datarobot_provider.operators.data_registry import UploadDatasetOperator
 from datarobot_provider.operators.datarobot import CreateProjectOperator
 from datarobot_provider.operators.datarobot import GetOrCreateUseCaseOperator
@@ -30,6 +32,12 @@ from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
         },
         "advanced_options": {"feature_discovery_supervised_feature_reduction": True},
         "deployment_id": "",
+        "do_snapshot": False,
+        "persist_data_after_ingestion": False,
+        "data_connection": "Demo Connection",
+        "table_schema": "TRIAL_READONLY",
+        "table_name": "LENDING_CLUB_TRANSACTIONS",
+        "dataset_name": "transactions",
     },
 )
 def datarobot_feature_discovery_retraining_and_scoring(
@@ -39,28 +47,22 @@ def datarobot_feature_discovery_retraining_and_scoring(
     profile_dataset_path=(
         "https://s3.us-east-1.amazonaws.com/datarobot_public_datasets/LendingClub/profile.csv"
     ),
-    transactions_dataset_path=(
-        "https://s3.us-east-1.amazonaws.com/datarobot_public_datasets/LendingClub/transactions.csv"
-    ),
 ):
     # Create a Use Case to keep all subsequent assets. Default name is "Airflow"
-    create_use_case = GetOrCreateUseCaseOperator(task_id="create_use_case")
+    create_use_case = GetOrCreateUseCaseOperator(task_id="create_use_case", set_default=True)
 
-    # Upload all the datasets into Data Registry.
+    # Upload primary dataset and a static secondary datasets into Data Registry.
     upload_primary_dataset = UploadDatasetOperator(
-        task_id="upload_primary_dataset",
-        file_path=primary_dataset_path,
-        use_case_id=create_use_case.output,
+        task_id="upload_primary_dataset", file_path=primary_dataset_path
     )
     upload_profile_dataset = UploadDatasetOperator(
-        task_id="upload_profile_dataset",
-        file_path=profile_dataset_path,
-        use_case_id=create_use_case.output,
+        task_id="upload_profile_dataset", file_path=profile_dataset_path
     )
-    upload_transactions_dataset = UploadDatasetOperator(
-        task_id="upload_transactions_dataset",
-        file_path=transactions_dataset_path,
-        use_case_id=create_use_case.output,
+
+    # Create a dynamic secondary dataset.
+    get_data_store = GetDataStoreOperator(task_id="get_data_store")
+    create_transactions_dataset = CreateDatasetFromDataStoreOperator(
+        task_id="create_transactions_dataset", data_store_id=get_data_store.output
     )
 
     # Define the secondary datasets for Feature Discovery
@@ -71,7 +73,8 @@ def datarobot_feature_discovery_retraining_and_scoring(
 
     transaction_dataset_definition = {
         "identifier": "transactions",
-        "catalogId": upload_transactions_dataset.output,
+        "catalogId": create_transactions_dataset.output,
+        "snapshotPolicy": "dynamic",
     }
 
     # Define the relationships between the datasets.
@@ -102,7 +105,6 @@ def datarobot_feature_discovery_retraining_and_scoring(
     # Create a Feature Discovery recipe with all the above information.
     create_feature_discovery_recipe = CreateFeatureDiscoveryRecipeOperator(
         dataset_id=upload_primary_dataset.output,
-        use_case_id=create_use_case.output,
         dataset_definitions=dataset_definitions,
         relationships=relationships,
         feature_discovery_settings=feature_discovery_settings,
@@ -111,9 +113,7 @@ def datarobot_feature_discovery_retraining_and_scoring(
 
     # Create and launch a project from the recipe.
     create_project = CreateProjectOperator(
-        recipe_id=create_feature_discovery_recipe.output,
-        use_case_id=create_use_case.output,
-        task_id="create_project",
+        recipe_id=create_feature_discovery_recipe.output, task_id="create_project"
     )
 
     train_models = StartAutopilotOperator(task_id="train_models", project_id=create_project.output)
@@ -142,12 +142,16 @@ def datarobot_feature_discovery_retraining_and_scoring(
     replace_model = ReplaceModelOperator(
         task_id="replace_model",
         new_registered_model_version_id=register_model.output,
-        deployment_id=str("{{ params.deployment_id }}"),
+        deployment_id="{{ params.deployment_id }}",
     )
 
     (
         create_use_case
-        >> [upload_primary_dataset, upload_profile_dataset, upload_transactions_dataset]
+        >> [
+            upload_primary_dataset,
+            upload_profile_dataset,
+            get_data_store >> create_transactions_dataset,
+        ]
         >> create_feature_discovery_recipe
         >> create_project
         >> train_models

@@ -9,4 +9,4 @@
 # affiliates.
 #
 # Released under the terms of DataRobot Tool and Utility Agreement.
-__version__ = "1.0.0"
+__version__ = "1.0.1"

@@ -34,7 +34,7 @@ def get_provider_info() -> ProviderInfoType:
         "package-name": "airflow-provider-datarobot",
         "name": "DataRobot Airflow Provider",
         "description": "DataRobot Airflow provider.",
-        "versions": ["1.0.0"],
+        "versions": ["1.0.1"],
         "connection-types": [
             {
                 "hook-class-name": "datarobot_provider.hooks.datarobot.DataRobotHook",
