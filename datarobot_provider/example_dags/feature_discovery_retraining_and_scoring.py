@@ -51,7 +51,7 @@ def datarobot_feature_discovery_retraining_and_scoring(
     # Create a Use Case to keep all subsequent assets. Default name is "Airflow"
     create_use_case = GetOrCreateUseCaseOperator(task_id="create_use_case", set_default=True)
 
-    # Upload primary dataset and one of secondary datasets into Data Registry.
+    # Upload primary dataset and a static secondary datasets into Data Registry.
     upload_primary_dataset = UploadDatasetOperator(
         task_id="upload_primary_dataset", file_path=primary_dataset_path
     )
@@ -59,7 +59,7 @@ def datarobot_feature_discovery_retraining_and_scoring(
         task_id="upload_profile_dataset", file_path=profile_dataset_path
     )
 
-    # Create dynamic secondary dataset.
+    # Create a dynamic secondary dataset.
     get_data_store = GetDataStoreOperator(task_id="get_data_store")
     create_transactions_dataset = CreateDatasetFromDataStoreOperator(
         task_id="create_transactions_dataset", data_store_id=get_data_store.output
