@@ -77,14 +77,16 @@ def test_operator_update_dataset_from_file(mocker):
 
 
 def test_operator_create_dataset_from_jdbc(mocker):
-    test_params = {
-        "dataset_name": "test_dataset_name",
-        "table_schema": "integration_demo",
-        "table_name": "test_table",
-        "query": 'SELECT * FROM "integration_demo"."test_table"',
-        "persist_data_after_ingestion": True,
-        "do_snapshot": True,
-        "max_wait": 3600,
+    context = {
+        "params": {
+            "dataset_name": "test_dataset_name",
+            "table_schema": "integration_demo",
+            "table_name": "test_table",
+            "query": 'SELECT * FROM "integration_demo"."test_table"',
+            "persist_data_after_ingestion": True,
+            "do_snapshot": True,
+            "max_wait": 3600,
+        }
     }
 
     datasource_params_mock = mocker.Mock(
@@ -105,25 +107,25 @@ def test_operator_create_dataset_from_jdbc(mocker):
     create_jdbc_dataset_mock = mocker.patch.object(
         dr.Dataset, "create_from_data_source", return_value=dataset_mock
     )
+    add_into_use_case_mock = mocker.patch.object(
+        CreateDatasetFromDataStoreOperator, "add_into_use_case"
+    )
 
     operator = CreateDatasetFromDataStoreOperator(
         task_id="load_jdbc_dataset", data_store_id="test", credential_id="test-cred-id"
     )
-    dataset_id = operator.execute(
-        context={
-            "params": test_params,
-        }
-    )
+    dataset_id = operator.execute(context=context)
 
     assert dataset_id == "dataset-id"
 
     create_jdbc_dataset_mock.assert_called_with(
         data_source_id="datasource-id",
         credential_id="test-cred-id",
-        persist_data_after_ingestion=test_params["persist_data_after_ingestion"],
-        do_snapshot=test_params["do_snapshot"],
+        persist_data_after_ingestion=True,
+        do_snapshot=True,
         max_wait=3600,
     )
+    add_into_use_case_mock.assert_called_once_with(dataset_mock, context=context)
 
 
 @pytest.mark.parametrize(
