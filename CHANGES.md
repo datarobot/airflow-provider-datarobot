@@ -2,6 +2,8 @@
 
 ## Unreleased Changes
 
+## v1.0.1
+
 
 ## v1.0.1
 - Don't allow `apache-airflow>=3.0` until the package is compatible.
