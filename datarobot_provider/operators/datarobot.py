@@ -372,7 +372,7 @@ class GetProjectBlueprintsOperator(BaseDatarobotOperator):
             blueprint_ids = [blueprint.id for blueprint in blueprints]
 
         if blueprint_ids is None:
-            raise AirflowFailException("No blueprints found for project_id={self.project_id}")
+            raise AirflowFailException(f"No blueprints found for project_id={self.project_id}")
 
         if self.return_all:
             return blueprint_ids
