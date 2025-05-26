@@ -110,11 +110,19 @@ class NotebookRunOperator(BaseDatarobotOperator):
             raise AirflowException("Notebook should have use_case_id")
 
         # Run the notebook as a manual run of type "pipeline"
-        manual_run = notebook.run(
-            notebook_path=self.notebook_path,
-            parameters=self.parameters,
-            manual_run_type=ManualRunType.PIPELINE,
-        )
+        if hasattr(notebook, "run_as_job"):
+            manual_run = notebook.run_as_job(
+                notebook_path=self.notebook_path,
+                parameters=self.parameters,
+                manual_run_type=ManualRunType.PIPELINE,
+            )
+        else:
+            # TODO: [CFX-2798] Remove this once both versions of early-access packages are in sync
+            manual_run = notebook.run(
+                notebook_path=self.notebook_path,
+                parameters=self.parameters,
+                manual_run_type=ManualRunType.PIPELINE,
+            )
         self.log.info(f"Notebook triggered. Manual run ID: {manual_run.id}")
 
         return manual_run.id
