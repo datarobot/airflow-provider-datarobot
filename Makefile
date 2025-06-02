@@ -9,8 +9,36 @@ else
 	ASTRO_CMD=curl -sSL install.astronomer.io | sudo bash -s
 endif
 
-.PHONY: format format-no-fix lint lint-fix typecheck check-licenses fix-licenses unit-tests
+.PHONY: help
+help:
+	@echo "DataRobot Airflow Provider"
+	@echo "=========================="
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9%-]+:.*?##/ { printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
+	@echo
 
+##@ Linting
+
+.PHONY: lint
+lint:  ## Lint using ruff
+	ruff check .
+
+.PHONY: lint-fix
+lint-fix:  ## Fix using ruff
+	ruff check . --fix
+
+.PHONY: format
+format:  ## Format using ruff
+	ruff format .
+
+.PHONY: format-no-fix
+format-no-fix:  ## Check formatting using ruff
+	ruff format . --check
+
+.PHONY: typecheck
+typecheck:  ## Type check using mypy
+	mypy --config-file pyproject.toml datarobot_provider
+
+##@ Development
 
 .PHONY: clean
 clean:  ## Clean up misc files like pytest and mypy cache for example
@@ -21,62 +49,59 @@ clean:  ## Clean up misc files like pytest and mypy cache for example
 	rm -rf build/* && rm -rf airflow_provider_datarobot.egg-info
 	rm -rf build/* && rm -rf airflow_provider_datarobot_early_access.egg-info
 
-req: clean
+.PHONY: req
+req: clean  ## Install requirements
 	pip install --upgrade setuptools
 	pip install 'pip<24.1'
 	pip install -e .
 
-req-dev: clean
+.PHONY: req-dev
+req-dev: clean  ## Install dev. requirements
 	pip install --upgrade setuptools
 	pip install 'pip<24.1'
 	pip install -e ".[dev]"
 
-req-dev-docs: clean
+.PHONY: req-dev-docs
+req-dev-docs: clean  ## Install dev. and docs. requirements
 	pip install --upgrade setuptools
 	pip install 'pip<24.1'
 	pip install -e ".[dev,docs]"
 
-lint:
-	ruff check .
-
-lint-fix:
-	ruff check . --fix
-
-format:
-	ruff format .
-
-format-no-fix:
-	ruff format . --check
-
+.PHONY: test-harness
 test-harness:
 	pytest -vv tests/unit/ --junit-xml=unit_test_report.xml
 
+.PHONY: unit-tests
 unit-tests:
 	pytest -vv tests/unit/
 
-typecheck:
-	mypy --config-file pyproject.toml datarobot_provider
-
+.PHONY: html-docs
 html-docs:
 	cd docs && $(MAKE) html
 
+.PHONY: test-docs
 test-docs:
 	cd docs && $(MAKE) doctest
 
+.PHONY: test-docs-harness
 test-docs-harness:
 	$(MAKE) test-docs
 
 # Copyright Notices are handled by the next two targets
 # See .licenserc.yaml for configuration
+.PHONY: fix-licenses
 fix-licenses:
 	docker run  --rm -v $(CURDIR):/github/workspace ghcr.io/apache/skywalking-eyes/license-eye:785bb7f3810572d6912666b4f64bad28e4360799 -v info -c .licenserc.yaml header fix
 
+.PHONY: check-licenses
 check-licenses:
 	docker run  --rm -v $(CURDIR):/github/workspace ghcr.io/apache/skywalking-eyes/license-eye:785bb7f3810572d6912666b4f64bad28e4360799 -v info -c .licenserc.yaml header check
 
+.PHONY: install-astro
 install-astro:
 	$(ASTRO_CMD)
 
+.PHONY: create-astro-dev
 create-astro-dev:
 	mkdir astro-dev
 	cd astro-dev && astro dev init
@@ -85,20 +110,25 @@ create-astro-dev:
 	grep -qF -- 'AIRFLOW__CORE__TEST_CONNECTION=Enabled' ./astro-dev/.env || \
 	echo "AIRFLOW__CORE__TEST_CONNECTION=Enabled" >> ./astro-dev/.env
 
+.PHONY: clean-astro-dev
 clean-astro-dev:  ## Completely wipeout an existing development environment and reset it
 	-$(MAKE) kill-astro-dev
 	rm -rf astro-dev
 	$(MAKE) create-astro-dev
 
+.PHONY: start-astro-dev
 start-astro-dev:
 	cd astro-dev && astro dev start --no-cache
 
+.PHONY: stop-astro-dev
 stop-astro-dev:
 	cd astro-dev && astro dev stop
 
+.PHONY: kill-astro-dev
 kill-astro-dev:
 	cd astro-dev && astro dev kill
 
+.PHONY: build-astro-dev
 build-astro-dev:
 	-$(MAKE) stop-astro-dev
 	rm -rf ./dist
@@ -109,6 +139,7 @@ build-astro-dev:
 	$(MAKE) copy-examples-astro-dev
 	$(MAKE) start-astro-dev
 
+.PHONY: build-astro-dev-early-access
 build-astro-dev-early-access:
 	-$(MAKE) stop-astro-dev
 	rm -rf ./dist
@@ -120,14 +151,27 @@ build-astro-dev-early-access:
 	$(MAKE) copy-experimental-examples-astro-dev
 	$(MAKE) start-astro-dev
 
+.PHONY: copy-examples-astro-dev
 copy-examples-astro-dev:
 	cp -r ./datarobot_provider/example_dags/* ./astro-dev/dags/
 
+.PHONY: copy-experimental-examples-astro-dev
 copy-experimental-examples-astro-dev:
 	cp -r ./datarobot_provider/_experimental/example_dags/* ./astro-dev/dags/
 
+.PHONY: autogen-operators
 autogen-operators:
 	python ./datarobot_provider/autogen/generate_operator.py --whitelist ./datarobot_provider/autogen/whitelist.yaml --output_folder ./datarobot_provider/operators/gen
+
+.PHONY: test-development-container
+test-development-container:
+	$(MAKE) install-astro
+	$(MAKE) clean-astro-dev
+	$(MAKE) build-astro-dev
+	chmod +x ./scripts/test_development_container.sh
+	./scripts/test_development_container.sh
+
+##@ Building
 
 .PHONY: build-release
 build-release: clean  ## Make release build
@@ -138,10 +182,3 @@ build-release: clean  ## Make release build
 build-early-access: clean  ## Make early access build
 	pip3 install --no-cache-dir --upgrade pip setuptools wheel twine
 	python setup_early_access.py sdist bdist_wheel
-
-test-development-container:
-	$(MAKE) install-astro
-	$(MAKE) clean-astro-dev
-	$(MAKE) build-astro-dev
-	chmod +x ./scripts/test_development_container.sh
-	./scripts/test_development_container.sh

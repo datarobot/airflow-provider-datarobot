@@ -14,9 +14,15 @@ from typing import Union
 
 from airflow.exceptions import AirflowException
 from airflow.utils.context import Context
-from datarobot._experimental.models.notebooks import Notebook
-from datarobot._experimental.models.notebooks.enums import ManualRunType
-from datarobot._experimental.models.notebooks.session import StartSessionParameters
+
+try:
+    from datarobot.models.notebooks import Notebook
+    from datarobot.models.notebooks.enums import ManualRunType
+    from datarobot.models.notebooks.session import StartSessionParameters
+except ImportError:
+    from datarobot._experimental.models.notebooks import Notebook
+    from datarobot._experimental.models.notebooks.enums import ManualRunType
+    from datarobot._experimental.models.notebooks.session import StartSessionParameters
 
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
