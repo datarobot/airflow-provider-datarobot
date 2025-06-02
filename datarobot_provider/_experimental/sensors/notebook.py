@@ -10,9 +10,15 @@ from typing import Any
 from airflow.exceptions import AirflowException
 from airflow.sensors.base import BaseSensorOperator
 from airflow.utils.context import Context
-from datarobot._experimental.models.notebooks.enums import ScheduledRunStatus
-from datarobot._experimental.models.notebooks.notebook import Notebook
-from datarobot._experimental.models.notebooks.scheduled_job import NotebookScheduledJob
+
+try:
+    from datarobot.models.notebooks.enums import ScheduledRunStatus
+    from datarobot.models.notebooks.notebook import Notebook
+    from datarobot.models.notebooks.scheduled_job import NotebookScheduledJob
+except ImportError:
+    from datarobot._experimental.models.notebooks.enums import ScheduledRunStatus
+    from datarobot._experimental.models.notebooks.notebook import Notebook
+    from datarobot._experimental.models.notebooks.scheduled_job import NotebookScheduledJob
 
 from datarobot_provider.constants import DATAROBOT_CONN_ID
 from datarobot_provider.hooks.datarobot import DataRobotHook
