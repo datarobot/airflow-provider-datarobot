@@ -1,5 +1,6 @@
 # Deployment Prediction Generation
-`path: datarobot_provider/examples/deployment_prediction_generation.py`
+
+`path: datarobot_provider/example_dags/deployment_prediction_generation.py`
 
 This is an example of an Aiflow DAG for DataRobot data deployment and prediction generation.
 This DAG will create a new deployment from a registered model and demonstrate how to generate predictions from the deployment.
@@ -9,6 +10,7 @@ This DAG will create a new deployment from a registered model and demonstrate ho
 * ENABLE_MLOPS
 
 ## Input parameters
+
 | Parameter                     | Data Types | Required | Description                                                                       |
 |-------------------------------|------------|----------|-----------------------------------------------------------------------------------|
 | model_package_id              | str        | Yes      | The ID of the DataRobot model package (version) to deploy.                        |
@@ -33,5 +35,6 @@ This DAG will create a new deployment from a registered model and demonstrate ho
 You now have a new deployment created from a registered model and test making predictions from the new deployment.
 
 ## Troubleshooting
+
 In order to make predictions from a deployment via DataRobot's Prediction API, you need a prediction server ID.
 See [Get a prediction server ID](https://docs.datarobot.com/en/docs/api/reference/predapi/pred-server-id.html){ target=_blank } for more information on how to get the prediction server ID for your organization or deployments.
