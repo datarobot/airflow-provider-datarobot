@@ -2,7 +2,7 @@
 
 `path: datarobot_provider/example_dags/model_training_xgboost.py`
 
-This DAG demonstrates how to use the DataRobot provider for Apache Airflow to wrangle Snowflake data, create a new project, train an XGBoost model from a selected blueprint, and register it to DataRobot MLOps for use as a future deployment.
+This DAG demonstrates how to use the DataRobot provider for Apache Airflow to wrangle Snowflake data, create a new project, train an XGBoost model from a selected blueprint, and register it to DataRobot for use as a future deployment.
 
 ## Requirements
 
