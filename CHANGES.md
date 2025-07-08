@@ -2,6 +2,8 @@
 
 ## Unreleased Changes
 
+## v1.0.2
+
 - As DR Notebooks APIs become GA the DR Python Client will have the Notebooks related classes moved out of the respective '\_experimental' directory. The Notebooks operator and sensor have been updated to work with both import locations for now.
 
 ## v1.0.1
