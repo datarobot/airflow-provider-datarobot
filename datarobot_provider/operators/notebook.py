@@ -14,15 +14,9 @@ from typing import Union
 
 from airflow.exceptions import AirflowException
 from airflow.utils.context import Context
-
-try:
-    from datarobot.models.notebooks import Notebook
-    from datarobot.models.notebooks.enums import ManualRunType
-    from datarobot.models.notebooks.session import StartSessionParameters
-except ImportError:
-    from datarobot._experimental.models.notebooks import Notebook
-    from datarobot._experimental.models.notebooks.enums import ManualRunType
-    from datarobot._experimental.models.notebooks.session import StartSessionParameters
+from datarobot.models.notebooks import Notebook
+from datarobot.models.notebooks.enums import ManualRunType
+from datarobot.models.notebooks.session import StartSessionParameters
 
 from datarobot_provider.operators.base_datarobot_operator import BaseDatarobotOperator
 
@@ -116,19 +110,11 @@ class NotebookRunOperator(BaseDatarobotOperator):
             raise AirflowException("Notebook should have use_case_id")
 
         # Run the notebook as a manual run of type "pipeline"
-        if hasattr(notebook, "run_as_job"):
-            manual_run = notebook.run_as_job(
-                notebook_path=self.notebook_path,
-                parameters=self.parameters,
-                manual_run_type=ManualRunType.PIPELINE,
-            )
-        else:
-            # TODO: [CFX-2798] Remove this once both versions of early-access packages are in sync
-            manual_run = notebook.run(
-                notebook_path=self.notebook_path,
-                parameters=self.parameters,
-                manual_run_type=ManualRunType.PIPELINE,
-            )
+        manual_run = notebook.run_as_job(
+            notebook_path=self.notebook_path,
+            parameters=self.parameters,
+            manual_run_type=ManualRunType.PIPELINE,
+        )
         self.log.info(f"Notebook triggered. Manual run ID: {manual_run.id}")
 
         return manual_run.id

@@ -36,7 +36,7 @@ common_setup_kwargs = dict(
     long_description=None,
     long_description_content_type="text/markdown",
     classifiers=None,
-    install_requires=["apache-airflow>=2.6.0,<3.0", "datarobot>=3.7.0"],
+    install_requires=["apache-airflow>=2.6.0,<3.0", "datarobot>=3.8.0rc1"],
     entry_points={
         "apache_airflow_provider": [
             "provider_info = datarobot_provider.__init__:get_provider_info",
