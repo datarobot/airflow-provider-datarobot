@@ -2,6 +2,8 @@
 
 ## Unreleased Changes
 
+- Add DR Notebooks operator and sensor to the documentation.
+
 ## v1.0.2
 
 - DR Notebooks APIs have become GA in the DR Python Client. The Notebooks related classes have been moved out of the '\_experimental' directory.
