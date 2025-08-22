@@ -8,7 +8,7 @@
 /datarobot_provider/operators/model_package.py           @datarobot/model-management
 /datarobot_provider/operators/model_predictions.py       @datarobot/predictions
 /datarobot_provider/operators/monitoring.py              @datarobot/model-management
-/datarobot_provider/operators/monitoring_job.py          @datarobot/tracking-agent
+/datarobot_provider/operators/monitoring_job.py          @datarobot/model-management
 /datarobot_provider/operators/notebook.py                @datarobot/cfx
 /datarobot_provider/operators/prediction_explanations.py @datarobot/predictive-ai
 /datarobot_provider/sensors/notebook.py                  @datarobot/cfx
