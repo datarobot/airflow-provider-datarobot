@@ -6,7 +6,7 @@
 /datarobot_provider/operators/mlops.py                   @datarobot/model-management
 /datarobot_provider/operators/model_insights.py          @datarobot/predictive-ai
 /datarobot_provider/operators/model_package.py           @datarobot/model-management
-/datarobot_provider/operators/model_predictions.py       @datarobot/predictions
+/datarobot_provider/operators/model_predictions.py       @datarobot/inference-platform
 /datarobot_provider/operators/monitoring.py              @datarobot/model-management
 /datarobot_provider/operators/monitoring_job.py          @datarobot/model-management
 /datarobot_provider/operators/notebook.py                @datarobot/cfx
