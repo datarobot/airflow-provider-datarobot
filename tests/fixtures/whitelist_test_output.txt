@@ -13,9 +13,9 @@ from datarobot_provider.hooks.datarobot import DataRobotHook
 class ModelJobGetOperator(BaseOperator):
     """Fetches one ModelJob. If the job finished, raises PendingJobFinished exception.
 
-    :param project_id: The identifier of the project the model belongs to
+    :param project_id: The identifier of the project the model belongs to.
     :type project_id: str
-    :param model_job_id: The identifier of the model_job
+    :param model_job_id: The identifier of the ``model_job``.
     :type model_job_id: str
     :return: model_job
     :rtype ModelJob

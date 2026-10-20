@@ -33,6 +33,7 @@ ignore = [
     "C408",  # Unnecessary `dict()` call (rewrite as a literal)
     "B018",  # Found useless expression. Either assign it to a variable or remove it.
     "C901",  # Method is too complex
+    "AIR3",  # Airflow 3 migration rules; the provider requires apache-airflow<3.0
 ]
 
 [tool.ruff.lint.isort]

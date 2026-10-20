@@ -230,7 +230,7 @@ class GetTrainedModelParametersOperator(BaseDatarobotOperator):
     def execute(self, context: Context) -> Dict[str, Any]:
         model = dr.Model.get(self.project_id, self.model_id)
         model_parameters: ModelParameters = model.get_parameters()
-        return model_parameters.parameters
+        return model_parameters.parameters  # type: ignore[return-value, unused-ignore]
 
 
 class CrossValidateModelOperator(BaseDatarobotOperator):
@@ -310,4 +310,4 @@ class ScoreBacktestsModelOperator(CrossValidateModelOperator):
         model = dr.DatetimeModel.get(self.project_id, self.model_id)
         job = model.score_backtests()
 
-        return job.id
+        return job.id  # type: ignore[return-value, unused-ignore]
