@@ -135,4 +135,4 @@ class RequestModelPredictionsOperator(BaseDatarobotOperator):
 
         self.log.info(f"Model predictions requested, job_id={predict_job.id}")
 
-        return predict_job.id
+        return predict_job.id  # type: ignore[return-value, unused-ignore]

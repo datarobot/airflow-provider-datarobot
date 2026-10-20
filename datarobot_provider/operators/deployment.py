@@ -368,7 +368,7 @@ class ScorePredictionsOperator(BaseDatarobotOperator):
 
         job = dr.BatchPredictionJob.score(self.deployment_id, **self.score_settings)
         self.log.info(f"Batch Prediction submitted, job.id={job.id}")
-        return job.id
+        return job.id  # type: ignore[return-value, unused-ignore]
 
 
 class ActivateDeploymentOperator(BaseDatarobotOperator):

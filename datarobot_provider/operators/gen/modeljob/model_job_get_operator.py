@@ -59,4 +59,4 @@ class ModelJobGetOperator(BaseOperator):
             self.project_id,
             self.model_job_id,
         )
-        return result.id
+        return result.id  # type: ignore[return-value, unused-ignore]

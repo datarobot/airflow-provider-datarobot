@@ -44,6 +44,7 @@ def new_use_case():
             "models_count": 0,
             "projects_count": 0,
             "datasets_count": 0,
+            "files_count": 0,
             "notebooks_count": 0,
             "applications_count": 0,
             "members": [],

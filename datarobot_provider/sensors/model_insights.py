@@ -61,10 +61,10 @@ class DataRobotJobSensor(BaseSensorOperator):
 
         job = Job.get(project_id=self.project_id, job_id=self.job_id)
 
-        if job.status.lower() in ["error", "abort"]:
+        if job.status.lower() in ["error", "abort"]:  # type: ignore[union-attr, unused-ignore]
             raise AsyncProcessUnsuccessfulError(
                 f"The job did not complete successfully. Job Status: {job.status}"
             )
-        if job.status.lower() == "completed":
+        if job.status.lower() == "completed":  # type: ignore[union-attr, unused-ignore]
             return self.get_job_result(context)
         return False

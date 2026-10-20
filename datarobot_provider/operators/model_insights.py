@@ -110,7 +110,7 @@ class ComputeFeatureImpactOperator(BaseDatarobotOperator):
 
         self.log.info(f"Feature Impact Job submitted, job_id={job.id}")
 
-        return job.id
+        return job.id  # type: ignore[return-value, unused-ignore]
 
 
 class ComputeFeatureEffectsOperator(BaseDatarobotOperator):

@@ -90,4 +90,4 @@ class BatchMonitoringOperator(BaseDatarobotOperator):
 
         self.log.info(f"Monitoring Job submitted job_id={job.id}")
 
-        return job.id
+        return job.id  # type: ignore[return-value, unused-ignore]

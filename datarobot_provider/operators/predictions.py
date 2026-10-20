@@ -76,7 +76,7 @@ class RequestPredictionsOperator(BaseDatarobotOperator):
             predict_job = model.request_predictions(file_path=self.file_path)
 
         self.log.info(f"Model predictions requested, predict_job_id={predict_job.id}")
-        return predict_job.id
+        return predict_job.id  # type: ignore[return-value, unused-ignore]
 
 
 class SavePredictionsToDatasetOperator(BaseDatarobotOperator):

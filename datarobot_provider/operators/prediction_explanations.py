@@ -60,13 +60,13 @@ class PredictionExplanationsInitializationOperator(BaseDatarobotOperator):
 
     def execute(self, context: Context) -> str:
         # Initialize prediction explanations
-        pei_job = dr.PredictionExplanationsInitialization.create(self.project_id, self.model_id)
+        pei_job = dr.PredictionExplanationsInitialization.create(self.project_id, self.model_id)  # type: ignore[arg-type, unused-ignore]
 
         self.log.info(
             f"Triggered prediction explanations initialization of a model, job_id={pei_job.id}"
         )
 
-        return pei_job.id
+        return pei_job.id  # type: ignore[return-value, unused-ignore]
 
 
 class ComputePredictionExplanationsOperator(BaseDatarobotOperator):
@@ -117,9 +117,9 @@ class ComputePredictionExplanationsOperator(BaseDatarobotOperator):
     def execute(self, context: Context) -> str:
         # Creating compute prediction explanations job:
         pe_job = dr.PredictionExplanations.create(
-            self.project_id,
-            self.model_id,
-            self.external_dataset_id,
+            self.project_id,  # type: ignore[arg-type, unused-ignore]
+            self.model_id,  # type: ignore[arg-type, unused-ignore]
+            self.external_dataset_id,  # type: ignore[arg-type, unused-ignore]
             max_explanations=context["params"].get("max_explanations", None),
             threshold_low=context["params"].get("threshold_low", None),
             threshold_high=context["params"].get("threshold_high", None),
@@ -129,4 +129,4 @@ class ComputePredictionExplanationsOperator(BaseDatarobotOperator):
             f"Triggered prediction explanations for the specified dataset, job_id={pe_job.id}"
         )
 
-        return pe_job.id
+        return pe_job.id  # type: ignore[return-value, unused-ignore]
