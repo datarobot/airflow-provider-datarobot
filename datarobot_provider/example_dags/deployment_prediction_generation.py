@@ -21,7 +21,7 @@ from datarobot_provider.operators.monitoring import UpdateDriftTrackingOperator
 from datarobot_provider.sensors.datarobot import ScoringCompleteSensor
 
 """
-Example of Aiflow DAG for DataRobot data deployment and prediction generation.
+Example of Airflow DAG for DataRobot data deployment and prediction generation.
 Configurable parameters for this dag:
 * model_package_id - The ID of the DataRobot model package (version) to deploy.
 * deployment_label - A human readable label of the deployment.

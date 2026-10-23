@@ -2,7 +2,7 @@
 
 `path: datarobot_provider/example_dags/deployment_prediction_generation.py`
 
-This is an example of an Aiflow DAG for DataRobot data deployment and prediction generation.
+This is an example of an Airflow DAG for DataRobot data deployment and prediction generation.
 This DAG will create a new deployment from a registered model and demonstrate how to generate predictions from the deployment.
 
 ## Requirements
