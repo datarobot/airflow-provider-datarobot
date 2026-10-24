@@ -29,7 +29,7 @@ In order to create Prediction Explanations for a particular model and dataset, y
  - Compute feature impact for the model using ComputeFeatureImpactOperator
  - Initialize prediction explanations for the model using PredictionExplanationsInitializationOperator
  - Compute predictions for the model and dataset using RequestModelPredictionsOperator
- - Compute predictions explanations for the model and dataset using ComputePredictionExplanationsOperator
+ - Compute prediction explanations for the model and dataset using ComputePredictionExplanationsOperator
 """
 
 

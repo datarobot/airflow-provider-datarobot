@@ -15,7 +15,7 @@ from airflow.decorators import dag
 from datarobot_provider.operators.custom_function import CustomFunctionOperator
 
 """
-Example of Aiflow DAG to run any custom function in a DAG, in this case a post processing function on predictions.
+Example of Airflow DAG to run any custom function in a DAG, in this case a post processing function on predictions.
 Configurable parameters for this dag:
 * project_id - the project id for the project to use
 * predict_job_id - the predict job id for the predictions to post-process

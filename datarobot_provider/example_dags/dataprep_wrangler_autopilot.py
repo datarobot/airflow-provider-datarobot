@@ -20,7 +20,7 @@ from datarobot_provider.operators.model_registry import CreateRegisteredModelVer
 from datarobot_provider.sensors.datarobot import AutopilotCompleteSensor
 
 """
-Example of Aiflow DAG for DataRobot data preparation and model training.
+Example of Airflow DAG for DataRobot data preparation and model training.
 Configurable parameters for this dag:
 * dataset_file_path - URL or a local path for a csv/parquet/xlsx file.
 * project_name - name of the project as displayed in DataRobot UI.
@@ -49,7 +49,7 @@ def dataprep_wrangler_autopilot():
         task_id="create_recipe",
         dataset_id=upload_dataset.output,
         dialect=dr.enums.DataWranglingDialect.SPARK,
-        # See the list of available *operation* options in the DtaRobot API documentation:
+        # See the list of available *operation* options in the DataRobot API documentation:
         # https://docs.datarobot.com/en/docs/api/reference/public-api/data_wrangling.html#schemaoneofdirective
         # General *operation* structure is:
         # {"directive": <One of dr.enums.WranglingOperations>, "arguments": <dictionary>}

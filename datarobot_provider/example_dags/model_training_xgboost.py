@@ -23,7 +23,7 @@ from datarobot_provider.operators.model_training import TrainModelOperator
 from datarobot_provider.sensors.model_training import ModelTrainingJobSensor
 
 """
-Example of Aiflow DAG to apply db data transformations and train an xgboost model.
+Example of Airflow DAG to apply db data transformations and train an xgboost model.
 Configurable parameters for this dag:
 * data_connection - database connection name you can find at https://app.datarobot.com/account/data-connections
 * table_schema - the database schema to use
